@@ -24,26 +24,26 @@
   []
   (cc/mask-config props :filters [#"(?:irods)[-.](?:user|pass|key|secret)"]))
 
-(cc/defprop-int listen-port
+(cc/defprop-optint listen-port
   "The port that terrain listens to."
   [props config-valid configs]
-  "terrain.app.listen-port")
+  "terrain.app.listen-port" 60000)
 
-(cc/defprop-str environment-name
+(cc/defprop-optstr environment-name
   "The name of the environment that this instance of Terrain belongs to."
   [props config-valid configs]
-  "terrain.app.environment-name")
+  "terrain.app.environment-name" "docker-compose")
 
-(cc/defprop-vec allowed-groups
+(cc/defprop-optvec allowed-groups
   "The names of the groups that are permitted to access secured admin services."
   [props config-valid configs]
-  "terrain.cas.allowed-groups")
+  "terrain.cas.allowed-groups" ["core-services", "tito-admins", "tito-qa-admins", "dev"])
 
-(cc/defprop-str uid-domain
+(cc/defprop-optstr uid-domain
   "The domain name to append to the user identifier to get the fully qualified
    user identifier."
   [props config-valid configs]
-  "terrain.uid.domain")
+  "terrain.uid.domain" "cyverse.org")
 
 (cc/defprop-optboolean admin-routes-enabled
   "Enables or disables the administration routes."
@@ -115,40 +115,40 @@
   [props config-valid configs]
   "terrain.routes.coge" true)
 
-(cc/defprop-str iplant-email-base-url
+(cc/defprop-optstr iplant-email-base-url
   "The base URL to use when connnecting to the iPlant email service."
   [props config-valid configs app-routes-enabled]
-  "terrain.email.base-url")
+  "terrain.email.base-url" "http://iplant-email:60000")
 
-(cc/defprop-str tool-request-dest-addr
+(cc/defprop-optstr tool-request-dest-addr
   "The destination email address for tool request messages."
   [props config-valid configs app-routes-enabled]
-  "terrain.email.tool-request-dest")
+  "terrain.email.tool-request-dest" "tito-request@cyverse.org")
 
-(cc/defprop-str tool-request-src-addr
+(cc/defprop-optstr tool-request-src-addr
   "The source email address for tool request messages."
   [props config-valid configs app-routes-enabled]
-  "terrain.email.tool-request-src")
+  "terrain.email.tool-request-src" "prod-user@cyverse.org")
 
-(cc/defprop-str permanent-id-request-dest-addr
+(cc/defprop-optstr permanent-id-request-dest-addr
   "The destination email address for Permanent ID Request messages."
   [props config-valid configs app-routes-enabled]
-  "terrain.email.perm-id-req.dest")
+  "terrain.email.perm-id-req.dest" "doi@cyverse.org")
 
-(cc/defprop-str permanent-id-request-src-addr
+(cc/defprop-optstr permanent-id-request-src-addr
   "The source email address of Permanent ID Request messages."
   [props config-valid configs app-routes-enabled]
-  "terrain.email.perm-id-req.src")
+  "terrain.email.perm-id-req.src" "prod-user@cyverse.org")
 
-(cc/defprop-str feedback-dest-addr
+(cc/defprop-optstr feedback-dest-addr
   "The destination email address for DE feedback messages."
   [props config-valid configs app-routes-enabled]
-  "terrain.email.feedback-dest")
+  "terrain.email.feedback-dest" "de-feedback@cyverse.org")
 
-(cc/defprop-str apps-base-url
+(cc/defprop-optstr apps-base-url
   "The base URL to use when connecting to secured Apps services."
   [props config-valid configs app-routes-enabled]
-  "terrain.apps.base-url")
+  "terrain.apps.base-url" "http://apps:60000")
 
 (def apps-base
   (memoize
@@ -157,10 +157,10 @@
        (cfg/env-setting "APPS_PORT")
        (apps-base-url)))))
 
-(cc/defprop-str metadata-base-url
+(cc/defprop-optstr metadata-base-url
   "The base URL to use when connecting to the metadata services."
   [props config-valid configs metadata-routes-enabled]
-  "terrain.metadata.base-url")
+  "terrain.metadata.base-url" "http://metadata:60000")
 
 (def metadata-base
   (memoize
@@ -169,10 +169,10 @@
        (cfg/env-setting "METADATA_PORT")
        (metadata-base-url)))))
 
-(cc/defprop-str notificationagent-base-url
+(cc/defprop-optstr notificationagent-base-url
   "The base URL to use when connecting to the notification agent."
   [props config-valid configs notification-routes-enabled]
-  "terrain.notificationagent.base-url")
+  "terrain.notificationagent.base-url" "http://notification-agent:60000")
 
 (def notificationagent-base
   (memoize
@@ -181,141 +181,141 @@
        (cfg/env-setting "NOTIFICATIONAGENT_PORT")
        (notificationagent-base-url)))))
 
-(cc/defprop-str ipg-base
+(cc/defprop-optstr ipg-base
   "The base URL for the iplant-groups service."
   [props config-valid configs]
-  "terrain.iplant-groups.base-url")
+  "terrain.iplant-groups.base-url" "http://iplant-groups:60000")
 
-(cc/defprop-str jex-base-url
+(cc/defprop-optstr jex-base-url
   "The base URL for the JEX."
   [props config-valid configs app-routes-enabled]
-  "terrain.jex.base-url")
+  "terrain.jex.base-url" "http://jex-adapter:60000")
 
 
 ;;;iRODS connection information
-(cc/defprop-str irods-home
+(cc/defprop-optstr irods-home
   "Returns the path to the home directory in iRODS. Usually /iplant/home"
   [props config-valid configs data-routes-enabled]
-  "terrain.irods.home")
+  "terrain.irods.home" "/iplant/home")
 
-(cc/defprop-str irods-user
+(cc/defprop-optstr irods-user
   "Returns the user that porklock should connect as."
   [props config-valid configs data-routes-enabled]
-  "terrain.irods.user")
+  "terrain.irods.user" "rods")
 
-(cc/defprop-str irods-pass
+(cc/defprop-optstr irods-pass
   "Returns the iRODS user's password."
   [props config-valid configs data-routes-enabled]
-  "terrain.irods.pass")
+  "terrain.irods.pass" "notprod")
 
-(cc/defprop-str irods-host
+(cc/defprop-optstr irods-host
   "Returns the iRODS hostname/IP address."
   [props config-valid configs data-routes-enabled]
-  "terrain.irods.host")
+  "terrain.irods.host" "irods")
 
-(cc/defprop-str irods-port
+(cc/defprop-optstr irods-port
   "Returns the iRODS port."
   [props config-valid configs data-routes-enabled]
-  "terrain.irods.port")
+  "terrain.irods.port" "1247")
 
-(cc/defprop-str irods-zone
+(cc/defprop-optstr irods-zone
   "Returns the iRODS zone."
   [props config-valid configs data-routes-enabled]
-  "terrain.irods.zone")
+  "terrain.irods.zone" "iplant")
 
 (cc/defprop-optstr irods-resc
   "Returns the iRODS resource."
   [props config-valid configs data-routes-enabled]
-  "terrain.irods.resc")
+  "terrain.irods.resc" "")
 
-(cc/defprop-int irods-max-retries
+(cc/defprop-optint irods-max-retries
   "The number of retries for failed operations."
   [props config-valid configs data-routes-enabled]
-  "terrain.irods.max-retries")
+  "terrain.irods.max-retries" 10)
 
-(cc/defprop-int irods-retry-sleep
+(cc/defprop-optint irods-retry-sleep
   "The number of milliseconds to sleep between retries."
   [props config-valid configs data-routes-enabled]
-  "terrain.irods.retry-sleep")
+  "terrain.irods.retry-sleep" 1000)
 
-(cc/defprop-boolean irods-use-trash
+(cc/defprop-optboolean irods-use-trash
   "Toggles whether to move deleted files to the trash first."
   [props config-valid configs data-routes-enabled]
-  "terrain.irods.use-trash")
+  "terrain.irods.use-trash" true)
 
-(cc/defprop-vec irods-admins
+(cc/defprop-optvec irods-admins
   "The admin users in iRODS."
   [props config-valid configs fileio-routes-enabled]
-  "terrain.irods.admin-users")
+  "terrain.irods.admin-users" ["rods", "rodsadmin"])
 ;;;End iRODS connection information
 
 ;;; ICAT connection information
-(cc/defprop-str icat-host
+(cc/defprop-optstr icat-host
   "The hostname for the server running the ICAT database."
   [props config-valid configs data-routes-enabled]
-  "terrain.icat.host")
+  "terrain.icat.host" "irods")
 
-(cc/defprop-int icat-port
+(cc/defprop-optint icat-port
   "The port that the ICAT is accepting connections on."
   [props config-valid configs data-routes-enabled]
-  "terrain.icat.port")
+  "terrain.icat.port" 5432)
 
-(cc/defprop-str icat-user
+(cc/defprop-optstr icat-user
   "The user for the ICAT database."
   [props config-valid configs data-routes-enabled]
-  "terrain.icat.user")
+  "terrain.icat.user" "rods")
 
-(cc/defprop-str icat-password
+(cc/defprop-optstr icat-password
   "The password for the ICAT database."
   [props config-valid configs data-routes-enabled]
-  "terrain.icat.password")
+  "terrain.icat.password" "notprod")
 
-(cc/defprop-str icat-db
+(cc/defprop-optstr icat-db
   "The database name for the ICAT database. Yeah, it's most likely going to be 'ICAT'."
   [props config-valid configs data-routes-enabled]
-  "terrain.icat.db")
+  "terrain.icat.db" "ICAT")
 ;;; End ICAT connection information.
 
 ;;; Garnish configuration
-(cc/defprop-str garnish-type-attribute
+(cc/defprop-optstr garnish-type-attribute
   "The value that goes in the attribute column for AVUs that define a file type."
   [props config-valid configs data-routes-enabled]
-  "terrain.garnish.type-attribute")
+  "terrain.garnish.type-attribute" "ipc-filetype")
 ;;; End of Garnish configuration
 
 ;;; File IO configuration
-(cc/defprop-uuid fileio-url-import-app
+(cc/defprop-optuuid fileio-url-import-app
   "The identifier of the internal app used for URL imports."
   [props config-valid configs fileio-routes-enabled]
-  "terrain.fileio.url-import-app")
+  "terrain.fileio.url-import-app" "1E8F719B-0452-4D39-A2F3-8714793EE3E6")
 ;;; End File IO configuration
 
 ;;; Filesystem configuration (a.k.a. data-info).
 
-(cc/defprop-str fs-community-data
+(cc/defprop-optstr fs-community-data
   "The path to the root directory for community data."
   [props config-valid configs filesystem-routes-enabled]
-  "terrain.fs.community-data")
+  "terrain.fs.community-data" "/iplant/home/shared")
 
-(cc/defprop-vec fs-bad-names
+(cc/defprop-optvec fs-bad-names
   "The bad data names."
   [props config-valid configs filesystem-routes-enabled]
-  "terrain.fs.bad-names")
+  "terrain.fs.bad-names" "cacheServiceTempDir")
 
-(cc/defprop-vec fs-perms-filter
+(cc/defprop-optvec fs-perms-filter
   "Hmmm..."
   [props config-valid configs filesystem-routes-enabled]
-  "terrain.fs.perms-filter")
+  "terrain.fs.perms-filter" ["rods", "rodsadmin"])
 
-(cc/defprop-str fs-bad-chars
+(cc/defprop-optstr fs-bad-chars
   "The characters that are considered invalid in iRODS dir- and filenames."
   [props config-valid configs filesystem-routes-enabled]
-  "terrain.fs.bad-chars")
+  "terrain.fs.bad-chars" "\u0060\u0027\u000A\u0009")
 
-(cc/defprop-int fs-max-paths-in-request
+(cc/defprop-optint fs-max-paths-in-request
   "The number of paths that are allowable in an API request."
   [props config-valid configs filesystem-routes-enabled]
-  "terrain.fs.max-paths-in-request")
+  "terrain.fs.max-paths-in-request" 1000)
 
 ;;; End Filesystem configuration
 
@@ -324,10 +324,10 @@
   [props config-valid configs search-routes-enabled]
   "terrain.search.default-limit" 50)
 
-(cc/defprop-str data-info-base-url
+(cc/defprop-optstr data-info-base-url
   "The base URL for the data info service."
   [props config-valid configs filesystem-routes-enabled]
-  "terrain.data-info.base-url")
+  "terrain.data-info.base-url" "http://data-info:60000")
 
 (def data-info-base
   (memoize
@@ -336,141 +336,140 @@
        (cfg/env-setting "DATA_INFO_PORT")
        (data-info-base-url)))))
 
-(cc/defprop-str tree-parser-url
+(cc/defprop-optstr tree-parser-url
   "The URL for the tree parser service."
   [props config-valid configs tree-viewer-routes-enabled]
-  "terrain.tree-viewer.base-url")
+  "terrain.tree-viewer.base-url" "http://portnoy.iplantcollaborative.org/parseTree")
 
-(cc/defprop-str es-url
+(cc/defprop-optstr es-url
   "The URL for Elastic Search"
   [props config-valid configs data-routes-enabled]
-  "terrain.infosquito.es-url")
+  "terrain.infosquito.es-url" "http://elasticsearch:9200")
 
-(cc/defprop-str jwt-private-signing-key
+(cc/defprop-optstr jwt-private-signing-key
   "The path to the private key used for signing JWT assertions."
   [props config-valid configs]
-  "terrain.jwt.signing-key.private")
+  "terrain.jwt.signing-key.private" "/path/to/private-key.pem")
 
-(cc/defprop-str jwt-private-signing-key-password
+(cc/defprop-optstr jwt-private-signing-key-password
   "The password used to access the private key used for signing JWT assertions."
   [props config-valid configs]
-  "terrain.jwt.signing-key.password")
+  "terrain.jwt.signing-key.password" "notprod")
 
-(cc/defprop-str jwt-public-signing-key
+(cc/defprop-optstr jwt-public-signing-key
   "The path to the public key used to validate JWT assertions."
   [props config-valid configs]
-  "terrain.jwt.signing-key.public")
+  "terrain.jwt.signing-key.public" "/path/to/public-key.pem")
 
-(cc/defprop-str jwt-accepted-keys-dir
+(cc/defprop-optstr jwt-accepted-keys-dir
   "The path to the directory containing public signing keys for JWT assertions."
   [props config-valid configs]
-  "terrain.jwt.accepted-keys.dir")
+  "terrain.jwt.accepted-keys.dir" "/path/to/accepted_keys")
 
-(cc/defprop-str jwt-signing-algorithm
+(cc/defprop-optstr jwt-signing-algorithm
   "The algorithm used to sign JWT assertions."
   [props config-valid configs]
-  "terrain.jwt.signing-key.algorithm")
+  "terrain.jwt.signing-key.algorithm" "rs256")
 
-(cc/defprop-int jwt-validity-window-end
+(cc/defprop-optint jwt-validity-window-end
   "The number of seconds before newly created JWT assertions expire."
   [props config-valid configs]
-  "terrain.jwt.validity-window.end")
+  "terrain.jwt.validity-window.end" 300)
 
 (cc/defprop-optstr wso2-jwt-header
   "The name of the HTTP header used by requests forwarded from WSO2."
   [props config-valid configs]
-  "terrain.wso2.jwt-header"
-  "x-jwt-assertion-iplant-org")
+  "terrain.wso2.jwt-header" "x-jwt-assertion-iplant-org")
 
-(cc/defprop-str coge-base-url
+(cc/defprop-optstr coge-base-url
   "The base URL for CoGe services."
   [props config-valid configs coge-enabled]
-  "terrain.coge.base-url")
+  "terrain.coge.base-url" "https://genomevolution.org/coge/api/v1")
 
-(cc/defprop-str coge-data-folder-name
+(cc/defprop-optstr coge-data-folder-name
   "The name of the coge data folder in each user's home folder."
   [props config-valid configs coge-enabled]
-  "terrain.coge.data-folder-name")
+  "terrain.coge.data-folder-name" "coge_data")
 
-(cc/defprop-str coge-user
+(cc/defprop-optstr coge-user
   "The COGE user that needs file sharing permissions for genome viewer services."
   [props config-valid configs coge-enabled]
-  "terrain.coge.user")
+  "terrain.coge.user" "coge")
 
-(cc/defprop-str default-output-dir
+(cc/defprop-optstr default-output-dir
   "The default name of the default job output directory."
   [props config-valid configs]
-  "terrain.job-exec.default-output-folder")
+  "terrain.job-exec.default-output-folder" "analyses")
 
-(cc/defprop-str permanent-id-curators-group
+(cc/defprop-optstr permanent-id-curators-group
   "The data store group that manages permanent ID request data."
   [props config-valid configs]
-  "terrain.permanent-id.curators-group")
+  "terrain.permanent-id.curators-group" "data-curators")
 
-(cc/defprop-str permanent-id-staging-dir
+(cc/defprop-optstr permanent-id-staging-dir
   "The data store directory where user folders are staged for permanent ID requests."
   [props config-valid configs]
-  "terrain.permanent-id.staging-dir")
+  "terrain.permanent-id.staging-dir" "/iplant/home/shared/commons_repo/staging")
 
-(cc/defprop-str permanent-id-publish-dir
+(cc/defprop-optstr permanent-id-publish-dir
   "The data store directory where curated folders with a permanent ID are published."
   [props config-valid configs]
-  "terrain.permanent-id.publish-dir")
+  "terrain.permanent-id.publish-dir" "/iplant/home/shared/commons_repo/curated")
 
-(cc/defprop-str permanent-id-target-base-url
+(cc/defprop-optstr permanent-id-target-base-url
   "The base URL where curated folders with a permanent ID are published."
   [props config-valid configs]
-  "terrain.permanent-id.target-base-url")
+  "terrain.permanent-id.target-base-url" "http://dcr.cyverse.org/browse")
 
-(cc/defprop-str permanent-id-identifier-attr
+(cc/defprop-optstr permanent-id-identifier-attr
   "The metadata attribute where a new permanent ID is stored."
   [props config-valid configs]
-  "terrain.permanent-id.attr.identifier")
+  "terrain.permanent-id.attr.identifier" "Identifier")
 
-(cc/defprop-str permanent-id-alt-identifier-attr
+(cc/defprop-optstr permanent-id-alt-identifier-attr
   "The metadata attribute where a new permanent ID is stored."
   [props config-valid configs]
-  "terrain.permanent-id.attr.alt-identifier")
+  "terrain.permanent-id.attr.alt-identifier" "AlternateIdentifier")
 
-(cc/defprop-str permanent-id-alt-identifier-type-attr
+(cc/defprop-optstr permanent-id-alt-identifier-type-attr
   "The metadata attribute where a new permanent ID is stored."
   [props config-valid configs]
-  "terrain.permanent-id.attr.alt-identifier-type")
+  "terrain.permanent-id.attr.alt-identifier-type" "alternateIdentifierType")
 
-(cc/defprop-str permanent-id-date-attr
+(cc/defprop-optstr permanent-id-date-attr
   "The metadata attribute where a permanent ID request's publication year is set."
   [props config-valid configs]
-  "terrain.permanent-id.attr.publication-year")
+  "terrain.permanent-id.attr.publication-year" "datacite.publicationyear")
 
-(cc/defprop-str ezid-base-url
+(cc/defprop-optstr ezid-base-url
   "The EZID API base URL."
   [props config-valid configs]
-  "terrain.permanent-id.ezid.base-url")
+  "terrain.permanent-id.ezid.base-url" "https://ezid.cdlib.org")
 
-(cc/defprop-str ezid-username
+(cc/defprop-optstr ezid-username
   "The EZID API account username."
   [props config-valid configs]
-  "terrain.permanent-id.ezid.username")
+  "terrain.permanent-id.ezid.username" "apitest")
 
-(cc/defprop-str ezid-password
+(cc/defprop-optstr ezid-password
   "The EZID API account password."
   [props config-valid configs]
-  "terrain.permanent-id.ezid.password")
+  "terrain.permanent-id.ezid.password" "notprod")
 
-(cc/defprop-str ezid-shoulders-ark
+(cc/defprop-optstr ezid-shoulders-ark
   "The EZID ARK shoulder or namespace."
   [props config-valid configs]
-  "terrain.permanent-id.ezid.shoulders.ark")
+  "terrain.permanent-id.ezid.shoulders.ark" "ark:/99999/fk4")
 
-(cc/defprop-str ezid-shoulders-doi
+(cc/defprop-optstr ezid-shoulders-doi
   "The EZID DOI shoulder or namespace."
   [props config-valid configs]
-  "terrain.permanent-id.ezid.shoulders.doi")
+  "terrain.permanent-id.ezid.shoulders.doi" "doi:10.5072/FK2")
 
-(cc/defprop-str prefs-base-url
+(cc/defprop-optstr prefs-base-url
   "The hostname of the user-preferences service"
   [props config-valid configs]
-  "terrain.preferences.host")
+  "terrain.preferences.host" "http://user-preferences:60000")
 
 (def prefs-base
   (memoize
@@ -479,10 +478,10 @@
        (cfg/env-setting "USER_PREFERENCES_PORT")
        (prefs-base-url)))))
 
-(cc/defprop-str sessions-base-url
+(cc/defprop-optstr sessions-base-url
   "The hostname of the user-sessions service"
   [props config-valid configs]
-  "terrain.sessions.host")
+  "terrain.sessions.host" "http://user-sessions:60000")
 
 (def sessions-base
   (memoize
@@ -491,10 +490,10 @@
        (cfg/env-setting "USER_SESSIONS_PORT")
        (sessions-base-url)))))
 
-(cc/defprop-str saved-searches-base-url
+(cc/defprop-optstr saved-searches-base-url
   "The base URL of the saved-searches service"
   [props config-valid configs]
-  "terrain.saved-searches.host")
+  "terrain.saved-searches.host" "http://saved-searches:60000")
 
 (def saved-searches-base
   (memoize
@@ -503,10 +502,10 @@
        (cfg/env-setting "SAVED_SEARCHES_PORT")
        (saved-searches-base-url)))))
 
-(cc/defprop-str tree-urls-base-url
+(cc/defprop-optstr tree-urls-base-url
   "The base URL of the tree-urls service"
   [props config-valid configs]
-  "terrain.tree-urls.host")
+  "terrain.tree-urls.host" "http://tree-urls:60000")
 
 (def tree-urls-base
   (memoize
