@@ -349,7 +349,7 @@
 (cc/defprop-optstr jwt-private-signing-key
   "The path to the private key used for signing JWT assertions."
   [props config-valid configs]
-  "terrain.jwt.signing-key.private" "/path/to/private-key.pem")
+  "terrain.jwt.signing-key.private" "/etc/iplant/crypto/private-key.pem")
 
 (cc/defprop-optstr jwt-private-signing-key-password
   "The password used to access the private key used for signing JWT assertions."
@@ -359,12 +359,12 @@
 (cc/defprop-optstr jwt-public-signing-key
   "The path to the public key used to validate JWT assertions."
   [props config-valid configs]
-  "terrain.jwt.signing-key.public" "/path/to/public-key.pem")
+  "terrain.jwt.signing-key.public" "/etc/iplant/crypto/public-key.pem")
 
 (cc/defprop-optstr jwt-accepted-keys-dir
   "The path to the directory containing public signing keys for JWT assertions."
   [props config-valid configs]
-  "terrain.jwt.accepted-keys.dir" "/path/to/accepted_keys")
+  "terrain.jwt.accepted-keys.dir" "/etc/iplant/crypto/accepted_keys")
 
 (cc/defprop-optstr jwt-signing-algorithm
   "The algorithm used to sign JWT assertions."
