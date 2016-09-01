@@ -41,9 +41,12 @@
                  [org.iplantc/kameleon "5.2.8.0"]
                  [org.iplantc/heuristomancer "5.2.8.0"]
                  [org.iplantc/service-logging "5.2.8.0"]]
+  :eastwood {:exclude-namespaces [terrain.util.jwt :test-paths]
+             :linters [:wrong-arity :wrong-ns-form :wrong-pre-post :wrong-tag :misplaced-docstrings]}
   :plugins [[lein-ring "0.9.2" :exclusions [org.clojure/clojure]]
             [swank-clojure "1.4.2" :exclusions [org.clojure/clojure]]
-            [test2junit "1.1.3"]]
+            [test2junit "1.1.3"]
+            [jonase/eastwood "0.2.3"]]
   :profiles {:dev     {:resource-paths ["conf/test"]}
              :uberjar {:aot :all}}
   :main ^:skip-aot terrain.core
