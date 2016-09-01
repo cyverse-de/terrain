@@ -39,11 +39,11 @@
   [props config-valid configs]
   "terrain.cas.allowed-groups" ["core-services", "tito-admins", "tito-qa-admins", "dev"])
 
-(cc/defprop-optstr uid-domain
+(cc/defprop-str uid-domain
   "The domain name to append to the user identifier to get the fully qualified
    user identifier."
   [props config-valid configs]
-  "terrain.uid.domain" "cyverse.org")
+  "terrain.uid.domain")
 
 (cc/defprop-optboolean admin-routes-enabled
   "Enables or disables the administration routes."
@@ -120,30 +120,30 @@
   [props config-valid configs app-routes-enabled]
   "terrain.email.base-url" "http://iplant-email:60000")
 
-(cc/defprop-optstr tool-request-dest-addr
+(cc/defprop-str tool-request-dest-addr
   "The destination email address for tool request messages."
   [props config-valid configs app-routes-enabled]
-  "terrain.email.tool-request-dest" "tito-request@cyverse.org")
+  "terrain.email.tool-request-dest")
 
-(cc/defprop-optstr tool-request-src-addr
+(cc/defprop-str tool-request-src-addr
   "The source email address for tool request messages."
   [props config-valid configs app-routes-enabled]
-  "terrain.email.tool-request-src" "prod-user@cyverse.org")
+  "terrain.email.tool-request-src")
 
-(cc/defprop-optstr permanent-id-request-dest-addr
+(cc/defprop-str permanent-id-request-dest-addr
   "The destination email address for Permanent ID Request messages."
   [props config-valid configs app-routes-enabled]
-  "terrain.email.perm-id-req.dest" "doi@cyverse.org")
+  "terrain.email.perm-id-req.dest")
 
-(cc/defprop-optstr permanent-id-request-src-addr
+(cc/defprop-str permanent-id-request-src-addr
   "The source email address of Permanent ID Request messages."
   [props config-valid configs app-routes-enabled]
-  "terrain.email.perm-id-req.src" "prod-user@cyverse.org")
+  "terrain.email.perm-id-req.src")
 
-(cc/defprop-optstr feedback-dest-addr
+(cc/defprop-str feedback-dest-addr
   "The destination email address for DE feedback messages."
   [props config-valid configs app-routes-enabled]
-  "terrain.email.feedback-dest" "de-feedback@cyverse.org")
+  "terrain.email.feedback-dest")
 
 (cc/defprop-optstr apps-base-url
   "The base URL to use when connecting to secured Apps services."
@@ -416,10 +416,10 @@
   [props config-valid configs]
   "terrain.permanent-id.publish-dir" "/iplant/home/shared/commons_repo/curated")
 
-(cc/defprop-optstr permanent-id-target-base-url
+(cc/defprop-str permanent-id-target-base-url
   "The base URL where curated folders with a permanent ID are published."
   [props config-valid configs]
-  "terrain.permanent-id.target-base-url" "http://dcr.cyverse.org/browse")
+  "terrain.permanent-id.target-base-url")
 
 (cc/defprop-optstr permanent-id-identifier-attr
   "The metadata attribute where a new permanent ID is stored."
