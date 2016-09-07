@@ -134,13 +134,6 @@
                 :as               :stream
                 :follow-redirects false}))
 
-(defn list-app-ids
-  []
-  (client/get (apps-url "apps" "ids")
-              {:query-params     (secured-params)
-               :as               :stream
-               :follow-redirects false}))
-
 (defn delete-apps
   [deletion-request]
   (client/post (apps-url "apps" "shredder")
