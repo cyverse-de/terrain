@@ -16,18 +16,18 @@
   :uberjar-name "terrain-standalone.jar"
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [org.clojure/tools.nrepl "0.2.12"]
-                 [cheshire "5.5.0"]
+                 [cheshire "5.6.3"]
                  [clj-http "2.0.0"]
-                 [clj-time "0.11.0"]
+                 [clj-time "0.12.0"]
                  [clojurewerkz/elastisch "2.2.0"]
                  [com.cemerick/url "0.1.1" :exclusions [com.cemerick/clojurescript.test]]
                  [commons-net "3.4"]                               ; provides org.apache.commons.net
-                 [compojure "1.4.0"]
-                 [metosin/compojure-api "0.24.5"]  ; should be held to the same version as the one
+                 [compojure "1.5.1"]
+                 [metosin/compojure-api "1.1.8"]   ; should be held to the same version as the one
                                                    ; used by org.iplantc/clojure-commons
                  [dire "0.5.3"]
                  [me.raynes/fs "1.4.6"]
-                 [medley "0.7.0"]
+                 [medley "0.8.2"]
                  [org.apache.tika/tika-core "1.11"]      ; provides org.apache.tika
                  [org.nexml.model/nexml "1.5-SNAPSHOT"]  ; provides org.nexml.model
                  [org.biojava.thirdparty/forester "1.005" ]
