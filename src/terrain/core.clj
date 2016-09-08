@@ -122,7 +122,7 @@
 (def svc-info
   {:desc "DE service for business logic"
    :app-name "terrain"
-   :group-id "org.iplantc"
+   :group-id "org.cyverse"
    :art-id "terrain"
    :service "terrain"})
 

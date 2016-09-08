@@ -7,9 +7,9 @@
       (string/trim (:out (sh "git" "rev-parse" "HEAD")))
       ""))
 
-(defproject org.iplantc/terrain "5.2.8.0-SNAPSHOT"
-  :description "Framework for hosting DiscoveryEnvironment metadata services."
-  :url "https://github.com/cyverse/DE"
+(defproject org.cyverse/terrain "2.8.1-SNAPSHOT"
+  :description "Discovery Environment API gateway/API services catch-all project"
+  :url "https://github.com/cyverse-de/terrain"
   :license {:name "BSD Standard License"
             :url "http://www.iplantcollaborative.org/sites/default/files/iPLANT-LICENSE.txt"}
   :manifest {"Git-Ref" ~(git-ref)}
@@ -32,15 +32,15 @@
                  [org.nexml.model/nexml "1.5-SNAPSHOT"]  ; provides org.nexml.model
                  [org.biojava.thirdparty/forester "1.005" ]
                  [slingshot "0.12.2"]
-                 [org.iplantc/clj-icat-direct "5.2.8.0"]
-                 [org.iplantc/clj-jargon "5.2.8.0"]
-                 [org.iplantc/clojure-commons "5.2.8.0"]
-                 [org.iplantc/tree-urls-client "5.2.8.0"]
-                 [org.iplantc/common-cfg "5.2.8.0"]
-                 [org.iplantc/common-cli "5.2.8.0"]
-                 [org.iplantc/kameleon "5.2.8.0"]
-                 [org.iplantc/heuristomancer "5.2.8.0"]
-                 [org.iplantc/service-logging "5.2.8.0"]]
+                 [org.cyverse/clj-icat-direct "2.8.0"]
+                 [org.cyverse/clj-jargon "2.8.0"]
+                 [org.cyverse/clojure-commons "2.8.0"]
+                 [org.cyverse/tree-urls-client "2.8.0"]
+                 [org.cyverse/common-cfg "2.8.0"]
+                 [org.cyverse/common-cli "2.8.0"]
+                 [org.cyverse/kameleon "2.8.0"]
+                 [org.cyverse/heuristomancer "2.8.0"]
+                 [org.cyverse/service-logging "2.8.0"]]
   :eastwood {:exclude-namespaces [terrain.util.jwt :test-paths]
              :linters [:wrong-arity :wrong-ns-form :wrong-pre-post :wrong-tag :misplaced-docstrings]}
   :plugins [[lein-ring "0.9.2" :exclusions [org.clojure/clojure]]
