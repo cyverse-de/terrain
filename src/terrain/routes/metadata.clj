@@ -1,6 +1,5 @@
 (ns terrain.routes.metadata
   (:use [compojure.core]
-        [terrain.services.file-listing]
         [terrain.services.metadata.apps]
         [terrain.util])
   (:require [terrain.clients.apps.raw :as apps]
@@ -391,12 +390,6 @@
 
    (GET "/logout" [:as {params :params}]
         (logout params))
-
-   (GET "/default-output-dir" []
-        (get-default-output-dir))
-
-   (POST "/default-output-dir" [:as {body :body}]
-         (reset-default-output-dir body))
 
    (PUT "/feedback" [:as {body :body}]
         (provide-user-feedback body))))

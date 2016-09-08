@@ -54,18 +54,6 @@
   (cup/delete-prefs (:username current-user))
   (success-response))
 
-(defn save-default-output-dir
-  "Saves the path to the user's default output folder in the user's preferences."
-  [user path]
-  (user-prefs user (output-dir/add-default-output-dir (user-prefs user) path)))
-
-(defn get-default-output-dir
-  "Gets the path to the user's default output folder from the user's preferences."
-  []
-  (-> (:username current-user)
-      (user-prefs)
-      (output-dir/extract-default-output-dir)))
-
 (defn do-get-prefs
   []
   (success-response (user-prefs (:username current-user))))
