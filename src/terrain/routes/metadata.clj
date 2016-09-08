@@ -139,9 +139,6 @@
     (POST "/apps/arg-preview" [:as {:keys [body]}]
           (service/success-response (apps/preview-args body)))
 
-    (GET "/apps/ids" []
-         (service/success-response (apps/list-app-ids)))
-
     (GET "/apps/elements" [:as {:keys [params]}]
          (service/success-response (apps/get-all-workflow-elements params)))
 
