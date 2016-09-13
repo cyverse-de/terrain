@@ -133,11 +133,11 @@
     (GET "/apps" [:as {params :params}]
          (service/success-response (apps/search-apps params)))
 
-    (POST "/apps" [:as {:keys [body]}]
-          (service/success-response (apps/create-app body)))
+    (POST "/apps/:system-id" [system-id :as {:keys [body]}]
+          (service/success-response (apps/create-app system-id body)))
 
-    (POST "/apps/arg-preview" [:as {:keys [body]}]
-          (service/success-response (apps/preview-args body)))
+    (POST "/apps/:system-id/arg-preview" [system-id :as {:keys [body]}]
+          (service/success-response (apps/preview-args system-id body)))
 
     (GET "/apps/elements" [:as {:keys [params]}]
          (service/success-response (apps/get-all-workflow-elements params)))
@@ -224,7 +224,9 @@
          (service/success-response (apps/get-tools-in-app app-id)))
 
     (GET "/apps/:app-id/ui" [app-id]
-         (service/success-response (apps/get-app-ui app-id)))))
+      (service/success-response (apps/get-app-ui app-id)))
+
+    ()))
 
 (defn admin-app-avu-routes
   []

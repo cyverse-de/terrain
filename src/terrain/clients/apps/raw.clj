@@ -117,8 +117,8 @@
                :follow-redirects false}))
 
 (defn create-app
-  [app]
-  (client/post (apps-url "apps")
+  [system-id app]
+  (client/post (apps-url "apps" system-id)
                {:query-params     (secured-params)
                 :body             app
                 :content-type     :json
@@ -126,8 +126,8 @@
                 :follow-redirects false}))
 
 (defn preview-args
-  [app]
-  (client/post (apps-url "apps" "arg-preview")
+  [system-id app]
+  (client/post (apps-url "apps" system-id "arg-preview")
                {:query-params     (secured-params)
                 :body             app
                 :content-type     :json
