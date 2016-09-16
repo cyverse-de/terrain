@@ -169,8 +169,8 @@
    (POST "/apps/unsharing" [:as {:keys [body]}]
      (service/success-response (apps/unshare body)))
 
-   (GET "/apps/:app-id" [app-id]
-     (service/success-response (apps/get-app app-id)))
+   (GET "/apps/:system-id/:app-id" [system-id app-id]
+     (service/success-response (apps/get-app system-id app-id)))
 
    (DELETE "/apps/:app-id" [app-id]
      (service/success-response (apps/delete-app app-id)))
