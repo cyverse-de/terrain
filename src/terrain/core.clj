@@ -130,10 +130,10 @@
   []
   (util/flagged-routes
     (app-category-routes)
-    (apps-routes)
     (app-avu-routes)
     (app-comment-routes)
     (app-ontology-routes)
+    (apps-routes)
     (analysis-routes)
     (coge-routes)
     (reference-genomes-routes)
