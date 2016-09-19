@@ -175,8 +175,8 @@
    (DELETE "/apps/:system-id/:app-id" [system-id app-id]
      (service/success-response (apps/delete-app system-id app-id)))
 
-   (PATCH "/apps/:app-id" [app-id :as {:keys [body]}]
-          (service/success-response (apps/relabel-app app-id body)))
+   (PATCH "/apps/:system-id/:app-id" [system-id app-id :as {:keys [body]}]
+          (service/success-response (apps/relabel-app system-id app-id body)))
 
    (PUT "/apps/:app-id" [app-id :as {:keys [body]}]
      (service/success-response (apps/update-app app-id body)))

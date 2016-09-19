@@ -185,8 +185,8 @@
                   :follow-redirects false}))
 
 (defn relabel-app
-  [app-id relabel-request]
-  (client/patch (apps-url "apps" app-id)
+  [system-id app-id relabel-request]
+  (client/patch (apps-url "apps" system-id app-id)
                 {:query-params     (secured-params)
                  :body             relabel-request
                  :content-type     :json
