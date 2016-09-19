@@ -178,8 +178,8 @@
                :follow-redirects false}))
 
 (defn delete-app
-  [app-id]
-  (client/delete (apps-url "apps" app-id)
+  [system-id app-id]
+  (client/delete (apps-url "apps" system-id app-id)
                  {:query-params     (secured-params)
                   :as               :stream
                   :follow-redirects false}))

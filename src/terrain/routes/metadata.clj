@@ -133,12 +133,6 @@
    (GET "/apps" [:as {params :params}]
      (service/success-response (apps/search-apps params)))
 
-   (POST "/apps/:system-id" [system-id :as {:keys [body]}]
-     (service/success-response (apps/create-app system-id body)))
-
-   (POST "/apps/:system-id/arg-preview" [system-id :as {:keys [body]}]
-     (service/success-response (apps/preview-args system-id body)))
-
    (GET "/apps/elements" [:as {:keys [params]}]
      (service/success-response (apps/get-all-workflow-elements params)))
 
@@ -169,11 +163,17 @@
    (POST "/apps/unsharing" [:as {:keys [body]}]
      (service/success-response (apps/unshare body)))
 
+   (POST "/apps/:system-id" [system-id :as {:keys [body]}]
+     (service/success-response (apps/create-app system-id body)))
+
+   (POST "/apps/:system-id/arg-preview" [system-id :as {:keys [body]}]
+     (service/success-response (apps/preview-args system-id body)))
+
    (GET "/apps/:system-id/:app-id" [system-id app-id]
      (service/success-response (apps/get-app system-id app-id)))
 
-   (DELETE "/apps/:app-id" [app-id]
-     (service/success-response (apps/delete-app app-id)))
+   (DELETE "/apps/:system-id/:app-id" [system-id app-id]
+     (service/success-response (apps/delete-app system-id app-id)))
 
    (PATCH "/apps/:app-id" [app-id :as {:keys [body]}]
           (service/success-response (apps/relabel-app app-id body)))
