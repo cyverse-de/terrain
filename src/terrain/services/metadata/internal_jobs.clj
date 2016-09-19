@@ -14,7 +14,7 @@
 
 (defn- load-param-map
   [app-id]
-  (->> (apps/get-app app-id)
+  (->> (apps/get-app config/de-system-id app-id)
        (:groups)
        (mapcat :parameters)
        (map (juxt :label :id))

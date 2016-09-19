@@ -4,8 +4,8 @@
             [terrain.util.service :as service]))
 
 (defn get-app
-  [app-id]
-  (->> (raw/get-app app-id)
+  [system-id app-id]
+  (->> (raw/get-app system-id app-id)
        (:body)
        (service/decode-json)))
 
