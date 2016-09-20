@@ -10,8 +10,8 @@
        (service/decode-json)))
 
 (defn get-app-details
-  [app-id]
-  (->> (raw/get-app-details app-id)
+  [system-id app-id]
+  (->> (raw/get-app-details system-id app-id)
        (:body)
        (service/decode-json)))
 

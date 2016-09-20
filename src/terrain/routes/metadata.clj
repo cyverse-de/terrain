@@ -184,8 +184,8 @@
    (POST "/apps/:system-id/:app-id/copy" [system-id app-id]
      (service/success-response (apps/copy-app system-id app-id)))
 
-   (GET "/apps/:app-id/details" [app-id]
-     (service/success-response (apps/get-app-details app-id)))
+   (GET "/apps/:system-id/:app-id/details" [system-id app-id]
+     (service/success-response (apps/get-app-details system-id app-id)))
 
    (GET "/apps/:app-id/documentation" [app-id]
      (service/success-response (apps/get-app-docs app-id)))
