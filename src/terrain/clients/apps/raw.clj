@@ -537,8 +537,8 @@
                  :follow-redirects false}))
 
 (defn get-app-docs
-  [app-id]
-  (client/get (apps-url "apps" app-id "documentation")
+  [system-id app-id]
+  (client/get (apps-url "apps" system-id app-id "documentation")
               {:query-params     (secured-params)
                :as               :stream
                :follow-redirects false}))

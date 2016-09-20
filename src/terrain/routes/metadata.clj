@@ -187,8 +187,8 @@
    (GET "/apps/:system-id/:app-id/details" [system-id app-id]
      (service/success-response (apps/get-app-details system-id app-id)))
 
-   (GET "/apps/:app-id/documentation" [app-id]
-     (service/success-response (apps/get-app-docs app-id)))
+   (GET "/apps/:system-id/:app-id/documentation" [system-id app-id]
+     (service/success-response (apps/get-app-docs system-id app-id)))
 
    (POST "/apps/:app-id/documentation" [app-id :as {:keys [body]}]
      (service/success-response (apps/add-app-docs app-id body)))
