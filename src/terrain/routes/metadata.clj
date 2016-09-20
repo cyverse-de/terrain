@@ -202,8 +202,8 @@
    (PUT "/apps/:app-id/favorite" [app-id]
      (service/success-response (apps/add-favorite-app app-id)))
 
-   (GET "/apps/:app-id/integration-data" [app-id]
-     (service/success-response (apps/get-app-integration-data app-id)))
+   (GET "/apps/:system-id/:app-id/integration-data" [system-id app-id]
+     (service/success-response (apps/get-app-integration-data system-id app-id)))
 
    (GET "/apps/:app-id/is-publishable" [app-id]
      (service/success-response (apps/app-publishable? app-id)))
