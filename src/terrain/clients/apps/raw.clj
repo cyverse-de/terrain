@@ -786,8 +786,8 @@
                   :follow-redirects false}))
 
 (defn get-app-integration-data
-  [app-id]
-  (client/get (apps-url "apps" app-id "integration-data")
+  [system-id app-id]
+  (client/get (apps-url "apps" system-id app-id "integration-data")
               {:query-params     (secured-params)
                :as               :stream
                :follow-redirects false}))
