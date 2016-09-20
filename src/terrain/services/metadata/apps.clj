@@ -55,7 +55,7 @@
     (success-response
       {:workspaceId   (:id @workspace)
        :newWorkspace  (:new_workspace @workspace)
-       :loginTime     (str (:login-time @login-record))
+       :loginTime     (str (:login_time @login-record))
        :username      user
        :full_username username
        :email         (:email current-user)
