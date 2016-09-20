@@ -194,8 +194,8 @@
                  :follow-redirects false}))
 
 (defn update-app
-  [app-id update-request]
-  (client/put (apps-url "apps" app-id)
+  [system-id app-id update-request]
+  (client/put (apps-url "apps" system-id app-id)
               {:query-params     (secured-params)
                :body             update-request
                :content-type     :json

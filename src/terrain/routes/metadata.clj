@@ -178,8 +178,8 @@
    (PATCH "/apps/:system-id/:app-id" [system-id app-id :as {:keys [body]}]
           (service/success-response (apps/relabel-app system-id app-id body)))
 
-   (PUT "/apps/:app-id" [app-id :as {:keys [body]}]
-     (service/success-response (apps/update-app app-id body)))
+   (PUT "/apps/:system-id/:app-id" [system-id app-id :as {:keys [body]}]
+     (service/success-response (apps/update-app system-id app-id body)))
 
    (POST "/apps/:app-id/copy" [app-id]
      (service/success-response (apps/copy-app app-id)))
