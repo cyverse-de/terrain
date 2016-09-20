@@ -6,6 +6,7 @@
             [common-cfg.cfg :as cfg]
             [clojure.tools.logging :as log]))
 
+(def de-system-id "de")
 
 (def ^:private props
   "A ref for storing the configuration properties."

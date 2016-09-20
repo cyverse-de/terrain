@@ -117,8 +117,8 @@
                :follow-redirects false}))
 
 (defn create-app
-  [app]
-  (client/post (apps-url "apps")
+  [system-id app]
+  (client/post (apps-url "apps" system-id)
                {:query-params     (secured-params)
                 :body             app
                 :content-type     :json
@@ -126,8 +126,8 @@
                 :follow-redirects false}))
 
 (defn preview-args
-  [app]
-  (client/post (apps-url "apps" "arg-preview")
+  [system-id app]
+  (client/post (apps-url "apps" system-id "arg-preview")
                {:query-params     (secured-params)
                 :body             app
                 :content-type     :json
@@ -171,22 +171,22 @@
                 :follow-redirects false}))
 
 (defn get-app
-  [app-id]
-  (client/get (apps-url "apps" app-id)
+  [system-id app-id]
+  (client/get (apps-url "apps" system-id app-id)
               {:query-params     (secured-params)
                :as               :stream
                :follow-redirects false}))
 
 (defn delete-app
-  [app-id]
-  (client/delete (apps-url "apps" app-id)
+  [system-id app-id]
+  (client/delete (apps-url "apps" system-id app-id)
                  {:query-params     (secured-params)
                   :as               :stream
                   :follow-redirects false}))
 
 (defn relabel-app
-  [app-id relabel-request]
-  (client/patch (apps-url "apps" app-id)
+  [system-id app-id relabel-request]
+  (client/patch (apps-url "apps" system-id app-id)
                 {:query-params     (secured-params)
                  :body             relabel-request
                  :content-type     :json
@@ -194,8 +194,8 @@
                  :follow-redirects false}))
 
 (defn update-app
-  [app-id update-request]
-  (client/put (apps-url "apps" app-id)
+  [system-id app-id update-request]
+  (client/put (apps-url "apps" system-id app-id)
               {:query-params     (secured-params)
                :body             update-request
                :content-type     :json
@@ -786,8 +786,8 @@
                   :follow-redirects false}))
 
 (defn get-app-integration-data
-  [app-id]
-  (client/get (apps-url "apps" app-id "integration-data")
+  [system-id app-id]
+  (client/get (apps-url "apps" system-id app-id "integration-data")
               {:query-params     (secured-params)
                :as               :stream
                :follow-redirects false}))

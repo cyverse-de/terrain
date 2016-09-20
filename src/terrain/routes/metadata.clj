@@ -11,34 +11,34 @@
 (defn app-category-routes
   []
   (optional-routes
-    [config/app-routes-enabled]
+   [config/app-routes-enabled]
 
-    (GET "/apps/categories" [:as {params :params}]
-         (service/success-response (apps/get-app-categories params)))
+   (GET "/apps/categories" [:as {params :params}]
+     (service/success-response (apps/get-app-categories params)))
 
-    (GET "/apps/categories/:category-id" [category-id :as {params :params}]
-         (service/success-response (apps/apps-in-category category-id params)))))
+   (GET "/apps/categories/:category-id" [category-id :as {params :params}]
+     (service/success-response (apps/apps-in-category category-id params)))))
 
 (defn admin-category-routes
   []
   (optional-routes
-    [#(and (config/admin-routes-enabled)
-           (config/app-routes-enabled))]
+   [#(and (config/admin-routes-enabled)
+          (config/app-routes-enabled))]
 
-    (GET "/apps/categories" [:as {params :params}]
-         (service/success-response (apps/get-admin-app-categories params)))
+   (GET "/apps/categories" [:as {params :params}]
+     (service/success-response (apps/get-admin-app-categories params)))
 
-    (POST "/apps/categories" [:as {:keys [body]}]
-          (service/success-response (apps/add-category body)))
+   (POST "/apps/categories" [:as {:keys [body]}]
+     (service/success-response (apps/add-category body)))
 
-    (POST "/apps/categories/shredder" [:as {:keys [body]}]
-          (service/success-response (apps/delete-categories body)))
+   (POST "/apps/categories/shredder" [:as {:keys [body]}]
+     (service/success-response (apps/delete-categories body)))
 
-    (DELETE "/apps/categories/:category-id" [category-id]
-            (service/success-response (apps/delete-category category-id)))
+   (DELETE "/apps/categories/:category-id" [category-id]
+     (service/success-response (apps/delete-category category-id)))
 
-    (PATCH "/apps/categories/:category-id" [category-id :as {:keys [body]}]
-           (service/success-response (apps/update-category category-id body)))))
+   (PATCH "/apps/categories/:category-id" [category-id :as {:keys [body]}]
+          (service/success-response (apps/update-category category-id body)))))
 
 (defn app-ontology-routes
   []
@@ -98,164 +98,164 @@
 (defn admin-apps-routes
   []
   (optional-routes
-    [#(and (config/admin-routes-enabled)
-           (config/app-routes-enabled))]
+   [#(and (config/admin-routes-enabled)
+          (config/app-routes-enabled))]
 
-    (POST "/apps" [:as {:keys [body]}]
-          (service/success-response (apps/categorize-apps body)))
+   (POST "/apps" [:as {:keys [body]}]
+     (service/success-response (apps/categorize-apps body)))
 
-    (POST "/apps/shredder" [:as {:keys [body]}]
-          (service/success-response (apps/permanently-delete-apps body)))
+   (POST "/apps/shredder" [:as {:keys [body]}]
+     (service/success-response (apps/permanently-delete-apps body)))
 
-    (DELETE "/apps/:app-id" [app-id]
-            (service/success-response (apps/admin-delete-app app-id)))
+   (DELETE "/apps/:app-id" [app-id]
+     (service/success-response (apps/admin-delete-app app-id)))
 
-    (PATCH "/apps/:app-id" [app-id :as {:keys [body]}]
-           (service/success-response (apps/admin-update-app app-id body)))
+   (PATCH "/apps/:app-id" [app-id :as {:keys [body]}]
+          (service/success-response (apps/admin-update-app app-id body)))
 
-    (GET "/apps/:app-id/details" [app-id]
-         (service/success-response (apps/get-admin-app-details app-id)))
+   (GET "/apps/:app-id/details" [app-id]
+     (service/success-response (apps/get-admin-app-details app-id)))
 
-    (POST "/apps/:app-id/documentation" [app-id :as {:keys [body]}]
-          (service/success-response (apps/admin-add-app-docs app-id body)))
+   (POST "/apps/:app-id/documentation" [app-id :as {:keys [body]}]
+     (service/success-response (apps/admin-add-app-docs app-id body)))
 
-    (PATCH "/apps/:app-id/documentation" [app-id :as {:keys [body]}]
-           (service/success-response (apps/admin-edit-app-docs app-id body)))
+   (PATCH "/apps/:app-id/documentation" [app-id :as {:keys [body]}]
+          (service/success-response (apps/admin-edit-app-docs app-id body)))
 
-    (PUT "/apps/:app-id/integration-data/:integration-data-id" [app-id integration-data-id]
-         (service/success-response (apps/update-app-integration-data app-id integration-data-id)))))
+   (PUT "/apps/:app-id/integration-data/:integration-data-id" [app-id integration-data-id]
+     (service/success-response (apps/update-app-integration-data app-id integration-data-id)))))
 
 (defn apps-routes
   []
   (optional-routes
-    [config/app-routes-enabled]
+   [config/app-routes-enabled]
 
-    (GET "/apps" [:as {params :params}]
-         (service/success-response (apps/search-apps params)))
+   (GET "/apps" [:as {params :params}]
+     (service/success-response (apps/search-apps params)))
 
-    (POST "/apps" [:as {:keys [body]}]
-          (service/success-response (apps/create-app body)))
+   (GET "/apps/elements" [:as {:keys [params]}]
+     (service/success-response (apps/get-all-workflow-elements params)))
 
-    (POST "/apps/arg-preview" [:as {:keys [body]}]
-          (service/success-response (apps/preview-args body)))
+   (GET "/apps/elements/:element-type" [element-type :as {:keys [params]}]
+     (service/success-response (apps/get-workflow-elements element-type params)))
 
-    (GET "/apps/elements" [:as {:keys [params]}]
-         (service/success-response (apps/get-all-workflow-elements params)))
+   (POST "/apps/pipelines" [:as {:keys [body]}]
+     (service/success-response (apps/add-pipeline body)))
 
-    (GET "/apps/elements/:element-type" [element-type :as {:keys [params]}]
-         (service/success-response (apps/get-workflow-elements element-type params)))
+   (PUT "/apps/pipelines/:app-id" [app-id :as {:keys [body]}]
+     (service/success-response (apps/update-pipeline app-id body)))
 
-    (POST "/apps/pipelines" [:as {:keys [body]}]
-          (service/success-response (apps/add-pipeline body)))
+   (POST "/apps/pipelines/:app-id/copy" [app-id]
+     (service/success-response (apps/copy-pipeline app-id)))
 
-    (PUT "/apps/pipelines/:app-id" [app-id :as {:keys [body]}]
-         (service/success-response (apps/update-pipeline app-id body)))
+   (GET "/apps/pipelines/:app-id/ui" [app-id]
+     (service/success-response (apps/edit-pipeline app-id)))
 
-    (POST "/apps/pipelines/:app-id/copy" [app-id]
-          (service/success-response (apps/copy-pipeline app-id)))
+   (POST "/apps/shredder" [:as {:keys [body]}]
+     (service/success-response (apps/delete-apps body)))
 
-    (GET "/apps/pipelines/:app-id/ui" [app-id]
-         (service/success-response (apps/edit-pipeline app-id)))
+   (POST "/apps/permission-lister" [:as {:keys [body]}]
+     (service/success-response (apps/list-permissions body)))
 
-    (POST "/apps/shredder" [:as {:keys [body]}]
-          (service/success-response (apps/delete-apps body)))
+   (POST "/apps/sharing" [:as {:keys [body]}]
+     (service/success-response (apps/share body)))
 
-    (POST "/apps/permission-lister" [:as {:keys [body]}]
-          (service/success-response (apps/list-permissions body)))
+   (POST "/apps/unsharing" [:as {:keys [body]}]
+     (service/success-response (apps/unshare body)))
 
-    (POST "/apps/sharing" [:as {:keys [body]}]
-          (service/success-response (apps/share body)))
+   (POST "/apps/:system-id" [system-id :as {:keys [body]}]
+     (service/success-response (apps/create-app system-id body)))
 
-    (POST "/apps/unsharing" [:as {:keys [body]}]
-          (service/success-response (apps/unshare body)))
+   (POST "/apps/:system-id/arg-preview" [system-id :as {:keys [body]}]
+     (service/success-response (apps/preview-args system-id body)))
 
-    (GET "/apps/:app-id" [app-id]
-         (service/success-response (apps/get-app app-id)))
+   (GET "/apps/:system-id/:app-id" [system-id app-id]
+     (service/success-response (apps/get-app system-id app-id)))
 
-    (DELETE "/apps/:app-id" [app-id]
-            (service/success-response (apps/delete-app app-id)))
+   (DELETE "/apps/:system-id/:app-id" [system-id app-id]
+     (service/success-response (apps/delete-app system-id app-id)))
 
-    (PATCH "/apps/:app-id" [app-id :as {:keys [body]}]
-           (service/success-response (apps/relabel-app app-id body)))
+   (PATCH "/apps/:system-id/:app-id" [system-id app-id :as {:keys [body]}]
+          (service/success-response (apps/relabel-app system-id app-id body)))
 
-    (PUT "/apps/:app-id" [app-id :as {:keys [body]}]
-         (service/success-response (apps/update-app app-id body)))
+   (PUT "/apps/:system-id/:app-id" [system-id app-id :as {:keys [body]}]
+     (service/success-response (apps/update-app system-id app-id body)))
 
-    (POST "/apps/:app-id/copy" [app-id]
-          (service/success-response (apps/copy-app app-id)))
+   (POST "/apps/:app-id/copy" [app-id]
+     (service/success-response (apps/copy-app app-id)))
 
-    (GET "/apps/:app-id/details" [app-id]
-         (service/success-response (apps/get-app-details app-id)))
+   (GET "/apps/:app-id/details" [app-id]
+     (service/success-response (apps/get-app-details app-id)))
 
-    (GET "/apps/:app-id/documentation" [app-id]
-         (service/success-response (apps/get-app-docs app-id)))
+   (GET "/apps/:app-id/documentation" [app-id]
+     (service/success-response (apps/get-app-docs app-id)))
 
-    (POST "/apps/:app-id/documentation" [app-id :as {:keys [body]}]
-          (service/success-response (apps/add-app-docs app-id body)))
+   (POST "/apps/:app-id/documentation" [app-id :as {:keys [body]}]
+     (service/success-response (apps/add-app-docs app-id body)))
 
-    (PATCH "/apps/:app-id/documentation" [app-id :as {:keys [body]}]
-           (service/success-response (apps/edit-app-docs app-id body)))
+   (PATCH "/apps/:app-id/documentation" [app-id :as {:keys [body]}]
+          (service/success-response (apps/edit-app-docs app-id body)))
 
-    (DELETE "/apps/:app-id/favorite" [app-id]
-            (service/success-response (apps/remove-favorite-app app-id)))
+   (DELETE "/apps/:app-id/favorite" [app-id]
+     (service/success-response (apps/remove-favorite-app app-id)))
 
-    (PUT "/apps/:app-id/favorite" [app-id]
-         (service/success-response (apps/add-favorite-app app-id)))
+   (PUT "/apps/:app-id/favorite" [app-id]
+     (service/success-response (apps/add-favorite-app app-id)))
 
-    (GET "/apps/:app-id/integration-data" [app-id]
-         (service/success-response (apps/get-app-integration-data app-id)))
+   (GET "/apps/:system-id/:app-id/integration-data" [system-id app-id]
+     (service/success-response (apps/get-app-integration-data system-id app-id)))
 
-    (GET "/apps/:app-id/is-publishable" [app-id]
-         (service/success-response (apps/app-publishable? app-id)))
+   (GET "/apps/:app-id/is-publishable" [app-id]
+     (service/success-response (apps/app-publishable? app-id)))
 
-    (POST "/apps/:app-id/publish" [app-id :as {:keys [body]}]
-          (service/success-response (apps/make-app-public app-id body)))
+   (POST "/apps/:app-id/publish" [app-id :as {:keys [body]}]
+     (service/success-response (apps/make-app-public app-id body)))
 
-    (DELETE "/apps/:app-id/rating" [app-id]
-            (service/success-response (apps/delete-rating app-id)))
+   (DELETE "/apps/:app-id/rating" [app-id]
+     (service/success-response (apps/delete-rating app-id)))
 
-    (POST "/apps/:app-id/rating" [app-id :as {body :body}]
-          (service/success-response (apps/rate-app app-id body)))
+   (POST "/apps/:app-id/rating" [app-id :as {body :body}]
+     (service/success-response (apps/rate-app app-id body)))
 
-    (GET "/apps/:app-id/tasks" [app-id]
-         (service/success-response (apps/list-app-tasks app-id)))
+   (GET "/apps/:app-id/tasks" [app-id]
+     (service/success-response (apps/list-app-tasks app-id)))
 
-    (GET "/apps/:app-id/tools" [app-id]
-         (service/success-response (apps/get-tools-in-app app-id)))
+   (GET "/apps/:app-id/tools" [app-id]
+     (service/success-response (apps/get-tools-in-app app-id)))
 
-    (GET "/apps/:app-id/ui" [app-id]
-         (service/success-response (apps/get-app-ui app-id)))))
+   (GET "/apps/:app-id/ui" [app-id]
+     (service/success-response (apps/get-app-ui app-id)))))
 
 (defn admin-app-avu-routes
   []
   (optional-routes
-    [#(and (config/admin-routes-enabled)
-           (config/app-routes-enabled)
-           (config/metadata-routes-enabled))]
+   [#(and (config/admin-routes-enabled)
+          (config/app-routes-enabled)
+          (config/metadata-routes-enabled))]
 
-    (GET "/apps/:app-id/metadata" [app-id]
-      (service/success-response (apps/admin-list-avus app-id)))
+   (GET "/apps/:app-id/metadata" [app-id]
+     (service/success-response (apps/admin-list-avus app-id)))
 
-    (POST "/apps/:app-id/metadata" [app-id :as {:keys [body]}]
-      (service/success-response (apps/admin-update-avus app-id body)))
+   (POST "/apps/:app-id/metadata" [app-id :as {:keys [body]}]
+     (service/success-response (apps/admin-update-avus app-id body)))
 
-    (PUT "/apps/:app-id/metadata" [app-id :as {:keys [body]}]
-      (service/success-response (apps/admin-set-avus app-id body)))))
+   (PUT "/apps/:app-id/metadata" [app-id :as {:keys [body]}]
+     (service/success-response (apps/admin-set-avus app-id body)))))
 
 (defn app-avu-routes
   []
   (optional-routes
-    [#(and (config/app-routes-enabled)
-           (config/metadata-routes-enabled))]
+   [#(and (config/app-routes-enabled)
+          (config/metadata-routes-enabled))]
 
-    (GET "/apps/:app-id/metadata" [app-id]
-      (service/success-response (apps/list-avus app-id)))
+   (GET "/apps/:app-id/metadata" [app-id]
+     (service/success-response (apps/list-avus app-id)))
 
-    (POST "/apps/:app-id/metadata" [app-id :as {:keys [body]}]
-      (service/success-response (apps/update-avus app-id body)))
+   (POST "/apps/:app-id/metadata" [app-id :as {:keys [body]}]
+     (service/success-response (apps/update-avus app-id body)))
 
-    (PUT "/apps/:app-id/metadata" [app-id :as {:keys [body]}]
-      (service/success-response (apps/set-avus app-id body)))))
+   (PUT "/apps/:app-id/metadata" [app-id :as {:keys [body]}]
+     (service/success-response (apps/set-avus app-id body)))))
 
 (defn analysis-routes
   []
@@ -263,119 +263,119 @@
    [config/app-routes-enabled]
 
    (GET "/analyses" [:as {:keys [params]}]
-        (service/success-response (apps/list-jobs params)))
+     (service/success-response (apps/list-jobs params)))
 
    (POST "/analyses" [:as {:keys [body]}]
-         (service/success-response (apps/submit-job body)))
+     (service/success-response (apps/submit-job body)))
 
    (POST "/analyses/permission-lister" [:as {:keys [body]}]
-         (service/success-response (apps/list-job-permissions body)))
+     (service/success-response (apps/list-job-permissions body)))
 
    (POST "/analyses/sharing" [:as {:keys [body]}]
-         (service/success-response (apps/share-jobs body)))
+     (service/success-response (apps/share-jobs body)))
 
    (POST "/analyses/unsharing" [:as {:keys [body]}]
-         (service/success-response (apps/unshare-jobs body)))
+     (service/success-response (apps/unshare-jobs body)))
 
    (PATCH "/analyses/:analysis-id" [analysis-id :as {body :body}]
           (service/success-response (apps/update-job analysis-id body)))
 
    (DELETE "/analyses/:analysis-id" [analysis-id]
-           (service/success-response (apps/delete-job analysis-id)))
+     (service/success-response (apps/delete-job analysis-id)))
 
    (POST "/analyses/shredder" [:as {:keys [body]}]
-         (service/success-response (apps/delete-jobs body)))
+     (service/success-response (apps/delete-jobs body)))
 
    (GET "/analyses/:analysis-id/parameters" [analysis-id]
-        (service/success-response (apps/get-job-params analysis-id)))
+     (service/success-response (apps/get-job-params analysis-id)))
 
    (GET "/analyses/:analysis-id/relaunch-info" [analysis-id]
-        (service/success-response (apps/get-job-relaunch-info analysis-id)))
+     (service/success-response (apps/get-job-relaunch-info analysis-id)))
 
    (GET "/analyses/:analysis-id/steps" [analysis-id]
-        (service/success-response (apps/list-job-steps analysis-id)))
+     (service/success-response (apps/list-job-steps analysis-id)))
 
    (POST "/analyses/:analysis-id/stop" [analysis-id]
-         (service/success-response (apps/stop-job analysis-id)))))
+     (service/success-response (apps/stop-job analysis-id)))))
 
 (defn admin-reference-genomes-routes
   []
   (optional-routes
-    [#(and (config/admin-routes-enabled)
-           (config/app-routes-enabled))]
+   [#(and (config/admin-routes-enabled)
+          (config/app-routes-enabled))]
 
-    (POST "/reference-genomes" [:as req]
-          (add-reference-genome req))
+   (POST "/reference-genomes" [:as req]
+     (add-reference-genome req))
 
-    (PUT "/reference-genomes" [:as req]
-         (replace-reference-genomes req))
+   (PUT "/reference-genomes" [:as req]
+     (replace-reference-genomes req))
 
-    (DELETE "/reference-genomes/:reference-genome-id" [reference-genome-id]
-            (delete-reference-genomes reference-genome-id))
+   (DELETE "/reference-genomes/:reference-genome-id" [reference-genome-id]
+     (delete-reference-genomes reference-genome-id))
 
-    (PATCH "/reference-genomes/:reference-genome-id" [reference-genome-id :as req]
-           (update-reference-genome req reference-genome-id))))
+   (PATCH "/reference-genomes/:reference-genome-id" [reference-genome-id :as req]
+          (update-reference-genome req reference-genome-id))))
 
 (defn reference-genomes-routes
   []
   (optional-routes
-    [config/app-routes-enabled]
+   [config/app-routes-enabled]
 
-    (GET "/reference-genomes" [:as {params :params}]
-         (service/success-response (apps/list-reference-genomes params)))
+   (GET "/reference-genomes" [:as {params :params}]
+     (service/success-response (apps/list-reference-genomes params)))
 
-    (GET "/reference-genomes/:reference-genome-id" [reference-genome-id]
-         (service/success-response (apps/get-reference-genome reference-genome-id)))))
+   (GET "/reference-genomes/:reference-genome-id" [reference-genome-id]
+     (service/success-response (apps/get-reference-genome reference-genome-id)))))
 
 (defn admin-tool-routes
   []
   (optional-routes
-    [#(and (config/admin-routes-enabled)
-        (config/app-routes-enabled))]
+   [#(and (config/admin-routes-enabled)
+          (config/app-routes-enabled))]
 
-    (POST "/tools" [:as {:keys [body]}]
-          (import-tools body))
+   (POST "/tools" [:as {:keys [body]}]
+     (import-tools body))
 
-    (DELETE "/tools/:tool-id" [tool-id]
-            (apps/delete-tool tool-id))
+   (DELETE "/tools/:tool-id" [tool-id]
+     (apps/delete-tool tool-id))
 
-    (PATCH "/tools/:tool-id" [tool-id :as {:keys [params body]}]
-           (apps/update-tool tool-id params body))
+   (PATCH "/tools/:tool-id" [tool-id :as {:keys [params body]}]
+          (apps/update-tool tool-id params body))
 
-    (PUT "/tools/:tool-id/integration-data/:integration-data-id" [tool-id integration-data-id]
-         (service/success-response (apps/update-tool-integration-data tool-id integration-data-id)))
+   (PUT "/tools/:tool-id/integration-data/:integration-data-id" [tool-id integration-data-id]
+     (service/success-response (apps/update-tool-integration-data tool-id integration-data-id)))
 
-    (GET "/tool-requests" [:as {params :params}]
-         (admin-list-tool-requests params))
+   (GET "/tool-requests" [:as {params :params}]
+     (admin-list-tool-requests params))
 
-    (GET "/tool-requests/:request-id" [request-id]
-         (get-tool-request request-id))
+   (GET "/tool-requests/:request-id" [request-id]
+     (get-tool-request request-id))
 
-    (POST "/tool-requests/:request-id/status" [request-id :as req]
-          (update-tool-request req request-id))))
+   (POST "/tool-requests/:request-id/status" [request-id :as req]
+     (update-tool-request req request-id))))
 
 (defn tool-routes
   []
   (optional-routes
-    [config/app-routes-enabled]
+   [config/app-routes-enabled]
 
-    (GET "/tools" [:as {:keys [params]}]
-         (service/success-response (apps/search-tools params)))
+   (GET "/tools" [:as {:keys [params]}]
+     (service/success-response (apps/search-tools params)))
 
-    (GET "/tools/:tool-id" [tool-id]
-         (service/success-response (apps/get-tool tool-id)))
+   (GET "/tools/:tool-id" [tool-id]
+     (service/success-response (apps/get-tool tool-id)))
 
-    (GET "/tools/:tool-id/integration-data" [tool-id]
-         (service/success-response (apps/get-tool-integration-data tool-id)))
+   (GET "/tools/:tool-id/integration-data" [tool-id]
+     (service/success-response (apps/get-tool-integration-data tool-id)))
 
-    (GET "/tool-requests" []
-         (list-tool-requests))
+   (GET "/tool-requests" []
+     (list-tool-requests))
 
-    (POST "/tool-requests" [:as req]
-          (submit-tool-request req))
+   (POST "/tool-requests" [:as req]
+     (submit-tool-request req))
 
-    (GET "/tool-requests/status-codes" [:as {params :params}]
-          (list-tool-request-status-codes params))))
+   (GET "/tool-requests/status-codes" [:as {params :params}]
+     (list-tool-request-status-codes params))))
 
 (defn secured-metadata-routes
   []
@@ -383,13 +383,13 @@
    [config/app-routes-enabled]
 
    (GET "/bootstrap" [:as req]
-        (bootstrap req))
+     (bootstrap req))
 
    (GET "/logout" [:as {params :params}]
-        (logout params))
+     (logout params))
 
    (PUT "/feedback" [:as {body :body}]
-        (provide-user-feedback body))))
+     (provide-user-feedback body))))
 
 (defn admin-integration-data-routes
   []
@@ -397,16 +397,16 @@
    [config/app-routes-enabled]
 
    (GET "/integration-data" [:as {:keys [params]}]
-        (service/success-response (apps/list-integration-data params)))
+     (service/success-response (apps/list-integration-data params)))
 
    (POST "/integration-data" [:as {:keys [body]}]
-         (service/success-response (apps/add-integration-data body)))
+     (service/success-response (apps/add-integration-data body)))
 
    (GET "/integration-data/:integration-data-id" [integration-data-id]
-        (service/success-response (apps/get-integration-data integration-data-id)))
+     (service/success-response (apps/get-integration-data integration-data-id)))
 
    (PUT "/integration-data/:integration-data-id" [integration-data-id :as {:keys [body]}]
-        (service/success-response (apps/update-integration-data integration-data-id body)))
+     (service/success-response (apps/update-integration-data integration-data-id body)))
 
    (DELETE "/integration-data/:integration-data-id" [integration-data-id]
-           (service/success-response (apps/delete-integration-data integration-data-id)))))
+     (service/success-response (apps/delete-integration-data integration-data-id)))))
