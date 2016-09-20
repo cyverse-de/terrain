@@ -203,8 +203,8 @@
                :follow-redirects false}))
 
 (defn copy-app
-  [app-id]
-  (client/post (apps-url "apps" app-id "copy")
+  [system-id app-id]
+  (client/post (apps-url "apps" system-id app-id "copy")
                {:query-params     (secured-params)
                 :as               :stream
                 :follow-redirects false}))

@@ -181,8 +181,8 @@
    (PUT "/apps/:system-id/:app-id" [system-id app-id :as {:keys [body]}]
      (service/success-response (apps/update-app system-id app-id body)))
 
-   (POST "/apps/:app-id/copy" [app-id]
-     (service/success-response (apps/copy-app app-id)))
+   (POST "/apps/:system-id/:app-id/copy" [system-id app-id]
+     (service/success-response (apps/copy-app system-id app-id)))
 
    (GET "/apps/:app-id/details" [app-id]
      (service/success-response (apps/get-app-details app-id)))
