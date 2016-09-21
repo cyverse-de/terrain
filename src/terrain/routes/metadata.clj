@@ -212,8 +212,8 @@
    (GET "/apps/:system-id/:app-id/is-publishable" [system-id app-id]
      (service/success-response (apps/app-publishable? system-id app-id)))
 
-   (POST "/apps/:app-id/publish" [app-id :as {:keys [body]}]
-     (service/success-response (apps/make-app-public app-id body)))
+   (POST "/apps/:system-id/:app-id/publish" [system-id app-id :as {:keys [body]}]
+     (service/success-response (apps/make-app-public system-id app-id body)))
 
    (DELETE "/apps/:app-id/rating" [app-id]
      (service/success-response (apps/delete-rating app-id)))

@@ -295,8 +295,8 @@
                 :follow-redirects false}))
 
 (defn make-app-public
-  [app-id app]
-  (client/post (apps-url "apps" app-id "publish")
+  [system-id app-id app]
+  (client/post (apps-url "apps" system-id app-id "publish")
                {:query-params     (secured-params)
                 :body             app
                 :content-type     :json
