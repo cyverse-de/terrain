@@ -196,11 +196,11 @@
    (PATCH "/apps/:app-id/documentation" [app-id :as {:keys [body]}]
           (service/success-response (apps/edit-app-docs app-id body)))
 
-   (DELETE "/apps/:app-id/favorite" [app-id]
-     (service/success-response (apps/remove-favorite-app app-id)))
+   (DELETE "/apps/:system-id/:app-id/favorite" [system-id app-id]
+     (service/success-response (apps/remove-favorite-app system-id app-id)))
 
-   (PUT "/apps/:app-id/favorite" [app-id]
-     (service/success-response (apps/add-favorite-app app-id)))
+   (PUT "/apps/:system-id/:app-id/favorite" [system-id app-id]
+     (service/success-response (apps/add-favorite-app system-id app-id)))
 
    (GET "/apps/:system-id/:app-id/integration-data" [system-id app-id]
      (service/success-response (apps/get-app-integration-data system-id app-id)))
