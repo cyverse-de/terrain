@@ -45,7 +45,7 @@
              :linters [:wrong-arity :wrong-ns-form :wrong-pre-post :wrong-tag :misplaced-docstrings]}
   :plugins [[lein-ring "0.9.2" :exclusions [org.clojure/clojure]]
             [swank-clojure "1.4.2" :exclusions [org.clojure/clojure]]
-            [test2junit "1.1.3"]
+            [test2junit "1.2.2"]
             [jonase/eastwood "0.2.3"]]
   :profiles {:dev     {:resource-paths ["conf/test"]}
              :uberjar {:aot :all}}
