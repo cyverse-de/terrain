@@ -205,8 +205,8 @@
    (GET "/apps/:system-id/:app-id/integration-data" [system-id app-id]
      (service/success-response (apps/get-app-integration-data system-id app-id)))
 
-   (GET "/apps/:app-id/is-publishable" [app-id]
-     (service/success-response (apps/app-publishable? app-id)))
+   (GET "/apps/:system-id/:app-id/is-publishable" [system-id app-id]
+     (service/success-response (apps/app-publishable? system-id app-id)))
 
    (POST "/apps/:app-id/publish" [app-id :as {:keys [body]}]
      (service/success-response (apps/make-app-public app-id body)))
