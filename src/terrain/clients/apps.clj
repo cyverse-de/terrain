@@ -27,12 +27,6 @@
       (:body)
       (service/decode-json)))
 
-(defn get-tools-in-app
-  [app-id]
-  (-> (raw/get-tools-in-app app-id)
-      (:body)
-      (service/decode-json)))
-
 (defn import-tools
   [body]
   (raw/import-tools (cheshire/encode body)))

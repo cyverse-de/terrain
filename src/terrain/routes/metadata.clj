@@ -224,8 +224,8 @@
    (GET "/apps/:system-id/:app-id/tasks" [system-id app-id]
      (service/success-response (apps/list-app-tasks system-id app-id)))
 
-   (GET "/apps/:app-id/tools" [app-id]
-     (service/success-response (apps/get-tools-in-app app-id)))
+   (GET "/apps/:system-id/:app-id/tools" [system-id app-id]
+     (service/success-response (apps/get-tools-in-app system-id app-id)))
 
    (GET "/apps/:app-id/ui" [app-id]
      (service/success-response (apps/get-app-ui app-id)))))

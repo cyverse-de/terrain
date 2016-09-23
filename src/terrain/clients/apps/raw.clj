@@ -630,8 +630,8 @@
                :follow-redirects false}))
 
 (defn get-tools-in-app
-  [app-id]
-  (client/get (apps-url "apps" app-id "tools")
+  [system-id app-id]
+  (client/get (apps-url "apps" system-id app-id "tools")
               {:query-params     (secured-params)
                :as               :stream
                :follow-redirects false}))
