@@ -215,11 +215,11 @@
    (POST "/apps/:system-id/:app-id/publish" [system-id app-id :as {:keys [body]}]
      (service/success-response (apps/make-app-public system-id app-id body)))
 
-   (DELETE "/apps/:app-id/rating" [app-id]
-     (service/success-response (apps/delete-rating app-id)))
+   (DELETE "/apps/:system-id/:app-id/rating" [system-id app-id]
+     (service/success-response (apps/delete-rating system-id app-id)))
 
-   (POST "/apps/:app-id/rating" [app-id :as {body :body}]
-     (service/success-response (apps/rate-app app-id body)))
+   (POST "/apps/:system-id/:app-id/rating" [system-id app-id :as {body :body}]
+     (service/success-response (apps/rate-app system-id app-id body)))
 
    (GET "/apps/:app-id/tasks" [app-id]
      (service/success-response (apps/list-app-tasks app-id)))
