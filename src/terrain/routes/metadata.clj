@@ -221,8 +221,8 @@
    (POST "/apps/:system-id/:app-id/rating" [system-id app-id :as {body :body}]
      (service/success-response (apps/rate-app system-id app-id body)))
 
-   (GET "/apps/:app-id/tasks" [app-id]
-     (service/success-response (apps/list-app-tasks app-id)))
+   (GET "/apps/:system-id/:app-id/tasks" [system-id app-id]
+     (service/success-response (apps/list-app-tasks system-id app-id)))
 
    (GET "/apps/:app-id/tools" [app-id]
      (service/success-response (apps/get-tools-in-app app-id)))

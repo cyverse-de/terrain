@@ -320,8 +320,8 @@
                 :follow-redirects false}))
 
 (defn list-app-tasks
-  [app-id]
-  (client/get (apps-url "apps" app-id "tasks")
+  [system-id app-id]
+  (client/get (apps-url "apps" system-id app-id "tasks")
               {:query-params     (secured-params)
                :as               :stream
                :follow-redirects false}))
