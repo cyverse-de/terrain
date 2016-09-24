@@ -227,8 +227,8 @@
    (GET "/apps/:system-id/:app-id/tools" [system-id app-id]
      (service/success-response (apps/get-tools-in-app system-id app-id)))
 
-   (GET "/apps/:app-id/ui" [app-id]
-     (service/success-response (apps/get-app-ui app-id)))))
+   (GET "/apps/:system-id/:app-id/ui" [system-id app-id]
+     (service/success-response (apps/get-app-ui system-id app-id)))))
 
 (defn admin-app-avu-routes
   []
