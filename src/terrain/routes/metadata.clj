@@ -101,6 +101,9 @@
    [#(and (config/admin-routes-enabled)
           (config/app-routes-enabled))]
 
+   (GET "/apps" [:as {:keys [params]}]
+     (service/success-response (apps/admin-get-apps params)))
+
    (POST "/apps" [:as {:keys [body]}]
      (service/success-response (apps/categorize-apps body)))
 

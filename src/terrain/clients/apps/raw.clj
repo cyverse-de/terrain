@@ -461,6 +461,13 @@
                 :as               :stream
                 :follow-redirects false}))
 
+(defn admin-get-apps
+  [params]
+  (client/get (apps-url "admin" "apps")
+              {:query-params     (secured-params params apps-search-params)
+               :as               :stream
+               :follow-redirects false}))
+
 (defn categorize-apps
   [body]
   (client/post (apps-url "admin" "apps")
