@@ -28,3 +28,4 @@
 *.swp
 build.xml
 test2junit
+Dockerfile.local
