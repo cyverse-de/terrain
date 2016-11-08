@@ -1,6 +1,7 @@
 (ns terrain.services.metadata.apps
   (:use [clojure.java.io :only [reader]]
         [clojure-commons.client :only [build-url-with-query]]
+        [slingshot.slingshot :only [try+]]
         [terrain.util.config]
         [terrain.util.transformers :only [secured-params add-current-user-to-map]]
         [terrain.auth.user-attributes]
@@ -40,32 +41,62 @@
     (dorun (map dn/send-tool-notification (:tools json))))
   (success-response))
 
+(defn- decode-error-response
+  [body]
+  (try+
+    (decode-json body)
+    (catch Throwable e
+      body)))
+
+(defn- trap-bootstrap-request
+  [req]
+  (try+
+    (req)
+    (catch #(not (nil? (:status %))) {:keys [status body] :as e}
+      (log/error e)
+      {:status status
+       :error  (decode-error-response body)})
+    (catch Throwable e
+      (log/error e)
+      {:error (str e)})))
+
+(defn- get-workspace
+  []
+  (trap-bootstrap-request #(select-keys (dm/get-workspace) [:id :new_workspace])))
+
+(defn- get-user-data-info
+  [user]
+  (trap-bootstrap-request
+    #(hash-map :user_home_path  (di/user-home-folder user)
+               :user_trash_path (di/user-trash-folder user)
+               :base_trash_path (di/base-trash-folder))))
+
+(defn- get-user-prefs
+  [username]
+  (trap-bootstrap-request #(user-prefs username)))
+
 (defn bootstrap
   "This service obtains information about and initializes the workspace for the authenticated user.
    It also records the fact that the user logged in."
   [{{:keys [ip-address]} :params {user-agent "user-agent"} :headers}]
   (assert-valid ip-address "Missing or empty query string parameter: ip-address")
   (assert-valid user-agent "Missing or empty request parameter: user-agent")
-  (let [username    (:username current-user)
-        user        (:shortUsername current-user)
-        workspace   (future (dm/get-workspace))
-        preferences (future (user-prefs (:username current-user)))
+  (let [{user :shortUsername :keys [email firstName lastName username]} current-user
+        workspace (future (get-workspace))
+        preferences (future (get-user-prefs username))
         login-record (future (dm/record-login ip-address user-agent))
         auth-redirect (future (dm/get-auth-redirect-uris))]
     (success-response
-      {:workspaceId   (:id @workspace)
-       :newWorkspace  (:new_workspace @workspace)
-       :loginTime     (str (:login_time @login-record))
-       :username      user
-       :full_username username
-       :email         (:email current-user)
-       :firstName     (:firstName current-user)
-       :lastName      (:lastName current-user)
-       :userHomePath  (di/user-home-folder user)
-       :userTrashPath (di/user-trash-folder user)
-       :baseTrashPath (di/base-trash-folder)
-       :preferences   @preferences
-       :auth-redirect @auth-redirect})))
+      {:user_info   {:username      user
+                     :full_username username
+                     :email         email
+                     :first_name    firstName
+                     :last_name     lastName
+                     :session       {:login_time    (str (:login_time @login-record))
+                                     :auth_redirect @auth-redirect}}
+       :workspace   @workspace
+       :data_info   (get-user-data-info user)
+       :preferences @preferences})))
 
 (defn logout
   "This service records the fact that the user logged out."
