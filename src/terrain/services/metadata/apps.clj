@@ -60,6 +60,11 @@
       (log/error e)
       {:error (str e)})))
 
+(defn- get-login-session
+  [ip-address user-agent]
+  (trap-bootstrap-request
+    #(select-keys (dm/record-login ip-address user-agent) [:login_time :auth_redirect])))
+
 (defn- get-workspace
   []
   (trap-bootstrap-request #(select-keys (dm/get-workspace) [:id :new_workspace])))
@@ -79,19 +84,17 @@
   (assert-valid ip-address "Missing or empty query string parameter: ip-address")
   (assert-valid user-agent "Missing or empty request parameter: user-agent")
   (let [{user :shortUsername :keys [email firstName lastName username]} current-user
-        workspace (future (get-workspace))
-        data-info (future (get-user-data-info user))
-        preferences (future (get-user-prefs username))
-        login-record (future (dm/record-login ip-address user-agent))
-        auth-redirect (future (dm/get-auth-redirect-uris))]
+        login-session (future (get-login-session ip-address user-agent))
+        workspace     (future (get-workspace))
+        data-info     (future (get-user-data-info user))
+        preferences   (future (get-user-prefs username))]
     (success-response
       {:user_info   {:username      user
                      :full_username username
                      :email         email
                      :first_name    firstName
-                     :last_name     lastName
-                     :session       {:login_time    (str (:login_time @login-record))
-                                     :auth_redirect @auth-redirect}}
+                     :last_name     lastName}
+       :session     @login-session
        :workspace   @workspace
        :data_info   @data-info
        :preferences @preferences})))
