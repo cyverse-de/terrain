@@ -1,19 +1,14 @@
 (ns terrain.services.metadata.apps
   (:use [clojure.java.io :only [reader]]
         [clojure-commons.client :only [build-url-with-query]]
-        [slingshot.slingshot :only [try+]]
         [terrain.util.config]
-        [terrain.util.transformers :only [secured-params add-current-user-to-map]]
-        [terrain.auth.user-attributes]
-        [terrain.services.user-prefs :only [user-prefs]]
+        [terrain.util.transformers :only [secured-params]]
         [terrain.util.email]
         [terrain.util.service])
   (:require [cheshire.core :as cheshire]
             [clj-http.client :as client]
             [clojure.string :as string]
-            [clojure.tools.logging :as log]
             [terrain.clients.iplant-groups :as ipg]
-            [terrain.clients.data-info :as di]
             [terrain.clients.apps :as dm]
             [terrain.clients.notifications :as dn]))
 
@@ -40,64 +35,6 @@
     (dm/import-tools json)
     (dorun (map dn/send-tool-notification (:tools json))))
   (success-response))
-
-(defn- decode-error-response
-  [body]
-  (try+
-    (decode-json body)
-    (catch Throwable e
-      body)))
-
-(defn- trap-bootstrap-request
-  [req]
-  (try+
-    (req)
-    (catch #(not (nil? (:status %))) {:keys [status body] :as e}
-      (log/error e)
-      {:status status
-       :error  (decode-error-response body)})
-    (catch Throwable e
-      (log/error e)
-      {:error (str e)})))
-
-(defn- get-login-session
-  [ip-address user-agent]
-  (trap-bootstrap-request
-    #(select-keys (dm/record-login ip-address user-agent) [:login_time :auth_redirect])))
-
-(defn- get-workspace
-  []
-  (trap-bootstrap-request #(select-keys (dm/get-workspace) [:id :new_workspace])))
-
-(defn- get-user-data-info
-  [user]
-  (trap-bootstrap-request #(di/user-base-paths user)))
-
-(defn- get-user-prefs
-  [username]
-  (trap-bootstrap-request #(user-prefs username)))
-
-(defn bootstrap
-  "This service obtains information about and initializes the workspace for the authenticated user.
-   It also records the fact that the user logged in."
-  [{{:keys [ip-address]} :params {user-agent "user-agent"} :headers}]
-  (assert-valid ip-address "Missing or empty query string parameter: ip-address")
-  (assert-valid user-agent "Missing or empty request parameter: user-agent")
-  (let [{user :shortUsername :keys [email firstName lastName username]} current-user
-        login-session (future (get-login-session ip-address user-agent))
-        workspace     (future (get-workspace))
-        data-info     (future (get-user-data-info user))
-        preferences   (future (get-user-prefs username))]
-    (success-response
-      {:user_info   {:username      user
-                     :full_username username
-                     :email         email
-                     :first_name    firstName
-                     :last_name     lastName}
-       :session     @login-session
-       :workspace   @workspace
-       :data_info   @data-info
-       :preferences @preferences})))
 
 (defn logout
   "This service records the fact that the user logged out."

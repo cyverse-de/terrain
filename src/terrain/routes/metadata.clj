@@ -1,6 +1,7 @@
 (ns terrain.routes.metadata
   (:use [compojure.core]
         [terrain.services.metadata.apps]
+        [terrain.services.bootstrap]
         [terrain.util])
   (:require [terrain.clients.apps.raw :as apps]
             [terrain.clients.metadata :as metadata]
