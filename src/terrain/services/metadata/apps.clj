@@ -66,10 +66,7 @@
 
 (defn- get-user-data-info
   [user]
-  (trap-bootstrap-request
-    #(hash-map :user_home_path  (di/user-home-folder user)
-               :user_trash_path (di/user-trash-folder user)
-               :base_trash_path (di/base-trash-folder))))
+  (trap-bootstrap-request #(di/user-base-paths user)))
 
 (defn- get-user-prefs
   [username]
@@ -83,6 +80,7 @@
   (assert-valid user-agent "Missing or empty request parameter: user-agent")
   (let [{user :shortUsername :keys [email firstName lastName username]} current-user
         workspace (future (get-workspace))
+        data-info (future (get-user-data-info user))
         preferences (future (get-user-prefs username))
         login-record (future (dm/record-login ip-address user-agent))
         auth-redirect (future (dm/get-auth-redirect-uris))]
@@ -95,7 +93,7 @@
                      :session       {:login_time    (str (:login_time @login-record))
                                      :auth_redirect @auth-redirect}}
        :workspace   @workspace
-       :data_info   (get-user-data-info user)
+       :data_info   @data-info
        :preferences @preferences})))
 
 (defn logout
