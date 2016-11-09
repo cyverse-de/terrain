@@ -6,7 +6,12 @@
             [terrain.clients.data-info :as di]
             [terrain.util.config :as cfg]))
 
-(def default-output-dir-key :defaultOutputFolder)
+(def default-output-dir-key :default_output_folder)
+
+(defn- convert-default-output-dir-keys
+  [prefs]
+  (clojure.set/rename-keys prefs {:defaultOutputFolder    default-output-dir-key
+                                  :systemDefaultOutputDir :system_default_output_dir}))
 
 (defn add-default-output-dir
   "Adds the default output directory to a set of user preferences."
@@ -35,12 +40,12 @@
   "Adds system default output directory to the preferences that are passed in."
   [prefs]
   (assoc prefs
-    :systemDefaultOutputDir {:id   (system-default-output-dir)
-                             :path (system-default-output-dir)}))
+    :system_default_output_dir {:id   (system-default-output-dir)
+                                :path (system-default-output-dir)}))
 
 (defn- sysdefoutdir
   [prefs]
-  (let [out-dir (:systemDefaultOutputDir prefs)]
+  (let [out-dir (:system_default_output_dir prefs)]
     (if (map? out-dir)
       (:path out-dir)
       out-dir)))
@@ -80,7 +85,7 @@
   [prefs]
   (let [user                (:shortUsername current-user)
         user-default        (default-output-dir-key prefs)
-        sys-default         (:systemDefaultOutputDir prefs)
+        sys-default         (:system_default_output_dir prefs)
         restore-sys-default #(assoc prefs default-output-dir-key sys-default)]
     (cond (= user-default sys-default)                   prefs
           (di/can-create-dir? user (:path user-default)) prefs
@@ -89,6 +94,7 @@
 (defn process-outgoing
   [user prefs]
   (->> prefs
+       (convert-default-output-dir-keys)
        (handle-blank-default-output-dir user)
        (handle-string-default-output-dir)
        (add-system-default-output-dir)
