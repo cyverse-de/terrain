@@ -59,6 +59,11 @@
 
 ;; NAVIGATION
 
+(defn base-paths
+  "Uses the data-info navigation/base-paths endpoint to list a user's home and trash paths."
+  [user]
+  (request :get ["navigation" "base-paths"] (mk-req-map user)))
+
 (defn list-roots
   "Uses the data-info navigation/root endpoint to list a user's navigation roots."
   [user]

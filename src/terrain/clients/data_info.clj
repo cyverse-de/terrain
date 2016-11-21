@@ -47,22 +47,19 @@
   (cp/user-home-dir user))
 
 
-(defn ^String base-trash-folder
-  "It returns the root directory for all users' trash folders."
-  []
-  (cp/base-trash-path))
-
-
-(defn ^String user-trash-folder
-  "Determines the top-level trash folder for the given user.
+(defn ^String user-base-paths
+  "Fetches the home and trash paths for the given user.
 
    Parameters:
-     user - the user of the trash folder.
+     user - the user of the base paths.
 
    Returns:
-     It returns the absolute path to the trash folder."
+     A map of the absolute paths to the home and trash folders."
   [^String user]
-  (cp/user-trash-path user))
+  (-> (raw/base-paths user)
+      :body
+      (json/decode true)))
+
 
 (defn uuid-for-path
   [^String user ^String path]
