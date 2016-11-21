@@ -13,7 +13,7 @@
   [body]
   (try+
     (service/decode-json body)
-    (catch Throwable e
+    (catch Object _
       body)))
 
 (defn- trap-bootstrap-request
@@ -24,9 +24,9 @@
       (log/error e)
       {:status status
        :error  (decode-error-response body)})
-    (catch Throwable e
-      (log/error e)
-      {:error (str e)})))
+    (catch Object _
+      (log/error (:throwable &throw-context) "bootstrap request failed")
+      {:error (str (:throwable &throw-context))})))
 
 (defn- get-login-session
   [ip-address user-agent]
