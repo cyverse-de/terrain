@@ -38,7 +38,7 @@
                  [org.cyverse/tree-urls-client "2.8.0"]
                  [org.cyverse/common-cfg "2.8.0"]
                  [org.cyverse/common-cli "2.8.0"]
-                 [org.cyverse/kameleon "2.8.0"]
+                 [org.cyverse/kameleon "3.0.0"]
                  [org.cyverse/heuristomancer "2.8.0"]
                  [org.cyverse/service-logging "2.8.0"]]
   :eastwood {:exclude-namespaces [terrain.util.jwt :test-paths]
