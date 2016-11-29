@@ -7,7 +7,7 @@
       (string/trim (:out (sh "git" "rev-parse" "HEAD")))
       ""))
 
-(defproject org.cyverse/terrain "2.9.0-SNAPSHOT"
+(defproject org.cyverse/terrain "2.10.0-SNAPSHOT"
   :description "Discovery Environment API gateway/API services catch-all project"
   :url "https://github.com/cyverse-de/terrain"
   :license {:name "BSD Standard License"
