@@ -11,10 +11,11 @@
 
 (defn- decode-error-response
   [body]
-  (try+
-    (service/decode-json body)
+  (let [response (if (string? body) body (slurp body))]
+    (try+
+      (service/decode-json response)
     (catch Object _
-      body)))
+      response))))
 
 (defn- trap-bootstrap-request
   [req]
@@ -24,6 +25,9 @@
       (log/error e)
       {:status status
        :error  (decode-error-response body)})
+    (catch map? e
+      (log/error e)
+      {:error e})
     (catch Object _
       (log/error (:throwable &throw-context) "bootstrap request failed")
       {:error (str (:throwable &throw-context))})))

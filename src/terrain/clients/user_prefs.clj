@@ -23,7 +23,10 @@
 
      (= (:status resp) 500)
      (throw+ {:error_code ERR_UNCHECKED_EXCEPTION :msg "Error thrown by user-preferences service."})
-     
+
+     (or (= (:status resp) 503) (= (:status resp) 504))
+     (throw+ resp)
+
      (not (<= 200 (:status resp) 299))
      (throw+ {:error_code ERR_UNCHECKED_EXCEPTION :msg "Unknown error thrown by the user-preferences service"})
 
