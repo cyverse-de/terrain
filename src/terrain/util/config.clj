@@ -141,10 +141,10 @@
   [props config-valid configs app-routes-enabled]
   "terrain.email.perm-id-req.src")
 
-(cc/defprop-str feedback-dest-addr
-  "The destination email address for DE feedback messages."
+(cc/defprop-str support-email-dest-addr
+  "The destination email address for DE support request messages."
   [props config-valid configs app-routes-enabled]
-  "terrain.email.feedback-dest")
+  "terrain.email.support-email-dest")
 
 (cc/defprop-optstr apps-base-url
   "The base URL to use when connecting to secured Apps services."

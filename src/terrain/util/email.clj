@@ -81,11 +81,11 @@
       :template  "permanent_id_request_submitted"
       :values    template-values)))
 
-(defn send-feedback-email
-  "Sends email messages containing user feedback."
+(defn send-support-email
+  "Sends email messages containing information about a request for support."
   [{:strs [email fields subject]}]
   (send-email
-   :to        (config/feedback-dest-addr)
+   :to        (config/support-email-dest-addr)
    :from-addr (or email (:email current-user))
    :subject   (or subject "DE Support Request")
    :template  "blank"
