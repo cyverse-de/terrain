@@ -81,30 +81,12 @@
       :template  "permanent_id_request_submitted"
       :values    template-values)))
 
-(defn- format-question
-  "Formats a question and answer for a user feedback submission."
-  [[q a]]
-  (let [q (string/replace q #"^(?![*])" "* ")
-        a (if (string? a) [a] a)]
-    (apply str "\n" q "\n" (mapv #(str % "\n") a))))
-
-(defn- feedback-email-text
-  "Formats the text for the user feedback email message."
-  [feedback]
-  (let [user (:username current-user)]
-    (apply str user " has provided some DE feedback:\n"
-           (mapv format-question feedback))))
-
 (defn send-feedback-email
   "Sends email messages containing user feedback."
-  [feedback]
-  (let [text (-> (assoc (dissoc feedback "shibbolethEppn")
-                   "username" (:shortUsername current-user)
-                   "email"    (:email current-user))
-                 (feedback-email-text))]
-    (send-email
-     :to        (config/feedback-dest-addr)
-     :from-addr (config/feedback-dest-addr)
-     :subject   "DE Feedback"
-     :template  "blank"
-     :values    {:contents text})))
+  [{:strs [email fields subject]}]
+  (send-email
+   :to        (config/feedback-dest-addr)
+   :from-addr (or email (:email current-user))
+   :subject   (or subject "DE Support Request")
+   :template  "blank"
+   :values    {:contents (apply str (mapv (fn [[k v]] (str k ": " v "\n")) fields))}))
