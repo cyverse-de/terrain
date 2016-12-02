@@ -381,6 +381,14 @@
    (GET "/tool-requests/status-codes" [:as {params :params}]
      (list-tool-request-status-codes params))))
 
+(defn misc-metadata-routes
+  []
+  (optional-routes
+   [config/app-routes-enabled]
+
+   (POST "/support-email" [:as {body :body}]
+     (send-support-email body))))
+
 (defn secured-metadata-routes
   []
   (optional-routes
@@ -390,10 +398,7 @@
      (bootstrap req))
 
    (GET "/logout" [:as {params :params}]
-     (logout params))
-
-   (PUT "/feedback" [:as {body :body}]
-     (provide-user-feedback body))))
+     (logout params))))
 
 (defn admin-integration-data-routes
   []

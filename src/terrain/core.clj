@@ -139,6 +139,7 @@
     (reference-genomes-routes)
     (tool-routes)
     (permanent-id-request-routes)
+    (misc-metadata-routes)
     (route/not-found (unrecognized-path-response))))
 
 (defn secured-routes

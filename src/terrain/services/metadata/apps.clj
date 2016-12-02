@@ -3,14 +3,14 @@
         [clojure-commons.client :only [build-url-with-query]]
         [terrain.util.config]
         [terrain.util.transformers :only [secured-params]]
-        [terrain.util.email]
         [terrain.util.service])
   (:require [cheshire.core :as cheshire]
             [clj-http.client :as client]
             [clojure.string :as string]
             [terrain.clients.iplant-groups :as ipg]
             [terrain.clients.apps :as dm]
-            [terrain.clients.notifications :as dn]))
+            [terrain.clients.notifications :as dn]
+            [terrain.util.email :as email]))
 
 (defn- apps-request
   "Prepares a apps request by extracting only the body of the client request and sets the
@@ -90,7 +90,7 @@
     (postprocess-tool-request
       (forward-post tool-request-url req)
       (fn [tool-req user-details]
-        (send-tool-request-email tool-req user-details)
+        (email/send-tool-request-email tool-req user-details)
         (success-response tool-req)))))
 
 (defn list-tool-requests
@@ -125,8 +125,8 @@
   (client/get (apps-url {} "admin" "tool-requests" request-id)
               {:as :stream}))
 
-(defn provide-user-feedback
-  "Forwards feedback from the user to iPlant."
+(defn send-support-email
+  "Sends a support email from the user."
   [body]
-  (send-feedback-email (cheshire/decode-stream (reader body)))
+  (email/send-support-email (cheshire/decode-stream (reader body)))
   (success-response))
