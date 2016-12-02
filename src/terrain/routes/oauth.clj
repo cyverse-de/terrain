@@ -13,6 +13,9 @@
    (GET "/oauth/access-code/:api-name" [api-name :as {params :params}]
      (service/success-response (apps/get-oauth-access-token api-name params)))
 
+   (GET "/oauth/redirect-uris" []
+     (service/success-response (apps/get-oauth-redirect-uris)))
+
    (GET "/oauth/token-info/:api-name" [api-name]
      (service/success-response (apps/get-oauth-token-info api-name)))))
 
