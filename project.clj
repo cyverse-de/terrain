@@ -35,7 +35,7 @@
                  [org.cyverse/clj-icat-direct "2.8.0"]
                  [org.cyverse/clj-jargon "2.8.0"]
                  [org.cyverse/clojure-commons "2.8.1"]
-                 [org.cyverse/tree-urls-client "2.8.0"]
+                 [org.cyverse/tree-urls-client "2.8.1"]
                  [org.cyverse/common-cfg "2.8.0"]
                  [org.cyverse/common-cli "2.8.0"]
                  [org.cyverse/kameleon "3.0.0"]
