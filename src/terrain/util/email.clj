@@ -81,6 +81,15 @@
       :template  "permanent_id_request_submitted"
       :values    template-values)))
 
+(defn format-field
+  "Formats a single field in a support email."
+  [[k v]]
+  (str (->> (if (sequential? v) v [v])
+            (mapv (partial str " - "))
+            (concat [k])
+            (string/join "\n"))
+       "\n\n"))
+
 (defn send-support-email
   "Sends email messages containing information about a request for support."
   [{:strs [email fields subject]}]
@@ -89,4 +98,4 @@
    :from-addr (or email (:email current-user))
    :subject   (or subject "DE Support Request")
    :template  "blank"
-   :values    {:contents (apply str (mapv (fn [[k v]] (str k ": " v "\n")) fields))}))
+   :values    {:contents (apply str (mapv format-field fields))}))
