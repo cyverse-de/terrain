@@ -295,8 +295,8 @@
                 :follow-redirects false}))
 
 (defn make-app-public
-  [app-id app]
-  (client/post (apps-url "apps" app-id "publish")
+  [system-id app-id app]
+  (client/post (apps-url "apps" system-id app-id "publish")
                {:query-params     (secured-params)
                 :body             app
                 :content-type     :json
@@ -304,15 +304,15 @@
                 :follow-redirects false}))
 
 (defn delete-rating
-  [app-id]
-  (client/delete (apps-url "apps" app-id "rating")
+  [system-id app-id]
+  (client/delete (apps-url "apps" system-id app-id "rating")
                  {:query-params     (secured-params)
                   :as               :stream
                   :follow-redirects false}))
 
 (defn rate-app
-  [app-id rating]
-  (client/post (apps-url "apps" app-id "rating")
+  [system-id app-id rating]
+  (client/post (apps-url "apps" system-id app-id "rating")
                {:query-params     (secured-params)
                 :body             rating
                 :content-type     :json
@@ -320,15 +320,15 @@
                 :follow-redirects false}))
 
 (defn list-app-tasks
-  [app-id]
-  (client/get (apps-url "apps" app-id "tasks")
+  [system-id app-id]
+  (client/get (apps-url "apps" system-id app-id "tasks")
               {:query-params     (secured-params)
                :as               :stream
                :follow-redirects false}))
 
 (defn get-app-ui
-  [app-id]
-  (client/get (apps-url "apps" app-id "ui")
+  [system-id app-id]
+  (client/get (apps-url "apps" system-id app-id "ui")
               {:query-params     (secured-params)
                :as               :stream
                :follow-redirects false}))
@@ -630,8 +630,8 @@
                :follow-redirects false}))
 
 (defn get-tools-in-app
-  [app-id]
-  (client/get (apps-url "apps" app-id "tools")
+  [system-id app-id]
+  (client/get (apps-url "apps" system-id app-id "tools")
               {:query-params     (secured-params)
                :as               :stream
                :follow-redirects false}))

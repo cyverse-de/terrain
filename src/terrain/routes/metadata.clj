@@ -212,23 +212,23 @@
    (GET "/apps/:system-id/:app-id/is-publishable" [system-id app-id]
      (service/success-response (apps/app-publishable? system-id app-id)))
 
-   (POST "/apps/:app-id/publish" [app-id :as {:keys [body]}]
-     (service/success-response (apps/make-app-public app-id body)))
+   (POST "/apps/:system-id/:app-id/publish" [system-id app-id :as {:keys [body]}]
+     (service/success-response (apps/make-app-public system-id app-id body)))
 
-   (DELETE "/apps/:app-id/rating" [app-id]
-     (service/success-response (apps/delete-rating app-id)))
+   (DELETE "/apps/:system-id/:app-id/rating" [system-id app-id]
+     (service/success-response (apps/delete-rating system-id app-id)))
 
-   (POST "/apps/:app-id/rating" [app-id :as {body :body}]
-     (service/success-response (apps/rate-app app-id body)))
+   (POST "/apps/:system-id/:app-id/rating" [system-id app-id :as {body :body}]
+     (service/success-response (apps/rate-app system-id app-id body)))
 
-   (GET "/apps/:app-id/tasks" [app-id]
-     (service/success-response (apps/list-app-tasks app-id)))
+   (GET "/apps/:system-id/:app-id/tasks" [system-id app-id]
+     (service/success-response (apps/list-app-tasks system-id app-id)))
 
-   (GET "/apps/:app-id/tools" [app-id]
-     (service/success-response (apps/get-tools-in-app app-id)))
+   (GET "/apps/:system-id/:app-id/tools" [system-id app-id]
+     (service/success-response (apps/get-tools-in-app system-id app-id)))
 
-   (GET "/apps/:app-id/ui" [app-id]
-     (service/success-response (apps/get-app-ui app-id)))))
+   (GET "/apps/:system-id/:app-id/ui" [system-id app-id]
+     (service/success-response (apps/get-app-ui system-id app-id)))))
 
 (defn admin-app-avu-routes
   []
