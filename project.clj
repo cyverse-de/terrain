@@ -28,7 +28,7 @@
                  [dire "0.5.3"]
                  [me.raynes/fs "1.4.6"]
                  [medley "0.8.2"]
-                 [org.apache.tika/tika-core "1.11"]      ; provides org.apache.tika
+                 [org.apache.tika/tika-core "1.14"]      ; provides org.apache.tika
                  [org.nexml.model/nexml "1.5-SNAPSHOT"]  ; provides org.nexml.model
                  [org.biojava.thirdparty/forester "1.005" ]
                  [slingshot "0.12.2"]
