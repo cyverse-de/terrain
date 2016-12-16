@@ -111,23 +111,23 @@
    (POST "/apps/shredder" [:as {:keys [body]}]
      (service/success-response (apps/permanently-delete-apps body)))
 
-   (DELETE "/apps/:app-id" [app-id]
-     (service/success-response (apps/admin-delete-app app-id)))
+   (DELETE "/apps/:system-id/:app-id" [system-id app-id]
+     (service/success-response (apps/admin-delete-app system-id app-id)))
 
-   (PATCH "/apps/:app-id" [app-id :as {:keys [body]}]
-          (service/success-response (apps/admin-update-app app-id body)))
+   (PATCH "/apps/:system-id/:app-id" [system-id app-id :as {:keys [body]}]
+     (service/success-response (apps/admin-update-app system-id app-id body)))
 
-   (GET "/apps/:app-id/details" [app-id]
-     (service/success-response (apps/get-admin-app-details app-id)))
+   (GET "/apps/:system-id/:app-id/details" [system-id app-id]
+     (service/success-response (apps/get-admin-app-details system-id app-id)))
 
-   (POST "/apps/:app-id/documentation" [app-id :as {:keys [body]}]
-     (service/success-response (apps/admin-add-app-docs app-id body)))
+   (POST "/apps/:system-id/:app-id/documentation" [system-id app-id :as {:keys [body]}]
+     (service/success-response (apps/admin-add-app-docs system-id app-id body)))
 
-   (PATCH "/apps/:app-id/documentation" [app-id :as {:keys [body]}]
-          (service/success-response (apps/admin-edit-app-docs app-id body)))
+   (PATCH "/apps/:system-id/:app-id/documentation" [system-id app-id :as {:keys [body]}]
+     (service/success-response (apps/admin-edit-app-docs system-id app-id body)))
 
-   (PUT "/apps/:app-id/integration-data/:integration-data-id" [app-id integration-data-id]
-     (service/success-response (apps/update-app-integration-data app-id integration-data-id)))))
+   (PUT "/apps/:system-id/:app-id/integration-data/:integration-data-id" [system-id app-id integration-data-id]
+     (service/success-response (apps/update-app-integration-data system-id app-id integration-data-id)))))
 
 (defn apps-routes
   []
