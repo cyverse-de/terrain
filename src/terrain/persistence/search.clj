@@ -6,7 +6,8 @@
             [clojurewerkz.elastisch.rest.response :as resp]
             [slingshot.slingshot :refer [try+ throw+]]
             [terrain.util.config :as cfg]
-            [clojure-commons.exception :as cx])
+            [clojure-commons.exception :as cx]
+            [clojurewerkz.elastisch.rest :as rest])
   (:import [java.net ConnectException]
            [java.util UUID]
            [clojure.lang IPersistentMap ISeq]))
@@ -24,6 +25,12 @@
       (throw+ {:type ::cx/invalid-cfg
                :error "cannot connect to elasticsearch"}))))
 
+
+(defn update-with-script
+  "Scripted updates which are only compatible with Elasticsearch 5.x and greater."
+  [es index mapping-type id script params]
+  (rest/post es (rest/record-update-url es index mapping-type id)
+             {:body {:script {:inline script :lang "painless" :params params}}}))
 
 (defn index-tag
   "Inserts a tag into the search index.
@@ -51,10 +58,10 @@
      ::cx/invalid-cfg - This is thrown if there is a problem with elasticsearch"
   [^UUID tag-id ^IPersistentMap updates]
   (try+
-    (let [script "ctx._source.value = value;
-                  ctx._source.description = description;
-                  ctx._source.dateModified = dateModified"]
-      (doc/update-with-script (connect) "data" "tag" (str tag-id) script updates))
+    (let [script "ctx._source.value = params.value;
+                  ctx._source.description = params.description;
+                  ctx._source.dateModified = params.dateModified"]
+      (update-with-script (connect) "data" "tag" (str tag-id) script updates))
     (catch [:status 404] {:keys []}
       (throw+ es-uninitialized))))
 
@@ -70,9 +77,9 @@
      ::cx/invalid-cfg - This is thrown if there is a problem with elasticsearch"
   [^UUID tag-id ^ISeq targets]
   (try+
-    (let [script "ctx._source.targets = targets"
+    (let [script "ctx._source.targets = params.targets"
           update {:targets (map #(assoc % :type (str (:type %))) targets)}]
-      (doc/update-with-script (connect) "data" "tag" (str tag-id) script update))
+      (update-with-script (connect) "data" "tag" (str tag-id) script update))
     (catch [:status 404] {:keys []}
       (throw+ es-uninitialized))))
 
