@@ -71,14 +71,19 @@
 
 
 (defn- mk-sort
-  "Builds a sort request."
+  "Builds a sort request.
+   In Elasticsearch v5.x, the 'missing' parameter is not supported for '_score' sorting.
+   Therefore, if the default sort of '_score' is detected, then sort is passed back empty
+   (i.e. elasticsearch default sort)."
   [sort]
   (let [field (case (ffirst sort)
                 :entity (second (first sort))
                 :score  :_score
                 :type   :_type)]
-    [{field {:order           (name (second sort))
-             :missing         "_last"}}]))
+    (if (= field :_score)
+      []
+      [{field {:order           (name (second sort))
+               :missing         "_last"}}])))
 
 
 (defn- extract-direction
