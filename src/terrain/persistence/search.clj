@@ -126,7 +126,7 @@
                                                :id    tag
                                                :path  "targets.id"}))
         perm-filter (query/nested :path   "userPermissions"
-                                  :filter (query/term "userPermissions.user" memberships))]
+                                  :query (query/term "userPermissions.user" memberships))]
     (query/bool :must   (query/bool :must perm-filter :should (map filter-path in-folders))
                 :should (map filter-tag tags))))
 
