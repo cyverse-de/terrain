@@ -113,6 +113,7 @@
   (http/post (str (url/url (cfg/data-info-base) "data"))
              {:query-params {:user user
                              :dest dest-path}
+              :accept :json
               :multipart [{:part-name "file"
                            :name filename
                            :mime-type content-type
@@ -130,6 +131,7 @@
   [user path-uuid istream]
   (http/put (str (url/url (cfg/data-info-base) "data" path-uuid))
             {:query-params {:user user}
+             :accept :json
              :multipart [{:name "file"
                           :content istream}]}))
 
