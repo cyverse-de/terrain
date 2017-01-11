@@ -78,8 +78,7 @@
                 :score  :_score
                 :type   :_type)]
     [{field {:order           (name (second sort))
-             :missing         "_last"
-             :ignore_unmapped true}}]))
+             :missing         "_last"}}]))
 
 
 (defn- extract-direction
