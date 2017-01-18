@@ -52,6 +52,7 @@
   {:config               (build-url-import-config address filename)
    :description          (str "URL Import of " filename " from " address)
    :name                 (str "url_import_" filename)
+   :system_id            config/de-system-id
    :app_id               (str (config/fileio-url-import-app))
    :debug                false
    :create_output_subdir false
