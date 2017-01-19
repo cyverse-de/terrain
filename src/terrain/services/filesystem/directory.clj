@@ -171,6 +171,10 @@
       (throw+ body)
       (data/respond-with-default-error 422 method url err))))
 
+(defn- handle-error-with-rethrow
+  [_ _ err]
+  (throw+ err))
+
 
 (defn- paged-dir-listing
   "Provides paged directory listing as an alternative to (list-dir). Always contains files."
@@ -195,7 +199,8 @@
       :404 handle-not-found
       :410 handle-not-found
       :414 handle-not-found
-      :422 handle-not-processable)))
+      :422 handle-not-processable
+      :503 handle-error-with-rethrow)))
 
 
 (defn- resolve-sort-field
