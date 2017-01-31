@@ -32,9 +32,6 @@
    (POST "/apps/categories" [:as {:keys [body]}]
      (service/success-response (apps/add-category body)))
 
-   (POST "/apps/categories/shredder" [:as {:keys [body]}]
-     (service/success-response (apps/delete-categories body)))
-
    (DELETE "/apps/categories/:category-id" [category-id]
      (service/success-response (apps/delete-category category-id)))
 
