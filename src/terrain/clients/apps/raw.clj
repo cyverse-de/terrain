@@ -551,8 +551,8 @@
                  :follow-redirects false}))
 
 (defn add-app-docs
-  [app-id docs]
-  (client/post (apps-url "apps" app-id "documentation")
+  [system-id app-id docs]
+  (client/post (apps-url "apps" system-id app-id "documentation")
                {:query-params     (secured-params)
                 :content-type     :json
                 :body             docs

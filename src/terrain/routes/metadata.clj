@@ -191,8 +191,8 @@
    (GET "/apps/:system-id/:app-id/documentation" [system-id app-id]
      (service/success-response (apps/get-app-docs system-id app-id)))
 
-   (POST "/apps/:app-id/documentation" [app-id :as {:keys [body]}]
-     (service/success-response (apps/add-app-docs app-id body)))
+   (POST "/apps/:system-id/:app-id/documentation" [system-id app-id :as {:keys [body]}]
+     (service/success-response (apps/add-app-docs system-id app-id body)))
 
    (PATCH "/apps/:system-id/:app-id/documentation" [system-id app-id :as {:keys [body]}]
      (service/success-response (apps/edit-app-docs system-id app-id body)))
