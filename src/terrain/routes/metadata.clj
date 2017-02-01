@@ -177,7 +177,7 @@
      (service/success-response (apps/delete-app system-id app-id)))
 
    (PATCH "/apps/:system-id/:app-id" [system-id app-id :as {:keys [body]}]
-          (service/success-response (apps/relabel-app system-id app-id body)))
+     (service/success-response (apps/relabel-app system-id app-id body)))
 
    (PUT "/apps/:system-id/:app-id" [system-id app-id :as {:keys [body]}]
      (service/success-response (apps/update-app system-id app-id body)))
@@ -194,8 +194,8 @@
    (POST "/apps/:app-id/documentation" [app-id :as {:keys [body]}]
      (service/success-response (apps/add-app-docs app-id body)))
 
-   (PATCH "/apps/:app-id/documentation" [app-id :as {:keys [body]}]
-          (service/success-response (apps/edit-app-docs app-id body)))
+   (PATCH "/apps/:system-id/:app-id/documentation" [system-id app-id :as {:keys [body]}]
+     (service/success-response (apps/edit-app-docs system-id app-id body)))
 
    (DELETE "/apps/:system-id/:app-id/favorite" [system-id app-id]
      (service/success-response (apps/remove-favorite-app system-id app-id)))

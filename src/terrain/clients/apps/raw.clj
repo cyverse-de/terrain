@@ -542,8 +542,8 @@
                :follow-redirects false}))
 
 (defn edit-app-docs
-  [app-id docs]
-  (client/patch (apps-url "apps" app-id "documentation")
+  [system-id app-id docs]
+  (client/patch (apps-url "apps" system-id app-id "documentation")
                 {:query-params     (secured-params)
                  :content-type     :json
                  :body             docs
