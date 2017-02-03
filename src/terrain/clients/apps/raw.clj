@@ -103,8 +103,8 @@
                :follow-redirects false}))
 
 (defn apps-in-category
-  [category-id params]
-  (client/get (apps-url "apps" "categories" category-id)
+  [system-id category-id params]
+  (client/get (apps-url "apps" "categories" system-id category-id)
               {:query-params     (secured-params params apps-sort-params)
                :as               :stream
                :follow-redirects false}))

@@ -17,8 +17,8 @@
    (GET "/apps/categories" [:as {params :params}]
      (service/success-response (apps/get-app-categories params)))
 
-   (GET "/apps/categories/:category-id" [category-id :as {params :params}]
-     (service/success-response (apps/apps-in-category category-id params)))))
+   (GET "/apps/categories/:system-id/:category-id" [system-id category-id :as {params :params}]
+     (service/success-response (apps/apps-in-category system-id category-id params)))))
 
 (defn admin-category-routes
   []
