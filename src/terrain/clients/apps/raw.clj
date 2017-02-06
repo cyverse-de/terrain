@@ -510,8 +510,8 @@
                :follow-redirects false}))
 
 (defn add-category
-  [body]
-  (client/post (apps-url "admin" "apps" "categories")
+  [system-id body]
+  (client/post (apps-url "admin" "apps" "categories" system-id)
                {:query-params     (secured-params)
                 :content-type     :json
                 :body             body
@@ -519,15 +519,15 @@
                 :follow-redirects false}))
 
 (defn delete-category
-  [category-id]
-  (client/delete (apps-url "admin" "apps" "categories" category-id)
+  [system-id category-id]
+  (client/delete (apps-url "admin" "apps" "categories" system-id category-id)
                  {:query-params     (secured-params)
                   :as               :stream
                   :follow-redirects false}))
 
 (defn update-category
-  [category-id body]
-  (client/patch (apps-url "admin" "apps" "categories" category-id)
+  [system-id category-id body]
+  (client/patch (apps-url "admin" "apps" "categories" system-id category-id)
                 {:query-params     (secured-params)
                  :content-type     :json
                  :body             body
