@@ -103,8 +103,8 @@
                :follow-redirects false}))
 
 (defn apps-in-category
-  [category-id params]
-  (client/get (apps-url "apps" "categories" category-id)
+  [system-id category-id params]
+  (client/get (apps-url "apps" "categories" system-id category-id)
               {:query-params     (secured-params params apps-sort-params)
                :as               :stream
                :follow-redirects false}))
@@ -210,8 +210,8 @@
                 :follow-redirects false}))
 
 (defn get-admin-app-details
-  [app-id]
-  (client/get (apps-url "admin" "apps" app-id "details")
+  [system-id app-id]
+  (client/get (apps-url "admin" "apps" system-id app-id "details")
               {:query-params      (secured-params)
                :as                :stream
                :follow-redirects  false}))
@@ -487,15 +487,15 @@
                 :follow-redirects false}))
 
 (defn admin-delete-app
-  [app-id]
-  (client/delete (apps-url "admin" "apps" app-id)
+  [system-id app-id]
+  (client/delete (apps-url "admin" "apps" system-id app-id)
                  {:query-params     (secured-params)
                   :as               :stream
                   :follow-redirects false}))
 
 (defn admin-update-app
-  [app-id body]
-  (client/patch (apps-url "admin" "apps" app-id)
+  [system-id app-id body]
+  (client/patch (apps-url "admin" "apps" system-id app-id)
                 {:query-params     (secured-params)
                  :content-type     :json
                  :body             body
@@ -510,17 +510,8 @@
                :follow-redirects false}))
 
 (defn add-category
-  [body]
-  (client/post (apps-url "admin" "apps" "categories")
-               {:query-params     (secured-params)
-                :content-type     :json
-                :body             body
-                :as               :stream
-                :follow-redirects false}))
-
-(defn delete-categories
-  [body]
-  (client/post (apps-url "admin" "apps" "categories" "shredder")
+  [system-id body]
+  (client/post (apps-url "admin" "apps" "categories" system-id)
                {:query-params     (secured-params)
                 :content-type     :json
                 :body             body
@@ -528,15 +519,15 @@
                 :follow-redirects false}))
 
 (defn delete-category
-  [category-id]
-  (client/delete (apps-url "admin" "apps" "categories" category-id)
+  [system-id category-id]
+  (client/delete (apps-url "admin" "apps" "categories" system-id category-id)
                  {:query-params     (secured-params)
                   :as               :stream
                   :follow-redirects false}))
 
 (defn update-category
-  [category-id body]
-  (client/patch (apps-url "admin" "apps" "categories" category-id)
+  [system-id category-id body]
+  (client/patch (apps-url "admin" "apps" "categories" system-id category-id)
                 {:query-params     (secured-params)
                  :content-type     :json
                  :body             body
@@ -551,8 +542,8 @@
                :follow-redirects false}))
 
 (defn edit-app-docs
-  [app-id docs]
-  (client/patch (apps-url "apps" app-id "documentation")
+  [system-id app-id docs]
+  (client/patch (apps-url "apps" system-id app-id "documentation")
                 {:query-params     (secured-params)
                  :content-type     :json
                  :body             docs
@@ -560,8 +551,8 @@
                  :follow-redirects false}))
 
 (defn add-app-docs
-  [app-id docs]
-  (client/post (apps-url "apps" app-id "documentation")
+  [system-id app-id docs]
+  (client/post (apps-url "apps" system-id app-id "documentation")
                {:query-params     (secured-params)
                 :content-type     :json
                 :body             docs
@@ -569,8 +560,8 @@
                 :follow-redirects false}))
 
 (defn admin-edit-app-docs
-  [app-id docs]
-  (client/patch (apps-url "admin" "apps" app-id "documentation")
+  [system-id app-id docs]
+  (client/patch (apps-url "admin" "apps" system-id app-id "documentation")
                 {:query-params     (secured-params)
                  :content-type     :json
                  :body             docs
@@ -578,8 +569,8 @@
                  :follow-redirects false}))
 
 (defn admin-add-app-docs
-  [app-id docs]
-  (client/post (apps-url "admin" "apps" app-id "documentation")
+  [system-id app-id docs]
+  (client/post (apps-url "admin" "apps" system-id app-id "documentation")
                {:query-params     (secured-params)
                 :content-type     :json
                 :body             docs
@@ -807,8 +798,8 @@
                :follow-redirects false}))
 
 (defn update-app-integration-data
-  [app-id integration-data-id]
-  (client/put (apps-url "admin" "apps" app-id "integration-data" integration-data-id)
+  [system-id app-id integration-data-id]
+  (client/put (apps-url "admin" "apps" system-id app-id "integration-data" integration-data-id)
               {:query-params     (secured-params)
                :as               :stream
                :follow-redirects false}))

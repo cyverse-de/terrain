@@ -17,8 +17,8 @@
    (GET "/apps/categories" [:as {params :params}]
      (service/success-response (apps/get-app-categories params)))
 
-   (GET "/apps/categories/:category-id" [category-id :as {params :params}]
-     (service/success-response (apps/apps-in-category category-id params)))))
+   (GET "/apps/categories/:system-id/:category-id" [system-id category-id :as {params :params}]
+     (service/success-response (apps/apps-in-category system-id category-id params)))))
 
 (defn admin-category-routes
   []
@@ -29,17 +29,14 @@
    (GET "/apps/categories" [:as {params :params}]
      (service/success-response (apps/get-admin-app-categories params)))
 
-   (POST "/apps/categories" [:as {:keys [body]}]
-     (service/success-response (apps/add-category body)))
+   (POST "/apps/categories/:system-id" [system-id :as {:keys [body]}]
+     (service/success-response (apps/add-category system-id body)))
 
-   (POST "/apps/categories/shredder" [:as {:keys [body]}]
-     (service/success-response (apps/delete-categories body)))
+   (DELETE "/apps/categories/:system-id/:category-id" [system-id category-id]
+     (service/success-response (apps/delete-category system-id category-id)))
 
-   (DELETE "/apps/categories/:category-id" [category-id]
-     (service/success-response (apps/delete-category category-id)))
-
-   (PATCH "/apps/categories/:category-id" [category-id :as {:keys [body]}]
-          (service/success-response (apps/update-category category-id body)))))
+   (PATCH "/apps/categories/:system-id/:category-id" [system-id category-id :as {:keys [body]}]
+     (service/success-response (apps/update-category system-id category-id body)))))
 
 (defn app-ontology-routes
   []
@@ -111,23 +108,23 @@
    (POST "/apps/shredder" [:as {:keys [body]}]
      (service/success-response (apps/permanently-delete-apps body)))
 
-   (DELETE "/apps/:app-id" [app-id]
-     (service/success-response (apps/admin-delete-app app-id)))
+   (DELETE "/apps/:system-id/:app-id" [system-id app-id]
+     (service/success-response (apps/admin-delete-app system-id app-id)))
 
-   (PATCH "/apps/:app-id" [app-id :as {:keys [body]}]
-          (service/success-response (apps/admin-update-app app-id body)))
+   (PATCH "/apps/:system-id/:app-id" [system-id app-id :as {:keys [body]}]
+     (service/success-response (apps/admin-update-app system-id app-id body)))
 
-   (GET "/apps/:app-id/details" [app-id]
-     (service/success-response (apps/get-admin-app-details app-id)))
+   (GET "/apps/:system-id/:app-id/details" [system-id app-id]
+     (service/success-response (apps/get-admin-app-details system-id app-id)))
 
-   (POST "/apps/:app-id/documentation" [app-id :as {:keys [body]}]
-     (service/success-response (apps/admin-add-app-docs app-id body)))
+   (POST "/apps/:system-id/:app-id/documentation" [system-id app-id :as {:keys [body]}]
+     (service/success-response (apps/admin-add-app-docs system-id app-id body)))
 
-   (PATCH "/apps/:app-id/documentation" [app-id :as {:keys [body]}]
-          (service/success-response (apps/admin-edit-app-docs app-id body)))
+   (PATCH "/apps/:system-id/:app-id/documentation" [system-id app-id :as {:keys [body]}]
+     (service/success-response (apps/admin-edit-app-docs system-id app-id body)))
 
-   (PUT "/apps/:app-id/integration-data/:integration-data-id" [app-id integration-data-id]
-     (service/success-response (apps/update-app-integration-data app-id integration-data-id)))))
+   (PUT "/apps/:system-id/:app-id/integration-data/:integration-data-id" [system-id app-id integration-data-id]
+     (service/success-response (apps/update-app-integration-data system-id app-id integration-data-id)))))
 
 (defn apps-routes
   []
@@ -180,7 +177,7 @@
      (service/success-response (apps/delete-app system-id app-id)))
 
    (PATCH "/apps/:system-id/:app-id" [system-id app-id :as {:keys [body]}]
-          (service/success-response (apps/relabel-app system-id app-id body)))
+     (service/success-response (apps/relabel-app system-id app-id body)))
 
    (PUT "/apps/:system-id/:app-id" [system-id app-id :as {:keys [body]}]
      (service/success-response (apps/update-app system-id app-id body)))
@@ -194,11 +191,11 @@
    (GET "/apps/:system-id/:app-id/documentation" [system-id app-id]
      (service/success-response (apps/get-app-docs system-id app-id)))
 
-   (POST "/apps/:app-id/documentation" [app-id :as {:keys [body]}]
-     (service/success-response (apps/add-app-docs app-id body)))
+   (POST "/apps/:system-id/:app-id/documentation" [system-id app-id :as {:keys [body]}]
+     (service/success-response (apps/add-app-docs system-id app-id body)))
 
-   (PATCH "/apps/:app-id/documentation" [app-id :as {:keys [body]}]
-          (service/success-response (apps/edit-app-docs app-id body)))
+   (PATCH "/apps/:system-id/:app-id/documentation" [system-id app-id :as {:keys [body]}]
+     (service/success-response (apps/edit-app-docs system-id app-id body)))
 
    (DELETE "/apps/:system-id/:app-id/favorite" [system-id app-id]
      (service/success-response (apps/remove-favorite-app system-id app-id)))
