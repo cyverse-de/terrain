@@ -655,7 +655,7 @@
 (defn search-tools
   [params]
   (client/get (apps-url "tools")
-              {:query-params     (secured-params params [:search :include-hidden])
+              {:query-params     (secured-params params (conj apps-search-params :include-hidden))
                :as               :stream
                :follow-redirects :false}))
 
