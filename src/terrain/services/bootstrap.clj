@@ -42,6 +42,10 @@
   (trap-bootstrap-request
     #(select-keys (apps-client/get-workspace) [:id :new_workspace])))
 
+(defn- get-system-ids
+  []
+  (trap-bootstrap-request apps-client/get-system-ids))
+
 (defn- get-user-data-info
   [user]
   (trap-bootstrap-request
@@ -61,6 +65,7 @@
   (let [{user :shortUsername :keys [email firstName lastName username]} current-user
         login-session (future (get-login-session ip-address user-agent))
         workspace     (future (get-workspace))
+        system-ids    (future (get-system-ids))
         data-info     (future (get-user-data-info user))
         preferences   (future (get-user-prefs username))]
     (service/success-response
@@ -71,5 +76,6 @@
                      :last_name     lastName}
        :session     @login-session
        :workspace   @workspace
+       :system_ids  @system-ids
        :data_info   @data-info
        :preferences @preferences})))

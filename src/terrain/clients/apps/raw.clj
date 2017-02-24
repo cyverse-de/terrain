@@ -687,6 +687,13 @@
                :as               :stream
                :follow-redirects false}))
 
+(defn get-system-ids
+  []
+  (client/get (apps-url "apps" "systems" "ids")
+              {:query-params     (secured-params)
+               :as               :stream
+               :follow-redirects false}))
+
 (defn get-collaborators
   []
   (client/get (apps-url "collaborators")

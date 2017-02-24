@@ -41,6 +41,12 @@
       (:body)
       (service/decode-json)))
 
+(defn get-system-ids
+  []
+  (-> (raw/get-system-ids)
+      (:body)
+      (service/decode-json)))
+
 (defn get-users-by-id
   [ids]
   (-> (raw/get-users-by-id (cheshire/encode {:ids ids}))
