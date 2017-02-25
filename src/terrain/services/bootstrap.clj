@@ -37,14 +37,9 @@
   (trap-bootstrap-request
     #(select-keys (apps-client/record-login ip-address user-agent) [:login_time :auth_redirect])))
 
-(defn- get-workspace
+(defn- get-apps-info
   []
-  (trap-bootstrap-request
-    #(select-keys (apps-client/get-workspace) [:id :new_workspace])))
-
-(defn- get-system-ids
-  []
-  (trap-bootstrap-request apps-client/get-system-ids))
+  (trap-bootstrap-request #(apps-client/bootstrap)))
 
 (defn- get-user-data-info
   [user]
@@ -64,8 +59,7 @@
   (service/assert-valid user-agent "Missing or empty request parameter: user-agent")
   (let [{user :shortUsername :keys [email firstName lastName username]} current-user
         login-session (future (get-login-session ip-address user-agent))
-        workspace     (future (get-workspace))
-        system-ids    (future (get-system-ids))
+        apps-info     (future (get-apps-info))
         data-info     (future (get-user-data-info user))
         preferences   (future (get-user-prefs username))]
     (service/success-response
@@ -75,7 +69,6 @@
                      :first_name    firstName
                      :last_name     lastName}
        :session     @login-session
-       :workspace   @workspace
-       :system_ids  @system-ids
+       :apps_info   @apps-info
        :data_info   @data-info
        :preferences @preferences})))

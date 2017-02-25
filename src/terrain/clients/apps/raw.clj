@@ -680,20 +680,6 @@
                :as               :stream
                :follow-redirects false}))
 
-(defn get-workspace
-  []
-  (client/get (apps-url "workspaces")
-              {:query-params     (secured-params)
-               :as               :stream
-               :follow-redirects false}))
-
-(defn get-system-ids
-  []
-  (client/get (apps-url "apps" "systems" "ids")
-              {:query-params     (secured-params)
-               :as               :stream
-               :follow-redirects false}))
-
 (defn get-collaborators
   []
   (client/get (apps-url "collaborators")
@@ -839,4 +825,11 @@
                :as               :stream
                :body             body
                :content-type     :json
+               :follow-redirects false}))
+
+(defn bootstrap
+  []
+  (client/get (apps-url "bootstrap")
+              {:query-params     (secured-params)
+               :as               :stream
                :follow-redirects false}))

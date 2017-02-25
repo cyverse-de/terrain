@@ -35,18 +35,6 @@
   [submission]
   (raw/submit-job (cheshire/encode submission)))
 
-(defn get-workspace
-  []
-  (-> (raw/get-workspace)
-      (:body)
-      (service/decode-json)))
-
-(defn get-system-ids
-  []
-  (-> (raw/get-system-ids)
-      (:body)
-      (service/decode-json)))
-
 (defn get-users-by-id
   [ids]
   (-> (raw/get-users-by-id (cheshire/encode {:ids ids}))
@@ -73,5 +61,11 @@
 (defn get-auth-redirect-uris
   []
   (-> (raw/get-oauth-redirect-uris)
+      :body
+      service/decode-json))
+
+(defn bootstrap
+  []
+  (-> (raw/bootstrap)
       :body
       service/decode-json))
