@@ -32,7 +32,7 @@
                  [org.biojava.thirdparty/forester "1.005" ]
                  [slingshot "0.12.2"]
                  [org.cyverse/clj-icat-direct "2.8.0"]
-                 [org.cyverse/clj-jargon "2.8.2"]
+                 [org.cyverse/clj-jargon "2.8.3"]
                  [org.cyverse/clojure-commons "2.8.1"]
                  [org.cyverse/tree-urls-client "2.8.1"]
                  [org.cyverse/common-cfg "2.8.1"]
