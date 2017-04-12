@@ -347,6 +347,11 @@
   [props config-valid configs data-routes-enabled]
   "terrain.infosquito.es-url" "http://elasticsearch:9200")
 
+(cc/defprop-optstr es-index
+                   "The ElasticSearch index"
+                   [props config-valid configs data-routes-enabled]
+                   "terrain.es.index" "data")
+
 (cc/defprop-optstr jwt-private-signing-key
   "The path to the private key used for signing JWT assertions."
   [props config-valid configs]
