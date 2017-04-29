@@ -8,6 +8,7 @@
 (def apps-analysis-listing-params (conj apps-sort-params :include-hidden :filter))
 (def apps-search-params (conj apps-sort-params :search))
 (def apps-hierarchy-sort-params (conj apps-sort-params :attr))
+(def tools-search-params (conj apps-search-params :include-hidden :public))
 
 (defn- apps-url
   [& components]
@@ -627,7 +628,14 @@
                :as               :stream
                :follow-redirects false}))
 
-(defn import-tools
+(defn admin-list-tools
+  [params]
+  (client/get (apps-url "admin" "tools")
+              {:query-params     (secured-params params tools-search-params)
+               :as               :stream
+               :follow-redirects :false}))
+
+(defn admin-add-tools
   [body]
   (client/post (apps-url "admin" "tools")
                {:query-params     (secured-params)
@@ -636,14 +644,21 @@
                 :content-type     :json
                 :follow-redirects false}))
 
-(defn delete-tool
+(defn admin-delete-tool
   [tool-id]
   (client/delete (apps-url "admin" "tools" tool-id)
                  {:query-params     (secured-params)
                   :as               :stream
                   :follow-redirects false}))
 
-(defn update-tool
+(defn admin-get-tool
+  [tool-id]
+  (client/get (apps-url "admin" "tools" tool-id)
+              {:query-params     (secured-params)
+               :as               :stream
+               :follow-redirects false}))
+
+(defn admin-update-tool
   [tool-id params tool]
   (client/patch (apps-url "admin" "tools" tool-id)
                 {:query-params     (secured-params params [:overwrite-public])
@@ -652,12 +667,55 @@
                  :content-type     :json
                  :follow-redirects false}))
 
-(defn search-tools
+(defn list-tools
   [params]
   (client/get (apps-url "tools")
-              {:query-params     (secured-params params (conj apps-search-params :include-hidden))
+              {:query-params     (secured-params params tools-search-params)
                :as               :stream
                :follow-redirects :false}))
+
+(defn create-private-tool
+  [body]
+  (client/post (apps-url "tools")
+               {:query-params     (secured-params)
+                :body             body
+                :content-type     :json
+                :as               :stream
+                :follow-redirects false}))
+
+(defn list-tool-permissions
+  [body]
+  (client/post (apps-url "tools" "permission-lister")
+               {:query-params     (secured-params)
+                :body             body
+                :content-type     :json
+                :as               :stream
+                :follow-redirects false}))
+
+(defn share-tool
+  [body]
+  (client/post (apps-url "tools" "sharing")
+               {:query-params     (secured-params)
+                :body             body
+                :content-type     :json
+                :as               :stream
+                :follow-redirects false}))
+
+(defn unshare-tool
+  [body]
+  (client/post (apps-url "tools" "unsharing")
+               {:query-params     (secured-params)
+                :body             body
+                :content-type     :json
+                :as               :stream
+                :follow-redirects false}))
+
+(defn delete-private-tool
+  [tool-id params]
+  (client/delete (apps-url "tools" tool-id)
+                 {:query-params     (secured-params params [:force-delete])
+                  :as               :stream
+                  :follow-redirects false}))
 
 (defn get-tool
   [tool-id]
@@ -665,6 +723,15 @@
               {:query-params     (secured-params)
                :as               :stream
                :follow-redirects false}))
+
+(defn update-private-tool
+  [tool-id tool]
+  (client/patch (apps-url "tools" tool-id)
+                {:query-params     (secured-params)
+                 :as               :stream
+                 :body             tool
+                 :content-type     :json
+                 :follow-redirects false}))
 
 (defn list-reference-genomes
   [params]
