@@ -27,9 +27,9 @@
       (:body)
       (service/decode-json)))
 
-(defn import-tools
+(defn admin-add-tools
   [body]
-  (raw/import-tools (cheshire/encode body)))
+  (raw/admin-add-tools (cheshire/encode body)))
 
 (defn submit-job
   [submission]

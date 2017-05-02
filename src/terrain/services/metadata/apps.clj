@@ -32,7 +32,7 @@
    components are successfully imported."
   [body]
   (let [json (decode-json body)]
-    (dm/import-tools json)
+    (dm/admin-add-tools json)
     (dorun (map dn/send-tool-notification (:tools json))))
   (success-response))
 
