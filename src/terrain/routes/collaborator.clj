@@ -11,10 +11,10 @@
    [config/collaborator-routes-enabled]
 
    (GET "/collaborators" []
-        (service/success-response (apps/get-collaborators)))
+     (service/success-response (apps/get-collaborators)))
 
    (POST "/collaborators" [:as {:keys [body]}]
-         (service/success-response (apps/add-collaborators body)))
+     (service/success-response (apps/add-collaborators body)))
 
    (POST "/remove-collaborators" [:as {:keys [body]}]
-         (service/success-response (apps/remove-collaborators body)))))
+     (service/success-response (apps/remove-collaborators body)))))
