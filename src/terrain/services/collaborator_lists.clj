@@ -8,3 +8,6 @@
 
 (defn add-collaborator-list [{user :shortUsername} body]
   (ipg/add-collaborator-list user body))
+
+(defn get-collaborator-list [{user :shortUsername} name]
+  (ipg/get-collaborator-list user name))

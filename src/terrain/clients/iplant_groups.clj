@@ -114,3 +114,10 @@
     (ensure-collaborator-list-folder-exists client user)
     (->> (c/add-group client user (str folder ":" name) collaborator-list-group-type description)
          (format-collaborator-list folder))))
+
+(defn get-collaborator-list [user name]
+  (let [client (get-client)
+        _      (ensure-collaborator-list-folder-exists client user)
+        folder (get-collaborator-list-folder-name client user)]
+    (->> (c/get-group client user (format "%s:%s" folder name))
+         (format-collaborator-list folder))))
