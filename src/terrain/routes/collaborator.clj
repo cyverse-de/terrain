@@ -20,7 +20,10 @@
      (service/success-response (cl/add-collaborator-list current-user (json/decode (slurp body) true))))
 
    (GET "/collaborator-lists/:name" [name]
-     (service/success-response (cl/get-collaborator-list current-user name)))))
+     (service/success-response (cl/get-collaborator-list current-user name)))
+
+   (DELETE "/collaborator-lists/:name" [name]
+     (service/success-response (cl/delete-collaborator-list current-user name)))))
 
 (defn secured-collaborator-routes
   []

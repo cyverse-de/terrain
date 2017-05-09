@@ -121,3 +121,10 @@
         folder (get-collaborator-list-folder-name client user)]
     (->> (c/get-group client user (format "%s:%s" folder name))
          (format-collaborator-list folder))))
+
+(defn delete-collaborator-list [user name]
+  (let [client (get-client)
+        _      (ensure-collaborator-list-folder-exists client user)
+        folder (get-collaborator-list-folder-name client user)]
+    (->> (c/delete-group client user (format "%s:%s" folder name))
+         (format-collaborator-list folder))))
