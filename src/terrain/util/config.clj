@@ -187,6 +187,11 @@
   [props config-valid configs]
   "terrain.iplant-groups.base-url" "http://iplant-groups:60000")
 
+(cc/defprop-optstr grouper-user
+  "The administrative user to use for Grouper."
+  [props config-valid configs]
+  "terrain.iplant-groups.grouper-user" "de_grouper")
+
 (cc/defprop-optstr jex-base-url
   "The base URL for the JEX."
   [props config-valid configs app-routes-enabled]

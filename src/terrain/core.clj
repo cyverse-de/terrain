@@ -136,6 +136,7 @@
     (apps-routes)
     (analysis-routes)
     (coge-routes)
+    (collaborator-list-routes)
     (reference-genomes-routes)
     (tool-routes)
     (permanent-id-request-routes)

@@ -1,7 +1,10 @@
 (ns terrain.clients.iplant-groups
+  (:use [slingshot.slingshot :only [try+]])
   (:require [cemerick.url :as curl]
             [clj-http.client :as http]
+            [clojure.string :as string]
             [clojure.tools.logging :as log]
+            [cyverse-groups-client.core :as c]
             [terrain.util.config :as config]))
 
 (defn format-like-trellis
@@ -57,3 +60,57 @@
     (when-not (#{200 404} status)
       (throw (Exception. (str "iplant-groups service returned status " status))))
     {:subjects (:subjects (:body res))}))
+
+(defn- get-client []
+  (c/new-cyverse-groups-client (config/ipg-base) (config/environment-name)))
+
+(defn- create-folder [client user name]
+  (c/add-folder client (config/grouper-user) name "")
+  (c/grant-folder-privilege client (config/grouper-user) name user :stem)
+  nil)
+
+(defn- ensure-folder-exists [client user name]
+  (try+
+   (c/get-folder client user name)
+   (catch [:status 404] _
+     (create-folder client user name)))
+  nil)
+
+(def ^:private collaborator-list-group-type "group")
+
+(defn- get-user-folder-name [client user]
+  (c/build-folder-name client (format "users:%s" user)))
+
+(defn- get-collaborator-list-folder-name [client user]
+  (c/build-folder-name client (format "users:%s:collaborator-lists" user)))
+
+(defn- ensure-collaborator-list-folder-exists [client user]
+  (ensure-folder-exists client user (get-user-folder-name client user))
+  (ensure-folder-exists client user (get-collaborator-list-folder-name client user)))
+
+(defn- format-collaborator-list [folder collaborator-list]
+  (let [regex (re-pattern (str "^\\Q" folder ":"))]
+    (update-in (dissoc collaborator-list :detail) [:name] (fn [s] (string/replace s regex "")))))
+
+(defn- get-collaborator-lists* [client user lookup-fn]
+  (ensure-collaborator-list-folder-exists client user)
+  (let [folder (get-collaborator-list-folder-name client user)]
+    {:groups (mapv (partial format-collaborator-list folder) (:groups (lookup-fn folder)))}))
+
+;; This function kind of uses a hack. A search string is required, but if we make it the
+;; same as the folder name then that approximates listing all groups in the folder. An
+;; update to iplant-groups will be required to eliminate this hack.
+(defn get-collaborator-lists
+  ([user]
+   (let [client (get-client)]
+     (get-collaborator-lists* client user (partial c/find-groups client user))))
+  ([user search]
+   (let [client (get-client)]
+     (get-collaborator-lists* client user (partial c/find-groups client user search)))))
+
+(defn add-collaborator-list [user {:keys [name description]}]
+  (let [client (get-client)
+        folder (get-collaborator-list-folder-name client user)]
+    (ensure-collaborator-list-folder-exists client user)
+    (->> (c/add-group client user (str folder ":" name) collaborator-list-group-type description)
+         (format-collaborator-list folder))))
