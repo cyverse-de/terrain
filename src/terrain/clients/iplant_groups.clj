@@ -64,45 +64,53 @@
 (defn- get-client []
   (c/new-cyverse-groups-client (config/ipg-base) (config/environment-name)))
 
-(defn- get-optional-folder [client user name]
+(defn- create-folder [client user name]
+  (c/add-folder client (config/grouper-user) name "")
+  (c/grant-folder-privilege client (config/grouper-user) name user :stem)
+  nil)
+
+(defn- ensure-folder-exists [client user name]
   (try+
    (c/get-folder client user name)
-   (catch [:status 404] _ nil)))
+   (catch [:status 404] _
+     (create-folder client user name)))
+  nil)
 
-(defn- create-user-folder [client user name]
-  (let [folder (c/add-folder client (config/grouper-user) name "")]
-    (c/grant-folder-privilege client (config/grouper-user) name user :stem)
-    folder))
+(def ^:private collaborator-list-group-type "group")
 
-(defn- get-or-add-folder [client user name]
-  (or (get-optional-folder client user name)
-      (create-user-folder client user name)))
+(defn- get-user-folder-name [client user]
+  (c/build-folder-name client (format "users:%s" user)))
 
-(defn- get-collaborator-list-folder [user client]
-  (let [name (c/build-folder-name client (format "users:%s:collaborator-lists" user))]
-    (get-or-add-folder client user (string/replace name  #":[^:]+$" ""))
-    (get-or-add-folder client user name)))
+(defn- get-collaborator-list-folder-name [client user]
+  (c/build-folder-name client (format "users:%s:collaborator-lists" user)))
+
+(defn- ensure-collaborator-list-folder-exists [client user]
+  (ensure-folder-exists client user (get-user-folder-name client user))
+  (ensure-folder-exists client user (get-collaborator-list-folder-name client user)))
 
 (defn- format-collaborator-list [folder collaborator-list]
   (let [regex (re-pattern (str "^\\Q" folder ":"))]
-    (update-in collaborator-list [:name] (fn [s] (string/replace s regex "")))))
+    (update-in (dissoc collaborator-list :detail) [:name] (fn [s] (string/replace s regex "")))))
 
-(def ^:private collaborator-list-group-type "group")
+(defn- get-collaborator-lists* [client user lookup-fn]
+  (ensure-collaborator-list-folder-exists client user)
+  (let [folder (get-collaborator-list-folder-name client user)]
+    {:groups (mapv (partial format-collaborator-list folder) (:groups (lookup-fn folder)))}))
 
 ;; This function kind of uses a hack. A search string is required, but if we make it the
 ;; same as the folder name then that approximates listing all groups in the folder. An
 ;; update to iplant-groups will be required to eliminate this hack.
 (defn get-collaborator-lists
   ([user]
-   (let [client (get-client)
-         folder (:name (get-collaborator-list-folder user client))]
-     {:groups (mapv (partial format-collaborator-list folder) (:groups (c/find-groups client user folder)))}))
+   (let [client (get-client)]
+     (get-collaborator-lists* client user (partial c/find-groups client user))))
   ([user search]
-   (let [client (get-client)
-         folder (:name (get-collaborator-list-folder user client))]
-     {:groups (mapv format-collaborator-list (c/find-groups client user search folder))})))
+   (let [client (get-client)]
+     (get-collaborator-lists* client user (partial c/find-groups client user search)))))
 
 (defn add-collaborator-list [user {:keys [name description]}]
   (let [client (get-client)
-        folder (:name (get-collaborator-list-folder user client))]
-    (c/add-group client user (str folder ":" name) collaborator-list-group-type description)))
+        folder (get-collaborator-list-folder-name client user)]
+    (ensure-collaborator-list-folder-exists client user)
+    (->> (c/add-group client user (str folder ":" name) collaborator-list-group-type description)
+         (format-collaborator-list folder))))
