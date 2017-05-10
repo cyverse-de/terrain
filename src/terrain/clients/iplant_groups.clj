@@ -69,11 +69,16 @@
   (c/grant-folder-privilege client (config/grouper-user) name user :stem)
   nil)
 
-(defn- ensure-folder-exists [client user name]
+(defn- folder-exists? [client user name]
   (try+
    (c/get-folder client user name)
+   true
    (catch [:status 404] _
-     (create-folder client user name)))
+     false)))
+
+(defn- ensure-folder-exists [client user name]
+  (when-not (folder-exists? client user name)
+    (create-folder client user name))
   nil)
 
 (def ^:private collaborator-list-group-type "group")
@@ -93,9 +98,15 @@
     (update-in (dissoc collaborator-list :detail) [:name] (fn [s] (string/replace s regex "")))))
 
 (defn- get-collaborator-lists* [client user lookup-fn]
-  (ensure-collaborator-list-folder-exists client user)
   (let [folder (get-collaborator-list-folder-name client user)]
-    {:groups (mapv (partial format-collaborator-list folder) (:groups (lookup-fn folder)))}))
+    (if (folder-exists? client user folder)
+      {:groups (mapv (partial format-collaborator-list folder) (:groups (lookup-fn folder)))}
+      {:groups []})))
+
+(defn- verify-group-exists [client user name]
+  ;; get-group will return a 404 if the group doesn't exist.
+  (c/get-group client user name)
+  nil)
 
 ;; This function kind of uses a hack. A search string is required, but if we make it the
 ;; same as the folder name then that approximates listing all groups in the folder. An
@@ -113,4 +124,18 @@
         folder (get-collaborator-list-folder-name client user)]
     (ensure-collaborator-list-folder-exists client user)
     (->> (c/add-group client user (str folder ":" name) collaborator-list-group-type description)
+         (format-collaborator-list folder))))
+
+(defn get-collaborator-list [user name]
+  (let [client (get-client)
+        folder (get-collaborator-list-folder-name client user)]
+    (->> (c/get-group client user (format "%s:%s" folder name))
+         (format-collaborator-list folder))))
+
+(defn delete-collaborator-list [user name]
+  (let [client (get-client)
+        folder (get-collaborator-list-folder-name client user)
+        group  (format "%s:%s" folder name)]
+    (verify-group-exists client user group)
+    (->> (c/delete-group client user group)
          (format-collaborator-list folder))))
