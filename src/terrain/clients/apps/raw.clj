@@ -667,6 +667,13 @@
                  :content-type     :json
                  :follow-redirects false}))
 
+(defn admin-get-apps-by-tool
+  [tool-id]
+  (client/get (apps-url "admin" "tools" tool-id "apps")
+              {:query-params     (secured-params)
+               :as               :stream
+               :follow-redirects false}))
+
 (defn list-tools
   [params]
   (client/get (apps-url "tools")
@@ -732,6 +739,13 @@
                  :body             tool
                  :content-type     :json
                  :follow-redirects false}))
+
+(defn get-apps-by-tool
+  [tool-id]
+  (client/get (apps-url "tools" tool-id "apps")
+              {:query-params     (secured-params)
+               :as               :stream
+               :follow-redirects false}))
 
 (defn list-reference-genomes
   [params]

@@ -349,6 +349,9 @@
    (PATCH "/tools/:tool-id" [tool-id :as {:keys [params body]}]
      (apps/admin-update-tool tool-id params body))
 
+   (GET "/tools/:tool-id/apps" [tool-id]
+     (service/success-response (apps/admin-get-apps-by-tool tool-id)))
+
    (PUT "/tools/:tool-id/integration-data/:integration-data-id" [tool-id integration-data-id]
      (service/success-response (apps/update-tool-integration-data tool-id integration-data-id)))
 
@@ -389,6 +392,9 @@
 
    (PATCH "/tools/:tool-id" [tool-id :as {:keys [body]}]
      (apps/update-private-tool tool-id body))
+
+   (GET "/tools/:tool-id/apps" [tool-id]
+     (service/success-response (apps/get-apps-by-tool tool-id)))
 
    (GET "/tools/:tool-id/integration-data" [tool-id]
      (service/success-response (apps/get-tool-integration-data tool-id)))
