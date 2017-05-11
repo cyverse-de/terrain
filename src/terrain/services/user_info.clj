@@ -9,7 +9,7 @@
   "Performs user searches by username, name and e-mail address and returns the
    merged results."
   [search-string]
-     (let [results (ipg/search-subjects (:shortUsername user/current-user) search-string)
+     (let [results (ipg/find-subjects (:shortUsername user/current-user) search-string)
            users (map ipg/format-like-trellis (:subjects results))]
        (success-response {:users users :truncated false})))
 

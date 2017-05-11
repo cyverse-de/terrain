@@ -49,20 +49,13 @@
     user-info
     (empty-user-info short-username)))
 
-(defn search-subjects
-  "Uses iplant-groups's subject search endpoint to retrieve user details."
-  [user search]
-  (let [res (http/get (str (curl/url (config/ipg-base) "subjects"))
-                      ;; Adding wildcards matches previous (trellis) search behavior
-                      {:query-params {:user user :search (str "*" search "*")}
-                       :as           :json})
-        status (:status res)]
-    (when-not (#{200 404} status)
-      (throw (Exception. (str "iplant-groups service returned status " status))))
-    {:subjects (:subjects (:body res))}))
-
 (defn- get-client []
   (c/new-cyverse-groups-client (config/ipg-base) (config/environment-name)))
+
+(defn find-subjects
+  [user search]
+  (let [client (get-client)]
+    (c/find-subjects (get-client) user search)))
 
 (defn- create-folder [client user name]
   (c/add-folder client (config/grouper-user) name "")
