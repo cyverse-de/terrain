@@ -5,6 +5,7 @@
   (:require [cheshire.core :as json]
             [terrain.clients.apps.raw :as apps]
             [terrain.services.collaborator-lists :as cl]
+            [terrain.services.subjects :as subjects]
             [terrain.util.config :as config]
             [terrain.util.service :as service]))
 
@@ -24,6 +25,14 @@
 
    (DELETE "/collaborator-lists/:name" [name]
      (service/success-response (cl/delete-collaborator-list current-user name)))))
+
+(defn subject-routes
+  []
+  (optional-routes
+   [config/collaborator-routes-enabled]
+
+   (GET "/subjects" [:as {:keys [params]}]
+     (service/success-response (subjects/find-subjects current-user params)))))
 
 (defn secured-collaborator-routes
   []
