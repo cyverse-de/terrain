@@ -20,3 +20,6 @@
 
 (defn add-collaborator-list-members [{user :shortUsername} name {:keys [members]}]
   (ipg/add-collaborator-list-members user name members))
+
+(defn remove-collaborator-list-members [{user :shortUsername} name {:keys [members]}]
+  (ipg/remove-collaborator-list-members user name members))

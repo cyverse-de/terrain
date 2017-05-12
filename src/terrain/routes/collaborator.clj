@@ -30,7 +30,11 @@
      (service/success-response (cl/get-collaborator-list-members current-user name)))
 
    (POST "/collaborator-lists/:name/members" [name :as {:keys [body]}]
-     (service/success-response (cl/add-collaborator-list-members current-user name (json/decode (slurp body) true))))))
+     (service/success-response (cl/add-collaborator-list-members current-user name (json/decode (slurp body) true))))
+
+   (POST "/collaborator-lists/:name/members/deleter" [name :as {:keys [body]}]
+     (service/success-response
+      (cl/remove-collaborator-list-members current-user name (json/decode (slurp body) true))))))
 
 (defn subject-routes
   []
