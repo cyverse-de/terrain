@@ -132,3 +132,24 @@
     (verify-group-exists client user group)
     (->> (c/delete-group client user group)
          (format-collaborator-list folder))))
+
+(defn get-collaborator-list-members [user name]
+  (let [client (get-client)
+        folder (get-collaborator-list-folder-name client user)
+        group  (format "%s:%s" folder name)]
+    (verify-group-exists client user group)
+    (c/list-group-members client user group)))
+
+(defn add-collaborator-list-members [user name members]
+  (let [client (get-client)
+        folder (get-collaborator-list-folder-name client user)
+        group  (format "%s:%s" folder name)]
+    (verify-group-exists client user group)
+    (c/add-group-members client user group members)))
+
+(defn remove-collaborator-list-members [user name members]
+  (let [client (get-client)
+        folder (get-collaborator-list-folder-name client user)
+        group  (format "%s:%s" folder name)]
+    (verify-group-exists client user group)
+    (c/remove-group-members client user group members)))
