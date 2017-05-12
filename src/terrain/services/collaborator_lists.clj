@@ -14,3 +14,6 @@
 
 (defn delete-collaborator-list [{user :shortUsername} name]
   (ipg/delete-collaborator-list user name))
+
+(defn add-collaborator-list-members [{user :shortUsername} name {:keys [members]}]
+  (ipg/add-collaborator-list-members user name members))
