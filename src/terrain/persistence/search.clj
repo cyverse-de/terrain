@@ -19,11 +19,16 @@
 
 (defn- connect
   []
-  (try+
-    (es/connect (cfg/es-url))
-    (catch ConnectException _
-      (throw+ {:type ::cx/invalid-cfg
-               :error "cannot connect to elasticsearch"}))))
+  (let [url (cfg/es-url)
+        http-opts (if (or (empty? (cfg/es-user)) (empty? (cfg/es-password)))
+                    {}
+                    {:basic-auth [(cfg/es-user) (cfg/es-password)]
+                     :content-type :application/json})]
+    (try+
+      (es/connect url http-opts)
+      (catch ConnectException _
+        (throw+ {:type ::cx/invalid-cfg
+                 :error "cannot connect to elasticsearch"})))))
 
 
 (defn update-with-script
