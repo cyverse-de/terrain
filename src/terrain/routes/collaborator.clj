@@ -18,13 +18,13 @@
      (service/success-response (cl/get-collaborator-lists current-user params)))
 
    (POST "/collaborator-lists" [:as {:keys [body]}]
-     (service/success-response (cl/add-collaborator-list current-user (json/decode (slurp body) true))))
+     (service/success-response (cl/add-collaborator-list current-user (service/decode-json body))))
 
    (GET "/collaborator-lists/:name" [name]
      (service/success-response (cl/get-collaborator-list current-user name)))
 
    (PATCH "/collaborator-lists/:name" [name :as {:keys [body]}]
-     (service/success-response (cl/update-collaborator-list current-user name (json/decode (slurp body) true))))
+     (service/success-response (cl/update-collaborator-list current-user name (service/decode-json body))))
 
    (DELETE "/collaborator-lists/:name" [name]
      (service/success-response (cl/delete-collaborator-list current-user name)))
@@ -33,11 +33,11 @@
      (service/success-response (cl/get-collaborator-list-members current-user name)))
 
    (POST "/collaborator-lists/:name/members" [name :as {:keys [body]}]
-     (service/success-response (cl/add-collaborator-list-members current-user name (json/decode (slurp body) true))))
+     (service/success-response (cl/add-collaborator-list-members current-user name (service/decode-json body))))
 
    (POST "/collaborator-lists/:name/members/deleter" [name :as {:keys [body]}]
      (service/success-response
-      (cl/remove-collaborator-list-members current-user name (json/decode (slurp body) true))))))
+      (cl/remove-collaborator-list-members current-user name (service/decode-json body))))))
 
 (defn subject-routes
   []
