@@ -23,6 +23,9 @@
    (GET "/collaborator-lists/:name" [name]
      (service/success-response (cl/get-collaborator-list current-user name)))
 
+   (PATCH "/collaborator-lists/:name" [name :as {:keys [body]}]
+     (service/success-response (cl/update-collaborator-list current-user name (json/decode (slurp body) true))))
+
    (DELETE "/collaborator-lists/:name" [name]
      (service/success-response (cl/delete-collaborator-list current-user name)))
 

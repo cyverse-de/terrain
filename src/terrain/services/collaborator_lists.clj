@@ -12,6 +12,9 @@
 (defn get-collaborator-list [{user :shortUsername} name]
   (ipg/get-collaborator-list user name))
 
+(defn update-collaborator-list [{user :shortUsername} name body]
+  (ipg/update-collaborator-list user name body))
+
 (defn delete-collaborator-list [{user :shortUsername} name]
   (ipg/delete-collaborator-list user name))
 

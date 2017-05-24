@@ -1,5 +1,6 @@
 (ns terrain.clients.iplant-groups
-  (:use [slingshot.slingshot :only [try+]])
+  (:use [slingshot.slingshot :only [try+]]
+        [medley.core :only [remove-vals]])
   (:require [cemerick.url :as curl]
             [clj-http.client :as http]
             [clojure.string :as string]
@@ -123,6 +124,15 @@
   (let [client (get-client)
         folder (get-collaborator-list-folder-name client user)]
     (->> (c/get-group client user (format "%s:%s" folder name))
+         (format-collaborator-list folder))))
+
+(defn update-collaborator-list [user old-name {:keys [name description]}]
+  (let [client    (get-client)
+        folder    (get-collaborator-list-folder-name client user)
+        old-group (format "%s:%s" folder old-name)
+        new-group (when name (format "%s:%s" folder name))]
+    (->> (remove-vals nil? {:name new-group :description description})
+         (c/update-group client user old-group)
          (format-collaborator-list folder))))
 
 (defn delete-collaborator-list [user name]
