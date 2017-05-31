@@ -21,10 +21,13 @@
 (defn- empty-user-info
   "Returns an empty user-info record for the given username."
   [username]
-  {:email     ""
-   :firstname ""
-   :id        username
-   :lastname  ""})
+  {:id username
+   :name ""
+   :first_name ""
+   :last_name ""
+   :email ""
+   :institution ""
+   :source_id ""})
 
 (defn- lookup-subject-url
   [short-username]

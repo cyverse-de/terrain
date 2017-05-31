@@ -10,7 +10,7 @@
    merged results."
   [search-string]
      (let [results (ipg/find-subjects (:shortUsername user/current-user) search-string)
-           users (map ipg/format-like-trellis (:subjects results))]
+           users   (:subjects results)]
        (success-response {:users users :truncated false})))
 
 (defn- add-user-info
@@ -18,7 +18,7 @@
   [result [username user-info]]
   (if (nil? user-info)
     result
-    (assoc result username (ipg/format-like-trellis user-info))))
+    (assoc result username user-info)))
 
 (defn- get-user-info
   "Gets the information for a single user, returning a vector in which the first
