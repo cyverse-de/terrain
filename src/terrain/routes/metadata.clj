@@ -355,6 +355,9 @@
    (PUT "/tools/:tool-id/integration-data/:integration-data-id" [tool-id integration-data-id]
      (service/success-response (apps/update-tool-integration-data tool-id integration-data-id)))
 
+   (POST "/tools/:tool-id/publish" [tool-id :as {:keys [body]}]
+     (apps/admin-publish-tool tool-id body))
+
    (GET "/tool-requests" [:as {params :params}]
      (admin-list-tool-requests params))
 

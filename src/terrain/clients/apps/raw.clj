@@ -674,6 +674,15 @@
                :as               :stream
                :follow-redirects false}))
 
+(defn admin-publish-tool
+  [tool-id body]
+  (client/post (apps-url "admin" "tools" tool-id "publish")
+               {:query-params     (secured-params)
+                :body             body
+                :content-type     :json
+                :as               :stream
+                :follow-redirects false}))
+
 (defn list-tools
   [params]
   (client/get (apps-url "tools")
