@@ -192,6 +192,11 @@
   [props config-valid configs]
   "terrain.iplant-groups.grouper-user" "de_grouper")
 
+(cc/defprop-optstr permissions-base
+  "The base URL for the permissions service."
+  [props config-valid configs]
+  "terrain.permissions.base-url" "http://permissions:60000")
+
 (cc/defprop-optstr jex-base-url
   "The base URL for the JEX."
   [props config-valid configs app-routes-enabled]

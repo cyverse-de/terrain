@@ -40,6 +40,7 @@
                  [org.cyverse/common-cli "2.8.1"]
                  [org.cyverse/kameleon "3.0.1"]
                  [org.cyverse/heuristomancer "2.8.0"]
+                 [org.cyverse/permissions-client "2.8.0"]
                  [org.cyverse/service-logging "2.8.0"]]
   :eastwood {:exclude-namespaces [terrain.util.jwt :test-paths]
              :linters [:wrong-arity :wrong-ns-form :wrong-pre-post :wrong-tag :misplaced-docstrings]}
