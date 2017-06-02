@@ -1,5 +1,6 @@
 (ns terrain.services.collaborator-lists
-  (:require [terrain.clients.iplant-groups :as ipg]))
+  (:require [terrain.clients.iplant-groups :as ipg]
+            [terrain.clients.permissions :as perms-client]))
 
 (defn get-collaborator-lists [{user :shortUsername} {:keys [search]}]
   (if-not search
@@ -16,7 +17,9 @@
   (ipg/update-collaborator-list user name body))
 
 (defn delete-collaborator-list [{user :shortUsername} name]
-  (ipg/delete-collaborator-list user name))
+  (let [{:keys [id] :as list} (ipg/delete-collaborator-list user name)]
+    (when id (perms-client/delete-group-subject id))
+    list))
 
 (defn get-collaborator-list-members [{user :shortUsername} name]
   (ipg/get-collaborator-list-members user name))
