@@ -220,3 +220,9 @@
           group     (c/add-group client user full-name team-group-type description)]
       (dorun (map (partial c/grant-group-privilege client user full-name c/public-user) public_privileges))
       (format-group (get-team-folder-name client) group))))
+
+(defn get-team [user name]
+  (let [client (get-client)
+        folder (get-team-folder-name client)]
+    (->> (c/get-group client user (format "%s:%s" folder name))
+         (format-group folder))))

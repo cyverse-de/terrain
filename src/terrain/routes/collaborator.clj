@@ -49,7 +49,10 @@
      (service/success-response (teams/get-teams current-user params)))
 
    (POST "/teams" [:as {:keys [body]}]
-     (service/success-response (teams/add-team current-user (service/decode-json body))))))
+     (service/success-response (teams/add-team current-user (service/decode-json body))))
+
+   (GET "/teams/:name" [name]
+     (service/success-response (teams/get-team current-user name)))))
 
 (defn subject-routes
   []

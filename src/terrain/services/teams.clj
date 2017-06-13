@@ -7,3 +7,6 @@
 
 (defn add-team [{user :shortUsername} body]
   (ipg/add-team user body))
+
+(defn get-team [{user :shortUsername} name]
+  (ipg/get-team user name))
