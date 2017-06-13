@@ -63,7 +63,8 @@
 
 (defn- create-folder [client user name]
   (c/add-folder client (config/grouper-user) name "")
-  (c/grant-folder-privilege client (config/grouper-user) name user :stem)
+  (when-not (= user (config/grouper-user))
+    (c/grant-folder-privilege client (config/grouper-user) name user :stem))
   nil)
 
 (defn- folder-exists? [client user name]
@@ -178,34 +179,42 @@
 
 (def ^:private team-group-type "group")
 
-(defn- get-team-folder-name [client]
-  (c/build-folder-name client "teams"))
-
-(defn- get-user-team-folder-name [client user]
-  (c/build-folder-name client (format "teams:%s" user)))
+(defn- get-team-folder-name [client & [user]]
+  (if-not user
+    (c/build-folder-name client "teams")
+    (c/build-folder-name client (format "teams:%s" user))))
 
 (defn- ensure-team-folder-exists [client user]
-  (ensure-folder-exists client user (get-team-folder-name client))
-  (ensure-folder-exists client user (get-user-team-folder-name client user)))
+  (ensure-folder-exists client (config/grouper-user) (get-team-folder-name client))
+  (ensure-folder-exists client user (get-team-folder-name client user)))
 
-(defn- get-teams* [client user lookup-fn]
+(defn- get-teams* [client user search-folder lookup-fn]
   (let [folder (get-team-folder-name client)]
-    (get-groups* folder (partial format-group folder) client user lookup-fn)))
+    (get-groups* search-folder (partial format-group folder) client user lookup-fn)))
+
+(defn- filter-teams [search result]
+  (update-in result [:groups] (partial filter (comp (partial re-find (re-pattern (str "\\Q" search))) :name))))
+
+(defn- find-groups-with-member [client user member search-folder search]
+  (let [result (c/list-subject-groups client user member search-folder)]
+    (if search
+      (filter-teams search result)
+      result)))
 
 ;; This function kind of uses a hack. A search string is required, but if we make it the
 ;; same as the folder name then that approximates listing all groups in the folder. An
 ;; update to iplant-groups will be required to eliminate this hack.
-(defn get-teams
-  ([user]
-   (let [client (get-client)]
-     (get-teams* client user (partial c/find-groups client user))))
-  ([user search]
-   (let [client (get-client)]
-     (get-teams* client user (partial c/find-groups client user search)))))
+(defn get-teams [user {:keys [search creator member]}]
+  (let [client (get-client)
+        folder (get-team-folder-name client creator)]
+    (->> (cond member (fn [_] (find-groups-with-member client user member folder search))
+               search (partial c/find-groups client user search)
+               :else  (partial c/find-groups client user))
+         (get-teams* client user folder))))
 
 (defn add-team [user {:keys [name description public_privileges]}]
   (let [client (get-client)
-        folder (get-user-team-folder-name client user)]
+        folder (get-team-folder-name client user)]
     (ensure-team-folder-exists client user)
     (let [full-name (str folder ":" name)
           group     (c/add-group client user full-name team-group-type description)]
