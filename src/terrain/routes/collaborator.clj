@@ -6,6 +6,7 @@
             [terrain.clients.apps.raw :as apps]
             [terrain.services.collaborator-lists :as cl]
             [terrain.services.subjects :as subjects]
+            [terrain.services.teams :as teams]
             [terrain.util.config :as config]
             [terrain.util.service :as service]))
 
@@ -38,6 +39,17 @@
    (POST "/collaborator-lists/:name/members/deleter" [name :as {:keys [body]}]
      (service/success-response
       (cl/remove-collaborator-list-members current-user name (service/decode-json body))))))
+
+(defn team-routes
+  []
+  (optional-routes
+   [config/collaborator-routes-enabled]
+
+   (GET "/teams" [:as {:keys [params]}]
+     (service/success-response (teams/get-teams current-user params)))
+
+   (POST "/teams" [:as {:keys [body]}]
+     (service/success-response (teams/add-team current-user (service/decode-json body))))))
 
 (defn subject-routes
   []

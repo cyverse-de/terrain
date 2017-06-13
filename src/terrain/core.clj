@@ -137,6 +137,7 @@
     (analysis-routes)
     (coge-routes)
     (collaborator-list-routes)
+    (team-routes)
     (subject-routes)
     (reference-genomes-routes)
     (tool-routes)
