@@ -63,7 +63,8 @@
 
 (defn- create-folder [client user name]
   (c/add-folder client (config/grouper-user) name "")
-  (c/grant-folder-privilege client (config/grouper-user) name user :stem)
+  (when-not (= user (config/grouper-user))
+    (c/grant-folder-privilege client (config/grouper-user) name user :stem))
   nil)
 
 (defn- folder-exists? [client user name]
@@ -78,6 +79,19 @@
     (create-folder client user name))
   nil)
 
+;;
+
+(defn- format-group [folder group]
+  (let [regex (re-pattern (str "^\\Q" folder ":"))]
+    (update-in (dissoc group :detail) [:name] (fn [s] (string/replace s regex "")))))
+
+(defn- get-groups* [folder format-fn client user lookup-fn]
+  (if (folder-exists? client user folder)
+    {:groups (mapv format-fn (:groups (lookup-fn folder)))}
+    {:groups []}))
+
+;; Collaborator List Functions
+
 (def ^:private collaborator-list-group-type "group")
 
 (defn- get-user-folder-name [client user]
@@ -90,15 +104,9 @@
   (ensure-folder-exists client user (get-user-folder-name client user))
   (ensure-folder-exists client user (get-collaborator-list-folder-name client user)))
 
-(defn- format-collaborator-list [folder collaborator-list]
-  (let [regex (re-pattern (str "^\\Q" folder ":"))]
-    (update-in (dissoc collaborator-list :detail) [:name] (fn [s] (string/replace s regex "")))))
-
 (defn- get-collaborator-lists* [client user lookup-fn]
   (let [folder (get-collaborator-list-folder-name client user)]
-    (if (folder-exists? client user folder)
-      {:groups (mapv (partial format-collaborator-list folder) (:groups (lookup-fn folder)))}
-      {:groups []})))
+    (get-groups* folder (partial format-group folder) client user lookup-fn)))
 
 (defn- verify-group-exists [client user name]
   ;; get-group will return a 404 if the group doesn't exist.
@@ -121,13 +129,13 @@
         folder (get-collaborator-list-folder-name client user)]
     (ensure-collaborator-list-folder-exists client user)
     (->> (c/add-group client user (str folder ":" name) collaborator-list-group-type description)
-         (format-collaborator-list folder))))
+         (format-group folder))))
 
 (defn get-collaborator-list [user name]
   (let [client (get-client)
         folder (get-collaborator-list-folder-name client user)]
     (->> (c/get-group client user (format "%s:%s" folder name))
-         (format-collaborator-list folder))))
+         (format-group folder))))
 
 (defn update-collaborator-list [user old-name {:keys [name description]}]
   (let [client    (get-client)
@@ -136,7 +144,7 @@
         new-group (when name (format "%s:%s" folder name))]
     (->> (remove-vals nil? {:name new-group :description description})
          (c/update-group client user old-group)
-         (format-collaborator-list folder))))
+         (format-group folder))))
 
 (defn delete-collaborator-list [user name]
   (let [client (get-client)
@@ -144,7 +152,7 @@
         group  (format "%s:%s" folder name)]
     (verify-group-exists client user group)
     (->> (c/delete-group client user group)
-         (format-collaborator-list folder))))
+         (format-group folder))))
 
 (defn get-collaborator-list-members [user name]
   (let [client (get-client)
@@ -166,3 +174,55 @@
         group  (format "%s:%s" folder name)]
     (verify-group-exists client user group)
     (c/remove-group-members client user group members)))
+
+;; Team Functions
+
+(def ^:private team-group-type "group")
+
+(defn- get-team-folder-name [client & [user]]
+  (if-not user
+    (c/build-folder-name client "teams")
+    (c/build-folder-name client (format "teams:%s" user))))
+
+(defn- ensure-team-folder-exists [client user]
+  (ensure-folder-exists client (config/grouper-user) (get-team-folder-name client))
+  (ensure-folder-exists client user (get-team-folder-name client user)))
+
+(defn- get-teams* [client user search-folder lookup-fn]
+  (let [folder (get-team-folder-name client)]
+    (get-groups* search-folder (partial format-group folder) client user lookup-fn)))
+
+(defn- filter-teams [search result]
+  (update-in result [:groups] (partial filter (comp (partial re-find (re-pattern (str "\\Q" search))) :name))))
+
+(defn- find-groups-with-member [client user member search-folder search]
+  (let [result (c/list-subject-groups client user member search-folder)]
+    (if search
+      (filter-teams search result)
+      result)))
+
+;; This function kind of uses a hack. A search string is required, but if we make it the
+;; same as the folder name then that approximates listing all groups in the folder. An
+;; update to iplant-groups will be required to eliminate this hack.
+(defn get-teams [user {:keys [search creator member]}]
+  (let [client (get-client)
+        folder (get-team-folder-name client creator)]
+    (->> (cond member (fn [_] (find-groups-with-member client user member folder search))
+               search (partial c/find-groups client user search)
+               :else  (partial c/find-groups client user))
+         (get-teams* client user folder))))
+
+(defn add-team [user {:keys [name description public_privileges]}]
+  (let [client (get-client)
+        folder (get-team-folder-name client user)]
+    (ensure-team-folder-exists client user)
+    (let [full-name (str folder ":" name)
+          group     (c/add-group client user full-name team-group-type description)]
+      (dorun (map (partial c/grant-group-privilege client user full-name c/public-user) public_privileges))
+      (format-group (get-team-folder-name client) group))))
+
+(defn get-team [user name]
+  (let [client (get-client)
+        folder (get-team-folder-name client)]
+    (->> (c/get-group client user (format "%s:%s" folder name))
+         (format-group folder))))
