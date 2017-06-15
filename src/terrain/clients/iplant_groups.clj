@@ -5,7 +5,6 @@
             [clj-http.client :as http]
             [clojure.string :as string]
             [clojure.tools.logging :as log]
-            [clojure-commons.exception-util :as cxu]
             [cyverse-groups-client.core :as c]
             [terrain.util.config :as config]))
 
