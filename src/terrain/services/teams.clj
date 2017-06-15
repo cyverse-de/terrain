@@ -10,3 +10,6 @@
 
 (defn get-team [{user :shortUsername} name]
   (ipg/get-team user name))
+
+(defn update-team [{user :shortUsername} name body]
+  (ipg/update-team user name body))
