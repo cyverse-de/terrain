@@ -55,7 +55,10 @@
      (service/success-response (teams/get-team current-user name)))
 
    (PATCH "/teams/:name" [name :as {:keys [body]}]
-     (service/success-response (teams/update-team current-user name (service/decode-json body))))))
+     (service/success-response (teams/update-team current-user name (service/decode-json body))))
+
+   (DELETE "/teams/:name" [name]
+     (service/success-response (teams/delete-team current-user name)))))
 
 (defn subject-routes
   []

@@ -13,3 +13,6 @@
 
 (defn update-team [{user :shortUsername} name body]
   (ipg/update-team user name body))
+
+(defn delete-team [{user :shortUsername} name]
+  (ipg/delete-team user name))

@@ -240,3 +240,9 @@
          (remove-vals nil?)
          (c/update-group client user (full-group-name name folder))
          (format-group folder))))
+
+(defn delete-team [user name]
+  (let [client (get-client)
+        folder (get-team-folder-name client)]
+    (->> (c/delete-group client user (full-group-name name folder))
+         (format-group folder))))
