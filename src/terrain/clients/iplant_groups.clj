@@ -79,7 +79,11 @@
     (create-folder client user name))
   nil)
 
-;;
+;; General group functions.
+
+(defn- full-group-name [name folder]
+  (when name
+    (format "%s:%s" folder name)))
 
 (defn- format-group [folder group]
   (let [regex (re-pattern (str "^\\Q" folder ":"))]
@@ -134,14 +138,14 @@
 (defn get-collaborator-list [user name]
   (let [client (get-client)
         folder (get-collaborator-list-folder-name client user)]
-    (->> (c/get-group client user (format "%s:%s" folder name))
+    (->> (c/get-group client user (full-group-name name folder))
          (format-group folder))))
 
 (defn update-collaborator-list [user old-name {:keys [name description]}]
   (let [client    (get-client)
         folder    (get-collaborator-list-folder-name client user)
-        old-group (format "%s:%s" folder old-name)
-        new-group (when name (format "%s:%s" folder name))]
+        old-group (full-group-name folder old-name)
+        new-group (when name (full-group-name name folder))]
     (->> (remove-vals nil? {:name new-group :description description})
          (c/update-group client user old-group)
          (format-group folder))))
@@ -149,7 +153,7 @@
 (defn delete-collaborator-list [user name]
   (let [client (get-client)
         folder (get-collaborator-list-folder-name client user)
-        group  (format "%s:%s" folder name)]
+        group  (full-group-name name folder)]
     (verify-group-exists client user group)
     (->> (c/delete-group client user group)
          (format-group folder))))
@@ -157,21 +161,21 @@
 (defn get-collaborator-list-members [user name]
   (let [client (get-client)
         folder (get-collaborator-list-folder-name client user)
-        group  (format "%s:%s" folder name)]
+        group  (full-group-name name folder)]
     (verify-group-exists client user group)
     (c/list-group-members client user group)))
 
 (defn add-collaborator-list-members [user name members]
   (let [client (get-client)
         folder (get-collaborator-list-folder-name client user)
-        group  (format "%s:%s" folder name)]
+        group  (full-group-name name folder)]
     (verify-group-exists client user group)
     (c/add-group-members client user group members)))
 
 (defn remove-collaborator-list-members [user name members]
   (let [client (get-client)
         folder (get-collaborator-list-folder-name client user)
-        group  (format "%s:%s" folder name)]
+        group  (full-group-name name folder)]
     (verify-group-exists client user group)
     (c/remove-group-members client user group members)))
 
@@ -224,5 +228,21 @@
 (defn get-team [user name]
   (let [client (get-client)
         folder (get-team-folder-name client)]
-    (->> (c/get-group client user (format "%s:%s" folder name))
+    (->> (c/get-group client user (full-group-name name folder))
+         (format-group folder))))
+
+(defn update-team [user name updates]
+  (let [client  (get-client)
+        folder  (get-team-folder-name client)
+        creator (first (string/split name #":" 2))]
+    (->> (update (select-keys updates [:name :description]) :name
+                 full-group-name (get-team-folder-name client creator))
+         (remove-vals nil?)
+         (c/update-group client user (full-group-name name folder))
+         (format-group folder))))
+
+(defn delete-team [user name]
+  (let [client (get-client)
+        folder (get-team-folder-name client)]
+    (->> (c/delete-group client user (full-group-name name folder))
          (format-group folder))))
