@@ -94,6 +94,18 @@
     {:groups (mapv format-fn (:groups (lookup-fn folder)))}
     {:groups []}))
 
+(defn- group-exists? [client user name]
+  (try+
+   (c/get-group client user name)
+   true
+   (catch [:status 404] _
+     false)))
+
+(defn- verify-group-exists [client user name]
+  ;; get-group will return a 404 if the group doesn't exist.
+  (c/get-group client user name)
+  nil)
+
 ;; Collaborator List Functions
 
 (def ^:private collaborator-list-group-type "group")
@@ -111,11 +123,6 @@
 (defn- get-collaborator-lists* [client user lookup-fn]
   (let [folder (get-collaborator-list-folder-name client user)]
     (get-groups* folder (partial format-group folder) client user lookup-fn)))
-
-(defn- verify-group-exists [client user name]
-  ;; get-group will return a 404 if the group doesn't exist.
-  (c/get-group client user name)
-  nil)
 
 ;; This function kind of uses a hack. A search string is required, but if we make it the
 ;; same as the folder name then that approximates listing all groups in the folder. An
@@ -169,7 +176,8 @@
   (let [client (get-client)
         folder (get-collaborator-list-folder-name client user)
         group  (full-group-name name folder)]
-    (verify-group-exists client user group)
+    (when-not (group-exists? client user group)
+      (add-collaborator-list user {:name name :description ""}))
     (c/add-group-members client user group members)))
 
 (defn remove-collaborator-list-members [user name members]
