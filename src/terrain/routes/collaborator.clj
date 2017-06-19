@@ -61,7 +61,10 @@
      (service/success-response (teams/delete-team current-user name)))
 
    (GET "/teams/:name/members" [name]
-     (service/success-response (teams/get-team-members current-user name)))))
+     (service/success-response (teams/get-team-members current-user name)))
+
+   (POST "/teams/:name/members" [name :as {:keys [body]}]
+     (service/success-response (teams/add-team-members current-user name (service/decode-json body))))))
 
 (defn subject-routes
   []

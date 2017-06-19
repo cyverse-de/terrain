@@ -265,3 +265,10 @@
         group  (full-group-name name folder)]
     (verify-group-exists client user group)
     (c/list-group-members client user group)))
+
+(defn add-team-members [user name members]
+  (let [client (get-client)
+        folder (get-team-folder-name client)
+        group  (full-group-name name folder)]
+    (verify-group-exists client user group)
+    (c/add-group-members client user group members)))
