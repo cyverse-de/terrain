@@ -242,15 +242,19 @@
 (defn update-team [user name updates]
   (let [client  (get-client)
         folder  (get-team-folder-name client)
-        creator (first (string/split name #":" 2))]
+        creator (first (string/split name #":" 2))
+        group   (full-group-name name folder)]
+    (verify-group-exists client user group)
     (->> (update (select-keys updates [:name :description]) :name
                  full-group-name (get-team-folder-name client creator))
          (remove-vals nil?)
-         (c/update-group client user (full-group-name name folder))
+         (c/update-group client user group)
          (format-group folder))))
 
 (defn delete-team [user name]
   (let [client (get-client)
-        folder (get-team-folder-name client)]
-    (->> (c/delete-group client user (full-group-name name folder))
+        folder (get-team-folder-name client)
+        group  (full-group-name name folder)]
+    (verify-group-exists client user group)
+    (->> (c/delete-group client user group)
          (format-group folder))))
