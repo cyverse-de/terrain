@@ -151,7 +151,7 @@
 (defn update-collaborator-list [user old-name {:keys [name description]}]
   (let [client    (get-client)
         folder    (get-collaborator-list-folder-name client user)
-        old-group (full-group-name folder old-name)
+        old-group (full-group-name old-name folder)
         new-group (when name (full-group-name name folder))]
     (->> (remove-vals nil? {:name new-group :description description})
          (c/update-group client user old-group)
