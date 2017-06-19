@@ -22,3 +22,6 @@
 
 (defn add-team-members [{user :shortUsername} name {:keys [members]}]
   (ipg/add-team-members user name members))
+
+(defn remove-team-members [{user :shortUsername} name {:keys [members]}]
+  (ipg/remove-team-members user name members))
