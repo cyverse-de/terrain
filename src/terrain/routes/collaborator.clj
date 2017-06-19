@@ -58,7 +58,10 @@
      (service/success-response (teams/update-team current-user name (service/decode-json body))))
 
    (DELETE "/teams/:name" [name]
-     (service/success-response (teams/delete-team current-user name)))))
+     (service/success-response (teams/delete-team current-user name)))
+
+   (GET "/teams/:name/members" [name]
+     (service/success-response (teams/get-team-members current-user name)))))
 
 (defn subject-routes
   []

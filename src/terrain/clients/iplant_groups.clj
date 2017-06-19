@@ -258,3 +258,10 @@
     (verify-group-exists client user group)
     (->> (c/delete-group client user group)
          (format-group folder))))
+
+(defn get-team-members [user name]
+  (let [client (get-client)
+        folder (get-team-folder-name client)
+        group  (full-group-name name folder)]
+    (verify-group-exists client user group)
+    (c/list-group-members client user group)))
