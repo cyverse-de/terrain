@@ -16,3 +16,12 @@
 
 (defn delete-team [{user :shortUsername} name]
   (ipg/delete-team user name))
+
+(defn get-team-members [{user :shortUsername} name]
+  (ipg/get-team-members user name))
+
+(defn add-team-members [{user :shortUsername} name {:keys [members]}]
+  (ipg/add-team-members user name members))
+
+(defn remove-team-members [{user :shortUsername} name {:keys [members]}]
+  (ipg/remove-team-members user name members))
