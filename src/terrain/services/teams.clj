@@ -25,3 +25,6 @@
 
 (defn remove-team-members [{user :shortUsername} name {:keys [members]}]
   (ipg/remove-team-members user name members))
+
+(defn list-team-privileges [{user :shortUsername} name]
+  (ipg/list-team-privileges user name))

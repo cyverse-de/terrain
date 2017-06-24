@@ -279,3 +279,15 @@
         group  (full-group-name name folder)]
     (verify-group-exists client user group)
     (c/remove-group-members client user group members)))
+
+(defn- format-group-privileges [m]
+  (let [format-priv  (fn [priv] (dissoc priv :group))
+        format-privs (fn [privs] (vec (distinct (map format-priv privs))))]
+    (update m :privileges format-privs)))
+
+(defn list-team-privileges [user name]
+  (let [client (get-client)
+        folder (get-team-folder-name client)
+        group  (full-group-name name folder)]
+    (verify-group-exists client user group)
+    (format-group-privileges (c/list-group-privileges client user group))))
