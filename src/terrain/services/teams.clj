@@ -28,3 +28,6 @@
 
 (defn list-team-privileges [{user :shortUsername} name]
   (ipg/list-team-privileges user name))
+
+(defn update-team-privileges [{user :shortUsername} name updates]
+  (ipg/update-team-privileges user name updates))

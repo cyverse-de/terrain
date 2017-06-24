@@ -291,3 +291,10 @@
         group  (full-group-name name folder)]
     (verify-group-exists client user group)
     (format-group-privileges (c/list-group-privileges client user group))))
+
+(defn update-team-privileges [user name updates]
+  (let [client (get-client)
+        folder (get-team-folder-name client)
+        group  (full-group-name name folder)]
+    (verify-group-exists client user group)
+    (format-group-privileges (c/update-group-privileges client user group updates))))
