@@ -67,7 +67,13 @@
      (service/success-response (teams/add-team-members current-user name (service/decode-json body))))
 
    (POST "/teams/:name/members/deleter" [name :as {:keys [body]}]
-     (service/success-response (teams/remove-team-members current-user name (service/decode-json body))))))
+     (service/success-response (teams/remove-team-members current-user name (service/decode-json body))))
+
+   (GET "/teams/:name/privileges" [name]
+     (service/success-response (teams/list-team-privileges current-user name)))
+
+   (POST "/teams/:name/privileges" [name :as {:keys [body]}]
+     (service/success-response (teams/update-team-privileges current-user name (service/decode-json body))))))
 
 (defn subject-routes
   []
