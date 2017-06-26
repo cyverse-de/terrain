@@ -266,9 +266,14 @@
     (verify-group-exists client user group)
     (c/list-group-members client user group)))
 
+(defn- format-privilege-updates [subject-ids privileges]
+  {:updates (vec (for [subject-id subject-ids] {:subject_id subject-id :privileges privileges}))})
+
 (defn- grant-optout-privileges [client user group members]
-  (let [updates {:updates (vec (for [member members] {:subject_id member :privileges ["optout"]}))}]
-    (c/update-group-privileges client user group updates {:replace false})))
+  (c/update-group-privileges client user group (format-privilege-updates members ["optout"]) {:replace false}))
+
+(defn- revoke-optout-privileges [client user group members]
+  (c/revoke-group-privileges client user group (format-privilege-updates members ["optout"])))
 
 (defn add-team-members [user name members]
   (let [client (get-client)
@@ -283,6 +288,7 @@
         folder (get-team-folder-name client)
         group  (full-group-name name folder)]
     (verify-group-exists client user group)
+    (revoke-optout-privileges client user group members)
     (c/remove-group-members client user group members)))
 
 (defn- format-group-privileges [m]
