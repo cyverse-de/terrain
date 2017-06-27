@@ -224,13 +224,18 @@
                :else  (partial c/find-groups client user))
          (get-teams* client user folder))))
 
-(defn add-team [user {:keys [name description public_privileges]}]
+(defn- grant-initial-team-privileges [client user group public-privileges]
+  (c/update-group-privileges client user group
+                             {:updates [{:subject_id (config/grouper-user) :privileges ["admin"]}
+                                        {:subject_id c/public-user :privileges public-privileges}]}))
+
+(defn add-team [user {:keys [name description public_privileges] :or {public_privileges []}}]
   (let [client (get-client)
         folder (get-team-folder-name client user)]
     (ensure-team-folder-exists client user)
     (let [full-name (str folder ":" name)
           group     (c/add-group client user full-name team-group-type description)]
-      (dorun (map (partial c/grant-group-privilege client user full-name c/public-user) public_privileges))
+      (grant-initial-team-privileges client user full-name public_privileges)
       (format-group (get-team-folder-name client) group))))
 
 (defn get-team [user name]
