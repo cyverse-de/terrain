@@ -311,7 +311,8 @@
         group  (full-group-name name folder)]
     (verify-group-exists client user group)
     (let [response (c/remove-group-members client user group [user])]
-      (revoke-optout-privileges client (config/grouper-user) group [user]))))
+      (revoke-optout-privileges client (config/grouper-user) group [user])
+      response)))
 
 (defn- format-group-privileges [m]
   (let [format-priv  (fn [priv] (dissoc priv :group))
