@@ -73,7 +73,13 @@
      (service/success-response (teams/list-team-privileges current-user name)))
 
    (POST "/teams/:name/privileges" [name :as {:keys [body]}]
-     (service/success-response (teams/update-team-privileges current-user name (service/decode-json body))))))
+     (service/success-response (teams/update-team-privileges current-user name (service/decode-json body))))
+
+   (POST "/teams/:name/join" [name]
+     (service/success-response (teams/join current-user name)))
+
+   (POST "/teams/:name/leave" [name]
+     (service/success-response (teams/leave current-user name)))))
 
 (defn subject-routes
   []

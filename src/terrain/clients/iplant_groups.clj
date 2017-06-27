@@ -224,13 +224,18 @@
                :else  (partial c/find-groups client user))
          (get-teams* client user folder))))
 
-(defn add-team [user {:keys [name description public_privileges]}]
+(defn- grant-initial-team-privileges [client user group public-privileges]
+  (c/update-group-privileges client user group
+                             {:updates [{:subject_id (config/grouper-user) :privileges ["admin"]}
+                                        {:subject_id c/public-user :privileges public-privileges}]}))
+
+(defn add-team [user {:keys [name description public_privileges] :or {public_privileges []}}]
   (let [client (get-client)
         folder (get-team-folder-name client user)]
     (ensure-team-folder-exists client user)
     (let [full-name (str folder ":" name)
           group     (c/add-group client user full-name team-group-type description)]
-      (dorun (map (partial c/grant-group-privilege client user full-name c/public-user) public_privileges))
+      (grant-initial-team-privileges client user full-name public_privileges)
       (format-group (get-team-folder-name client) group))))
 
 (defn get-team [user name]
@@ -266,11 +271,21 @@
     (verify-group-exists client user group)
     (c/list-group-members client user group)))
 
+(defn- format-privilege-updates [subject-ids privileges]
+  {:updates (vec (for [subject-id subject-ids] {:subject_id subject-id :privileges privileges}))})
+
+(defn- grant-optout-privileges [client user group members]
+  (c/update-group-privileges client user group (format-privilege-updates members ["optout"]) {:replace false}))
+
+(defn- revoke-optout-privileges [client user group members]
+  (c/revoke-group-privileges client user group (format-privilege-updates members ["optout"])))
+
 (defn add-team-members [user name members]
   (let [client (get-client)
         folder (get-team-folder-name client)
         group  (full-group-name name folder)]
     (verify-group-exists client user group)
+    (grant-optout-privileges client user group members)
     (c/add-group-members client user group members)))
 
 (defn remove-team-members [user name members]
@@ -278,7 +293,26 @@
         folder (get-team-folder-name client)
         group  (full-group-name name folder)]
     (verify-group-exists client user group)
+    (revoke-optout-privileges client user group members)
     (c/remove-group-members client user group members)))
+
+(defn join-team [user name]
+  (let [client (get-client)
+        folder (get-team-folder-name client)
+        group  (full-group-name name folder)]
+    (verify-group-exists client user group)
+    (let [response (c/add-group-members client user group [user])]
+      (grant-optout-privileges client (config/grouper-user) group [user])
+      response)))
+
+(defn leave-team [user name]
+  (let [client (get-client)
+        folder (get-team-folder-name client)
+        group  (full-group-name name folder)]
+    (verify-group-exists client user group)
+    (let [response (c/remove-group-members client user group [user])]
+      (revoke-optout-privileges client (config/grouper-user) group [user])
+      response)))
 
 (defn- format-group-privileges [m]
   (let [format-priv  (fn [priv] (dissoc priv :group))
