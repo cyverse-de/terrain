@@ -31,3 +31,9 @@
 
 (defn update-team-privileges [{user :shortUsername} name updates]
   (ipg/update-team-privileges user name updates))
+
+(defn join [{user :shortUsername} name]
+  (ipg/join-team user name))
+
+(defn leave [{user :shortUsername} name]
+  (ipg/leave-team user name))

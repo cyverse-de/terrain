@@ -296,6 +296,23 @@
     (revoke-optout-privileges client user group members)
     (c/remove-group-members client user group members)))
 
+(defn join-team [user name]
+  (let [client (get-client)
+        folder (get-team-folder-name client)
+        group  (full-group-name name folder)]
+    (verify-group-exists client user group)
+    (let [response (c/add-group-members client user group [user])]
+      (grant-optout-privileges client (config/grouper-user) group [user])
+      response)))
+
+(defn leave-team [user name]
+  (let [client (get-client)
+        folder (get-team-folder-name client)
+        group  (full-group-name name folder)]
+    (verify-group-exists client user group)
+    (let [response (c/remove-group-members client user group [user])]
+      (revoke-optout-privileges client (config/grouper-user) group [user]))))
+
 (defn- format-group-privileges [m]
   (let [format-priv  (fn [priv] (dissoc priv :group))
         format-privs (fn [privs] (vec (distinct (map format-priv privs))))]
