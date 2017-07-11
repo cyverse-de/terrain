@@ -39,8 +39,8 @@
     (GET "/permanent-id-requests/:request-id" [request-id]
       (service/success-response (admin-get-permanent-id-request request-id)))
 
-    (POST "/permanent-id-requests/:request-id/ezid" [request-id :as {:keys [body]}]
-      (service/success-response (create-permanent-id request-id body)))
+    (POST "/permanent-id-requests/:request-id/ezid" [request-id]
+      (service/success-response (create-permanent-id request-id)))
 
     (POST "/permanent-id-requests/:request-id/status" [request-id :as {:keys [body]}]
       (service/success-response (update-permanent-id-request request-id body)))))
