@@ -1,5 +1,9 @@
 FROM discoenv/clojure-base:master
 
+ENV CONF_TEMPLATE=/usr/src/app/terrain.properties.tmpl
+ENV CONF_FILENAME=terrain.properties
+ENV PROGRAM=terrain
+
 RUN mkdir -p /etc/iplant/de/crypto && \
     touch /etc/iplant/de/crypto/pubring.gpg && \
     touch /etc/iplant/de/crypto/random_seed && \
@@ -19,7 +23,7 @@ RUN lein uberjar && \
 
 RUN ln -s "/usr/bin/java" "/bin/terrain"
 
-ENTRYPOINT ["terrain", "-Dlogback.configurationFile=/etc/iplant/de/logging/terrain-logging.xml", "-cp", ".:terrain-standalone.jar", "terrain.core"]
+ENTRYPOINT ["run-service", "-Dlogback.configurationFile=/etc/iplant/de/logging/terrain-logging.xml", "-cp", ".:terrain-standalone.jar", "terrain.core"]
 CMD ["--help"]
 
 ARG git_commit=unknown
