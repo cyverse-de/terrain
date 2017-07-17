@@ -1,0 +1,152 @@
+{{ with $base := (printf "configs/%s" (env "DE_ENV")) -}}
+# Connection details.
+{{ with $v := (key (printf "%s/services/port" $base)) }}terrain.app.listen-port = {{ $v }}{{ end }}
+
+# Environment information.
+{{ with $v := (key (printf "%s/de/environment-name" $base)) }}terrain.app.environment-name = {{ $v }}{{ end }}
+
+# Route flags.
+{{ with $v := (key (printf "%s/terrain/routes-notifications" $base)) }}terrain.routes.notifications = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/terrain/routes-apps" $base)) }}terrain.routes.apps          = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/terrain/routes-metadata" $base)) }}terrain.routes.metadata      = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/terrain/routes-prefs" $base)) }}terrain.routes.prefs         = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/terrain/routes-user-info" $base)) }}terrain.routes.user-info     = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/terrain/routes-data" $base)) }}terrain.routes.data          = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/terrain/routes-tree-viewer" $base)) }}terrain.routes.tree-viewer   = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/terrain/routes-session" $base)) }}terrain.routes.session       = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/terrain/routes-collaborator" $base)) }}terrain.routes.collaborator  = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/terrain/routes-coge" $base)) }}terrain.routes.coge          = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/terrain/routes-search" $base)) }}terrain.routes.search        = {{ $v }}{{ end }}
+
+# Terrain base URL.
+{{ with $v := (key (printf "%s/terrain/base" $base)) }}terrain.base-url = {{ $v }}{{ end }}
+
+# iPlant Email service connection settings.
+{{ with $v := (key (printf "%s/email/base" $base)) }}terrain.email.base-url           = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/tool-request/email-dest" $base)) }}terrain.email.tool-request-dest  = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/tool-request/email-src" $base)) }}terrain.email.tool-request-src   = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/permanent-id/email-dest" $base)) }}terrain.email.perm-id-req.dest   = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/permanent-id/email-src" $base)) }}terrain.email.perm-id-req.src    = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/support/email-dest" $base)) }}terrain.email.support-email-dest = {{ $v }}{{ end }}
+
+# Apps connection settings
+{{ with $v := (key (printf "%s/apps/base" $base)) }}terrain.apps.base-url = {{ $v }}{{ end }}
+
+# Metadata connection settings
+{{ with $v := (key (printf "%s/metadata/base" $base)) }}terrain.metadata.base-url = {{ $v }}{{ end }}
+
+# Notification agent connection settings.
+{{ with $v := (key (printf "%s/notifications/base" $base)) }}terrain.notificationagent.base-url = {{ $v }}{{ end }}
+
+# The settings to use for authorization.
+{{ with $v := (key (printf "%s/de/authorized-groups" $base)) }}terrain.cas.allowed-groups  = {{ $v }}{{ end }}
+
+# The domain name to append to the user id to get the fully qualified user id.
+{{ with $v := (key (printf "%s/de/cas-uid-domain" $base)) }}terrain.uid.domain = {{ $v }}{{ end }}
+
+# iplant-groups connection settings
+{{ with $v := (key (printf "%s/groups/base" $base)) }}terrain.iplant-groups.base-url = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/terrain/groups-default-search-limit" $base)) }}terrain.iplant-groups.default-search-limit = {{ $v }}{{ end }}
+
+# Permissions service connection settings
+{{ with $v := (key (printf "%s/permissions/base" $base)) }}terrain.permissions.base-url = {{ $v }}{{ end }}
+
+# JEX connection settings
+{{ with $v := (key (printf "%s/jex/base" $base)) }}terrain.jex.base-url = {{ $v }}/{{ end }}
+
+# Tree viewer settings
+{{ with $v := (key (printf "%s/terrain/tree-parser-base" $base)) }}terrain.tree-viewer.base-url = {{ $v }}{{ end }}
+
+# Data-Store Elastic Search settings
+{{ with $v := (key (printf "%s/elasticsearch/base" $base)) }}terrain.infosquito.es-url = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/elasticsearch/username" $base)) }}terrain.es.username       = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/elasticsearch/password" $base)) }}terrain.es.password       = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/elasticsearch/data-alias" $base)) }}terrain.es.index          = {{ $v }}{{ end }}
+
+# App execution settings
+{{ with $v := (key (printf "%s/analyses/out-dir" $base)) }}terrain.job-exec.default-output-folder = {{ $v }}{{ end }}
+
+# iRODS configuration
+{{ with $v := (key (printf "%s/irods/host" $base)) }}terrain.irods.host          = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/irods/port" $base)) }}terrain.irods.port          = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/irods/user" $base)) }}terrain.irods.user          = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/irods/pass" $base)) }}terrain.irods.pass          = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/irods/base" $base)) }}terrain.irods.home          = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/irods/zone" $base)) }}terrain.irods.zone          = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/irods/resc" $base)) }}terrain.irods.resc          = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/irods/max-retries" $base)) }}terrain.irods.max-retries   = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/irods/retry-sleep" $base)) }}terrain.irods.retry-sleep   = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/irods/use-trash" $base)) }}terrain.irods.use-trash     = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/irods/admin-users" $base)) }}terrain.irods.admin-users   = {{ $v }}{{ end }}
+
+# ICAT configuration
+{{ with $v := (key (printf "%s/icat/host" $base)) }}terrain.icat.host           = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/icat/port" $base)) }}terrain.icat.port           = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/icat/user" $base)) }}terrain.icat.user           = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/icat/password" $base)) }}terrain.icat.password       = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/icat/db" $base)) }}terrain.icat.db             = {{ $v }}{{ end }}
+
+# Garnish configuration
+{{ with $v := (key (printf "%s/data-info/type-detect-attribute" $base)) }}terrain.garnish.type-attribute = {{ $v }}{{ end }}
+
+# File IO settings
+{{ with $v := (key (printf "%s/terrain/url-import-app" $base)) }}terrain.fileio.url-import-app = {{ $v }}{{ end }}
+
+# Filesystem settings
+{{ with $v := (key (printf "%s/data-info/base" $base)) }}terrain.data-info.base-url            = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/data-info/community-data" $base)) }}terrain.fs.community-data             = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/irods/bad-names" $base)) }}terrain.fs.bad-names                  = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/irods/admins" $base)) }}terrain.fs.perms-filter               = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/irods/bad-chars" $base)) }}terrain.fs.bad-chars                  = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/irods/max-paths-in-request" $base)) }}terrain.fs.max-paths-in-request       = {{ $v }}{{ end }}
+
+# JWT settings
+{{ with $v := (key (printf "%s/jwt/private-key-path" $base)) }}terrain.jwt.signing-key.private   = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/jwt/private-key-password" $base)) }}terrain.jwt.signing-key.password  = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/jwt/public-key-path" $base)) }}terrain.jwt.signing-key.public    = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/jwt/signing-key-algorithm" $base)) }}terrain.jwt.signing-key.algorithm = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/jwt/accepted-keys-dir" $base)) }}terrain.jwt.accepted-keys.dir     = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/jwt/validity-window-end" $base)) }}terrain.jwt.validity-window.end   = {{ $v }}{{ end }}
+
+# WSO2 JWT settings
+{{ with $v := (key (printf "%s/jwt/wso2-header" $base)) }}terrain.wso2.jwt-header = {{ $v }}{{ end }}
+
+# COGE settings
+{{ with $v := (key (printf "%s/coge/user" $base)) }}terrain.coge.user             = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/coge/data-folder-name" $base)) }}terrain.coge.data-folder-name = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/coge/base" $base)) }}terrain.coge.base-url         = {{ $v }}{{ end }}
+
+# Search settings
+{{ with $v := (key (printf "%s/terrain/search-default-limit" $base)) }}terrain.search.default-limit = {{ $v }}{{ end }}
+
+# User Preferences Settings
+{{ with $v := (key (printf "%s/user-preferences/base" $base)) }}terrain.preferences.host = {{ $v }}{{ end }}
+
+# User Sessions Settings
+{{ with $v := (key (printf "%s/user-sessions/base" $base)) }}terrain.sessions.host = {{ $v }}{{ end }}
+
+# Saved Searches Settings
+{{ with $v := (key (printf "%s/saved-searches/base" $base)) }}terrain.saved-searches.host = {{ $v }}{{ end }}
+
+# Tree URLs Settings
+{{ with $v := (key (printf "%s/tree-urls/base" $base)) }}terrain.tree-urls.host = {{ $v }}{{ end }}
+
+# Permanent ID Request Settings
+{{ with $v := (key (printf "%s/dc/data-curators-group" $base)) }}terrain.permanent-id.curators-group  = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/dc/staging-dir" $base)) }}terrain.permanent-id.staging-dir     = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/dc/publish-dir" $base)) }}terrain.permanent-id.publish-dir     = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/dc/base" $base)) }}terrain.permanent-id.target-base-url = {{ $v }}{{ end }}
+
+# Permanent ID Request Metadata Attribute Settings
+{{ with $v := (key (printf "%s/permanent-id/attr-identifier" $base)) }}terrain.permanent-id.attr.identifier          = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/permanent-id/attr-alt-identifier" $base)) }}terrain.permanent-id.attr.alt-identifier      = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/permanent-id/attr-alt-identifier-type" $base)) }}terrain.permanent-id.attr.alt-identifier-type = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/permanent-id/attr-publication-year" $base)) }}terrain.permanent-id.attr.publication-year    = {{ $v }}{{ end }}
+
+# Permanent ID Request EZID API Settings
+{{ with $v := (key (printf "%s/permanent-id/base" $base)) }}terrain.permanent-id.ezid.base-url      = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/permanent-id/user" $base)) }}terrain.permanent-id.ezid.username      = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/permanent-id/pass" $base)) }}terrain.permanent-id.ezid.password      = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/permanent-id/shoulders-ark" $base)) }}terrain.permanent-id.ezid.shoulders.ark = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/permanent-id/shoulders-doi" $base)) }}terrain.permanent-id.ezid.shoulders.doi = {{ $v }}{{ end }}
+{{ end -}}
