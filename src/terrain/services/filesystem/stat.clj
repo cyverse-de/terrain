@@ -16,7 +16,9 @@
             [terrain.util.config :as cfg]
             [terrain.services.filesystem.common-paths :as paths]
             [terrain.services.filesystem.icat :as jargon])
-  (:import [org.apache.tika Tika]))
+  (:import [clojure.lang IPersistentMap]
+           [java.io InputStream]
+           [org.apache.tika Tika]))
 
 (defn- count-shares
   [cm user path]
@@ -40,12 +42,17 @@
     (merge stat-map {:share-count (count-shares cm user path)})
     stat-map))
 
-(defn detect-content-type
-  [cm path]
+(defn- detect-media-type-from-contents
+  [^IPersistentMap cm ^String path]
+  (with-open [^InputStream istream (input-stream cm path)]
+    (.detect (Tika.) istream)))
+
+(defn- detect-content-type
+  [^IPersistentMap cm ^String path]
   (let [path-type (.detect (Tika.) (ft/basename path))]
     (if (or (= path-type "application/octet-stream")
             (= path-type "text/plain"))
-      (.detect (Tika.) (input-stream cm path))
+      (detect-media-type-from-contents cm path)
       path-type)))
 
 (defn- merge-type-info
