@@ -19,6 +19,11 @@
 ;; Status Codes.
 (def ^:private status-code-completion "Completion")
 (def ^:private status-code-failed "Failed")
+(def ^:private completion-comment-fmt
+"%s
+
+To create a link to your data using the DOI, append https://doi.org to the identifier.
+For example, https://doi.org/10.7946/P2G596 links to the DOI 10.7946/P2G596.")
 
 (def ^:private ezid-target-attr "_target")
 
@@ -372,10 +377,13 @@
       (throw+ e))))
 
 (defn create-permanent-id
-  [request-id body]
+  [request-id]
   (create-publish-dir)
-  (let [identifier (complete-permanent-id-request (:shortUsername current-user)
-                                                  (admin-get-permanent-id-request request-id))]
+  (let [{request-type :type :as request} (admin-get-permanent-id-request request-id)
+        identifier                       (complete-permanent-id-request (:shortUsername current-user) request)
+        comments                         (if (= "DOI" request-type)
+                                           (format completion-comment-fmt identifier)
+                                           identifier)]
     (update-permanent-id-request request-id (json/encode {:status       status-code-completion
-                                                          :comments     identifier
+                                                          :comments     comments
                                                           :permanent_id identifier}))))
