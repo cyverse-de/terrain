@@ -16,20 +16,28 @@
 (defn update-collaborator-list [{user :shortUsername} name body]
   (ipg/update-collaborator-list user name body))
 
-(defn delete-collaborator-list [{user :shortUsername} name]
+(defn- perms-subject-for [{source-id :source_id :as subject}]
+  {:subject_type (if (= source-id "g:gsa") "group" "user")
+   :subject_id   ((some-fn :subject_id :id) subject)})
+
+(defn- delete-collaborator-list* [user name & [postproc-fn]]
   (let [{:keys [id] :as list} (ipg/delete-collaborator-list user name)]
-    (when id (perms-client/delete-group-subject id))
+    (when [id]
+      (when postproc-fn (postproc-fn id))
+      (perms-client/delete-group-subject id))
     list))
+
+(defn delete-collaborator-list [{user :shortUsername} name {retain-permissions? :retain-permissions}]
+  (if (Boolean/parseBoolean retain-permissions?)
+    (let [subjects (mapv perms-subject-for (:members (ipg/get-collaborator-list-members user name)))]
+      (delete-collaborator-list* user name (fn [group-id] (perms-client/copy-permissions "group" group-id subjects))))
+    (delete-collaborator-list* user name)))
 
 (defn get-collaborator-list-members [{user :shortUsername} name]
   (ipg/get-collaborator-list-members user name))
 
 (defn add-collaborator-list-members [{user :shortUsername} name {:keys [members]}]
   (ipg/add-collaborator-list-members user name members))
-
-(defn- perms-subject-for [{source-id :source_id subject-id :subject_id}]
-  {:subject_type (if (= source-id "g:gsa") "group" "user")
-   :subject_id   subject-id})
 
 (defn- copy-collaborator-list-permissions [user group-id {:keys [results]}]
   (when-let [subjects (seq (for [result results :when (:success result)] (perms-subject-for result)))]
