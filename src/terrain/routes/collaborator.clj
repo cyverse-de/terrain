@@ -27,8 +27,8 @@
    (PATCH "/collaborator-lists/:name" [name :as {:keys [body]}]
      (service/success-response (cl/update-collaborator-list current-user name (service/decode-json body))))
 
-   (DELETE "/collaborator-lists/:name" [name]
-     (service/success-response (cl/delete-collaborator-list current-user name)))
+   (DELETE "/collaborator-lists/:name" [name :as {:keys [params]}]
+     (service/success-response (cl/delete-collaborator-list current-user name params)))
 
    (GET "/collaborator-lists/:name/members" [name]
      (service/success-response (cl/get-collaborator-list-members current-user name)))
@@ -36,9 +36,9 @@
    (POST "/collaborator-lists/:name/members" [name :as {:keys [body]}]
      (service/success-response (cl/add-collaborator-list-members current-user name (service/decode-json body))))
 
-   (POST "/collaborator-lists/:name/members/deleter" [name :as {:keys [body]}]
+   (POST "/collaborator-lists/:name/members/deleter" [name :as {:keys [body params]}]
      (service/success-response
-      (cl/remove-collaborator-list-members current-user name (service/decode-json body))))))
+      (cl/remove-collaborator-list-members current-user name (service/decode-json body) params)))))
 
 (defn team-routes
   []

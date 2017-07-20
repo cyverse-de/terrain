@@ -16,3 +16,8 @@
    (c/delete-subject (get-client) external-id "group")
    (catch [:status 404] _))
   nil)
+
+(defn copy-permissions
+  "Copies permissions from one subject to one or more other subjects."
+  [source-type source-id dest-subjects]
+  (c/copy-permissions (get-client) source-type source-id dest-subjects))

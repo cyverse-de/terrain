@@ -8,6 +8,21 @@
             [cyverse-groups-client.core :as c]
             [terrain.util.config :as config]))
 
+;; General group name functions.
+
+(defn- get-user-folder-name [client user]
+  (c/build-folder-name client (format "users:%s" user)))
+
+(defn- get-collaborator-list-folder-name [client user]
+  (c/build-folder-name client (format "users:%s:collaborator-lists" user)))
+
+(defn- get-team-folder-name [client & [user]]
+  (if-not user
+    (c/build-folder-name client "teams")
+    (c/build-folder-name client (format "teams:%s" user))))
+
+;; Subject search functions.
+
 (defn format-like-trellis
   "Reformat an iplant-groups response to look like a trellis response."
   [response]
@@ -56,10 +71,24 @@
 (defn- get-client []
   (c/new-cyverse-groups-client (config/ipg-base) (config/environment-name)))
 
+(defn- build-group-name-prefix-regex [client user]
+  (->> [(get-collaborator-list-folder-name client user) (get-team-folder-name client)]
+       (mapv (partial format "\\Q%s\\E"))
+       (string/join "|")
+       (format "^(?:%s):")
+       re-pattern))
+
+(defn- format-subjects [subjects client user]
+  (let [regex (build-group-name-prefix-regex client user)]
+    (vec (for [subject subjects]
+           (assoc subject
+             :display_name (:name subject)
+             :name         (string/replace (:name subject) regex ""))))))
+
 (defn find-subjects
   [user search]
   (let [client (get-client)]
-    (c/find-subjects (get-client) user search)))
+    (update (c/find-subjects (get-client) user search) :subjects format-subjects client user)))
 
 (defn- create-folder [client user name]
   (c/add-folder client (config/grouper-user) name "")
@@ -109,12 +138,6 @@
 ;; Collaborator List Functions
 
 (def ^:private collaborator-list-group-type "group")
-
-(defn- get-user-folder-name [client user]
-  (c/build-folder-name client (format "users:%s" user)))
-
-(defn- get-collaborator-list-folder-name [client user]
-  (c/build-folder-name client (format "users:%s:collaborator-lists" user)))
 
 (defn- ensure-collaborator-list-folder-exists [client user]
   (ensure-folder-exists client user (get-user-folder-name client user))
@@ -190,11 +213,6 @@
 ;; Team Functions
 
 (def ^:private team-group-type "group")
-
-(defn- get-team-folder-name [client & [user]]
-  (if-not user
-    (c/build-folder-name client "teams")
-    (c/build-folder-name client (format "teams:%s" user))))
 
 (defn- ensure-team-folder-exists [client user]
   (ensure-folder-exists client (config/grouper-user) (get-team-folder-name client))

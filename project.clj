@@ -11,7 +11,7 @@
   :description "Discovery Environment API gateway/API services catch-all project"
   :url "https://github.com/cyverse-de/terrain"
   :license {:name "BSD Standard License"
-            :url "http://www.iplantcollaborative.org/sites/default/files/iPLANT-LICENSE.txt"}
+            :url "http://www.cyverse.org/sites/default/files/iPLANT-LICENSE.txt"}
   :manifest {"Git-Ref" ~(git-ref)}
   :uberjar-name "terrain-standalone.jar"
   :dependencies [[org.clojure/clojure "1.8.0"]
@@ -34,13 +34,13 @@
                  [org.cyverse/clj-icat-direct "2.8.0"]
                  [org.cyverse/clj-jargon "2.8.3"]
                  [org.cyverse/clojure-commons "2.8.1"]
-                 [org.cyverse/cyverse-groups-client "0.1.2-SNAPSHOT"]
+                 [org.cyverse/cyverse-groups-client "0.1.2"]
                  [org.cyverse/tree-urls-client "2.8.1"]
                  [org.cyverse/common-cfg "2.8.1"]
                  [org.cyverse/common-cli "2.8.1"]
                  [org.cyverse/kameleon "3.0.1"]
                  [org.cyverse/heuristomancer "2.8.0"]
-                 [org.cyverse/permissions-client "2.8.0"]
+                 [org.cyverse/permissions-client "2.8.1"]
                  [org.cyverse/service-logging "2.8.0"]]
   :eastwood {:exclude-namespaces [terrain.util.jwt :test-paths]
              :linters [:wrong-arity :wrong-ns-form :wrong-pre-post :wrong-tag :misplaced-docstrings]}
