@@ -27,5 +27,18 @@
 (defn add-collaborator-list-members [{user :shortUsername} name {:keys [members]}]
   (ipg/add-collaborator-list-members user name members))
 
-(defn remove-collaborator-list-members [{user :shortUsername} name {:keys [members]}]
-  (ipg/remove-collaborator-list-members user name members))
+(defn- perms-subject-for [{source-id :source_id subject-id :subject_id}]
+  {:subject_type (if (= source-id "g:gsa") "group" "user")
+   :subject_id   subject-id})
+
+(defn- copy-collaborator-list-permissions [user group-id {:keys [results]}]
+  (when-let [subjects (seq (for [result results :when (:success result)] (perms-subject-for result)))]
+    (perms-client/copy-permissions "group" group-id subjects)))
+
+(defn remove-collaborator-list-members
+  [{user :shortUsername} name {:keys [members]} {retain-permissions? :retain-permissions}]
+  (let [group-id (:id (ipg/get-collaborator-list user name))
+        results  (ipg/remove-collaborator-list-members user name members)]
+    (when (Boolean/parseBoolean retain-permissions?)
+      (copy-collaborator-list-permissions user group-id results))
+    results))

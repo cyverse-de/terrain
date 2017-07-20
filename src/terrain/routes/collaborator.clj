@@ -36,9 +36,9 @@
    (POST "/collaborator-lists/:name/members" [name :as {:keys [body]}]
      (service/success-response (cl/add-collaborator-list-members current-user name (service/decode-json body))))
 
-   (POST "/collaborator-lists/:name/members/deleter" [name :as {:keys [body]}]
+   (POST "/collaborator-lists/:name/members/deleter" [name :as {:keys [body params]}]
      (service/success-response
-      (cl/remove-collaborator-list-members current-user name (service/decode-json body))))))
+      (cl/remove-collaborator-list-members current-user name (service/decode-json body) params)))))
 
 (defn team-routes
   []
