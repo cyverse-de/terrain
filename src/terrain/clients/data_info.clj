@@ -307,8 +307,8 @@
 
    Returns:
      It returns a path-stat map containing an additional UUID field."
-  [^String user ^UUID uuid]
-  (-> (raw/collect-stats user :ids [uuid])
+  [^String user ^UUID uuid & {:keys [filter-include filter-exclude]}]
+  (-> (raw/collect-path-info user :ids [uuid] :filter-include filter-include :filter-exclude filter-exclude)
       :body
       json/decode
       (get-in ["ids" (str uuid)])

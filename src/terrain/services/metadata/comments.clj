@@ -93,7 +93,7 @@
   (let [user        (:shortUsername user/current-user)
         comment-id  (valid/extract-uri-uuid comment-id)
         entry-id    (extract-accessible-entry-id user entry-id)
-        owns-entry? (= (keyword (:permission (data/stat-by-uuid user entry-id))) :own)]
+        owns-entry? (= (keyword (:permission (data/stat-by-uuid user entry-id :filter-include "permission"))) :own)]
     (if owns-entry?
       (metadata/admin-update-data-retract-status entry-id comment-id retracted)
       (metadata/update-data-retract-status entry-id comment-id retracted))))
