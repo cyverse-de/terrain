@@ -68,6 +68,7 @@ For example, https://doi.org/10.7946/P2G596 links to the DOI 10.7946/P2G596.")
              :permanent-id permanent_id})))
 
 (defn- validate-request-target-type
+  "Validate the target is a folder. Needs the :type key."
   [{target-type :type :as folder}]
   (let [target-type (metadata/resolve-data-type target-type)]
     (when-not (= target-type "folder")
@@ -77,6 +78,7 @@ For example, https://doi.org/10.7946/P2G596 links to the DOI 10.7946/P2G596.")
     target-type))
 
 (defn- validate-owner
+  "Validate ownership. Needs only id and permission"
   [user {:keys [id permission] :as data-item}]
   (when-not (= (keyword permission) :own)
     (throw+ {:type :clojure-commons.exception/not-owner
@@ -86,6 +88,7 @@ For example, https://doi.org/10.7946/P2G596 links to the DOI 10.7946/P2G596.")
   data-item)
 
 (defn- validate-folder-not-empty
+  "Validate non-empty. Needs file-count and dir-count"
   [{:keys [dir-count file-count] :as folder}]
   (when-not (and dir-count file-count (<= 1 (+ dir-count file-count)))
     (throw+ {:type :clojure-commons.exception/bad-request-field
@@ -118,6 +121,7 @@ For example, https://doi.org/10.7946/P2G596 links to the DOI 10.7946/P2G596.")
   data-item)
 
 (defn- validate-data-item
+  "Validate then return a data item. Needs: path, plus what's needed by called validate- functions"
   [user {:keys [path] :as data-item}]
   (validate-owner user data-item)
   (validate-request-target-type data-item)
@@ -227,9 +231,10 @@ For example, https://doi.org/10.7946/P2G596 links to the DOI 10.7946/P2G596.")
       (config/permanent-id-date-attr) (str (time/year (time/now))))))
 
 (defn- get-validated-data-item
-  "Gets data-info stat for the given ID and checks if the data item is valid for a Permanent ID request."
+  "Gets data-info stat for the given ID and checks if the data item is valid for a Permanent ID request.
+  Should filter the stat to what's needed for validation and by callers."
   [user data-id]
-  (let [data-item (->> data-id (data-info/stat-by-uuid user) (validate-data-item user))
+  (let [data-item (->> (data-info/stat-by-uuid user data-id :filter-include "path,id,type,permission,file-count,dir-count") (validate-data-item user))
         metadata (data-info/get-metadata-json user data-id)]
     (parse-valid-ezid-metadata data-item metadata)
     data-item))
