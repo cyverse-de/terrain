@@ -234,6 +234,11 @@
     [params body]
     (raw/collect-permissions (:user params) (:paths body)))
 
+(defn path-list-creator
+  "Uses the data-info path-list-creator endpoint to create an HT Path List files for a set of file/folder paths."
+  [params body]
+  (raw/path-list-creator (:user params) (:paths body) params))
+
 (def get-type-list raw/get-type-list)
 
 (defn set-file-type

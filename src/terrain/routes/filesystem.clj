@@ -37,6 +37,9 @@
     (GET "/filesystem/paged-directory" [:as req]
       (controller req dir/do-paged-listing :params))
 
+    (POST "/filesystem/path-list-creator" [:as req]
+      (controller req data/path-list-creator :params :body))
+
     (POST "/filesystem/directories" [:as req]
       (controller req data/create-dirs :params :body))
 

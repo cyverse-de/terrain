@@ -321,3 +321,11 @@
   [user path-uuid type]
   (request :put ["data" path-uuid "type"]
            (mk-req-map user (json/encode {:type type}))))
+
+(defn path-list-creator
+  "Uses the data-info path-list-creator endpoint to create an HT Path List files for a set of file/folder paths."
+  [user paths params]
+  (request :post ["path-list-creator"]
+           (mk-req-map user
+                       (json/encode {:paths paths})
+                       (select-keys params [:dest :name-pattern :info-type :folders-only :recursive]))))
