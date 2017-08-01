@@ -193,7 +193,7 @@
         folder (get-collaborator-list-folder-name client user)
         group  (full-group-name name folder)]
     (verify-group-exists client user group)
-    (c/list-group-members client user group)))
+    (update (c/list-group-members client user group) :members format-subjects client user)))
 
 (defn add-collaborator-list-members [user name members]
   (let [client (get-client)
@@ -287,7 +287,7 @@
         folder (get-team-folder-name client)
         group  (full-group-name name folder)]
     (verify-group-exists client user group)
-    (c/list-group-members client user group)))
+    (update (c/list-group-members client user group) :members format-subjects client user)))
 
 (defn- format-privilege-updates [subject-ids privileges]
   {:updates (vec (for [subject-id subject-ids] {:subject_id subject-id :privileges privileges}))})
