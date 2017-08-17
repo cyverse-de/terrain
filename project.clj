@@ -11,7 +11,7 @@
   :description "Discovery Environment API gateway/API services catch-all project"
   :url "https://github.com/cyverse-de/terrain"
   :license {:name "BSD Standard License"
-            :url "http://www.cyverse.org/sites/default/files/iPLANT-LICENSE.txt"}
+            :url "http://www.cyverse.org/sites/default/files/CyVerse-LICENSE.txt"}
   :manifest {"Git-Ref" ~(git-ref)}
   :uberjar-name "terrain-standalone.jar"
   :dependencies [[org.clojure/clojure "1.8.0"]
