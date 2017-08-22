@@ -1,7 +1,8 @@
 (ns terrain.services.teams
   (:require [terrain.clients.iplant-groups :as ipg]
             [terrain.clients.permissions :as perms-client]
-            [terrain.clients.notifications :as cn]))
+            [terrain.clients.notifications :as cn]
+            [terrain.util.service :as service]))
 
 (defn get-teams [{user :shortUsername} params]
   (ipg/get-teams user (select-keys params [:search :creator :member])))
@@ -39,6 +40,12 @@
 (defn join-request [{user :shortUsername user-name :commonName email :email} name message]
   (let [admin (first (ipg/get-team-admins user name))]
     (cn/send-team-join-notification user-name email name admin message)))
+
+(defn deny-join-request [{user :shortUsername} name requester message]
+  (ipg/verify-team-exists user name)
+  (if-let [email (:email (ipg/lookup-subject user requester))]
+    (cn/send-team-join-denial requester email name message)
+    (service/not-found "user" requester)))
 
 (defn leave [{user :shortUsername} name]
   (ipg/leave-team user name))

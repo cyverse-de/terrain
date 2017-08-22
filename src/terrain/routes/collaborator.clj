@@ -84,6 +84,11 @@
            message (if-not (string/blank? encoded) (:message (service/decode-json encoded)) "")]
        (service/success-response (teams/join-request current-user name message))))
 
+   (POST "/teams/:name/join-request/:requester/deny" [name requester :as {:keys [body]}]
+     (let [encoded (slurp body)
+           message (if-not (string/blank? encoded) (:message (service/decode-json encoded)) "")]
+       (service/success-response (teams/deny-join-request current-user name requester message))))
+
    (POST "/teams/:name/leave" [name]
      (service/success-response (teams/leave current-user name)))))
 
