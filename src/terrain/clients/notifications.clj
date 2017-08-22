@@ -53,7 +53,8 @@
                         :subject (str user-name " has requested to join team \"" team-name "\"")
                         :email true
                         :email_template "team_join_request"
-                        :payload {:requester_name user-name
+                        :payload {:email_address (:email admin)
+                                  :requester_name user-name
                                   :requester_email user-email
                                   :requester_message message
                                   :team_name team-name}})))

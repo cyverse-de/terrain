@@ -1,6 +1,5 @@
 (ns terrain.services.teams
-  (:require [clojure.tools.logging :as log]
-            [terrain.clients.iplant-groups :as ipg]
+  (:require [terrain.clients.iplant-groups :as ipg]
             [terrain.clients.permissions :as perms-client]
             [terrain.clients.notifications :as cn]))
 
@@ -38,7 +37,6 @@
   (ipg/join-team user name))
 
 (defn join-request [{user :shortUsername user-name :commonName email :email :as user-info} name message]
-  (log/spy :warn user-info)
   (let [admin (first (ipg/get-team-admins user name))]
     (cn/send-team-join-notification user-name email name admin message)))
 
