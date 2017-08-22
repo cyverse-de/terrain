@@ -32,7 +32,8 @@
    :email         (:email jwt-user)
    :firstName     (:given-name jwt-user)
    :lastName      (:family-name jwt-user)
-   :commonName    (:common-name jwt-user)})
+   :commonName    (or (:common-name jwt-user)
+                      (str (:given-name jwt-user) " " (:family-name jwt-user)))})
 
 (defn user-from-wso2-assertion
   [jwt]

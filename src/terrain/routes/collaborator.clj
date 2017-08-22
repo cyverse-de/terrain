@@ -3,6 +3,7 @@
         [terrain.auth.user-attributes :only [current-user]]
         [terrain.util :only [optional-routes]])
   (:require [cheshire.core :as json]
+            [clojure.string :as string]
             [terrain.clients.apps.raw :as apps]
             [terrain.services.collaborator-lists :as cl]
             [terrain.services.subjects :as subjects]
@@ -77,6 +78,11 @@
 
    (POST "/teams/:name/join" [name]
      (service/success-response (teams/join current-user name)))
+
+   (POST "/teams/:name/join-request" [name :as {:keys [body]}]
+     (let [encoded (slurp body)
+           message (if-not (string/blank? encoded) (:message (service/decode-json encoded)) "")]
+       (service/success-response (teams/join-request current-user name message))))
 
    (POST "/teams/:name/leave" [name]
      (service/success-response (teams/leave current-user name)))))

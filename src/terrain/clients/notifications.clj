@@ -44,6 +44,20 @@
         (catch Exception e
           (log/warn e "unable to send tool deployment notification for" m))))))
 
+(defn send-team-join-notification
+  "Sends a notification indicating that a user has requested to join a team."
+  [user-name user-email team-name admin message]
+  (try
+    (send-notification {:type "team"
+                        :user (:id admin)
+                        :subject (str user-name " has requested to join team \"" team-name "\"")
+                        :email true
+                        :email_template "team_join_request"
+                        :payload {:requester_name user-name
+                                  :requester_email user-email
+                                  :requester_message message
+                                  :team_name team-name}})))
+
 (defn mark-all-notifications-seen
   []
   (raw/mark-all-notifications-seen (cheshire/encode (add-current-user-to-map {}))))

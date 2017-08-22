@@ -289,6 +289,16 @@
     (verify-group-exists client user group)
     (update (c/list-group-members client user group) :members format-subjects client user)))
 
+(defn get-team-admins [user name]
+  (let [client (get-client)
+        folder (get-team-folder-name client)
+        group  (full-group-name name folder)]
+    (verify-group-exists client user group)
+    (->> (c/list-group-privileges client (config/grouper-user) group {:subject-source-id "ldap" :privilege "admin"})
+         :privileges
+         (mapv :subject)
+         (remove (comp (partial = (config/grouper-user)) :id)))))
+
 (defn- format-privilege-updates [subject-ids privileges]
   {:updates (vec (for [subject-id subject-ids] {:subject_id subject-id :privileges privileges}))})
 
