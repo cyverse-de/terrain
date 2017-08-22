@@ -262,6 +262,11 @@
     (->> (c/get-group client user (full-group-name name folder))
          (format-group folder))))
 
+(defn verify-team-exists [user name]
+  ;; get-team will return a 404 if the team doesn't exist.
+  (get-team user name)
+  nil)
+
 (defn update-team [user name updates]
   (let [client  (get-client)
         folder  (get-team-folder-name client)

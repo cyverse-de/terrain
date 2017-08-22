@@ -47,17 +47,28 @@
 (defn send-team-join-notification
   "Sends a notification indicating that a user has requested to join a team."
   [user-name user-email team-name admin message]
-  (try
-    (send-notification {:type "team"
-                        :user (:id admin)
-                        :subject (str user-name " has requested to join team \"" team-name "\"")
-                        :email true
-                        :email_template "team_join_request"
-                        :payload {:email_address (:email admin)
-                                  :requester_name user-name
-                                  :requester_email user-email
-                                  :requester_message message
-                                  :team_name team-name}})))
+  (send-notification {:type "team"
+                      :user (:id admin)
+                      :subject (str user-name " has requested to join team \"" team-name "\"")
+                      :email true
+                      :email_template "team_join_request"
+                      :payload {:email_address (:email admin)
+                                :requester_name user-name
+                                :requester_email user-email
+                                :requester_message message
+                                :team_name team-name}}))
+
+(defn send-team-join-denial
+  "Sends a notification indicating that a user's request to join a team has been denied."
+  [user-id user-email team-name message]
+  (send-notification {:type "team"
+                      :user user-id
+                      :subject "Team join request denied"
+                      :email true
+                      :email_template "team_join_denial"
+                      :payload {:email_address user-email
+                                :team_name team-name
+                                :admin_message message}}))
 
 (defn mark-all-notifications-seen
   []
