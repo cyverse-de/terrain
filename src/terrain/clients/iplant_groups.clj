@@ -357,7 +357,7 @@
         folder (get-team-folder-name client)
         group  (full-group-name name folder)]
     (verify-group-exists client user group)
-    (format-group-privileges (c/list-group-privileges client user group))))
+    (format-group-privileges (c/list-group-privileges client user group {:inheritance-level "immediate"}))))
 
 (defn update-team-privileges [user name updates]
   (let [client (get-client)
