@@ -304,14 +304,15 @@
          (mapv :subject)
          (remove (comp (partial = (config/grouper-user)) :id)))))
 
-(defn- format-privilege-updates [subject-ids privileges]
-  {:updates (vec (for [subject-id subject-ids] {:subject_id subject-id :privileges privileges}))})
+(defn- format-privilege-updates [user subject-ids privileges]
+  {:updates (vec (for [subject-id subject-ids :when (not= user subject-id)]
+                   {:subject_id subject-id :privileges privileges}))})
 
 (defn- grant-optout-privileges [client user group members]
-  (c/update-group-privileges client user group (format-privilege-updates members ["optout"]) {:replace false}))
+  (c/update-group-privileges client user group (format-privilege-updates user members ["optout"]) {:replace false}))
 
 (defn- revoke-optout-privileges [client user group members]
-  (c/revoke-group-privileges client user group (format-privilege-updates members ["optout"])))
+  (c/revoke-group-privileges client user group (format-privilege-updates user members ["optout"])))
 
 (defn add-team-members [user name members]
   (let [client (get-client)
