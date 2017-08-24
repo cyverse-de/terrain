@@ -42,7 +42,7 @@
 
 (defn join-request [{user :shortUsername user-name :commonName email :email} name message]
   (let [admin (first (ipg/get-team-admins user name))]
-    (cn/send-team-join-notification user-name email name admin message)))
+    (cn/send-team-join-notification user user-name email name admin message)))
 
 (defn deny-join-request [{user :shortUsername} name requester message]
   (ipg/verify-team-exists user name)
