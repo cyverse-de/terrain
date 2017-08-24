@@ -23,7 +23,10 @@
   (ipg/get-team-members user name))
 
 (defn add-team-members [{user :shortUsername} name {:keys [members]}]
-  (ipg/add-team-members user name members))
+  (let [response (ipg/add-team-members user name members)]
+    (doseq [member members]
+      (cn/send-team-add-notification (ipg/lookup-subject user member) name))
+    response))
 
 (defn remove-team-members [{user :shortUsername} name {:keys [members]}]
   (ipg/remove-team-members user name members))

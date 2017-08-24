@@ -70,6 +70,17 @@
                                 :team_name team-name
                                 :admin_message message}}))
 
+(defn send-team-add-notification
+  "Sends a notification indicating that the userhas been added to a team."
+  [user team-name]
+  (send-notification {:type "team"
+                      :user (:id user)
+                      :subject (str "Added to team")
+                      :email true
+                      :email_template "added_to_team"
+                      :payload {:email_address (:email user)
+                                :team_name team-name}}))
+
 (defn mark-all-notifications-seen
   []
   (raw/mark-all-notifications-seen (cheshire/encode (add-current-user-to-map {}))))
