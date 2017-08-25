@@ -76,7 +76,7 @@
   [user team-name]
   (send-notification {:type "team"
                       :user (:id user)
-                      :subject (str "Added to team")
+                      :subject "Added to team"
                       :email true
                       :email_template "added_to_team"
                       :payload {:email_address (:email user)

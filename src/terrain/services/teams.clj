@@ -25,7 +25,9 @@
 (defn add-team-members [{user :shortUsername} name {:keys [members]}]
   (let [response (ipg/add-team-members user name members)]
     (doseq [member members]
-      (cn/send-team-add-notification (ipg/lookup-subject user member) name))
+      (let [member-info (ipg/lookup-subject user member)]
+        (when-not (= (:source_id member-info) "g:gsa")
+          (cn/send-team-add-notification member-info name))))
     response))
 
 (defn remove-team-members [{user :shortUsername} name {:keys [members]}]
