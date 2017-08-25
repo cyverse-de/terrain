@@ -46,13 +46,14 @@
 
 (defn send-team-join-notification
   "Sends a notification indicating that a user has requested to join a team."
-  [user-name user-email team-name admin message]
+  [user user-name user-email team-name admin message]
   (send-notification {:type "team"
                       :user (:id admin)
                       :subject (str user-name " has requested to join team \"" team-name "\"")
                       :email true
                       :email_template "team_join_request"
                       :payload {:email_address (:email admin)
+                                :requester_id user
                                 :requester_name user-name
                                 :requester_email user-email
                                 :requester_message message
@@ -69,6 +70,17 @@
                       :payload {:email_address user-email
                                 :team_name team-name
                                 :admin_message message}}))
+
+(defn send-team-add-notification
+  "Sends a notification indicating that the userhas been added to a team."
+  [user team-name]
+  (send-notification {:type "team"
+                      :user (:id user)
+                      :subject "Added to team"
+                      :email true
+                      :email_template "added_to_team"
+                      :payload {:email_address (:email user)
+                                :team_name team-name}}))
 
 (defn mark-all-notifications-seen
   []

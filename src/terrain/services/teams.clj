@@ -23,7 +23,12 @@
   (ipg/get-team-members user name))
 
 (defn add-team-members [{user :shortUsername} name {:keys [members]}]
-  (ipg/add-team-members user name members))
+  (let [response (ipg/add-team-members user name members)]
+    (doseq [member members]
+      (let [member-info (ipg/lookup-subject user member)]
+        (when-not (= (:source_id member-info) "g:gsa")
+          (cn/send-team-add-notification member-info name))))
+    response))
 
 (defn remove-team-members [{user :shortUsername} name {:keys [members]}]
   (ipg/remove-team-members user name members))
@@ -39,7 +44,7 @@
 
 (defn join-request [{user :shortUsername user-name :commonName email :email} name message]
   (let [admin (first (ipg/get-team-admins user name))]
-    (cn/send-team-join-notification user-name email name admin message)))
+    (cn/send-team-join-notification user user-name email name admin message)))
 
 (defn deny-join-request [{user :shortUsername} name requester message]
   (ipg/verify-team-exists user name)
