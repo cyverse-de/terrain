@@ -308,18 +308,21 @@
   {:updates (vec (for [subject-id subject-ids :when (not= user subject-id)]
                    {:subject_id subject-id :privileges privileges}))})
 
-(defn- grant-optout-privileges [client user group members]
-  (c/update-group-privileges client user group (format-privilege-updates user members ["optout"]) {:replace false}))
+(defn- format-member-privilege-updates [user subject-ids]
+  (format-privilege-updates user subject-ids ["optout" "read"]))
 
-(defn- revoke-optout-privileges [client user group members]
-  (c/revoke-group-privileges client user group (format-privilege-updates user members ["optout"])))
+(defn- grant-member-privileges [client user group members]
+  (c/update-group-privileges client user group (format-member-privilege-updates user members) {:replace false}))
+
+(defn- revoke-member-privileges [client user group members]
+  (c/revoke-group-privileges client user group (format-member-privilege-updates user members)))
 
 (defn add-team-members [user name members]
   (let [client (get-client)
         folder (get-team-folder-name client)
         group  (full-group-name name folder)]
     (verify-group-exists client user group)
-    (grant-optout-privileges client user group members)
+    (grant-member-privileges client user group members)
     (c/add-group-members client user group members)))
 
 (defn remove-team-members [user name members]
@@ -327,7 +330,7 @@
         folder (get-team-folder-name client)
         group  (full-group-name name folder)]
     (verify-group-exists client user group)
-    (revoke-optout-privileges client user group members)
+    (revoke-member-privileges client user group members)
     (c/remove-group-members client user group members)))
 
 (defn join-team [user name]
@@ -336,7 +339,7 @@
         group  (full-group-name name folder)]
     (verify-group-exists client user group)
     (let [response (c/add-group-members client user group [user])]
-      (grant-optout-privileges client (config/grouper-user) group [user])
+      (grant-member-privileges client (config/grouper-user) group [user])
       response)))
 
 (defn leave-team [user name]
@@ -345,7 +348,7 @@
         group  (full-group-name name folder)]
     (verify-group-exists client user group)
     (let [response (c/remove-group-members client user group [user])]
-      (revoke-optout-privileges client (config/grouper-user) group [user])
+      (revoke-member-privileges client (config/grouper-user) group [user])
       response)))
 
 (defn- format-group-privileges [m]
