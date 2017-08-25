@@ -593,6 +593,13 @@
                :as               :stream
                :follow-redirects false}))
 
+(defn delete-oauth-token-info
+  [api-name]
+  (client/delete (apps-url "oauth" "token-info" api-name)
+                 {:query-params     (secured-params)
+                  :as               :stream
+                  :follow-redirects false}))
+
 (defn get-oauth-redirect-uris
   []
   (client/get (apps-url "oauth" "redirect-uris")
@@ -606,6 +613,13 @@
               {:query-params     (secured-params params [:proxy-user])
                :as               :stream
                :follow-redirects false}))
+
+(defn delete-admin-oauth-token-info
+  [api-name params]
+  (client/delete (apps-url "admin" "oauth" "token-info" api-name)
+                 {:query-params     (secured-params params [:proxy-user])
+                  :as               :stream
+                  :follow-redirects false}))
 
 (defn admin-list-tool-requests
   [params]

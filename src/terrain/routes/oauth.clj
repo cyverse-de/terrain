@@ -17,7 +17,13 @@
      (service/success-response (apps/get-oauth-redirect-uris)))
 
    (GET "/oauth/token-info/:api-name" [api-name]
-     (service/success-response (apps/get-oauth-token-info api-name)))))
+     (service/success-response (apps/get-oauth-token-info api-name)))
+
+   (DELETE "/oauth/token-info/:api-name" [api-name]
+     (service/success-response (apps/delete-oauth-token-info api-name)))))
+
+;; An alias for OAuth routes without the "/secured" context.
+(def oauth-routes secured-oauth-routes)
 
 (defn oauth-admin-routes
   "These routes are general OAuth information routes designed for administrators. They're primarily intended
@@ -25,4 +31,7 @@
   []
   (routes
    (GET "/oauth/token-info/:api-name" [api-name :as {params :params}]
-     (service/success-response (apps/get-admin-oauth-token-info api-name params)))))
+     (service/success-response (apps/get-admin-oauth-token-info api-name params)))
+
+   (DELETE "/oauth/token-info/:api-name" [api-name :as {params :params}]
+     (service/success-response (apps/delete-admin-oauth-token-info api-name params)))))
