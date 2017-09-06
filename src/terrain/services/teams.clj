@@ -17,7 +17,9 @@
   (ipg/update-team user name body))
 
 (defn delete-team [{user :shortUsername} name]
-  (ipg/delete-team user name))
+  (let [{:keys [id] :as result} (ipg/delete-team user name)]
+    (when id (perms-client/delete-group-subject id))
+    result))
 
 (defn get-team-members [{user :shortUsername} name]
   (ipg/get-team-members user name))
