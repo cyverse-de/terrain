@@ -28,6 +28,7 @@
         [terrain.routes.oauth]
         [terrain.routes.favorites]
         [terrain.routes.tags]
+        [terrain.routes.webhooks]
         [terrain.routes.comments]
         [terrain.auth.user-attributes]
         [terrain.util.service])
@@ -142,6 +143,7 @@
     (reference-genomes-routes)
     (tool-routes)
     (permanent-id-request-routes)
+    (webhook-routes)
     (misc-metadata-routes)
     (oauth-routes)
     (route/not-found (unrecognized-path-response))))

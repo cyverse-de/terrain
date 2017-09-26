@@ -248,3 +248,8 @@
 (defn update-permanent-id-request
   [request-id request]
   (http/post (metadata-url "admin" "permanent-id-requests" request-id "status") (post-options request)))
+
+(defn save-webhooks
+  [webhooks]
+  (http/put (metadata-url "webhooks")
+            (put-options webhooks)))
