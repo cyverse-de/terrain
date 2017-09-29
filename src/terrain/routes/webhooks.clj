@@ -1,7 +1,7 @@
 (ns terrain.routes.webhooks
   (:use [compojure.core]
         [terrain.util])
-  (:require [terrain.clients.metadata.raw :as metadata-client]
+  (:require [terrain.clients.apps.raw :as apps-client]
             [terrain.util.config :as config]
             [terrain.util.service :as service]))
 (defn webhook-routes
@@ -10,4 +10,4 @@
     [config/app-routes-enabled]
 
     (PUT "/webhooks" [:as {:keys [body]}]
-      (service/success-response (metadata-client/save-webhooks body)))))
+      (service/success-response (apps-client/save-webhooks body)))))
