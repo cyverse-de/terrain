@@ -31,7 +31,7 @@
                  [org.nexml.model/nexml "1.5-SNAPSHOT"]  ; provides org.nexml.model
                  [org.biojava.thirdparty/forester "1.005" ]
                  [slingshot "0.12.2"]
-                 [org.cyverse/clj-icat-direct "2.8.0"]
+                 [org.cyverse/clj-icat-direct "2.8.2"]
                  [org.cyverse/clj-jargon "2.8.3"]
                  [org.cyverse/clojure-commons "2.8.1"]
                  [org.cyverse/cyverse-groups-client "0.1.4"]
