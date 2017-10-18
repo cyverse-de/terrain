@@ -937,3 +937,12 @@
               {:query-params     (secured-params)
                :as               :stream
                :follow-redirects false}))
+
+(defn save-webhooks
+  [webhooks]
+  (client/put (apps-url "webhooks")
+            {:query-params     (secured-params)
+             :as               :stream
+             :body             webhooks
+             :content-type     :json
+             :follow-redirects false}))
