@@ -29,6 +29,9 @@
    (GET "/apps/categories" [:as {params :params}]
      (service/success-response (apps/get-admin-app-categories params)))
 
+   (GET "/apps/categories/search" [:as {params :params}]
+     (service/success-response (apps/search-admin-app-categories params)))
+
    (POST "/apps/categories/:system-id" [system-id :as {:keys [body]}]
      (service/success-response (apps/add-category system-id body)))
 

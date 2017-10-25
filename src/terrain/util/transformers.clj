@@ -16,6 +16,14 @@
         username (get-in req [:user-attributes "uid"])]
     (cheshire/encode (assoc m :user username))))
 
+(defn- invalid-query-param-value?
+  "Determines whether the argument represents a valid query parameter value."
+  [v]
+  (cond
+    (string? v)     (string/blank? v)
+    (sequential? v) (empty? v)
+    :else           true))
+
 (defn add-current-user-to-map
   "Adds the name and e-mail address of the currently authenticated user to a
    map that can be used to generate a query string."
@@ -25,7 +33,7 @@
          :email      (:email current-user)
          :first-name (:firstName current-user)
          :last-name  (:lastName current-user))
-       (remove-vals string/blank?)))
+       (remove-vals invalid-query-param-value?)))
 
 (defn secured-params
   "Generates a set of query parameters to pass to a remote service that requires
