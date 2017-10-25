@@ -511,6 +511,13 @@
                :as               :stream
                :follow-redirects false}))
 
+(defn search-admin-app-categories
+  [params]
+  (client/get (apps-url "admin" "apps" "categories" "search")
+              {:query-params     (secured-params params [:name])
+               :as               :stream
+               :follow-redirects false}))
+
 (defn add-category
   [system-id body]
   (client/post (apps-url "admin" "apps" "categories" system-id)
