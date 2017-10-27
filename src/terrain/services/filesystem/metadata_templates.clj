@@ -40,8 +40,8 @@
 
 (defn- delete-metadata-template
   "Sets a Metadata Template's deleted flag to 'true'."
-  [template-id]
-  (metadata/admin-delete-template template-id))
+  [template-id params]
+  (metadata/admin-delete-template template-id params))
 
 (defn do-metadata-template-list
   []
@@ -104,12 +104,12 @@
 (with-post-hook! #'do-metadata-template-edit (log-func "do-metadata-template-edit"))
 
 (defn do-metadata-template-delete
-  [template-id]
-  (delete-metadata-template template-id)
+  [template-id params]
+  (delete-metadata-template template-id params)
   nil)
 
 (with-pre-hook! #'do-metadata-template-delete
-  (fn [template-id]
+  (fn [template-id params]
     (log-call "do-metadata-template-delete")))
 
 (with-post-hook! #'do-metadata-template-delete (log-func "do-metadata-template-delete"))

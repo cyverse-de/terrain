@@ -184,8 +184,8 @@
             (put-options template)))
 
 (defn admin-delete-template
-  [template-id]
-  (http/delete (metadata-url "admin" "templates" template-id) (delete-options)))
+  [template-id params]
+  (http/delete (metadata-url "admin" "templates" template-id) (delete-options params [:permanent])))
 
 (defn get-ontology-hierarchies
   [ontology-version]

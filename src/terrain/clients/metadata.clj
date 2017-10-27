@@ -33,8 +33,8 @@
   (parse-body (raw/admin-update-template template-id (cheshire/encode template))))
 
 (defn admin-delete-template
-  [template-id]
-  (raw/admin-delete-template template-id))
+  [template-id params]
+  (raw/admin-delete-template template-id params))
 
 (defn- store-ontology
   [{istream :stream filename :filename content-type :content-type}]

@@ -152,4 +152,4 @@
       (controller req mt/do-metadata-template-edit template-id :body))
 
     (DELETE "/filesystem/metadata/templates/:template-id" [template-id :as req]
-      (controller req mt/do-metadata-template-delete template-id))))
+      (controller req mt/do-metadata-template-delete template-id :params))))
