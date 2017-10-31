@@ -51,12 +51,6 @@
         req (apps-request req)]
     (forward-post url req)))
 
-(defn delete-reference-genomes
-  "Logically deletes a reference genome in the database."
-  [reference-genome-id]
-  (client/delete (apps-url {} "admin" "reference-genomes" reference-genome-id)
-                 {:as :stream}))
-
 (defn update-reference-genome
   "Updates a reference genome via apps."
   [req reference-genome-id]
