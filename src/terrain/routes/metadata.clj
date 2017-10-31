@@ -311,8 +311,8 @@
    (POST "/reference-genomes" [:as req]
      (add-reference-genome req))
 
-   (DELETE "/reference-genomes/:reference-genome-id" [reference-genome-id]
-     (delete-reference-genomes reference-genome-id))
+   (DELETE "/reference-genomes/:reference-genome-id" [reference-genome-id :as {:keys [params]}]
+     (apps/admin-delete-reference-genome reference-genome-id params))
 
    (PATCH "/reference-genomes/:reference-genome-id" [reference-genome-id :as req]
           (update-reference-genome req reference-genome-id))))

@@ -792,6 +792,13 @@
                :as               :stream
                :follow-redirects false}))
 
+(defn admin-delete-reference-genome
+  [reference-genome-id params]
+  (client/delete (apps-url "admin" "reference-genomes" reference-genome-id)
+                 {:query-params     (secured-params params [:permanent])
+                  :as               :stream
+                  :follow-redirects false}))
+
 (defn get-collaborators
   []
   (client/get (apps-url "collaborators")
