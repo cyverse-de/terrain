@@ -10,4 +10,6 @@
     [config/app-routes-enabled]
 
     (PUT "/webhooks" [:as {:keys [body]}]
-      (service/success-response (apps-client/save-webhooks body)))))
+      (service/success-response (apps-client/save-webhooks body)))
+    (GET "/webhooks/types" [:as {:keys [params]}]
+      (service/success-response (apps-client/get-webhook-types)))))
