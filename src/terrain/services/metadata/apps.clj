@@ -51,13 +51,6 @@
         req (apps-request req)]
     (forward-post url req)))
 
-(defn replace-reference-genomes
-  "Replaces the reference genomes in the database with a new set of reference genomes."
-  [req]
-  (let [url (apps-url {} "admin" "reference-genomes")
-        req (apps-request req)]
-    (forward-put url req)))
-
 (defn delete-reference-genomes
   "Logically deletes a reference genome in the database."
   [reference-genome-id]

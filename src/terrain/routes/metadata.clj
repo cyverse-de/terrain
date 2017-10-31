@@ -311,9 +311,6 @@
    (POST "/reference-genomes" [:as req]
      (add-reference-genome req))
 
-   (PUT "/reference-genomes" [:as req]
-     (replace-reference-genomes req))
-
    (DELETE "/reference-genomes/:reference-genome-id" [reference-genome-id]
      (delete-reference-genomes reference-genome-id))
 
