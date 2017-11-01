@@ -449,3 +449,14 @@
 
    (DELETE "/integration-data/:integration-data-id" [integration-data-id]
      (service/success-response (apps/delete-integration-data integration-data-id)))))
+
+(defn admin-workspace-routes
+  []
+  (optional-routes
+   [config/app-routes-enabled]
+
+   (GET "/workspaces" [:as {:keys [params]}]
+     (service/success-response (apps/admin-list-workspaces params)))
+
+   (DELETE "/workspaces" [:as {:keys [params]}]
+     (service/success-response (apps/admin-delete-workspaces params)))))
