@@ -961,3 +961,17 @@
              :body             webhooks
              :content-type     :json
              :follow-redirects false}))
+
+(defn admin-list-workspaces
+  [params]
+  (client/get (apps-url "admin" "workspaces")
+              {:query-params     (secured-params params [:username])
+               :as               :stream
+               :follow-redirects false}))
+
+(defn admin-delete-workspaces
+  [params]
+  (client/get (apps-url "admin" "workspaces")
+              {:query-params     (secured-params params [:username])
+               :as               :stream
+               :follow-redirects false}))
