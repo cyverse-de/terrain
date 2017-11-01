@@ -971,7 +971,7 @@
 
 (defn admin-delete-workspaces
   [params]
-  (client/get (apps-url "admin" "workspaces")
-              {:query-params     (secured-params params [:username])
-               :as               :stream
-               :follow-redirects false}))
+  (client/delete (apps-url "admin" "workspaces")
+                 {:query-params     (secured-params params [:username])
+                  :as               :stream
+                  :follow-redirects false}))
