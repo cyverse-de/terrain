@@ -13,6 +13,9 @@
    (GET "/filesystem/entry/tags" []
      (tags/list-all-attached-tags))
 
+   (DELETE "/filesystem/entry/tags" []
+     (tags/remove-all-attached-tags))
+
    (GET "/filesystem/entry/:entry-id/tags" [entry-id]
      (tags/list-attached-tags entry-id))
 

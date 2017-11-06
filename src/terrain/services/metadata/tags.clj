@@ -89,6 +89,12 @@
   (meta/list-all-attached-tags))
 
 
+(defn remove-all-attached-tags
+  "Removes all of the tags attached to any filesystem entry by the authenticated user."
+  []
+  (meta/remove-all-attached-tags))
+
+
 (defn list-attached-tags
   "Lists the tags attached to a filesystem entry.
 

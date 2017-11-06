@@ -123,6 +123,10 @@
   []
   (http/get (metadata-url "filesystem" "data" "tags") (get-options)))
 
+(defn remove-all-attached-tags
+  []
+  (http/delete (metadata-url "filesystem" "data" "tags") (get-options)))
+
 (defn list-attached-tags
   [target-id]
   (http/get (metadata-url "filesystem" "data" target-id "tags") (get-options)))
