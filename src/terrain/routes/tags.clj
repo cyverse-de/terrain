@@ -10,6 +10,9 @@
   (util/optional-routes
    [#(and (config/filesystem-routes-enabled) (config/metadata-routes-enabled))]
 
+   (GET "/filesystem/entry/tags" []
+     (tags/list-all-attached-tags))
+
    (GET "/filesystem/entry/:entry-id/tags" [entry-id]
      (tags/list-attached-tags entry-id))
 

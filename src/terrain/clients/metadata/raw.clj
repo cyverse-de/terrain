@@ -119,6 +119,10 @@
   [uuids]
   (http/post (metadata-url "favorites" "filter") (post-options (json/encode {:filesystem uuids}))))
 
+(defn list-all-attached-tags
+  []
+  (http/get (metadata-url "filesystem" "data" "tags") (get-options)))
+
 (defn list-attached-tags
   [target-id]
   (http/get (metadata-url "filesystem" "data" target-id "tags") (get-options)))

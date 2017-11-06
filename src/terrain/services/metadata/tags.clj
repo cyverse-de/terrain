@@ -83,6 +83,12 @@
     (svc/success-response)))
 
 
+(defn list-all-attached-tags
+  "Lists all of the tags attached to any filesystem entry by the authenticated user."
+  []
+  (meta/list-all-attached-tags))
+
+
 (defn list-attached-tags
   "Lists the tags attached to a filesystem entry.
 
