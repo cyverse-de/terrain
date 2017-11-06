@@ -142,6 +142,10 @@
   (http/get (metadata-url "tags" "suggestions") (get-options (remove-nil-values {:contains contains
                                                                                  :limit limit}))))
 
+(defn list-user-tags
+  []
+  (http/get (metadata-url "tags" "user") (get-options)))
+
 (defn create-user-tag
   [body]
   (http/post (metadata-url "tags" "user") (post-options body)))

@@ -142,3 +142,9 @@
         tag-rec (-> update :body slurp (json/parse-string true))]
     (do-update-tag tag-id tag-rec)
     (svc/success-response {})))
+
+
+(defn list-user-tags
+  "Lists all tags that were created by the authenticated user."
+  []
+  (meta/list-user-tags))

@@ -25,6 +25,9 @@
    (GET "/tags/suggestions" [contains limit]
      (tags/suggest-tags contains limit))
 
+   (GET "/tags/user" []
+     (tags/list-user-tags))
+
    (POST "/tags/user" [:as {body :body}]
      (tags/create-user-tag body))
 
