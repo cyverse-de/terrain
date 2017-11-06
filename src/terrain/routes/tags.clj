@@ -28,6 +28,9 @@
    (GET "/tags/user" []
      (tags/list-user-tags))
 
+   (DELETE "/tags/user" []
+     (tags/delete-all-user-tags))
+
    (POST "/tags/user" [:as {body :body}]
      (tags/create-user-tag body))
 

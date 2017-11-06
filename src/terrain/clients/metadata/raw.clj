@@ -125,7 +125,7 @@
 
 (defn remove-all-attached-tags
   []
-  (http/delete (metadata-url "filesystem" "data" "tags") (get-options)))
+  (http/delete (metadata-url "filesystem" "data" "tags") (delete-options)))
 
 (defn list-attached-tags
   [target-id]
@@ -145,6 +145,10 @@
 (defn list-user-tags
   []
   (http/get (metadata-url "tags" "user") (get-options)))
+
+(defn delete-all-user-tags
+  []
+  (http/delete (metadata-url "tags" "user") (delete-options)))
 
 (defn create-user-tag
   [body]
