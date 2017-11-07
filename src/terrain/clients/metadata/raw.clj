@@ -68,6 +68,10 @@
   [commenter-id]
   (http/get (metadata-url "admin" "comments" commenter-id) (get-options)))
 
+(defn delete-comments-by-user
+  [commenter-id]
+  (http/delete (metadata-url "admin" "comments" commenter-id) (delete-options)))
+
 (defn add-data-comment
   [target-id data-type body]
   (http/post (metadata-url "filesystem" "data" target-id "comments")

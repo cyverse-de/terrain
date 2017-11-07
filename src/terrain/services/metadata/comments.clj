@@ -130,3 +130,11 @@
      commenter-id: the ID of the user who entered the comments."
   [commenter-id]
   (metadata/list-comments-by-user commenter-id))
+
+(defn delete-comments-by-user
+  "Deletes all of the comments that were entered by the given user.
+
+   Parameters:
+     commenter-id: the ID of the user who entered the comments."
+  [commenter-id]
+  (metadata/delete-comments-by-user commenter-id))

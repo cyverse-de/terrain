@@ -58,4 +58,7 @@
    [#(and (config/app-routes-enabled) (config/metadata-routes-enabled))]
 
    (GET "/comments/:commenter-id" [commenter-id]
-     (comments/list-comments-by-user commenter-id))))
+     (comments/list-comments-by-user commenter-id))
+
+   (DELETE "/comments/:commenter-id" [commenter-id]
+     (comments/delete-comments-by-user commenter-id))))
