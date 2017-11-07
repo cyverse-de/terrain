@@ -51,3 +51,11 @@
     (DELETE "/apps/:app-id/comments/:comment-id"
       [app-id comment-id]
       (comments/delete-app-comment app-id comment-id))))
+
+(defn admin-comment-routes
+  []
+  (util/optional-routes
+   [#(and (config/app-routes-enabled) (config/metadata-routes-enabled))]
+
+   (GET "/comments/:commenter-id" [commenter-id]
+     (comments/list-comments-by-user commenter-id))))

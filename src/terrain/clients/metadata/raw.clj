@@ -64,6 +64,10 @@
             {:as               :stream
              :follow_redirects false}))
 
+(defn list-comments-by-user
+  [commenter-id]
+  (http/get (metadata-url "admin" "comments" commenter-id) (get-options)))
+
 (defn add-data-comment
   [target-id data-type body]
   (http/post (metadata-url "filesystem" "data" target-id "comments")

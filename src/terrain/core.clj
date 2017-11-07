@@ -178,6 +178,7 @@
     (admin-apps-routes)
     (admin-app-avu-routes)
     (admin-app-comment-routes)
+    (admin-comment-routes)
     (admin-filesystem-metadata-routes)
     (admin-groups-routes)
     (admin-notification-routes)
