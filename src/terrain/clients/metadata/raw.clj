@@ -114,6 +114,10 @@
   [entity-type]
   (http/get (metadata-url "favorites" "filesystem") (get-options {:entity-type entity-type})))
 
+(defn remove-selected-favorites
+  [entity-type]
+  (http/delete (metadata-url "favorites" "filesystem") (delete-options {:entity-type entity-type})))
+
 (defn remove-favorite
   [target-id]
   (http/delete (metadata-url "favorites" "filesystem" target-id) (delete-options)))
