@@ -153,7 +153,7 @@
 (defn delete-all-user-tags
   "Deletes all tags that were created by the authenticated user."
   []
-  (let [tag-ids (map :id (:tags (svc/decode-json (meta/list-user-tags))))
+  (let [tag-ids (map :id (:tags (svc/decode-json (:body (meta/list-user-tags)))))
         result  (meta/delete-all-user-tags)]
     (doseq [tag-id tag-ids]
       (search/remove-tag tag-id))
