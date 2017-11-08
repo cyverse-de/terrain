@@ -11,5 +11,6 @@
 
     (PUT "/webhooks" [:as {:keys [body]}]
       (service/success-response (apps-client/save-webhooks body)))
-    (GET "/webhooks/types" [:as {:keys [params]}]
+
+    (GET "/webhooks/types" [:as {:keys []}]
       (service/success-response (apps-client/get-webhook-types)))))
