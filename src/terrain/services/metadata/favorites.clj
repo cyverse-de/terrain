@@ -62,6 +62,15 @@
   (metadata/remove-favorite data-id))
 
 
+(defn remove-selected-favorites
+  "Unmarks all of the users favorites with the given entity type.
+
+   Parameters:
+     entity-type: a case-insensitive-string containing {file|folder|any}"
+  [entity-type]
+  (metadata/remove-selected-favorites (name (valid/resolve-entity-type entity-type))))
+
+
 (defn- ids-txt->uuids-set
   [ids-txt]
   (->> ids-txt (map #(UUID/fromString %)) set))

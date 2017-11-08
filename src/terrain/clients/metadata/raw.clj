@@ -64,6 +64,14 @@
             {:as               :stream
              :follow_redirects false}))
 
+(defn list-comments-by-user
+  [commenter-id]
+  (http/get (metadata-url "admin" "comments" commenter-id) (get-options)))
+
+(defn delete-comments-by-user
+  [commenter-id]
+  (http/delete (metadata-url "admin" "comments" commenter-id) (delete-options)))
+
 (defn add-data-comment
   [target-id data-type body]
   (http/post (metadata-url "filesystem" "data" target-id "comments")
@@ -106,6 +114,10 @@
   [entity-type]
   (http/get (metadata-url "favorites" "filesystem") (get-options {:entity-type entity-type})))
 
+(defn remove-selected-favorites
+  [entity-type]
+  (http/delete (metadata-url "favorites" "filesystem") (delete-options {:entity-type entity-type})))
+
 (defn remove-favorite
   [target-id]
   (http/delete (metadata-url "favorites" "filesystem" target-id) (delete-options)))
@@ -118,6 +130,14 @@
 (defn filter-favorites
   [uuids]
   (http/post (metadata-url "favorites" "filter") (post-options (json/encode {:filesystem uuids}))))
+
+(defn list-all-attached-tags
+  []
+  (http/get (metadata-url "filesystem" "data" "tags") (get-options)))
+
+(defn remove-all-attached-tags
+  []
+  (http/delete (metadata-url "filesystem" "data" "tags") (delete-options)))
 
 (defn list-attached-tags
   [target-id]
@@ -133,6 +153,14 @@
   [contains limit]
   (http/get (metadata-url "tags" "suggestions") (get-options (remove-nil-values {:contains contains
                                                                                  :limit limit}))))
+
+(defn list-user-tags
+  []
+  (http/get (metadata-url "tags" "user") (get-options)))
+
+(defn delete-all-user-tags
+  []
+  (http/delete (metadata-url "tags" "user") (delete-options)))
 
 (defn create-user-tag
   [body]

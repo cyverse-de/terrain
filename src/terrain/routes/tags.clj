@@ -8,22 +8,34 @@
 (defn secured-tag-routes
   []
   (util/optional-routes
-    [#(and (config/filesystem-routes-enabled) (config/metadata-routes-enabled))]
+   [#(and (config/filesystem-routes-enabled) (config/metadata-routes-enabled))]
 
-    (GET "/filesystem/entry/:entry-id/tags" [entry-id]
-         (tags/list-attached-tags entry-id))
+   (GET "/filesystem/entry/tags" []
+     (tags/list-all-attached-tags))
 
-    (PATCH "/filesystem/entry/:entry-id/tags" [entry-id type :as {body :body}]
-           (tags/handle-patch-file-tags entry-id type body))
+   (DELETE "/filesystem/entry/tags" []
+     (tags/remove-all-attached-tags))
 
-    (GET "/tags/suggestions" [contains limit]
-         (tags/suggest-tags contains limit))
+   (GET "/filesystem/entry/:entry-id/tags" [entry-id]
+     (tags/list-attached-tags entry-id))
 
-    (POST "/tags/user" [:as {body :body}]
-          (tags/create-user-tag body))
+   (PATCH "/filesystem/entry/:entry-id/tags" [entry-id type :as {body :body}]
+     (tags/handle-patch-file-tags entry-id type body))
 
-    (PATCH "/tags/user/:tag-id" [tag-id :as {body :body}]
-           (tags/update-user-tag tag-id body))
+   (GET "/tags/suggestions" [contains limit]
+     (tags/suggest-tags contains limit))
 
-    (DELETE "/tags/user/:tag-id" [tag-id]
-            (tags/delete-user-tag tag-id))))
+   (GET "/tags/user" []
+     (tags/list-user-tags))
+
+   (DELETE "/tags/user" []
+     (tags/delete-all-user-tags))
+
+   (POST "/tags/user" [:as {body :body}]
+     (tags/create-user-tag body))
+
+   (PATCH "/tags/user/:tag-id" [tag-id :as {body :body}]
+     (tags/update-user-tag tag-id body))
+
+   (DELETE "/tags/user/:tag-id" [tag-id]
+     (tags/delete-user-tag tag-id))))
