@@ -975,3 +975,10 @@
                  {:query-params     (secured-params params [:username])
                   :as               :stream
                   :follow-redirects false}))
+
+(defn get-webhook-types
+  []
+  (client/get (apps-url "webhooks" "types")
+              {:query-params     (secured-params)
+               :as               :stream
+               :follow-redirects false}))
