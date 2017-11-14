@@ -636,6 +636,13 @@
                :as               :stream
                :follow-redirects false}))
 
+(defn admin-delete-tool-request
+  [request-id]
+  (client/delete (apps-url "admin" "tool-requests" request-id)
+                 {:query-params     (secured-params)
+                  :as               :stream
+                  :follow-redirects false}))
+
 (defn list-tool-request-status-codes
   [params]
   (client/get (apps-url "tool-requests" "status-codes")

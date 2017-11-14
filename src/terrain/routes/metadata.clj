@@ -364,6 +364,9 @@
    (GET "/tool-requests/:request-id" [request-id]
      (get-tool-request request-id))
 
+   (DELETE "/tool-requests/:request-id" [request-id]
+     (apps/admin-delete-tool-request request-id))
+
    (POST "/tool-requests/:request-id/status" [request-id :as req]
      (update-tool-request req request-id))))
 
