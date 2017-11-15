@@ -504,6 +504,18 @@
        (cfg/env-setting "USER_PREFERENCES_PORT")
        (prefs-base-url)))))
 
+(cc/defprop-optstr search-base-url
+  "The hostname of the search service"
+  [props config-valid configs]
+  "terrain.search.base-url" "http://search:60000")
+
+(def search-base
+  (memoize
+   (fn []
+     (if (System/getenv "SEARCH_PORT")
+       (cfg/env-setting "SEARCH_PORT")
+       (search-base-url)))))
+
 (cc/defprop-optstr sessions-base-url
   "The hostname of the user-sessions service"
   [props config-valid configs]
