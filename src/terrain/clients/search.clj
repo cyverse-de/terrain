@@ -1,6 +1,5 @@
 (ns terrain.clients.search
-  (:use [terrain.util.transformers :only [secured-params]]
-        [terrain.util.config :only [search-base]])
+  (:use [terrain.util.config :only [search-base-url]])
   (:require [clj-http.client :as http]
             [cemerick.url :refer [url]]
             [cheshire.core :as json]))
@@ -11,8 +10,8 @@
                       :query-params params
                       :as           :stream
                       :content-type "application/json"}]
-    (http/post (str (url (search-base) "data" "search")) req-options)))
+    (http/post (str (url (search-base-url) "data" "search")) req-options)))
 
 (defn get-data-search-documentation
   []
-  (http/get (str (url (search-base) "data" "documentation"))))
+  (http/get (str (url (search-base-url) "data" "documentation"))))
