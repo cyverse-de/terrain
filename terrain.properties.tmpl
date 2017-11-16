@@ -51,6 +51,9 @@
 # Permissions service connection settings
 {{ with $v := (key (printf "%s/permissions/base" $base)) }}terrain.permissions.base-url = {{ $v }}{{ end }}
 
+# Search service connection settings
+{{ with $v := (key (printf "%s/search/base" $base)) }}terrain.search.base-url = {{ $v }}{{ end }}
+
 # JEX connection settings
 {{ with $v := (key (printf "%s/jex/base" $base)) }}terrain.jex.base-url = {{ $v }}/{{ end }}
 
