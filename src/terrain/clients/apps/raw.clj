@@ -10,6 +10,7 @@
 (def admin-apps-search-params (conj apps-search-params :app-subset))
 (def apps-hierarchy-sort-params (conj apps-sort-params :attr))
 (def tools-search-params (conj apps-search-params :include-hidden :public))
+(def permission-lister-params [:full-listing])
 
 (defn- apps-url
   [& components]
@@ -146,9 +147,9 @@
                 :follow-redirects false}))
 
 (defn list-permissions
-  [body]
+  [body params]
   (client/post (apps-url "apps" "permission-lister")
-               {:query-params     (secured-params)
+               {:query-params     (secured-params params permission-lister-params)
                 :body             body
                 :content-type     :json
                 :as               :stream
@@ -375,9 +376,9 @@
                :follow-redirects false}))
 
 (defn list-job-permissions
-  [body]
+  [body params]
   (client/post (apps-url "analyses" "permission-lister")
-               {:query-params     (secured-params)
+               {:query-params     (secured-params params permission-lister-params)
                 :content-type     :json
                 :body             body
                 :as               :stream
@@ -736,9 +737,9 @@
                 :follow-redirects false}))
 
 (defn list-tool-permissions
-  [body]
+  [body params]
   (client/post (apps-url "tools" "permission-lister")
-               {:query-params     (secured-params)
+               {:query-params     (secured-params params permission-lister-params)
                 :body             body
                 :content-type     :json
                 :as               :stream
