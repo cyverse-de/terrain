@@ -380,3 +380,6 @@
         folder (get-de-users-folder-name client)
         group  (full-group-name (config/de-users-group) folder)]
     (c/remove-group-member client (config/grouper-user) group subject-id)))
+
+(defn list-groups-for-user [subject-id]
+  (c/list-subject-groups (get-client) (config/grouper-user) subject-id))
