@@ -10,6 +10,9 @@
 
 ;; General group name functions.
 
+(defn- get-de-users-folder-name [client]
+  (c/build-folder-name client "users"))
+
 (defn- get-user-folder-name [client user]
   (c/build-folder-name client (format "users:%s" user)))
 
@@ -369,3 +372,11 @@
         group  (full-group-name name folder)]
     (verify-group-exists client user group)
     (format-group-privileges (c/update-group-privileges client user group updates))))
+
+;; DE user group administration functions.
+
+(defn remove-de-user [subject-id]
+  (let [client (get-client)
+        folder (get-de-users-folder-name client)
+        group  (full-group-name (config/de-users-group) folder)]
+    (c/remove-group-member client (config/grouper-user) group subject-id)))
