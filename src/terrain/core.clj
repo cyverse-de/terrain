@@ -189,6 +189,7 @@
     (oauth-admin-routes)
     (admin-integration-data-routes)
     (admin-workspace-routes)
+    (admin-user-info-routes)
     (route/not-found (unrecognized-path-response))))
 
 (defn unsecured-routes

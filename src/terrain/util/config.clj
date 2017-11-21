@@ -192,6 +192,11 @@
   [props config-valid configs]
   "terrain.iplant-groups.grouper-user" "de_grouper")
 
+(cc/defprop-optstr de-users-group
+  "The name of the DE users group, excluding the folder."
+  [props config-valid configs]
+  "terrain.iplant-groups.de-users-group" "de-users")
+
 (cc/defprop-optstr permissions-base
   "The base URL for the permissions service."
   [props config-valid configs]

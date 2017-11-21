@@ -158,8 +158,8 @@
    (POST "/apps/shredder" [:as {:keys [body]}]
      (service/success-response (apps/delete-apps body)))
 
-   (POST "/apps/permission-lister" [:as {:keys [body]}]
-     (service/success-response (apps/list-permissions body)))
+   (POST "/apps/permission-lister" [:as {:keys [body params]}]
+     (service/success-response (apps/list-permissions body params)))
 
    (POST "/apps/sharing" [:as {:keys [body]}]
      (service/success-response (apps/share body)))
@@ -272,8 +272,8 @@
    (POST "/analyses" [:as {:keys [body]}]
      (service/success-response (apps/submit-job body)))
 
-   (POST "/analyses/permission-lister" [:as {:keys [body]}]
-     (service/success-response (apps/list-job-permissions body)))
+   (POST "/analyses/permission-lister" [:as {:keys [body params]}]
+     (service/success-response (apps/list-job-permissions body params)))
 
    (POST "/analyses/sharing" [:as {:keys [body]}]
      (service/success-response (apps/share-jobs body)))
@@ -384,8 +384,8 @@
    (POST "/tools" [:as {:keys [body]}]
      (service/success-response (apps/create-private-tool body)))
 
-   (POST "/tools/permission-lister" [:as {:keys [body]}]
-     (service/success-response (apps/list-tool-permissions body)))
+   (POST "/tools/permission-lister" [:as {:keys [body params]}]
+     (service/success-response (apps/list-tool-permissions body params)))
 
    (POST "/tools/sharing" [:as {:keys [body]}]
      (service/success-response (apps/share-tool body)))
