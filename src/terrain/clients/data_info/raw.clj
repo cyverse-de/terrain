@@ -328,4 +328,9 @@
   (request :post ["path-list-creator"]
            (mk-req-map user
                        (json/encode {:paths paths})
-                       (select-keys params [:dest :name-pattern :info-type :folders-only :recursive]))))
+                       (select-keys params [:dest
+                                            :path-list-info-type
+                                            :name-pattern
+                                            :info-type
+                                            :folders-only
+                                            :recursive]))))
