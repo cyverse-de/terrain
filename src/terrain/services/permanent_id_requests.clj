@@ -166,21 +166,34 @@ For example, https://doi.org/10.7946/P2G596 links to the DOI 10.7946/P2G596.")
       (data-info-client/create-dirs (config/irods-user) [staging-path])
       (data-info/share (config/irods-user) [curators] [staging-path] "own"))))
 
+(defn- move-folder
+  [user {:keys [id path]} dest-path]
+  (try+
+   (data-info-client/move-single user id dest-path)
+   (ft/path-join dest-path (ft/basename path))
+
+   (catch Object e
+     (log/error e)
+     (email/send-permanent-id-request-data-move-error path dest-path current-user (:body e (str e)))
+     path)))
+
 (defn- stage-data-item
-  [user {:keys [id path]}]
-  (let [staged-path (format-staging-path path)
-        curators    (config/permanent-id-curators-group)]
-    (data-info-client/move-single (config/irods-user) id (config/permanent-id-staging-dir))
+  [user folder]
+  (let [curators-group (config/permanent-id-curators-group)
+        staged-path    (move-folder (config/irods-user)
+                                    folder
+                                    (config/permanent-id-staging-dir))]
+    (data-info/share (config/irods-user) [curators-group] [staged-path] "own")
     (data-info/share (config/irods-user) [user] [staged-path] "write")
-    (data-info/share (config/irods-user) [curators] [staged-path] "own")
     staged-path))
 
 (defn- publish-data-item
-  [user {:keys [id path]}]
-  (let [publish-path (format-publish-path path)
-        curators     (config/permanent-id-curators-group)]
-    (data-info-client/move-single curators id (config/permanent-id-publish-dir))
-    (data-info/share (config/irods-user) [curators] [publish-path] "own")
+  [user folder]
+  (let [curators-group (config/permanent-id-curators-group)
+        publish-path   (move-folder curators-group
+                                    folder
+                                    (config/permanent-id-publish-dir))]
+    (data-info/share (config/irods-user) [curators-group] [publish-path] "own")
     publish-path))
 
 (defn- publish-metadata
