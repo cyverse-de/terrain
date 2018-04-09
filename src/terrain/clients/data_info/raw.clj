@@ -248,6 +248,12 @@
   (request :post ["data" path-uuid "metadata" "save"]
            (mk-req-map user (json/encode {:dest dest :recursive recursive}))))
 
+(defn save-ore
+  "Request that an OAI-ORE file be saved for a directory."
+  [user path-uuid]
+  (request :post ["data" path-uuid "ore" "save"]
+           (mk-req-map user)))
+
 ;; SHARING
 
 (defn share-with-anonymous

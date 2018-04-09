@@ -132,7 +132,10 @@
       (controller req meta/do-metadata-copy :params data-id :body))
 
     (POST "/filesystem/:data-id/metadata/save" [data-id :as req]
-      (controller req meta/do-metadata-save data-id :params :body))))
+      (controller req meta/do-metadata-save data-id :params :body))
+
+    (POST "/filesystem/:data-id/ore/save" [data-id :as req]
+      (controller req meta/do-ore-save data-id :params))))
 
 (defn admin-filesystem-metadata-routes
   "The admin routes for file metadata endpoints."

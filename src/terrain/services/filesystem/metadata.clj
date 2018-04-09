@@ -64,6 +64,18 @@
 
 (with-post-hook! #'do-metadata-save (log-func "do-metadata-save"))
 
+(defn do-ore-save
+  "Forwards request to data-info service."
+  [data-id params]
+  (data-raw/save-ore (:user params) data-id))
+
+(with-pre-hook! #'do-ore-save
+  (fn [data-id params]
+    (log-call "do-ore-save" data-id params)
+    (validate-map params {:user string?})))
+
+(with-post-hook! #'do-ore-save (log-func "do-ore-save"))
+
 (defn parse-metadata-csv-file
   "Forwards request to data-info service by looking up the target data-id from the `dest` param."
   [{:keys [user]} {:keys [dest] :as params}]
