@@ -57,7 +57,7 @@
          :auto-reload? false}
   :uberjar-exclusions [#".*[.]SF" #"LICENSE" #"NOTICE"]
   :repositories [["biojava"
-                  {:url "http://www.biojava.org/download/maven"}]
+                  {:url "http://biojava.org/download/maven"}]
                  ["sonatype-releases"
                   {:url "https://oss.sonatype.org/content/repositories/releases/"}]
                  ["nexml"
