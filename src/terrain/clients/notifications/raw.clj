@@ -11,7 +11,7 @@
 
 (defn- na-url
   [& components]
-  (str (apply curl/url (config/notificationagent-base) components)))
+  (str (apply curl/url (config/notificationagent-base-url) components)))
 
 (defn get-messages
   [params]

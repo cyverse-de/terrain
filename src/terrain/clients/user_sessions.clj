@@ -8,7 +8,7 @@
 
 (defn session-url
   [user]
-  (str (url (sessions-base) user)))
+  (str (url (sessions-base-url) user)))
 
 (defn get-session
   [user]

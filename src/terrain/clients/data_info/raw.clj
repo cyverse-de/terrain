@@ -25,7 +25,7 @@
   "This function makes an HTTP request to the data-info service. It uses clj-http to make the
    request."
   [^Keyword method ^ISeq url-path ^IPersistentMap req-map]
-  (let [url (apply url/url (cfg/data-info-base) url-path)]
+  (let [url (apply url/url (cfg/data-info-base-url) url-path)]
     ((resolve-http-call method) (str url) req-map)))
 
 (defn- add-user
@@ -74,7 +74,7 @@
   (let [nodes         (fs/split path)
         nodes         (if (= "/" (first nodes)) (next nodes) nodes)
         encoded-nodes (map url/url-encode nodes)]
-    (apply url/url (cfg/data-info-base) "navigation" "path" encoded-nodes)))
+    (apply url/url (cfg/data-info-base-url) "navigation" "path" encoded-nodes)))
 
 (defn list-directories
   "Uses the data-info navigation/path endpoint to list directories contained under path."
@@ -110,7 +110,7 @@
 
 (defn upload-file
   [user dest-path filename content-type istream & {:keys [as] :or {as :stream}}]
-  (http/post (str (url/url (cfg/data-info-base) "data"))
+  (http/post (str (url/url (cfg/data-info-base-url) "data"))
              {:query-params {:user user
                              :dest dest-path}
               :accept :json
@@ -129,7 +129,7 @@
 
 (defn overwrite-file
   [user path-uuid istream]
-  (http/put (str (url/url (cfg/data-info-base) "data" path-uuid))
+  (http/put (str (url/url (cfg/data-info-base-url) "data" path-uuid))
             {:query-params {:user user}
              :accept :json
              :multipart [{:name "file"

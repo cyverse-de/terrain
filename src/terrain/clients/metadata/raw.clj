@@ -8,11 +8,11 @@
 
 (defn- metadata-url
   [& components]
-  (str (apply curl/url (config/metadata-base) components)))
+  (str (apply curl/url (config/metadata-base-url) components)))
 
 (defn- metadata-url-encoded
   [& components]
-  (str (apply curl/url (config/metadata-base) (map curl/url-encode components))))
+  (str (apply curl/url (config/metadata-base-url) (map curl/url-encode components))))
 
 (defn resolve-data-type
   "Returns a type converted from the type field of a stat result to a type expected by the

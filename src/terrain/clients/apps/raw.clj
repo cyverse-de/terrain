@@ -14,11 +14,11 @@
 
 (defn- apps-url
   [& components]
-  (str (apply curl/url (config/apps-base) components)))
+  (str (apply curl/url (config/apps-base-url) components)))
 
 (defn- apps-url-encoded
   [& components]
-  (str (apply curl/url (config/apps-base) (map curl/url-encode components))))
+  (str (apply curl/url (config/apps-base-url) (map curl/url-encode components))))
 
 (defn get-all-workflow-elements
   [params]

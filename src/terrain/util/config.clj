@@ -3,7 +3,6 @@
   (:require [clojure.string :as string]
             [clojure-commons.config :as cc]
             [clojure-commons.error-codes :as ce]
-            [common-cfg.cfg :as cfg]
             [clojure.tools.logging :as log]))
 
 (def de-system-id "de")
@@ -151,36 +150,15 @@
   [props config-valid configs app-routes-enabled]
   "terrain.apps.base-url" "http://apps:60000")
 
-(def apps-base
-  (memoize
-   (fn []
-     (if (System/getenv "APPS_PORT")
-       (cfg/env-setting "APPS_PORT")
-       (apps-base-url)))))
-
 (cc/defprop-optstr metadata-base-url
   "The base URL to use when connecting to the metadata services."
   [props config-valid configs metadata-routes-enabled]
   "terrain.metadata.base-url" "http://metadata:60000")
 
-(def metadata-base
-  (memoize
-   (fn []
-     (if (System/getenv "METADATA_PORT")
-       (cfg/env-setting "METADATA_PORT")
-       (metadata-base-url)))))
-
 (cc/defprop-optstr notificationagent-base-url
   "The base URL to use when connecting to the notification agent."
   [props config-valid configs notification-routes-enabled]
   "terrain.notificationagent.base-url" "http://notification-agent:60000")
-
-(def notificationagent-base
-  (memoize
-   (fn []
-     (if (System/getenv "NOTIFICATIONAGENT_PORT")
-       (cfg/env-setting "NOTIFICATIONAGENT_PORT")
-       (notificationagent-base-url)))))
 
 (cc/defprop-optstr ipg-base
   "The base URL for the iplant-groups service."
@@ -345,13 +323,6 @@
   [props config-valid configs filesystem-routes-enabled]
   "terrain.data-info.base-url" "http://data-info:60000")
 
-(def data-info-base
-  (memoize
-   (fn []
-     (if (System/getenv "DATA_INFO_PORT")
-       (cfg/env-setting "DATA_INFO_PORT")
-       (data-info-base-url)))))
-
 (cc/defprop-optstr tree-parser-url
   "The URL for the tree parser service."
   [props config-valid configs tree-viewer-routes-enabled]
@@ -502,13 +473,6 @@
   [props config-valid configs]
   "terrain.preferences.host" "http://user-preferences:60000")
 
-(def prefs-base
-  (memoize
-   (fn []
-     (if (System/getenv "USER_PREFERENCES_PORT")
-       (cfg/env-setting "USER_PREFERENCES_PORT")
-       (prefs-base-url)))))
-
 (cc/defprop-optstr search-base-url
   "The hostname of the search service"
   [props config-valid configs]
@@ -519,36 +483,15 @@
   [props config-valid configs]
   "terrain.sessions.host" "http://user-sessions:60000")
 
-(def sessions-base
-  (memoize
-   (fn []
-     (if (System/getenv "USER_SESSIONS_PORT")
-       (cfg/env-setting "USER_SESSIONS_PORT")
-       (sessions-base-url)))))
-
 (cc/defprop-optstr saved-searches-base-url
   "The base URL of the saved-searches service"
   [props config-valid configs]
   "terrain.saved-searches.host" "http://saved-searches:60000")
 
-(def saved-searches-base
-  (memoize
-   (fn []
-     (if (System/getenv "SAVED_SEARCHES_PORT")
-       (cfg/env-setting "SAVED_SEARCHES_PORT")
-       (saved-searches-base-url)))))
-
 (cc/defprop-optstr tree-urls-base-url
   "The base URL of the tree-urls service"
   [props config-valid configs]
   "terrain.tree-urls.host" "http://tree-urls:60000")
-
-(def tree-urls-base
-  (memoize
-   (fn []
-     (if (System/getenv "TREE_URLS_PORT")
-       (cfg/env-setting "TREE_URLS_PORT")
-       (tree-urls-base-url)))))
 
 (defn tree-urls-attr [] "ipc-tree-urls")
 
@@ -572,21 +515,10 @@
    :accepted-keys-dir    (jwt-accepted-keys-dir)
    :validity-window-end  (jwt-validity-window-end)})
 
-(defn log-environment
-  []
-  (log/warn "ENV? terrain.data-info.base-url -" (data-info-base))
-  (log/warn "ENV? terrain.apps.base-url =" (apps-base))
-  (log/warn "ENV? terrain.notificationagent.base-url =" (notificationagent-base))
-  (log/warn "ENV? terrain.sessions.host =" (sessions-base))
-  (log/warn "ENV? terrain.saved-searches.host =" (saved-searches-base))
-  (log/warn "ENV? terrain.tree-urls.host =" (tree-urls-base))
-  (log/warn "ENV? terrain.preferences.host =" (prefs-base)))
-
 (defn load-config-from-file
   "Loads the configuration settings from a file."
   [cfg-path]
   (cc/load-config-from-file cfg-path props)
   (cc/log-config props :filters [#"irods\.user" #"icat\.user" #"oauth\.pem"])
-  (log-environment)
   (validate-config)
   (ce/register-filters (exception-filters)))

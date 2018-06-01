@@ -22,7 +22,7 @@
   "Adds the name and email of the currently authenticated user to the apps URL with the given
    relative URL path."
   [query & components]
-  (apply build-url-with-query (apps-base)
+  (apply build-url-with-query (apps-base-url)
                               (secured-params query)
                               components))
 

@@ -1,6 +1,6 @@
 (ns terrain.clients.notifications
   (:use [clojure-commons.client :only [build-url-with-query]]
-        [terrain.util.config :only [notificationagent-base]]
+        [terrain.util.config :only [notificationagent-base-url]]
         [terrain.util.transformers :only [add-current-user-to-map]])
   (:require [cheshire.core :as cheshire]
             [clj-http.client :as client]
@@ -12,7 +12,7 @@
   ([relative-url]
      (notificationagent-url relative-url {}))
   ([relative-url query]
-     (build-url-with-query (notificationagent-base)
+     (build-url-with-query (notificationagent-base-url)
                            (add-current-user-to-map query) relative-url)))
 
 (defn send-notification

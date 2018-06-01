@@ -9,7 +9,7 @@
 
 (defn- user-prefs-url
   [user]
-  (str (url (prefs-base) user)))
+  (str (url (prefs-base-url) user)))
 
 (defn get-prefs
   [username]

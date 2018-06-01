@@ -58,7 +58,7 @@
 (defn perform-apps-check
   []
   (try
-    (let [base-url (scrub-url (config/apps-base))
+    (let [base-url (scrub-url (config/apps-base-url))
           s        (:status (get-with-timeout base-url))]
       (log/info "HTTP Status from Apps: " s)
       (<= 200 s 299))
@@ -70,7 +70,7 @@
 (defn perform-notificationagent-check
   []
   (try
-    (let [base-url (scrub-url (config/notificationagent-base))
+    (let [base-url (scrub-url (config/notificationagent-base-url))
           s        (:status (get-with-timeout base-url))]
       (log/info "HTTP Status from NotificationAgent: " s)
       (<= 200 s 299))
