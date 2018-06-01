@@ -58,6 +58,8 @@
   :uberjar-exclusions [#".*[.]SF" #"LICENSE" #"NOTICE"]
   :repositories [["biojava"
                   {:url "http://biojava.org/download/maven"}]
+                 ["cyverse-de"
+                  {:url "https://raw.github.com/cyverse-de/mvn/master/releases"}]
                  ["sonatype-releases"
                   {:url "https://oss.sonatype.org/content/repositories/releases/"}]
                  ["nexml"
