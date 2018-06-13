@@ -9,7 +9,6 @@
         [ring.middleware.keyword-params]
         [tree-urls-client.middleware :only [wrap-tree-urls-base]]
         [terrain.routes.admin]
-        [terrain.routes.callbacks]
         [terrain.routes.data]
         [terrain.routes.permanent-id-requests]
         [terrain.routes.fileio]
@@ -197,8 +196,7 @@
   (util/flagged-routes
     (unsecured-misc-routes)
     (unsecured-notification-routes)
-    (unsecured-tree-viewer-routes)
-    (unsecured-callback-routes)))
+    (unsecured-tree-viewer-routes)))
 
 (def admin-handler
   (-> (delayed-handler admin-routes)
