@@ -1,6 +1,11 @@
 (use '[clojure.java.shell :only (sh)])
 (require '[clojure.string :as string])
 
+;; This should be removed as soon as the need for Forester is removed.
+(require 'cemerick.pomegranate.aether)
+(cemerick.pomegranate.aether/register-wagon-factory!
+ "http" #(org.apache.maven.wagon.providers.http.HttpWagon.))
+
 (defn git-ref
   []
   (or (System/getenv "GIT_COMMIT")
