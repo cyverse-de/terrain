@@ -9,7 +9,6 @@
             [dire.core :refer [with-pre-hook! with-post-hook!]]
             [me.raynes.fs :as fs]
             [clojure-commons.error-codes :as error]
-            [clj-icat-direct.icat :as icat]
             [terrain.clients.data-info :as data]
             [terrain.clients.data-info.raw :as data-raw]
             [terrain.services.metadata.favorites :as favorites]
@@ -31,24 +30,6 @@
     (catch Object e
       (log/error e "Could not lookup favorites in directory listing")
       [])))
-
-(defn get-paths-in-folder
-  ([user folder]
-    (get-paths-in-folder user folder (cfg/fs-max-paths-in-request)))
-
-  ([user folder limit]
-    (let [listing (icat/paged-folder-listing
-                    :user           user
-                    :zone           (cfg/irods-zone)
-                    :folder-path    folder
-                    :entity-type    :any
-                    :sort-column    :base-name
-                    :sort-direction :asc
-                    :limit          limit
-                    :offset         0
-                    :info-types     nil)]
-      (map :full_path listing))))
-
 
 (defn- bad-paths
   "Returns a seq of full paths that should not be included in paged listing."
