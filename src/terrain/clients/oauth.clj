@@ -8,9 +8,8 @@
 
 (defn get-token [username password]
   (:body (http/post (oauth-url "token")
-                    {:form-params {:grant_type    "password"
-                                   :client_id     (config/oauth-client-id)
-                                   :client_secret (config/oauth-client-secret)
-                                   :username      username
-                                   :password      password}
+                    {:form-params {:grant_type "password"
+                                   :client_id  (config/oauth-client-id)
+                                   :username   username
+                                   :password   password}
                      :as          :x-www-form-urlencoded})))
