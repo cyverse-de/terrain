@@ -20,6 +20,7 @@
   :manifest {"Git-Ref" ~(git-ref)}
   :uberjar-name "terrain-standalone.jar"
   :dependencies [[org.clojure/clojure "1.8.0"]
+                 [org.clojure/data.codec "0.1.1"]
                  [org.clojure/tools.nrepl "0.2.12"]
                  [cheshire "5.6.3"]
                  [clj-http "3.4.1"]

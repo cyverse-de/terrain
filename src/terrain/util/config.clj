@@ -493,6 +493,21 @@
   [props config-valid configs]
   "terrain.tree-urls.host" "http://tree-urls:60000")
 
+(cc/defprop-optstr oauth-base-uri
+  "The base URI for the OAuth API endpoints."
+  [props config-valid configs]
+  "terrain.oauth.base-uri" "https://cas/oauth2.0")
+
+(cc/defprop-optstr oauth-client-id
+  "The client ID to use when authenticating to the OAuth server."
+  [props config-valid configs]
+  "terrain.oauth.client-id" "fake-client-id")
+
+(cc/defprop-optstr oauth-client-secret
+  "The client secret to use when authenticating to the OAuth server."
+  [props config-valid configs]
+  "terrain.oauth.client-secret" "notprod")
+
 (defn tree-urls-attr [] "ipc-tree-urls")
 
 (defn- validate-config

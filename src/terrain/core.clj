@@ -27,6 +27,7 @@
         [terrain.routes.oauth]
         [terrain.routes.favorites]
         [terrain.routes.tags]
+        [terrain.routes.token]
         [terrain.routes.webhooks]
         [terrain.routes.comments]
         [terrain.auth.user-attributes]
@@ -194,6 +195,7 @@
 (defn unsecured-routes
   []
   (util/flagged-routes
+    (token-routes)
     (unsecured-misc-routes)
     (unsecured-notification-routes)
     (unsecured-tree-viewer-routes)))
