@@ -4,7 +4,7 @@
             [clj-http.client :as client]
             [terrain.util.config :as config]))
 
-(def apps-sort-params [:limit :offset :sort-field :sort-dir])
+(def apps-sort-params [:limit :offset :sort-field :sort-dir :app-type])
 (def apps-analysis-listing-params (conj apps-sort-params :include-hidden :filter))
 (def apps-search-params (conj apps-sort-params :search))
 (def admin-apps-search-params (conj apps-search-params :app-subset))
