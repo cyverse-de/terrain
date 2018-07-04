@@ -4,8 +4,8 @@
             [clojure-commons.response :as resp]
             [clojure-commons.exception :as cx]
             [terrain.util.config :as cfg]
-            [terrain.util.jwt :as jwt]))
-
+            [terrain.util.jwt :as jwt]
+            [terrain.util.oauth :as oauth-util]))
 
 (def
   ^{:doc "The authenticated user or nil if the service is unsecured."
@@ -98,6 +98,14 @@
   (when-let [header-name (cfg/wso2-jwt-header)]
     (get (:headers request) (string/lower-case header-name))))
 
+(defn- get-oauth-token
+  "Returns a non-nil value if we're using OAuth for authentication."
+  [request]
+  (when-let [header (get (:headers request) "authorization")]
+    (let [[type token] (string/split header #"\s+" 2)]
+      (when (= (string/lower-case type) "bearer")
+        token))))
+
 (defn- wrap-fake-auth
   [handler]
   (wrap-current-user handler fake-user-from-attributes))
@@ -112,13 +120,19 @@
   (-> (wrap-current-user handler user-from-wso2-jwt-claims)
       (jwt/validate-jwt-assertion get-wso2-jwt-assertion jwt/user-from-wso2-assertion)))
 
+(defn- wrap-oauth
+  [handler]
+  (-> (wrap-current-user handler oauth-util/user-from-oauth-profile)
+      (oauth-util/validate-oauth-token get-oauth-token)))
+
 (defn authenticate-current-user
   "Authenticates the user and binds current-user to a map that is built from the user attributes retrieved
    during the authentication process."
   [handler]
   (wrap-auth-selection [[get-fake-auth          (wrap-fake-auth handler)]
                         [get-de-jwt-assertion   (wrap-de-jwt-auth handler)]
-                        [get-wso2-jwt-assertion (wrap-wso2-jwt-auth handler)]]))
+                        [get-wso2-jwt-assertion (wrap-wso2-jwt-auth handler)]
+                        [get-oauth-token        (wrap-oauth handler)]]))
 
 (defn validate-current-user
   "Verifies that the user belongs to one of the groups that are permitted to access the resource."
