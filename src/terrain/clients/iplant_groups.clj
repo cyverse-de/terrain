@@ -26,6 +26,9 @@
 
 ;; Subject search functions.
 
+(defn grouper-admin-user? [{username :id}]
+  (= username (config/grouper-user)))
+
 (defn format-like-trellis
   "Reformat an iplant-groups response to look like a trellis response."
   [response]
@@ -83,7 +86,7 @@
 
 (defn- format-subjects [subjects client user]
   (let [regex (build-group-name-prefix-regex client user)]
-    (vec (for [subject subjects]
+    (vec (for [subject (remove grouper-admin-user? subjects)]
            (assoc subject
              :display_name (:name subject)
              :name         (string/replace (:name subject) regex ""))))))
