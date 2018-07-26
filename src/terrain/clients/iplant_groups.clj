@@ -5,6 +5,7 @@
             [clj-http.client :as http]
             [clojure.string :as string]
             [clojure.tools.logging :as log]
+            [clojure-commons.exception-util :as cxu]
             [cyverse-groups-client.core :as c]
             [terrain.util.config :as config]))
 
@@ -328,6 +329,8 @@
         folder (get-team-folder-name client)
         group  (full-group-name name folder)]
     (verify-group-exists client user group)
+    (when (some (partial = (config/grouper-user)) members)
+      (cxu/bad-request "the administrative Grouper user may not be added to any teams"))
     (grant-member-privileges client user group members)
     (c/add-group-members client user group members)))
 
@@ -336,6 +339,8 @@
         folder (get-team-folder-name client)
         group  (full-group-name name folder)]
     (verify-group-exists client user group)
+    (when (some (partial = (config/grouper-user)) members)
+      (cxu/bad-request "the administrative Grouper user may not be removed from any teams"))
     (revoke-member-privileges client user group members)
     (c/remove-group-members client user group members)))
 
@@ -344,6 +349,8 @@
         folder (get-team-folder-name client)
         group  (full-group-name name folder)]
     (verify-group-exists client user group)
+    (when (= name (config/grouper-user))
+      (cxu/bad-request "the administrative Grouper user may not join any teams"))
     (let [response (c/add-group-members client user group [user])]
       (grant-member-privileges client (config/grouper-user) group [user])
       response)))
@@ -353,6 +360,8 @@
         folder (get-team-folder-name client)
         group  (full-group-name name folder)]
     (verify-group-exists client user group)
+    (when (= name (config/grouper-user))
+      (cxu/bad-request "the administrative Grouper user may not leave any teams"))
     (let [response (c/remove-group-members client user group [user])]
       (revoke-member-privileges client (config/grouper-user) group [user])
       response)))
