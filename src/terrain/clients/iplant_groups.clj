@@ -349,7 +349,7 @@
         folder (get-team-folder-name client)
         group  (full-group-name name folder)]
     (verify-group-exists client user group)
-    (when (= name (config/grouper-user))
+    (when (= user (config/grouper-user))
       (cxu/bad-request "the administrative Grouper user may not join any teams"))
     (let [response (c/add-group-members client user group [user])]
       (grant-member-privileges client (config/grouper-user) group [user])
@@ -360,7 +360,7 @@
         folder (get-team-folder-name client)
         group  (full-group-name name folder)]
     (verify-group-exists client user group)
-    (when (= name (config/grouper-user))
+    (when (= user (config/grouper-user))
       (cxu/bad-request "the administrative Grouper user may not leave any teams"))
     (let [response (c/remove-group-members client user group [user])]
       (revoke-member-privileges client (config/grouper-user) group [user])
