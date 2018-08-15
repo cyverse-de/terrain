@@ -5,11 +5,12 @@
             [terrain.util.config :as config]))
 
 (def apps-sort-params [:limit :offset :sort-field :sort-dir :app-type])
+(def base-search-params (conj apps-sort-params :search))
 (def apps-analysis-listing-params (conj apps-sort-params :include-hidden :filter))
-(def apps-search-params (conj apps-sort-params :search))
+(def apps-search-params (conj base-search-params :start_date :end_date))
 (def admin-apps-search-params (conj apps-search-params :app-subset))
 (def apps-hierarchy-sort-params (conj apps-sort-params :attr))
-(def tools-search-params (conj apps-search-params :include-hidden :public))
+(def tools-search-params (conj base-search-params :include-hidden :public))
 (def permission-lister-params [:full-listing])
 
 (defn- apps-url
@@ -874,7 +875,7 @@
 (defn list-integration-data
   [params]
   (client/get (apps-url "admin" "integration-data")
-              {:query-params     (secured-params params apps-search-params)
+              {:query-params     (secured-params params base-search-params)
                :as               :stream
                :follow-redirects false}))
 
