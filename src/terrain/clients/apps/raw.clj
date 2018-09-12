@@ -459,9 +459,9 @@
                :follow-redirects false}))
 
 (defn stop-job
-  [analysis-id]
+  [analysis-id params]
   (client/post (apps-url "analyses" analysis-id "stop")
-               {:query-params     (secured-params)
+               {:query-params     (secured-params params [:job_status])
                 :as               :stream
                 :follow-redirects false}))
 
