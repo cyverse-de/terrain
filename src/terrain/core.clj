@@ -8,6 +8,7 @@
         [compojure.api.middleware :only [wrap-exceptions]]
         [ring.middleware.keyword-params]
         [tree-urls-client.middleware :only [wrap-tree-urls-base]]
+        [terrain.middleware :only [wrap-context-path-remover]]
         [terrain.routes.admin]
         [terrain.routes.data]
         [terrain.routes.permanent-id-requests]
@@ -240,6 +241,7 @@
 (defn site-handler
   [routes-fn]
   (-> (delayed-handler routes-fn)
+      (wrap-context-path-remover "/terrain")
       wrap-keyword-params
       wrap-lcase-params
       wrap-query-params
