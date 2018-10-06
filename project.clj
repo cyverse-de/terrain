@@ -21,7 +21,7 @@
   :uberjar-name "terrain-standalone.jar"
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [org.clojure/data.codec "0.1.1"]
-                 [org.clojure/data.xml "0.0.8"]
+                 [org.clojure/data.xml "0.2.0-alpha5"]
                  [org.clojure/tools.nrepl "0.2.12"]
                  [cheshire "5.6.3"]
                  [clj-http "3.4.1"]
