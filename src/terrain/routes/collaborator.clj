@@ -6,6 +6,7 @@
             [clojure.string :as string]
             [terrain.clients.apps.raw :as apps]
             [terrain.services.collaborator-lists :as cl]
+            [terrain.services.communities :as communities]
             [terrain.services.subjects :as subjects]
             [terrain.services.teams :as teams]
             [terrain.util.config :as config]
@@ -91,6 +92,35 @@
 
    (POST "/teams/:name/leave" [name]
      (service/success-response (teams/leave current-user name)))))
+
+(defn community-routes
+  []
+  (optional-routes
+   [config/collaborator-routes-enabled]
+
+   (GET "/communities" [:as {:keys [params]}]
+     (service/success-response (communities/get-communities current-user params)))
+
+   (POST "/communities" [:as {:keys [body]}]
+     (service/success-response (communities/add-community current-user (service/decode-json body))))
+
+   (GET "/communities/:name" [name]
+     (service/success-response (communities/get-community current-user name)))
+
+   (PATCH "/communities/:name" [name :as {:keys [body]}]
+     (service/success-response (communities/update-community current-user name (service/decode-json body))))
+
+   (DELETE "/communities/:name" [name]
+     (service/success-response (communities/delete-community current-user name)))
+
+   (GET "/communities/:name/admins" [name]
+     (service/success-response (communities/get-community-admins current-user name)))
+
+   (POST "/communities/:name/admins" [name :as {:keys [body]}]
+     (service/success-response (communities/add-community-admins current-user name (service/decode-json body))))
+
+   (POST "/communities/:name/admins/deleter" [name :as {:keys [body]}]
+     (service/success-response (communities/remove-community-admins current-user name (service/decode-json body))))))
 
 (defn subject-routes
   []

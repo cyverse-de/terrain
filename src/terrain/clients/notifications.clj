@@ -35,7 +35,8 @@
                             :subject (str (:name m) " has been deployed")
                             :email true
                             :email_template "tool_deployment"
-                            :payload {:email_address email
+                            :payload {:action "tool_deployment"
+                                      :email_address email
                                       :toolname (:name m)
                                       :tooldirectory (:location m)
                                       :tooldescription (:description m)
@@ -52,7 +53,8 @@
                       :subject (str user-name " has requested to join team \"" team-name "\"")
                       :email true
                       :email_template "team_join_request"
-                      :payload {:email_address (:email admin)
+                      :payload {:action "team_join_request"
+                                :email_address (:email admin)
                                 :requester_id user
                                 :requester_name user-name
                                 :requester_email user-email
@@ -67,7 +69,8 @@
                       :subject "Team join request denied"
                       :email true
                       :email_template "team_join_denial"
-                      :payload {:email_address user-email
+                      :payload {:action "team_join_denial"
+                                :email_address user-email
                                 :team_name team-name
                                 :admin_message message}}))
 
@@ -79,8 +82,21 @@
                       :subject "Added to team"
                       :email true
                       :email_template "added_to_team"
-                      :payload {:email_address (:email user)
+                      :payload {:action "added_to_team"
+                                :email_address (:email user)
                                 :team_name team-name}}))
+
+(defn send-community-admin-add-notification
+  [user team-name]
+  (send-notification {:type           "team"
+                      :user           (:id user)
+                      :subject        (format "Added as community admin to %s" team-name)
+                      :email          true
+                      :email_template "blank"
+                      :payload        {:action        "added_to_community"
+                                       :email_address (:email user)
+                                       :contents      nil
+                                       :team_name     team-name}}))
 
 (defn mark-all-notifications-seen
   []
