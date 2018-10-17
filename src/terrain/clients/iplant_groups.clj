@@ -225,9 +225,9 @@
 
 ;; Team & Community Functions
 
-(defn- ensure-team-folder-exists [client team-type user]
-  (ensure-folder-exists client (config/grouper-user) (get-team-folder-name client team-type))
-  (ensure-folder-exists client user (get-team-folder-name client team-type user)))
+(defn- ensure-team-folder-exists [client user]
+  (ensure-folder-exists client (config/grouper-user) (get-team-folder-name client group-type-teams))
+  (ensure-folder-exists client user (get-team-folder-name client group-type-teams user)))
 
 (defn- find-teams* [client team-type user search-folder lookup-fn]
   (let [folder (get-team-folder-name client team-type)]
@@ -259,25 +259,28 @@
 (defn get-communities [user params]
   (get-teams* group-type-communities user params))
 
-(defn- grant-initial-team-privileges [client user group public-privileges]
+(defn- grant-initial-team-privileges [client user group initial-admin public-privileges]
   (c/update-group-privileges client user group
-                             {:updates [{:subject_id (config/grouper-user) :privileges ["admin"]}
+                             {:updates [{:subject_id initial-admin :privileges ["admin"]}
                                         {:subject_id c/public-user :privileges public-privileges}]}))
 
-(defn- add-team* [team-type user {:keys [name description public_privileges] :or {public_privileges []}}]
+(defn add-team [user {:keys [name description public_privileges] :or {public_privileges []}}]
   (let [client (get-client)
-        folder (get-team-folder-name client team-type user)]
-    (ensure-team-folder-exists client team-type user)
-    (let [full-name (str folder ":" name)
+        folder (get-team-folder-name client group-type-teams user)]
+    (ensure-team-folder-exists client user)
+    (let [full-name (full-group-name name folder)
           group     (c/add-group client user full-name team-group-type description)]
-      (grant-initial-team-privileges client user full-name public_privileges)
-      (format-group (get-team-folder-name client team-type) group))))
+      (grant-initial-team-privileges client user full-name (config/grouper-user) public_privileges)
+      (format-group (get-team-folder-name client group-type-teams) group))))
 
-(defn add-team [user request]
-  (add-team* group-type-teams user request))
-
-(defn add-community [user request]
-  (add-team* group-type-communities user request))
+(defn add-community [user {:keys [name description public_privileges] :or {public_privileges []}}]
+  (let [client (get-client)
+        folder (get-team-folder-name client group-type-communities)]
+    (ensure-folder-exists client (config/grouper-user) folder)
+    (let [full-name (full-group-name name folder)
+          group     (c/add-group client (config/grouper-user) full-name team-group-type description)]
+      (grant-initial-team-privileges client (config/grouper-user) full-name user public_privileges)
+      (format-group folder group))))
 
 (defn- get-team* [team-type user name]
   (let [client (get-client)
