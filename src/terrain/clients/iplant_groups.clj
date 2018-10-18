@@ -9,6 +9,10 @@
             [cyverse-groups-client.core :as c]
             [terrain.util.config :as config]))
 
+(def ^:private team-group-type "group")
+(def group-type-teams "teams")
+(def group-type-communities "communities")
+
 ;; General group name functions.
 
 (defn- get-de-users-folder-name [client]
@@ -20,10 +24,10 @@
 (defn- get-collaborator-list-folder-name [client user]
   (c/build-folder-name client (format "users:%s:collaborator-lists" user)))
 
-(defn- get-team-folder-name [client & [user]]
+(defn- get-team-folder-name [client team-type & [user]]
   (if-not user
-    (c/build-folder-name client "teams")
-    (c/build-folder-name client (format "teams:%s" user))))
+    (c/build-folder-name client team-type)
+    (c/build-folder-name client (format "%s:%s" team-type user))))
 
 ;; Subject search functions.
 
@@ -79,7 +83,9 @@
   (c/new-cyverse-groups-client (config/ipg-base) (config/environment-name)))
 
 (defn- build-group-name-prefix-regex [client user]
-  (->> [(get-collaborator-list-folder-name client user) (get-team-folder-name client)]
+  (->> [(get-collaborator-list-folder-name client user)
+        (get-team-folder-name client group-type-teams)
+        (get-team-folder-name client group-type-communities)]
        (mapv (partial format "\\Q%s\\E"))
        (string/join "|")
        (format "^(?:%s):")
@@ -217,16 +223,14 @@
     (verify-group-exists client user group)
     (c/remove-group-members client user group members)))
 
-;; Team Functions
-
-(def ^:private team-group-type "group")
+;; Team & Community Functions
 
 (defn- ensure-team-folder-exists [client user]
-  (ensure-folder-exists client (config/grouper-user) (get-team-folder-name client))
-  (ensure-folder-exists client user (get-team-folder-name client user)))
+  (ensure-folder-exists client (config/grouper-user) (get-team-folder-name client group-type-teams))
+  (ensure-folder-exists client user (get-team-folder-name client group-type-teams user)))
 
-(defn- get-teams* [client user search-folder lookup-fn]
-  (let [folder (get-team-folder-name client)]
+(defn- find-teams* [client team-type user search-folder lookup-fn]
+  (let [folder (get-team-folder-name client team-type)]
     (get-groups* search-folder (partial format-group folder) client user lookup-fn)))
 
 (defn- filter-teams [search result]
@@ -241,33 +245,54 @@
 ;; This function kind of uses a hack. A search string is required, but if we make it the
 ;; same as the folder name then that approximates listing all groups in the folder. An
 ;; update to iplant-groups will be required to eliminate this hack.
-(defn get-teams [user {:keys [search creator member]}]
+(defn- get-teams* [team-type user {:keys [search creator member]}]
   (let [client (get-client)
-        folder (get-team-folder-name client creator)]
+        folder (get-team-folder-name client team-type creator)]
     (->> (cond member (fn [_] (find-groups-with-member client user member folder search))
                search (partial c/find-groups client user search)
-               :else  (partial c/find-groups client user))
-         (get-teams* client user folder))))
+               :else (partial c/find-groups client user))
+         (find-teams* client team-type user folder))))
 
-(defn- grant-initial-team-privileges [client user group public-privileges]
+(defn get-teams [user params]
+  (get-teams* group-type-teams user params))
+
+(defn get-communities [user params]
+  (get-teams* group-type-communities user params))
+
+(defn- grant-initial-team-privileges [client user group initial-admin public-privileges]
   (c/update-group-privileges client user group
-                             {:updates [{:subject_id (config/grouper-user) :privileges ["admin"]}
+                             {:updates [{:subject_id initial-admin :privileges ["admin"]}
                                         {:subject_id c/public-user :privileges public-privileges}]}))
 
 (defn add-team [user {:keys [name description public_privileges] :or {public_privileges []}}]
   (let [client (get-client)
-        folder (get-team-folder-name client user)]
+        folder (get-team-folder-name client group-type-teams user)]
     (ensure-team-folder-exists client user)
-    (let [full-name (str folder ":" name)
+    (let [full-name (full-group-name name folder)
           group     (c/add-group client user full-name team-group-type description)]
-      (grant-initial-team-privileges client user full-name public_privileges)
-      (format-group (get-team-folder-name client) group))))
+      (grant-initial-team-privileges client user full-name (config/grouper-user) public_privileges)
+      (format-group (get-team-folder-name client group-type-teams) group))))
 
-(defn get-team [user name]
+(defn add-community [user {:keys [name description public_privileges] :or {public_privileges []}}]
   (let [client (get-client)
-        folder (get-team-folder-name client)]
+        folder (get-team-folder-name client group-type-communities)]
+    (ensure-folder-exists client (config/grouper-user) folder)
+    (let [full-name (full-group-name name folder)
+          group     (c/add-group client (config/grouper-user) full-name team-group-type description)]
+      (grant-initial-team-privileges client (config/grouper-user) full-name user public_privileges)
+      (format-group folder group))))
+
+(defn- get-team* [team-type user name]
+  (let [client (get-client)
+        folder (get-team-folder-name client team-type)]
     (->> (c/get-group client user (full-group-name name folder))
          (format-group folder))))
+
+(defn get-team [user name]
+  (get-team* group-type-teams user name))
+
+(defn get-community [user name]
+  (get-team* group-type-communities user name))
 
 (defn verify-team-exists [user name]
   ;; get-team will return a 404 if the team doesn't exist.
@@ -276,40 +301,64 @@
 
 (defn update-team [user name updates]
   (let [client  (get-client)
-        folder  (get-team-folder-name client)
+        folder  (get-team-folder-name client group-type-teams)
         creator (first (string/split name #":" 2))
         group   (full-group-name name folder)]
     (verify-group-exists client user group)
     (->> (update (select-keys updates [:name :description]) :name
-                 full-group-name (get-team-folder-name client creator))
+                 full-group-name (get-team-folder-name client group-type-teams creator))
          (remove-vals nil?)
          (c/update-group client user group)
          (format-group folder))))
 
-(defn delete-team [user name]
+(defn update-community [user name updates]
+  (let [client  (get-client)
+        folder  (get-team-folder-name client group-type-communities)
+        group   (full-group-name name folder)]
+    (verify-group-exists client user group)
+    (->> (update (select-keys updates [:name :description]) :name
+                 full-group-name (get-team-folder-name client group-type-communities))
+         (remove-vals nil?)
+         (c/update-group client user group)
+         (format-group folder))))
+
+(defn- delete-team* [team-type user name]
   (let [client (get-client)
-        folder (get-team-folder-name client)
+        folder (get-team-folder-name client team-type)
         group  (full-group-name name folder)]
     (verify-group-exists client user group)
     (->> (c/delete-group client user group)
          (format-group folder))))
 
+(defn delete-team [user name]
+  (delete-team* group-type-teams user name))
+
+(defn delete-community [user name]
+  (delete-team* group-type-communities user name))
+
 (defn get-team-members [user name]
   (let [client (get-client)
-        folder (get-team-folder-name client)
+        folder (get-team-folder-name client group-type-teams)
         group  (full-group-name name folder)]
     (verify-group-exists client user group)
     (update (c/list-group-members client user group) :members format-subjects client user)))
 
-(defn get-team-admins [user name]
+(defn- get-team-admins* [team-type user name]
   (let [client (get-client)
-        folder (get-team-folder-name client)
+        folder (get-team-folder-name client team-type)
         group  (full-group-name name folder)]
     (verify-group-exists client user group)
     (->> (c/list-group-privileges client (config/grouper-user) group {:subject-source-id "ldap" :privilege "admin"})
          :privileges
          (mapv :subject)
-         (remove (comp (partial = (config/grouper-user)) :id)))))
+         (remove (comp (partial = (config/grouper-user)) :id))
+         (hash-map :members))))
+
+(defn get-team-admins [user name]
+  (get-team-admins* group-type-teams user name))
+
+(defn get-community-admins [user name]
+  (get-team-admins* group-type-communities user name))
 
 (defn- format-privilege-updates [user subject-ids privileges]
   {:updates (vec (for [subject-id subject-ids :when (not= user subject-id)]
@@ -324,29 +373,50 @@
 (defn- revoke-member-privileges [client user group members]
   (c/revoke-group-privileges client user group (format-member-privilege-updates user members)))
 
-(defn add-team-members [user name members]
+(defn- format-admin-privilege-updates [user subject-ids]
+  (format-privilege-updates user subject-ids ["admin"]))
+
+(defn- grant-admin-privileges [client user group members]
+  (c/update-group-privileges client user group (format-admin-privilege-updates user members) {:replace false}))
+
+(defn- revoke-admin-privileges [client user group members]
+  (c/revoke-group-privileges client user group (format-admin-privilege-updates user members)))
+
+(defn- add-team-members* [team-type grant-privileges-fn user name members]
   (let [client (get-client)
-        folder (get-team-folder-name client)
+        folder (get-team-folder-name client team-type)
         group  (full-group-name name folder)]
     (verify-group-exists client user group)
     (when (some (partial = (config/grouper-user)) members)
-      (cxu/bad-request "the administrative Grouper user may not be added to any teams"))
-    (grant-member-privileges client user group members)
+      (cxu/bad-request "the administrative Grouper user may not be added to any teams or communities"))
+    (grant-privileges-fn client user group members)
     (c/add-group-members client user group members)))
 
-(defn remove-team-members [user name members]
+(defn add-team-members [user name members]
+  (add-team-members* group-type-teams grant-member-privileges user name members))
+
+(defn add-community-admins [user name members]
+  (add-team-members* group-type-communities grant-admin-privileges user name members))
+
+(defn- remove-team-members* [team-type revoke-privileges-fn user name members]
   (let [client (get-client)
-        folder (get-team-folder-name client)
+        folder (get-team-folder-name client team-type)
         group  (full-group-name name folder)]
     (verify-group-exists client user group)
     (when (some (partial = (config/grouper-user)) members)
-      (cxu/bad-request "the administrative Grouper user may not be removed from any teams"))
-    (revoke-member-privileges client user group members)
+      (cxu/bad-request "the administrative Grouper user may not be removed from any teams or communities"))
+    (revoke-privileges-fn client user group members)
     (c/remove-group-members client user group members)))
+
+(defn remove-team-members [user name members]
+  (remove-team-members* group-type-teams revoke-member-privileges user name members))
+
+(defn remove-community-admins [user name members]
+  (remove-team-members* group-type-communities revoke-admin-privileges user name members))
 
 (defn join-team [user name]
   (let [client (get-client)
-        folder (get-team-folder-name client)
+        folder (get-team-folder-name client group-type-teams)
         group  (full-group-name name folder)]
     (verify-group-exists client user group)
     (when (= user (config/grouper-user))
@@ -357,7 +427,7 @@
 
 (defn leave-team [user name]
   (let [client (get-client)
-        folder (get-team-folder-name client)
+        folder (get-team-folder-name client group-type-teams)
         group  (full-group-name name folder)]
     (verify-group-exists client user group)
     (when (= user (config/grouper-user))
@@ -373,14 +443,14 @@
 
 (defn list-team-privileges [user name]
   (let [client (get-client)
-        folder (get-team-folder-name client)
+        folder (get-team-folder-name client group-type-teams)
         group  (full-group-name name folder)]
     (verify-group-exists client user group)
     (format-group-privileges (c/list-group-privileges client user group {:inheritance-level "immediate"}))))
 
 (defn update-team-privileges [user name updates]
   (let [client (get-client)
-        folder (get-team-folder-name client)
+        folder (get-team-folder-name client group-type-teams)
         group  (full-group-name name folder)]
     (verify-group-exists client user group)
     (format-group-privileges (c/update-group-privileges client user group updates))))
