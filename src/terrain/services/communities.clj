@@ -24,11 +24,10 @@
   (ipg/get-community-admins user name))
 
 (defn add-community-admins [{user :shortUsername} name {:keys [members]}]
-  (let [response (ipg/add-community-admins user name members)]
-    (doseq [member members]
-      (let [member-info (ipg/lookup-subject user member)]
-        (when-not (= (:source_id member-info) "g:gsa")
-          (cn/send-community-admin-add-notification member-info name))))
+  (let [{:keys [results] :as response} (ipg/add-community-admins user name members)]
+    (doseq [{:keys [success subject_id source_id]} results]
+      (when (and success (not= source_id "g:gsa"))
+        (cn/send-community-admin-add-notification (ipg/lookup-subject user subject_id) name)))
     response))
 
 (defn remove-community-admins [{user :shortUsername} name {:keys [members]}]
