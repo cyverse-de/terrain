@@ -299,23 +299,28 @@
   (get-team user name)
   nil)
 
-(defn- update-team* [team-type user name updates]
+(defn update-team [user name updates]
   (let [client  (get-client)
-        folder  (get-team-folder-name client team-type)
+        folder  (get-team-folder-name client group-type-teams)
         creator (first (string/split name #":" 2))
         group   (full-group-name name folder)]
     (verify-group-exists client user group)
     (->> (update (select-keys updates [:name :description]) :name
-                 full-group-name (get-team-folder-name client team-type creator))
+                 full-group-name (get-team-folder-name client group-type-teams creator))
          (remove-vals nil?)
          (c/update-group client user group)
          (format-group folder))))
 
-(defn update-team [user name updates]
-  (update-team* group-type-teams user name updates))
-
 (defn update-community [user name updates]
-  (update-team* group-type-communities user name updates))
+  (let [client  (get-client)
+        folder  (get-team-folder-name client group-type-communities)
+        group   (full-group-name name folder)]
+    (verify-group-exists client user group)
+    (->> (update (select-keys updates [:name :description]) :name
+                 full-group-name (get-team-folder-name client group-type-communities))
+         (remove-vals nil?)
+         (c/update-group client user group)
+         (format-group folder))))
 
 (defn- delete-team* [team-type user name]
   (let [client (get-client)
