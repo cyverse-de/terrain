@@ -122,6 +122,35 @@
    (POST "/communities/:name/admins/deleter" [name :as {:keys [body]}]
      (service/success-response (communities/remove-community-admins current-user name (service/decode-json body))))))
 
+(defn admin-community-routes
+  []
+  (optional-routes
+   [config/collaborator-routes-enabled]
+
+   (GET "/communities" [:as {:keys [params]}]
+     (service/success-response (communities/admin-get-communities params)))
+
+   (POST "/communities" [:as {:keys [body]}]
+     (service/success-response (communities/add-community current-user (service/decode-json body))))
+
+   (GET "/communities/:name" [name]
+     (service/success-response (communities/admin-get-community name)))
+
+   (PATCH "/communities/:name" [name :as {:keys [body]}]
+     (service/success-response (communities/admin-update-community name (service/decode-json body))))
+
+   (DELETE "/communities/:name" [name]
+     (service/success-response (communities/admin-delete-community name)))
+
+   (GET "/communities/:name/admins" [name]
+     (service/success-response (communities/admin-get-community-admins name)))
+
+   (POST "/communities/:name/admins" [name :as {:keys [body]}]
+     (service/success-response (communities/admin-add-community-admins name (service/decode-json body))))
+
+   (POST "/communities/:name/admins/deleter" [name :as {:keys [body]}]
+     (service/success-response (communities/admin-remove-community-admins name (service/decode-json body))))))
+
 (defn subject-routes
   []
   (optional-routes
