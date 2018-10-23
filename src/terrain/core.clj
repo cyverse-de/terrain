@@ -183,6 +183,7 @@
     (admin-app-comment-routes)
     (admin-app-community-routes)
     (admin-comment-routes)
+    (admin-community-routes)
     (admin-filesystem-metadata-routes)
     (admin-groups-routes)
     (admin-notification-routes)
