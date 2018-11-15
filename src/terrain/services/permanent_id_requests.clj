@@ -4,8 +4,10 @@
         [terrain.auth.user-attributes :only [current-user]])
   (:require [cheshire.core :as json]
             [clj-time.core :as time]
+            [clojure.string :as string]
             [clojure.tools.logging :as log]
             [clojure-commons.file-utils :as ft]
+            [terrain.clients.datacite :as datacite]
             [terrain.clients.data-info :as data-info]
             [terrain.clients.data-info.raw :as data-info-client]
             [terrain.clients.ezid :as ezid]
@@ -43,18 +45,25 @@ For example, https://doi.org/10.7946/P2G596 links to the DOI 10.7946/P2G596.")
   [path]
   (str (ft/rm-last-slash (config/permanent-id-target-base-url)) (format-publish-path path)))
 
+(defn- find-attr-value
+  [avus attr]
+  (->> avus
+       (filter #(= attr (:attr %)))
+       first
+       :value))
+
 (defn- validate-ezid-metadata
-  [ezid-metadata]
-  (when (empty? ezid-metadata)
+  [avus]
+  (when (empty? avus)
     (throw+ {:type :clojure-commons.exception/bad-request
              :error "No metadata found for Permanent ID Request."}))
-  (let [identifier (get ezid-metadata (config/permanent-id-identifier-attr))]
+  (let [identifier (find-attr-value avus (config/permanent-id-identifier-attr))]
     (when-not (empty? identifier)
       (throw+ {:type :clojure-commons.exception/bad-request
                :error "The metadata already contains a Permanent Identifier attribute with a value."
                :attribute (config/permanent-id-identifier-attr)
                :identifier identifier})))
-  ezid-metadata)
+  avus)
 
 (defn- validate-request-for-completion
   [{:keys [folder original_path permanent_id]}]
@@ -234,49 +243,55 @@ For example, https://doi.org/10.7946/P2G596 links to the DOI 10.7946/P2G596.")
              :error "No EZID shoulder defined for this Permanent ID Request type."
              :request-type type})))
 
+(defn- format-avus
+  [{:keys [avus irods-avus]}]
+  (concat avus irods-avus [{:attr (config/permanent-id-date-attr) :value (str (time/year (time/now)))}]))
+
+(defn- append-placeholder-identifier
+  "Append a placeholder identifier AVU to the given metadata to allow the generated DataCite XML to pass validation.
+   Assumes `request-type->shoulder` will return a value such as `doi:10.5072/FK2`,
+   which will be parsed into an AVU value such as `10.5072/FK2/placeholder`."
+  [request-type avus]
+  (conj avus {:attr  (config/permanent-id-identifier-attr)
+              :value (-> request-type
+                         request-type->shoulder
+                         (string/split #":")
+                         second
+                         (str "/placeholder"))
+              :unit  ""
+              :avus  [{:attr  (config/permanent-id-identifier-type-attr)
+                       :value request-type
+                       :unit  ""}]}))
+
 (defn- parse-valid-ezid-metadata
-  [{:keys [path]} {:keys [avus irods-avus]}]
-  (let [format-avus #(vector (:attr %) (:value %))
-        ezid-metadata (into {} (concat (map format-avus irods-avus) (map format-avus avus)))]
-    (validate-ezid-metadata ezid-metadata)
-    (assoc ezid-metadata
-      ezid-target-attr (format-metadata-target-url path)
-      (config/permanent-id-date-attr) (str (time/year (time/now))))))
+  [request-type {:keys [path]} avus]
+  (validate-ezid-metadata avus)
+  {ezid-target-attr (format-metadata-target-url path)
+   :datacite        (datacite/avus->datacite-xml (append-placeholder-identifier request-type avus))})
 
 (defn- get-validated-data-item
   "Gets data-info stat for the given ID and checks if the data item is valid for a Permanent ID request.
   Should filter the stat to what's needed for validation and by callers."
-  [user data-id]
+  [user request-type data-id]
   (let [data-item (->> (data-info/stat-by-uuid user data-id :filter-include "path,id,type,permission,file-count,dir-count") (validate-data-item user))
         metadata (data-info/get-metadata-json user data-id)]
-    (parse-valid-ezid-metadata data-item metadata)
+    (parse-valid-ezid-metadata request-type data-item (format-avus metadata))
     data-item))
-
-(defn- format-alt-id-avus
-  "Formats metadata service AVUs from the alt-identifiers-map."
-  [alt-identifiers-map]
-  (mapcat (fn [[k v]] [{:attr (config/permanent-id-alt-identifier-attr)
-                        :value v
-                        :unit ""}
-                       {:attr (config/permanent-id-alt-identifier-type-attr)
-                        :value (name k)
-                        :unit ""}])
-          alt-identifiers-map))
 
 (defn- format-publish-avus
   "Formats AVUs containing completed request information for saving with the metadata service."
-  [ezid-metadata identifier alt-identifiers]
-  (let [publish-date (get ezid-metadata (config/permanent-id-date-attr))
-        alt-id-avus  (format-alt-id-avus alt-identifiers)]
+  [avus identifier identifier-type]
+  (let [publish-date (find-attr-value avus (config/permanent-id-date-attr))]
     {:avus
-     (concat
-       alt-id-avus
-       [{:attr  (config/permanent-id-identifier-attr)
-         :value identifier
-         :unit  ""}
-        {:attr  (config/permanent-id-date-attr)
-         :value publish-date
-         :unit  ""}])}))
+     [{:attr  (config/permanent-id-identifier-attr)
+       :value identifier
+       :unit  ""
+       :avus  [{:attr  (config/permanent-id-identifier-type-attr)
+                :value identifier-type
+                :unit  ""}]}
+      {:attr  (config/permanent-id-date-attr)
+       :value publish-date
+       :unit  ""}]}))
 
 (defn- format-folder-details
   [user folder-id]
@@ -322,7 +337,7 @@ For example, https://doi.org/10.7946/P2G596 links to the DOI 10.7946/P2G596.")
   (let [{type :type folder-id :folder} (service/decode-json body)
         folder-id                      (uuidify folder-id)
         user                           (:shortUsername current-user)
-        {:keys [path] :as folder}      (get-validated-data-item user folder-id)
+        {:keys [path] :as folder}      (get-validated-data-item user type folder-id)
         target-type                    (validate-request-target-type folder)
         {request-id :id :as response}  (submit-permanent-id-request type folder-id target-type path)
         staged-path                    (stage-data-item user folder)]
@@ -378,11 +393,10 @@ For example, https://doi.org/10.7946/P2G596 links to the DOI 10.7946/P2G596.")
           folder          (validate-publish-dest folder)
           folder-id       (uuidify (:id folder))
           metadata        (data-info/get-metadata-json user folder-id)
-          ezid-metadata   (parse-valid-ezid-metadata folder metadata)
-          ezid-response   (ezid/mint-id shoulder ezid-metadata)
+          avus            (format-avus metadata)
+          ezid-response   (ezid/mint-id shoulder (parse-valid-ezid-metadata type folder avus))
           identifier      (get ezid-response (keyword type))
-          alt-identifiers (dissoc ezid-response (keyword type))
-          publish-avus    (format-publish-avus ezid-metadata identifier alt-identifiers)
+          publish-avus    (format-publish-avus avus identifier type)
           publish-path    (publish-data-item user folder)]
       (email/send-permanent-id-request-complete type
                                                 publish-path
@@ -405,3 +419,12 @@ For example, https://doi.org/10.7946/P2G596 links to the DOI 10.7946/P2G596.")
     (update-permanent-id-request request-id (json/encode {:status       status-code-completion
                                                           :comments     comments
                                                           :permanent_id identifier}))))
+
+(defn preview-datacite-xml
+  [request-id]
+  (let [user      (:shortUsername current-user)
+        {:keys [folder type]} (admin-get-permanent-id-request request-id)
+        folder-id (uuidify (:id folder))
+        metadata  (data-info/get-metadata-json user folder-id)
+        avus      (format-avus metadata)]
+    (parse-valid-ezid-metadata type folder avus)))

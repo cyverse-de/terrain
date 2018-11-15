@@ -42,5 +42,8 @@
     (POST "/permanent-id-requests/:request-id/ezid" [request-id]
       (service/success-response (create-permanent-id request-id)))
 
+    (GET "/permanent-id-requests/:request-id/preview-submission" [request-id]
+      (service/success-response (preview-datacite-xml request-id)))
+
     (POST "/permanent-id-requests/:request-id/status" [request-id :as {:keys [body]}]
       (service/success-response (update-permanent-id-request request-id body)))))

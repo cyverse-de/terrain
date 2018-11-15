@@ -68,7 +68,7 @@
 
 (defn mint-id
   "Mints a new permanent ID under the given shoulder with the given metadata.
-   http://ezid.cdlib.org/doc/apidoc.html#operation-mint-identifier"
+   https://support.datacite.org/v1.1/reference#mint-doi"
   [shoulder metadata]
   (try+
     (let [response (ezid-post metadata "shoulder" shoulder)

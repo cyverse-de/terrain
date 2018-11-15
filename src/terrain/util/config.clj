@@ -426,27 +426,22 @@
 (cc/defprop-optstr permanent-id-identifier-attr
   "The metadata attribute where a new permanent ID is stored."
   [props config-valid configs]
-  "terrain.permanent-id.attr.identifier" "Identifier")
+  "terrain.permanent-id.attr.identifier" "identifier")
 
-(cc/defprop-optstr permanent-id-alt-identifier-attr
-  "The metadata attribute where a new permanent ID is stored."
+(cc/defprop-optstr permanent-id-identifier-type-attr
+  "The metadata attribute for the type of the `permanent-id-identifier-attr` AVU."
   [props config-valid configs]
-  "terrain.permanent-id.attr.alt-identifier" "AlternateIdentifier")
-
-(cc/defprop-optstr permanent-id-alt-identifier-type-attr
-  "The metadata attribute where a new permanent ID is stored."
-  [props config-valid configs]
-  "terrain.permanent-id.attr.alt-identifier-type" "alternateIdentifierType")
+  "terrain.permanent-id.attr.identifier-type" "identifierType")
 
 (cc/defprop-optstr permanent-id-date-attr
   "The metadata attribute where a permanent ID request's publication year is set."
   [props config-valid configs]
-  "terrain.permanent-id.attr.publication-year" "datacite.publicationyear")
+  "terrain.permanent-id.attr.publication-year" "publicationYear")
 
 (cc/defprop-optstr ezid-base-url
   "The EZID API base URL."
   [props config-valid configs]
-  "terrain.permanent-id.ezid.base-url" "https://ezid.cdlib.org")
+  "terrain.permanent-id.ezid.base-url" "https://ez.test.datacite.org")
 
 (cc/defprop-optstr ezid-username
   "The EZID API account username."
