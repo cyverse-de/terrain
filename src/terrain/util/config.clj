@@ -441,7 +441,7 @@
 (cc/defprop-optstr ezid-base-url
   "The EZID API base URL."
   [props config-valid configs]
-  "terrain.permanent-id.ezid.base-url" "https://ez.datacite.org")
+  "terrain.permanent-id.ezid.base-url" "https://ez.test.datacite.org")
 
 (cc/defprop-optstr ezid-username
   "The EZID API account username."

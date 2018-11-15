@@ -4,6 +4,7 @@
         [terrain.auth.user-attributes :only [current-user]])
   (:require [cheshire.core :as json]
             [clj-time.core :as time]
+            [clojure.string :as string]
             [clojure.tools.logging :as log]
             [clojure-commons.file-utils :as ft]
             [terrain.clients.datacite :as datacite]
@@ -246,19 +247,35 @@ For example, https://doi.org/10.7946/P2G596 links to the DOI 10.7946/P2G596.")
   [{:keys [avus irods-avus]}]
   (concat avus irods-avus [{:attr (config/permanent-id-date-attr) :value (str (time/year (time/now)))}]))
 
+(defn- append-placeholder-identifier
+  "Append a placeholder identifier AVU to the given metadata to allow the generated DataCite XML to pass validation.
+   Assumes `request-type->shoulder` will return a value such as `doi:10.5072/FK2`,
+   which will be parsed into an AVU value such as `10.5072/FK2/placeholder`."
+  [request-type avus]
+  (conj avus {:attr  (config/permanent-id-identifier-attr)
+              :value (-> request-type
+                         request-type->shoulder
+                         (string/split #":")
+                         second
+                         (str "/placeholder"))
+              :unit  ""
+              :avus  [{:attr  (config/permanent-id-identifier-type-attr)
+                       :value request-type
+                       :unit  ""}]}))
+
 (defn- parse-valid-ezid-metadata
-  [{:keys [path]} avus]
+  [request-type {:keys [path]} avus]
   (validate-ezid-metadata avus)
   {ezid-target-attr (format-metadata-target-url path)
-   :datacite        (datacite/avus->datacite-xml avus)})
+   :datacite        (datacite/avus->datacite-xml (append-placeholder-identifier request-type avus))})
 
 (defn- get-validated-data-item
   "Gets data-info stat for the given ID and checks if the data item is valid for a Permanent ID request.
   Should filter the stat to what's needed for validation and by callers."
-  [user data-id]
+  [user request-type data-id]
   (let [data-item (->> (data-info/stat-by-uuid user data-id :filter-include "path,id,type,permission,file-count,dir-count") (validate-data-item user))
         metadata (data-info/get-metadata-json user data-id)]
-    (parse-valid-ezid-metadata data-item (format-avus metadata))
+    (parse-valid-ezid-metadata request-type data-item (format-avus metadata))
     data-item))
 
 (defn- format-publish-avus
@@ -320,7 +337,7 @@ For example, https://doi.org/10.7946/P2G596 links to the DOI 10.7946/P2G596.")
   (let [{type :type folder-id :folder} (service/decode-json body)
         folder-id                      (uuidify folder-id)
         user                           (:shortUsername current-user)
-        {:keys [path] :as folder}      (get-validated-data-item user folder-id)
+        {:keys [path] :as folder}      (get-validated-data-item user type folder-id)
         target-type                    (validate-request-target-type folder)
         {request-id :id :as response}  (submit-permanent-id-request type folder-id target-type path)
         staged-path                    (stage-data-item user folder)]
@@ -377,7 +394,7 @@ For example, https://doi.org/10.7946/P2G596 links to the DOI 10.7946/P2G596.")
           folder-id       (uuidify (:id folder))
           metadata        (data-info/get-metadata-json user folder-id)
           avus            (format-avus metadata)
-          ezid-response   (ezid/mint-id shoulder (parse-valid-ezid-metadata folder avus))
+          ezid-response   (ezid/mint-id shoulder (parse-valid-ezid-metadata type folder avus))
           identifier      (get ezid-response (keyword type))
           publish-avus    (format-publish-avus avus identifier type)
           publish-path    (publish-data-item user folder)]
@@ -406,8 +423,8 @@ For example, https://doi.org/10.7946/P2G596 links to the DOI 10.7946/P2G596.")
 (defn preview-datacite-xml
   [request-id]
   (let [user      (:shortUsername current-user)
-        {:keys [folder]} (admin-get-permanent-id-request request-id)
+        {:keys [folder type]} (admin-get-permanent-id-request request-id)
         folder-id (uuidify (:id folder))
         metadata  (data-info/get-metadata-json user folder-id)
         avus      (format-avus metadata)]
-    (parse-valid-ezid-metadata folder avus)))
+    (parse-valid-ezid-metadata type folder avus)))
