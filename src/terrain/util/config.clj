@@ -1,9 +1,8 @@
 (ns terrain.util.config
   (:use [slingshot.slingshot :only [throw+]])
-  (:require [clojure.string :as string]
-            [clojure-commons.config :as cc]
+  (:require [clojure-commons.config :as cc]
             [clojure-commons.error-codes :as ce]
-            [clojure.tools.logging :as log]))
+            [metadata-client.core :as metadata-client]))
 
 (def de-system-id "de")
 
@@ -398,6 +397,11 @@
   [props config-valid configs coge-enabled]
   "terrain.coge.user" "coge")
 
+(cc/defprop-optstr communities-metadata-attr
+  "The attr of an App Community tag AVU."
+  [props config-valid configs]
+  "terrain.communities.metadata.attr" "cyverse-community")
+
 (cc/defprop-optstr default-output-dir
   "The default name of the default job output directory."
   [props config-valid configs]
@@ -504,6 +508,9 @@
   "terrain.oauth.client-secret" "notprod")
 
 (defn tree-urls-attr [] "ipc-tree-urls")
+
+(def metadata-client
+  (memoize #(metadata-client/new-metadata-client (metadata-base-url))))
 
 (defn- validate-config
   "Validates the configuration settings after they've been loaded."

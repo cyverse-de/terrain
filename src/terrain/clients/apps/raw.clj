@@ -121,10 +121,10 @@
                :follow-redirects false}))
 
 (defn admin-get-apps-in-community
-  [community-id]
+  [community-id  & {:keys [as] :or {as :stream}}]
   (client/get (apps-url "admin" "apps" "communities" community-id "apps")
               {:query-params     (secured-params)
-               :as               :stream
+               :as               as
                :follow-redirects false}))
 
 (defn search-apps

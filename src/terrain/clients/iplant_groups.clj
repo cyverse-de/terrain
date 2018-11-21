@@ -7,6 +7,8 @@
             [clojure.tools.logging :as log]
             [clojure-commons.exception-util :as cxu]
             [cyverse-groups-client.core :as c]
+            [terrain.clients.apps.raw :as apps-client]
+            [terrain.clients.metadata.raw :as metadata-client]
             [terrain.util.config :as config]))
 
 (def ^:private team-group-type "group")
@@ -311,13 +313,43 @@
          (c/update-group client user group)
          (format-group folder))))
 
-(defn update-community [user name updates]
+(defn- retag-avu [new-group-name avu]
+  (-> avu
+      (select-keys [:id :attr :unit :avus])
+      (assoc :value new-group-name)))
+
+(defn- retag-apps [new-group-name app-tag-avus]
+  (let [app-id->avus (group-by :target_id app-tag-avus)]
+    (doseq [app-id (keys app-id->avus)]
+      (->> (get app-id->avus app-id)
+           (map #(retag-avu new-group-name %))
+           (hash-map :avus)
+           (metadata-client/update-avus metadata-client/target-type-app app-id)))))
+
+(defn- check-for-tagged-apps [retag-apps? force-rename? group new-group-name]
+  (when (or retag-apps? (not force-rename?))
+    (when-let [app-tag-avus (->> (metadata-client/find-avus metadata-client/target-type-app
+                                                            (config/communities-metadata-attr)
+                                                            group)
+                                 :avus
+                                 seq)]
+      (if retag-apps?
+        (retag-apps new-group-name app-tag-avus)
+        (cxu/exists "Some apps have been tagged with the old community name"
+                    :name group
+                    :apps (:body (apps-client/admin-get-apps-in-community group :as :json)))))))
+
+(defn update-community [user name retag-apps? force-rename? {new-name :name :as updates}]
   (let [client  (get-client)
         folder  (get-team-folder-name client group-type-communities)
         group   (full-group-name name folder)]
     (verify-group-exists client user group)
-    (->> (update (select-keys updates [:name :description]) :name
-                 full-group-name (get-team-folder-name client group-type-communities))
+    (when (and new-name (not= name new-name))
+      (check-for-tagged-apps retag-apps? force-rename? group (full-group-name new-name folder)))
+    (->> (update (select-keys updates [:name :description])
+                 :name
+                 full-group-name
+                 folder)
          (remove-vals nil?)
          (c/update-group client user group)
          (format-group folder))))

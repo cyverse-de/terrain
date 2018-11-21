@@ -208,7 +208,7 @@ For example, https://doi.org/10.7946/P2G596 links to the DOI 10.7946/P2G596.")
 (defn- publish-metadata
   [{:keys [id type]} publish-avus]
   (let [data-type (metadata/resolve-data-type type)]
-    (metadata/add-metadata-avus data-type id publish-avus)))
+    (metadata/update-avus data-type id publish-avus)))
 
 (defn- send-notification
   [user email subject contents request-id]
