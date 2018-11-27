@@ -107,8 +107,8 @@
    (GET "/communities/:name" [name]
      (service/success-response (communities/get-community current-user name)))
 
-   (PATCH "/communities/:name" [name :as {:keys [body]}]
-     (service/success-response (communities/update-community current-user name (service/decode-json body))))
+   (PATCH "/communities/:name" [name :as {:keys [params body]}]
+     (service/success-response (communities/update-community current-user name params (service/decode-json body))))
 
    (DELETE "/communities/:name" [name]
      (service/success-response (communities/delete-community current-user name)))
@@ -136,8 +136,8 @@
    (GET "/communities/:name" [name]
      (service/success-response (communities/admin-get-community name)))
 
-   (PATCH "/communities/:name" [name :as {:keys [body]}]
-     (service/success-response (communities/admin-update-community name (service/decode-json body))))
+   (PATCH "/communities/:name" [name :as {:keys [params body]}]
+     (service/success-response (communities/admin-update-community name params (service/decode-json body))))
 
    (DELETE "/communities/:name" [name]
      (service/success-response (communities/admin-delete-community name)))

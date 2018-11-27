@@ -13,8 +13,8 @@
 (defn get-community [{user :shortUsername} name]
   (ipg/get-community user name))
 
-(defn update-community [{user :shortUsername} name body]
-  (ipg/update-community user name body))
+(defn update-community [{user :shortUsername} name {:keys [retag-apps force-rename]} body]
+  (ipg/update-community user name (Boolean/parseBoolean retag-apps) (Boolean/parseBoolean force-rename) body))
 
 (defn delete-community [{user :shortUsername} name]
   (let [{:keys [id] :as result} (ipg/delete-community user name)]
@@ -40,8 +40,8 @@
 (defn admin-get-community [name]
   (get-community {:shortUsername (config/grouper-user)} name))
 
-(defn admin-update-community [name body]
-  (update-community {:shortUsername (config/grouper-user)} name body))
+(defn admin-update-community [name params body]
+  (update-community {:shortUsername (config/grouper-user)} name params body))
 
 (defn admin-delete-community [name]
   (delete-community {:shortUsername (config/grouper-user)} name))

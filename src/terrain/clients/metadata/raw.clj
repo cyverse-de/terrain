@@ -4,6 +4,7 @@
   (:require [cemerick.url :as curl]
             [cheshire.core :as json]
             [clj-http.client :as http]
+            [metadata-client.core :as metadata-client]
             [terrain.util.config :as config]))
 
 (defn- metadata-url
@@ -13,6 +14,8 @@
 (defn- metadata-url-encoded
   [& components]
   (str (apply curl/url (config/metadata-base-url) (map curl/url-encode components))))
+
+(def target-type-app "app")
 
 (defn resolve-data-type
   "Returns a type converted from the type field of a stat result to a type expected by the
@@ -47,10 +50,22 @@
 
 (def put-options post-options)
 
-(defn add-metadata-avus
+(defn find-avus
+  [target-type attr value]
+  (metadata-client/find-avus (config/metadata-client)
+                             (:user (user-params))
+                             {:target-type target-type
+                              :attribute   attr
+                              :value       value}))
+
+(defn update-avus
+  "Adds or updates Metadata AVUs on the given target item."
   [target-type target-id avus-req]
-  (http/post (metadata-url "avus" target-type target-id)
-             (post-options (json/encode avus-req))))
+  (metadata-client/update-avus (config/metadata-client)
+                               (:user (user-params))
+                               target-type
+                               target-id
+                               (json/encode avus-req)))
 
 (defn list-data-comments
   [target-id]
@@ -217,7 +232,7 @@
 
 (defn get-ontology-hierarchies
   [ontology-version]
-  (http/get (metadata-url-encoded "ontologies" ontology-version) (get-options)))
+  (metadata-client/list-hierarchies (config/metadata-client) (:user (user-params)) ontology-version))
 
 (defn upload-ontology
   [filename content-type istream]
