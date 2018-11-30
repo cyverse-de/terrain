@@ -368,12 +368,18 @@
 (defn delete-community [user name]
   (delete-team* group-type-communities user name))
 
-(defn get-team-members [user name]
+(defn- get-team-members* [team-type user name]
   (let [client (get-client)
-        folder (get-team-folder-name client group-type-teams)
+        folder (get-team-folder-name client team-type)
         group  (full-group-name name folder)]
     (verify-group-exists client user group)
     (update (c/list-group-members client user group) :members format-subjects client user)))
+
+(defn get-team-members [user name]
+  (get-team-members* group-type-teams user name))
+
+(defn get-community-members [user name]
+  (get-team-members* group-type-communities user name))
 
 (defn- get-team-admins* [team-type user name]
   (let [client (get-client)
@@ -446,27 +452,39 @@
 (defn remove-community-admins [user name members]
   (remove-team-members* group-type-communities revoke-admin-privileges user name members))
 
-(defn join-team [user name]
+(defn- join-team* [team-type user name]
   (let [client (get-client)
-        folder (get-team-folder-name client group-type-teams)
+        folder (get-team-folder-name client team-type)
         group  (full-group-name name folder)]
     (verify-group-exists client user group)
     (when (= user (config/grouper-user))
-      (cxu/bad-request "the administrative Grouper user may not join any teams"))
+      (cxu/bad-request "the administrative Grouper user may not join any teams or communities"))
     (let [response (c/add-group-members client user group [user])]
       (grant-member-privileges client (config/grouper-user) group [user])
       response)))
 
-(defn leave-team [user name]
+(defn join-team [user name]
+  (join-team* group-type-teams user name))
+
+(defn join-community [user name]
+  (join-team* group-type-communities user name))
+
+(defn- leave-team* [team-type user name]
   (let [client (get-client)
-        folder (get-team-folder-name client group-type-teams)
+        folder (get-team-folder-name client team-type)
         group  (full-group-name name folder)]
     (verify-group-exists client user group)
     (when (= user (config/grouper-user))
-      (cxu/bad-request "the administrative Grouper user may not leave any teams"))
+      (cxu/bad-request "the administrative Grouper user may not leave any teams or communities"))
     (let [response (c/remove-group-members client user group [user])]
       (revoke-member-privileges client (config/grouper-user) group [user])
       response)))
+
+(defn leave-team [user name]
+  (leave-team* group-type-teams user name))
+
+(defn leave-community [user name]
+  (leave-team* group-type-communities user name))
 
 (defn- format-group-privileges [m]
   (let [format-priv  (fn [priv] (dissoc priv :group))
