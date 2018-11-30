@@ -34,6 +34,15 @@
 (defn remove-community-admins [{user :shortUsername} name {:keys [members]}]
   (ipg/remove-community-admins user name members))
 
+(defn get-community-members [{user :shortUsername} name]
+  (ipg/get-community-members user name))
+
+(defn join [{user :shortUsername} name]
+  (ipg/join-community user name))
+
+(defn leave [{user :shortUsername} name]
+  (ipg/leave-community user name))
+
 (defn admin-get-communities [params]
   (get-communities {:shortUsername (config/grouper-user)} params))
 

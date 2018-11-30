@@ -120,7 +120,16 @@
      (service/success-response (communities/add-community-admins current-user name (service/decode-json body))))
 
    (POST "/communities/:name/admins/deleter" [name :as {:keys [body]}]
-     (service/success-response (communities/remove-community-admins current-user name (service/decode-json body))))))
+     (service/success-response (communities/remove-community-admins current-user name (service/decode-json body))))
+
+   (GET "/communities/:name/members" [name]
+     (service/success-response (communities/get-community-members current-user name)))
+
+   (POST "/communities/:name/join" [name]
+     (service/success-response (communities/join current-user name)))
+
+   (POST "/communities/:name/leave" [name]
+     (service/success-response (communities/leave current-user name)))))
 
 (defn admin-community-routes
   []
