@@ -140,7 +140,8 @@
   (wrap-auth-selection
    [[get-fake-auth          handler]
     [get-de-jwt-assertion   (jwt/validate-group-membership handler cfg/allowed-groups)]
-    [get-wso2-jwt-assertion (constantly (resp/forbidden "Admin not supported for WSO2."))]]))
+    [get-wso2-jwt-assertion (constantly (resp/forbidden "Admin not supported for WSO2."))]
+    [get-oauth-token        (oauth-util/validate-group-membership handler cfg/allowed-groups)]]))
 
 (defn fake-store-current-user
   "Fake storage of a user"

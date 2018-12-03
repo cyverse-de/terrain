@@ -25,6 +25,15 @@
       (throw (ex-info (str "Missing required OAuth profile fields: " missing-fields)
                       {:type :validation :cause :missing-fields})))))
 
+(defn validate-group-membership
+  [handler allowed-groups-fn]
+  (fn [request]
+    (let [allowed-groups (allowed-groups-fn)
+          actual-groups  (get-in request [:oauth-profile :attributes :entitlement] [])]
+      (if (some (partial contains? (set allowed-groups)) actual-groups)
+        (handler request)
+        (resp/forbidden "You are not in one of the admin groups.")))))
+
 (defn validate-oauth-token
   [handler token-fn]
   (fn [request]
