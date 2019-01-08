@@ -1,67 +1,15 @@
 (ns terrain.core
   (:gen-class)
-  (:use [clojure.java.io :only [file]]
-        [clojure-commons.lcase-params :only [wrap-lcase-params]]
-        [clojure-commons.query-params :only [wrap-query-params]]
-        [service-logging.middleware :only [wrap-logging clean-context]]
-        [compojure.core]
-        [compojure.api.middleware :only [wrap-exceptions]]
-        [ring.middleware.keyword-params]
-        [tree-urls-client.middleware :only [wrap-tree-urls-base]]
-        [terrain.middleware :only [wrap-context-path-remover]]
-        [terrain.routes.admin]
-        [terrain.routes.data]
-        [terrain.routes.permanent-id-requests]
-        [terrain.routes.fileio]
-        [terrain.routes.groups]
-        [terrain.routes.metadata]
-        [terrain.routes.misc]
-        [terrain.routes.notification]
-        [terrain.routes.pref]
-        [terrain.routes.session]
-        [terrain.routes.tree-viewer]
-        [terrain.routes.user-info]
-        [terrain.routes.collaborator]
-        [terrain.routes.filesystem]
-        [terrain.routes.search]
-        [terrain.routes.coge]
-        [terrain.routes.oauth]
-        [terrain.routes.favorites]
-        [terrain.routes.tags]
-        [terrain.routes.token]
-        [terrain.routes.webhooks]
-        [terrain.routes.comments]
-        [terrain.auth.user-attributes]
-        [terrain.util.service])
-  (:require [compojure.route :as route]
-            [cheshire.core :as cheshire]
-            [clojure-commons.exception :as cx]
-            [terrain.util.config :as config]
+  (:use [clojure.java.io :only [file]])
+  (:require [terrain.util.config :as config]
             [clojure.tools.nrepl.server :as nrepl]
             [me.raynes.fs :as fs]
             [clj-http.client :as http]
             [common-cli.core :as ccli]
             [terrain.services.filesystem.icat :as icat]
-            [terrain.util :as util]
-            [terrain.util.transformers :as transform]
+            [terrain.routes :as routes]
             [clojure.tools.logging :as log]
             [service-logging.thread-context :as tc]))
-
-(defn delayed-handler
-  [routes-fn]
-  (fn [req]
-    (let [handler ((memoize routes-fn))]
-      (handler req))))
-
-(defn- wrap-user-info
-  [handler]
-  (fn [request]
-    (let [user-info (transform/add-current-user-to-map {})]
-         (log/log 'AccessLogger :trace nil "entering wrap-user-info")
-      (if (nil? (:user user-info))
-        (handler request)
-        (tc/with-logging-context {:user-info (cheshire/encode user-info)}
-                                 (handler request))))))
 
 (defn- start-nrepl
   []
@@ -128,131 +76,8 @@
    :art-id "terrain"
    :service "terrain"})
 
-(defn secured-routes-no-context
-  []
-  (util/flagged-routes
-    (app-category-routes)
-    (app-avu-routes)
-    (app-comment-routes)
-    (app-ontology-routes)
-    (app-community-routes)
-    (apps-routes)
-    (analysis-routes)
-    (coge-routes)
-    (collaborator-list-routes)
-    (community-routes)
-    (team-routes)
-    (subject-routes)
-    (reference-genomes-routes)
-    (tool-routes)
-    (permanent-id-request-routes)
-    (webhook-routes)
-    (misc-metadata-routes)
-    (oauth-routes)
-    (route/not-found (unrecognized-path-response))))
-
-(defn secured-routes
-  []
-  (util/flagged-routes
-    (secured-notification-routes)
-    (secured-metadata-routes)
-    (secured-pref-routes)
-    (secured-collaborator-routes)
-    (secured-user-info-routes)
-    (secured-tree-viewer-routes)
-    (secured-data-routes)
-    (secured-session-routes)
-    (secured-fileio-routes)
-    (secured-filesystem-routes)
-    (secured-filesystem-metadata-routes)
-    (secured-search-routes)
-    (secured-oauth-routes)
-    (secured-favorites-routes)
-    (secured-tag-routes)
-    (data-comment-routes)
-    (route/not-found (unrecognized-path-response))))
-
-(defn admin-routes
-  []
-  (util/flagged-routes
-    (secured-admin-routes)
-    (admin-data-comment-routes)
-    (admin-category-routes)
-    (admin-apps-routes)
-    (admin-app-avu-routes)
-    (admin-app-comment-routes)
-    (admin-app-community-routes)
-    (admin-comment-routes)
-    (admin-community-routes)
-    (admin-filesystem-metadata-routes)
-    (admin-groups-routes)
-    (admin-notification-routes)
-    (admin-ontology-routes)
-    (admin-reference-genomes-routes)
-    (admin-tool-routes)
-    (admin-permanent-id-request-routes)
-    (oauth-admin-routes)
-    (admin-integration-data-routes)
-    (admin-workspace-routes)
-    (admin-user-info-routes)
-    (route/not-found (unrecognized-path-response))))
-
-(defn unsecured-routes
-  []
-  (util/flagged-routes
-    (token-routes)
-    (unsecured-misc-routes)
-    (unsecured-notification-routes)
-    (unsecured-tree-viewer-routes)))
-
-(def admin-handler
-  (-> (delayed-handler admin-routes)
-      (wrap-routes authenticate-current-user)
-      (wrap-routes wrap-user-info)
-      (wrap-routes validate-current-user)
-      (wrap-routes wrap-exceptions  cx/exception-handlers)
-      (wrap-routes wrap-logging)))
-
-(def secured-routes-handler
-  (-> (delayed-handler secured-routes)
-      (wrap-routes wrap-tree-urls-base config/tree-urls-base-url)
-      (wrap-routes authenticate-current-user)
-      (wrap-routes wrap-user-info)
-      (wrap-routes wrap-exceptions  cx/exception-handlers)
-      (wrap-routes wrap-logging)))
-
-(def secured-routes-no-context-handler
-  (-> (delayed-handler secured-routes-no-context)
-      (wrap-routes authenticate-current-user)
-      (wrap-routes wrap-user-info)
-      (wrap-routes wrap-exceptions  cx/exception-handlers)
-      (wrap-routes wrap-logging)))
-
-(def unsecured-routes-handler
-  (-> (delayed-handler unsecured-routes)
-      (wrap-routes wrap-tree-urls-base config/tree-urls-base-url)
-      (wrap-routes wrap-exceptions cx/exception-handlers)
-      (wrap-routes wrap-logging)))
-
-(defn terrain-routes
-  []
-  (util/flagged-routes
-    unsecured-routes-handler
-    (context "/admin" [] admin-handler)
-    (context "/secured" [] secured-routes-handler)
-    secured-routes-no-context-handler))
-
-(defn site-handler
-  [routes-fn]
-  (-> (delayed-handler routes-fn)
-      (wrap-context-path-remover "/terrain")
-      wrap-keyword-params
-      wrap-lcase-params
-      wrap-query-params
-      clean-context))
-
 (def app
-  (site-handler terrain-routes))
+  (routes/site-handler routes/terrain-routes))
 
 (defn run-jetty
   []
