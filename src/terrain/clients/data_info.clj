@@ -268,25 +268,6 @@
          (map #(string/replace % #"^/+|/+$" "") components))))
 
 
-(defn get-tree-metaurl
-  "Gets the URL used to get saved tree URLs."
-  [user path]
-  (->> (raw/admin-get-avus user (uuid-for-path user path))
-    :body
-    :irods-avus
-    (filter #(= (:attr %) (cfg/tree-urls-attr)))
-    first
-    :value))
-
-(defn save-tree-metaurl
-  "Saves the URL used to get saved tree URLs. The metaurl argument should contain the URL used to
-   obtain the tree URLs."
-  [user path metaurl]
-  (let [path-uuid (uuid-for-path user path)]
-    (raw/admin-add-avus user path-uuid {:irods-avus [{:attr  (cfg/tree-urls-attr)
-                                                      :value metaurl
-                                                      :unit  ""}]})))
-
 (defn get-metadata-json
   [user data-id]
   (:body (raw/get-avus user data-id :as :json)))

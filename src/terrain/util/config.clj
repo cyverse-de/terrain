@@ -79,11 +79,6 @@
   [props config-valid configs]
   "terrain.routes.data" true)
 
-(cc/defprop-optboolean tree-viewer-routes-enabled
-  "Enables or disables tree-viewer endpoints."
-  [props config-valid configs]
-  "terrain.routes.tree-viewer" true)
-
 (cc/defprop-optboolean session-routes-enabled
   "Enables or disables user session endpoints."
   [props config-valid configs]
@@ -322,11 +317,6 @@
   [props config-valid configs filesystem-routes-enabled]
   "terrain.data-info.base-url" "http://data-info:60000")
 
-(cc/defprop-optstr tree-parser-url
-  "The URL for the tree parser service."
-  [props config-valid configs tree-viewer-routes-enabled]
-  "terrain.tree-viewer.base-url" "http://portnoy.iplantcollaborative.org/parseTree")
-
 (cc/defprop-optstr es-url
   "The URL for Elastic Search"
   [props config-valid configs data-routes-enabled]
@@ -487,11 +477,6 @@
   [props config-valid configs]
   "terrain.saved-searches.host" "http://saved-searches:60000")
 
-(cc/defprop-optstr tree-urls-base-url
-  "The base URL of the tree-urls service"
-  [props config-valid configs]
-  "terrain.tree-urls.host" "http://tree-urls:60000")
-
 (cc/defprop-optstr oauth-base-uri
   "The base URI for the OAuth API endpoints."
   [props config-valid configs]
@@ -506,8 +491,6 @@
   "The client secret to use when authenticating to the OAuth server."
   [props config-valid configs]
   "terrain.oauth.client-secret" "notprod")
-
-(defn tree-urls-attr [] "ipc-tree-urls")
 
 (def metadata-client
   (memoize #(metadata-client/new-metadata-client (metadata-base-url))))

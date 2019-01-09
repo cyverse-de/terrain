@@ -35,14 +35,12 @@
                  [me.raynes/fs "1.4.6"]
                  [medley "0.8.4"]
                  [org.apache.tika/tika-core "1.14"]      ; provides org.apache.tika
-                 [org.nexml.model/nexml "1.5-SNAPSHOT"]  ; provides org.nexml.model
                  [org.biojava.thirdparty/forester "1.005" ]
                  [slingshot "0.12.2"]
                  [org.cyverse/clj-icat-direct "2.8.2"]
                  [org.cyverse/clj-jargon "2.8.3"]
                  [org.cyverse/clojure-commons "2.8.1"]
                  [org.cyverse/cyverse-groups-client "0.1.4"]
-                 [org.cyverse/tree-urls-client "2.8.1"]
                  [org.cyverse/common-cfg "2.8.1"]
                  [org.cyverse/common-cli "2.8.1"]
                  [org.cyverse/kameleon "3.0.1"]
@@ -69,8 +67,5 @@
                  ["cyverse-de"
                   {:url "https://raw.github.com/cyverse-de/mvn/master/releases"}]
                  ["sonatype-releases"
-                  {:url "https://oss.sonatype.org/content/repositories/releases/"}]
-                 ["nexml"
-                  {:url "http://nexml.github.io/maven/repository"
-                   :checksum :ignore}]]
+                  {:url "https://oss.sonatype.org/content/repositories/releases/"}]]
   :jvm-opts ["-Dlogback.configurationFile=/etc/iplant/de/logging/terrain-logging.xml"])

@@ -119,12 +119,6 @@
                                    :prefix     prefix
                                    :base       base})})
 
-(defn tree-file-parse-err-response [{:keys [details]}]
-  {:status       400
-   :content-type :json
-   :body         (cheshire/encode {:error_code ce/ERR_ILLEGAL_ARGUMENT
-                                   :details    details})})
-
 (defn common-error-code [exception]
   (log/error ce/format-exception exception)
   (ce/err-resp (:object exception)))
