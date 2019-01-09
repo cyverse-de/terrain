@@ -1,5 +1,5 @@
 (ns terrain.routes.data
-  (:use [compojure.core]
+  (:use [compojure.api.core]
         [terrain.services.sharing :only [share unshare]]
         [terrain.auth.user-attributes]
         [terrain.util])

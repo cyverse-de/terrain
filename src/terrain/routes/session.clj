@@ -1,5 +1,5 @@
 (ns terrain.routes.session
-  (:use [compojure.core]
+  (:use [compojure.api.core]
         [terrain.services.user-sessions]
         [terrain.util])
   (:require [terrain.util.config :as config]))

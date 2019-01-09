@@ -1,5 +1,5 @@
 (ns terrain.routes.fileio
-  (:use [compojure.core])
+  (:use [compojure.api.core])
   (:require [terrain.util.config :as config]
             [terrain.services.fileio.controllers :as fio]
             [terrain.util :as util]))

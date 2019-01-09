@@ -1,5 +1,5 @@
 (ns terrain.routes.metadata
-  (:use [compojure.core]
+  (:use [compojure.api.core]
         [terrain.services.metadata.apps]
         [terrain.services.bootstrap]
         [terrain.util])

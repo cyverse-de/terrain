@@ -1,5 +1,5 @@
 (ns terrain.routes.webhooks
-  (:use [compojure.core]
+  (:use [compojure.api.core]
         [terrain.util])
   (:require [terrain.clients.apps.raw :as apps-client]
             [terrain.util.config :as config]

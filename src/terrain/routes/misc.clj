@@ -1,5 +1,5 @@
 (ns terrain.routes.misc
-  (:use [compojure.core]
+  (:use [compojure.api.core]
         [ring.util.http-response])
   (:require [clojure.string :as string])
   (:import [java.util UUID]))

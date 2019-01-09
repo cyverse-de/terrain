@@ -1,5 +1,5 @@
 (ns terrain.routes.coge
-  (:use [compojure.core]
+  (:use [compojure.api.core]
         [terrain.services.coge]
         [terrain.util.service]
         [terrain.util])

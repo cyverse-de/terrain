@@ -3,7 +3,7 @@
         [clojure-commons.lcase-params :only [wrap-lcase-params]]
         [clojure-commons.query-params :only [wrap-query-params]]
         [compojure.api.middleware :only [wrap-exceptions]]
-        [compojure.core]
+        [compojure.api.sweet]
         [ring.middleware.keyword-params :only [wrap-keyword-params]]
         [service-logging.middleware :only [wrap-logging clean-context]]
         [terrain.auth.user-attributes]
@@ -125,31 +125,31 @@
     (unsecured-notification-routes)))
 
 (def admin-handler
-  (-> (admin-routes)
-      (wrap-routes authenticate-current-user)
-      (wrap-routes wrap-user-info)
-      (wrap-routes validate-current-user)
-      (wrap-routes wrap-exceptions  cx/exception-handlers)
-      (wrap-routes wrap-logging)))
+  (middleware
+   [authenticate-current-user
+    wrap-user-info
+    validate-current-user
+    wrap-logging]
+   (admin-routes)))
 
 (def secured-routes-handler
-  (-> (secured-routes)
-      (wrap-routes authenticate-current-user)
-      (wrap-routes wrap-user-info)
-      (wrap-routes wrap-exceptions  cx/exception-handlers)
-      (wrap-routes wrap-logging)))
+  (middleware
+   [authenticate-current-user
+    wrap-user-info
+    wrap-logging]
+   (secured-routes)))
 
 (def secured-routes-no-context-handler
-  (-> (secured-routes-no-context)
-      (wrap-routes authenticate-current-user)
-      (wrap-routes wrap-user-info)
-      (wrap-routes wrap-exceptions  cx/exception-handlers)
-      (wrap-routes wrap-logging)))
+  (middleware
+   [authenticate-current-user
+    wrap-user-info
+    wrap-logging]
+   (secured-routes-no-context)))
 
 (def unsecured-routes-handler
-  (-> (unsecured-routes)
-      (wrap-routes wrap-exceptions cx/exception-handlers)
-      (wrap-routes wrap-logging)))
+  (middleware
+   [wrap-logging]
+   (unsecured-routes)))
 
 (defn- terrain-routes
   []
@@ -168,5 +168,12 @@
       wrap-query-params
       clean-context))
 
-(def app
-  (site-handler terrain-routes))
+(defapi app
+  {:exceptions cx/exception-handlers}
+  (middleware
+   [[wrap-context-path-remover "/terrain"]
+    wrap-keyword-params
+    wrap-lcase-params
+    wrap-query-params
+    clean-context]
+   (terrain-routes)))

@@ -1,5 +1,5 @@
 (ns terrain.routes.token
-  (:use [compojure.core :only [routes GET]]
+  (:use [compojure.api.core :only [routes GET]]
         [terrain.services.oauth :only [get-token]]))
 
 (defn token-routes

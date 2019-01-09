@@ -1,5 +1,5 @@
 (ns terrain.routes.filesystem
-  (:use [compojure.core]
+  (:use [compojure.api.core]
         [terrain.util])
   (:require [terrain.util.config :as config]
             [clojure.tools.logging :as log]

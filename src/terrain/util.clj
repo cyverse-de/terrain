@@ -1,7 +1,7 @@
 (ns terrain.util
   "Utility functions for defining services in Terrain. This namespace is used by terrain.core and
    several other top-level service definition namespaces."
-  (:use [compojure.core]
+  (:use [compojure.api.core]
         [terrain.util.service]
         [terrain.util.transformers]
         [terrain.util.validators :only [parse-body]]))

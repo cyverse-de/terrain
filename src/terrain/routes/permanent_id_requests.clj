@@ -1,5 +1,5 @@
 (ns terrain.routes.permanent-id-requests
-  (:use [compojure.core]
+  (:use [compojure.api.core]
         [terrain.services.permanent-id-requests]
         [terrain.util :only [optional-routes]])
   (:require [terrain.util.config :as config]

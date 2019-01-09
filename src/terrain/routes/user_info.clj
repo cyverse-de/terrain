@@ -1,5 +1,5 @@
 (ns terrain.routes.user-info
-  (:use [compojure.core]
+  (:use [compojure.api.core]
         [terrain.services.user-info]
         [terrain.util]
         [terrain.util.service :only [success-response]])

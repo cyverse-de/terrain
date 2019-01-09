@@ -1,5 +1,5 @@
 (ns terrain.routes.admin
-  (:use [compojure.core]
+  (:use [compojure.api.core]
         [terrain.util])
   (:require [terrain.util.config :as config]
             [terrain.services.admin :as admin]
