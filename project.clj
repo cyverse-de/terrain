@@ -1,11 +1,6 @@
 (use '[clojure.java.shell :only (sh)])
 (require '[clojure.string :as string])
 
-;; This should be removed as soon as the need for Forester is removed.
-(require 'cemerick.pomegranate.aether)
-(cemerick.pomegranate.aether/register-wagon-factory!
- "http" #(org.apache.maven.wagon.providers.http.HttpWagon.))
-
 (defn git-ref
   []
   (or (System/getenv "GIT_COMMIT")
@@ -35,7 +30,6 @@
                  [me.raynes/fs "1.4.6"]
                  [medley "0.8.4"]
                  [org.apache.tika/tika-core "1.14"]      ; provides org.apache.tika
-                 [org.biojava.thirdparty/forester "1.005" ]
                  [slingshot "0.12.2"]
                  [org.cyverse/clj-icat-direct "2.8.2"]
                  [org.cyverse/clj-jargon "2.8.3"]
@@ -62,9 +56,7 @@
          :port 31325
          :auto-reload? false}
   :uberjar-exclusions [#".*[.]SF" #"LICENSE" #"NOTICE"]
-  :repositories [["biojava"
-                  {:url "http://biojava.org/download/maven"}]
-                 ["cyverse-de"
+  :repositories [["cyverse-de"
                   {:url "https://raw.github.com/cyverse-de/mvn/master/releases"}]
                  ["sonatype-releases"
                   {:url "https://oss.sonatype.org/content/repositories/releases/"}]]
