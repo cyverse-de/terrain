@@ -18,7 +18,6 @@
         [terrain.routes.notification]
         [terrain.routes.pref]
         [terrain.routes.session]
-        [terrain.routes.tree-viewer]
         [terrain.routes.user-info]
         [terrain.routes.collaborator]
         [terrain.routes.filesystem]
@@ -31,8 +30,7 @@
         [terrain.routes.webhooks]
         [terrain.routes.comments]
         [terrain.util :as util]
-        [terrain.util.transformers :as transform]
-        [tree-urls-client.middleware :only [wrap-tree-urls-base]])
+        [terrain.util.transformers :as transform])
   (:require [clojure.tools.logging :as log]
             [clojure-commons.exception :as cx]
             [compojure.route :as route]
@@ -88,7 +86,6 @@
     (secured-pref-routes)
     (secured-collaborator-routes)
     (secured-user-info-routes)
-    (secured-tree-viewer-routes)
     (secured-data-routes)
     (secured-session-routes)
     (secured-fileio-routes)
@@ -131,8 +128,7 @@
   (util/flagged-routes
     (token-routes)
     (unsecured-misc-routes)
-    (unsecured-notification-routes)
-    (unsecured-tree-viewer-routes)))
+    (unsecured-notification-routes)))
 
 (def admin-handler
   (-> (delayed-handler admin-routes)
@@ -144,7 +140,6 @@
 
 (def secured-routes-handler
   (-> (delayed-handler secured-routes)
-      (wrap-routes wrap-tree-urls-base config/tree-urls-base-url)
       (wrap-routes authenticate-current-user)
       (wrap-routes wrap-user-info)
       (wrap-routes wrap-exceptions  cx/exception-handlers)
@@ -159,7 +154,6 @@
 
 (def unsecured-routes-handler
   (-> (delayed-handler unsecured-routes)
-      (wrap-routes wrap-tree-urls-base config/tree-urls-base-url)
       (wrap-routes wrap-exceptions cx/exception-handlers)
       (wrap-routes wrap-logging)))
 

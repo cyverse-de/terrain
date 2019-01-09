@@ -12,7 +12,6 @@
 {{ with $v := (key (printf "%s/terrain/routes-prefs" $base)) }}terrain.routes.prefs         = {{ $v }}{{ end }}
 {{ with $v := (key (printf "%s/terrain/routes-user-info" $base)) }}terrain.routes.user-info     = {{ $v }}{{ end }}
 {{ with $v := (key (printf "%s/terrain/routes-data" $base)) }}terrain.routes.data          = {{ $v }}{{ end }}
-{{ with $v := (key (printf "%s/terrain/routes-tree-viewer" $base)) }}terrain.routes.tree-viewer   = {{ $v }}{{ end }}
 {{ with $v := (key (printf "%s/terrain/routes-session" $base)) }}terrain.routes.session       = {{ $v }}{{ end }}
 {{ with $v := (key (printf "%s/terrain/routes-collaborator" $base)) }}terrain.routes.collaborator  = {{ $v }}{{ end }}
 {{ with $v := (key (printf "%s/terrain/routes-coge" $base)) }}terrain.routes.coge          = {{ $v }}{{ end }}
@@ -56,9 +55,6 @@
 
 # JEX connection settings
 {{ with $v := (key (printf "%s/jex/base" $base)) }}terrain.jex.base-url = {{ $v }}/{{ end }}
-
-# Tree viewer settings
-{{ with $v := (key (printf "%s/terrain/tree-parser-base" $base)) }}terrain.tree-viewer.base-url = {{ $v }}{{ end }}
 
 # Data-Store Elastic Search settings
 {{ with $v := (key (printf "%s/elasticsearch/base" $base)) }}terrain.infosquito.es-url = {{ $v }}{{ end }}
@@ -130,9 +126,6 @@
 
 # Saved Searches Settings
 {{ with $v := (key (printf "%s/saved-searches/base" $base)) }}terrain.saved-searches.host = {{ $v }}{{ end }}
-
-# Tree URLs Settings
-{{ with $v := (key (printf "%s/tree-urls/base" $base)) }}terrain.tree-urls.host = {{ $v }}{{ end }}
 
 # Permanent ID Request Settings
 {{ with $v := (key (printf "%s/dc/data-curators-group" $base)) }}terrain.permanent-id.curators-group  = {{ $v }}{{ end }}
