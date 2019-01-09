@@ -39,12 +39,6 @@
             [terrain.util.service :as service]
             [terrain.util.config :as config]))
 
-(defn- delayed-handler
-  [routes-fn]
-  (fn [req]
-    (let [handler ((memoize routes-fn))]
-      (handler req))))
-
 (defn- wrap-user-info
   [handler]
   (fn [request]
@@ -131,7 +125,7 @@
     (unsecured-notification-routes)))
 
 (def admin-handler
-  (-> (delayed-handler admin-routes)
+  (-> (admin-routes)
       (wrap-routes authenticate-current-user)
       (wrap-routes wrap-user-info)
       (wrap-routes validate-current-user)
@@ -139,25 +133,25 @@
       (wrap-routes wrap-logging)))
 
 (def secured-routes-handler
-  (-> (delayed-handler secured-routes)
+  (-> (secured-routes)
       (wrap-routes authenticate-current-user)
       (wrap-routes wrap-user-info)
       (wrap-routes wrap-exceptions  cx/exception-handlers)
       (wrap-routes wrap-logging)))
 
 (def secured-routes-no-context-handler
-  (-> (delayed-handler secured-routes-no-context)
+  (-> (secured-routes-no-context)
       (wrap-routes authenticate-current-user)
       (wrap-routes wrap-user-info)
       (wrap-routes wrap-exceptions  cx/exception-handlers)
       (wrap-routes wrap-logging)))
 
 (def unsecured-routes-handler
-  (-> (delayed-handler unsecured-routes)
+  (-> (unsecured-routes)
       (wrap-routes wrap-exceptions cx/exception-handlers)
       (wrap-routes wrap-logging)))
 
-(defn terrain-routes
+(defn- terrain-routes
   []
   (util/flagged-routes
     unsecured-routes-handler
@@ -165,11 +159,14 @@
     (context "/secured" [] secured-routes-handler)
     secured-routes-no-context-handler))
 
-(defn site-handler
+(defn- site-handler
   [routes-fn]
-  (-> (delayed-handler routes-fn)
+  (-> (routes-fn)
       (wrap-context-path-remover "/terrain")
       wrap-keyword-params
       wrap-lcase-params
       wrap-query-params
       clean-context))
+
+(def app
+  (site-handler terrain-routes))

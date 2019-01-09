@@ -51,7 +51,7 @@
   :profiles {:dev     {:resource-paths ["conf/test"]}
              :uberjar {:aot :all}}
   :main ^:skip-aot terrain.core
-  :ring {:handler terrain.core/app
+  :ring {:handler terrain.core/dev-handler
          :init terrain.core/lein-ring-init
          :port 31325
          :auto-reload? false}
