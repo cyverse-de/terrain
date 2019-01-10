@@ -170,6 +170,14 @@
 
 (defapi app
   {:exceptions cx/exception-handlers}
+  (swagger-routes
+   {:ui      config/docs-uri
+    :options {:ui {:validatorUrl nil}}
+    :data    {:info                {:title       "Discovery Environment API"
+                                    :description "Documentation for the Discovery Environment REST API"
+                                    :version     "2.12.0"}
+              :tags                [{:name "apps", :description "App Information"}]
+              :securityDefinitions {:api_key {:type "apiKey" :name "Authorization" :in "header"}}}})
   (middleware
    [[wrap-context-path-remover "/terrain"]
     wrap-keyword-params
