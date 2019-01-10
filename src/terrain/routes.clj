@@ -31,7 +31,8 @@
         [terrain.routes.comments]
         [terrain.util :as util]
         [terrain.util.transformers :as transform])
-  (:require [clojure.tools.logging :as log]
+  (:require [cemerick.url :as curl]
+            [clojure.tools.logging :as log]
             [clojure-commons.exception :as cx]
             [compojure.route :as route]
             [service-logging.thread-context :as tc]
@@ -168,6 +169,12 @@
       wrap-query-params
       clean-context))
 
+(def ^:private security-definitions
+  {:oauth {:type             "oauth2"
+           :flow             "authorizationCode"
+           :authorizationUrl (str (curl/url (config/oauth-base-uri) "authorize"))
+           :tokenUrl         (str (curl/url (config/oauth-base-uri) "accessToken"))}})
+
 (defapi app
   {:exceptions cx/exception-handlers}
   (swagger-routes
@@ -177,7 +184,7 @@
                                     :description "Documentation for the Discovery Environment REST API"
                                     :version     "2.12.0"}
               :tags                [{:name "apps", :description "App Information"}]
-              :securityDefinitions {:api_key {:type "apiKey" :name "Authorization" :in "header"}}}})
+              :securityDefinitions security-definitions}})
   (middleware
    [[wrap-context-path-remover "/terrain"]
     wrap-keyword-params
