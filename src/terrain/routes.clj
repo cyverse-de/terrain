@@ -171,7 +171,7 @@
 
 (def ^:private security-definitions
   {:oauth {:type             "oauth2"
-           :flow             "authorizationCode"
+           :flow             "accessCode"
            :authorizationUrl (str (curl/url (config/oauth-base-uri) "authorize"))
            :tokenUrl         (str (curl/url (config/oauth-base-uri) "accessToken"))}})
 
@@ -179,7 +179,8 @@
   {:exceptions cx/exception-handlers}
   (swagger-routes
    {:ui      config/docs-uri
-    :options {:ui {:validatorUrl nil}}
+    :options {:ui {:oauth2 {:client-id     (config/oauth-client-id)
+                            :client-secret (config/oauth-client-secret)}}}
     :data    {:info                {:title       "Discovery Environment API"
                                     :description "Documentation for the Discovery Environment REST API"
                                     :version     "2.12.0"}
