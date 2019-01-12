@@ -103,7 +103,13 @@
            (config/metadata-routes-enabled))]
 
     (GET "/apps/communities/:community-id/apps" [community-id]
-      (service/success-response (apps/apps-in-community community-id)))))
+      (service/success-response (apps/apps-in-community community-id)))
+
+    (DELETE "/apps/:app-id/communities" [app-id :as {:keys [body]}]
+      (service/success-response (apps/remove-app-from-communities app-id body)))
+
+    (POST "/apps/:app-id/communities" [app-id :as {:keys [body]}]
+      (service/success-response (apps/update-app-communities app-id body)))))
 
 (defn admin-app-community-routes
   []
