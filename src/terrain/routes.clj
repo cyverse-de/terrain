@@ -170,22 +170,20 @@
       clean-context))
 
 (def ^:private security-definitions
-  {:oauth {:type             "oauth2"
-           :flow             "accessCode"
-           :authorizationUrl (str (curl/url (config/oauth-base-uri) "authorize"))
-           :tokenUrl         (str (curl/url (config/oauth-base-uri) "accessToken"))}})
+  {:Bearer {:type "apiKey"
+            :name "Authorization"
+            :in   "header"}})
 
 (defapi app
   {:exceptions cx/exception-handlers}
   (swagger-routes
-   {:ui      config/docs-uri
-    :options {:ui {:oauth2 {:client-id     (config/oauth-client-id)
-                            :client-secret (config/oauth-client-secret)}}}
-    :data    {:info                {:title       "Discovery Environment API"
-                                    :description "Documentation for the Discovery Environment REST API"
-                                    :version     "2.12.0"}
-              :tags                [{:name "apps", :description "App Information"}]
-              :securityDefinitions security-definitions}})
+   {:ui       config/docs-uri
+    :data     {:info                {:title       "Discovery Environment API"
+                                     :description "Documentation for the Discovery Environment REST API"
+                                     :version     "2.12.0"}
+               :tags                [{:name "apps", :description "App Information"}]
+               :securityDefinitions security-definitions}
+    :security {:Bearer []}})
   (middleware
    [[wrap-context-path-remover "/terrain"]
     wrap-keyword-params
