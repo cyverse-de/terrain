@@ -8,7 +8,7 @@
   (ipg/get-communities user (select-keys params [:search :creator :member])))
 
 (defn add-community [{user :shortUsername} body]
-  (ipg/add-community user (assoc body :public_privileges ["read"])))
+  (ipg/add-community user (assoc body :public_privileges ["read","optin"])))
 
 (defn get-community [{user :shortUsername} name]
   (ipg/get-community user name))
