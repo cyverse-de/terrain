@@ -170,7 +170,8 @@
       clean-context))
 
 (def ^:private security-definitions
-  {:Bearer {:type "apiKey"
+  {:basic  {:type "basic"}
+   :bearer {:type "apiKey"
             :name "Authorization"
             :in   "header"}})
 
@@ -181,9 +182,8 @@
     :data     {:info                {:title       "Discovery Environment API"
                                      :description "Documentation for the Discovery Environment REST API"
                                      :version     "2.12.0"}
-               :tags                [{:name "apps", :description "App Information"}]
-               :securityDefinitions security-definitions}
-    :security {:Bearer []}})
+               :tags                [{:name "token", :description "OAuth Tokens"}]
+               :securityDefinitions security-definitions}})
   (middleware
    [[wrap-context-path-remover "/terrain"]
     wrap-keyword-params

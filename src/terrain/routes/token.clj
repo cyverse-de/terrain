@@ -1,9 +1,31 @@
 (ns terrain.routes.token
-  (:use [compojure.api.core :only [routes GET]]
-        [terrain.services.oauth :only [get-token]]))
+  (:use [compojure.api.core :only [context routes GET]]
+        [terrain.routes.schemas.token]
+        [terrain.services.oauth :only [get-token]])
+  (:require [clojure.string :as string]))
+
+(def ^:private token-route-description
+  (->> ["This service allows users to obtain OAuth tokens for accessing other API endpoints. You must be logged"
+        "in using HTTP basic authorization to use this endpoint. This is the only endpoint that uses basic"
+        "authorization. To log in, click the Authorize button above, enter your username and password under"
+        "`Basic authentication`, and click the Authorize button underneath the password text box."
+        ""
+        "Once you have the access token, you can use it to authorize calls to other endpoints in the Swagger UI."
+        "First, remove the basic authentication credentials by clicking the Authorize button above and clicking"
+        "the Logout button in the `Basic authenitcation` section of authorization window. Second, click the"
+        "Authorization button again and type the word \"Bearer\" followed by a single space in the Value text"
+        "box of the `Api key authorization` section of the window. Paste in the access token from this endpoint's"
+        "response body then click the Authorize button underneath the Value text box."]
+       (string/join "\n")))
 
 (defn token-routes
   []
   (routes
-   (GET "/token" [:as {{:strs [authorization]} :headers}]
-     (get-token authorization))))
+   (context "/token" []
+     :tags ["token"]
+
+     (GET "/" [:as {{:strs [authorization]} :headers}]
+       :summary "Obtain OAuth Tokens"
+       :return AccessTokenResponse
+       :description token-route-description
+       (get-token authorization)))))
