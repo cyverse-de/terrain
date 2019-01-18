@@ -16,10 +16,10 @@
 
      (context "/genomes" []
        (GET "/" []
-         :summary "Service Configuration Listing"
+         :summary "Genome Search"
          :query [params GenomeSearchParams]
          :return GenomeSearchResponse
-         :description "Returns service configuration information with passwords redacted."
+         :description "Searches the CoGe database for genomes matching a string."
          (ok (search-genomes params)))
 
        (POST "/:genome-id/export-fasta" [genome-id :as {:keys [params]}]
