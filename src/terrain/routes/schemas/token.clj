@@ -3,5 +3,5 @@
         [schema.core :only [defschema]]))
 
 (defschema AccessTokenResponse
-  {:access_token (describe String "The access token.")
+  {:access_token (describe String "The access token")
    :expires_in   (describe String "The lifetime of the token in seconds")})
