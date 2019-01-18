@@ -182,7 +182,8 @@
     :data     {:info                {:title       "Discovery Environment API"
                                      :description "Documentation for the Discovery Environment REST API"
                                      :version     "2.12.0"}
-               :tags                [{:name "token", :description "OAuth Tokens"}]
+               :tags                [{:name "admin", :description "General Admin Endpoints"}
+                                     {:name "token", :description "OAuth Tokens"}]
                :securityDefinitions security-definitions}})
   (middleware
    [[wrap-context-path-remover "/terrain"]
