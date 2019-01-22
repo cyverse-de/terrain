@@ -30,5 +30,8 @@
          :description "Exports CoGe sequence data to a FASTA file in the CyVerse data store"
          (ok (export-fasta genome-id params)))
 
-       (POST "/load" [:as {:keys [body]}]
-         (success-response (get-genome-viewer-url body)))))))
+       (POST "/load" []
+         :summary "View Genomes in CoGe"
+         :body [body GenomeLoadRequest]
+         :return GenomeLoadResponse
+         (ok (get-genome-viewer-url body)))))))

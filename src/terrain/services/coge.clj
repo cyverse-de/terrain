@@ -38,10 +38,9 @@
 (defn get-genome-viewer-url
   "Retrieves a genome viewer URL by sharing the given paths and sending a request to the CoGe
    service."
-  [body]
-  (let [paths (:paths (decode-json body))]
-    (share-paths (:shortUsername current-user) paths)
-    {:coge_genome_url (:site_url (coge/get-genome-viewer-url paths))}))
+  [{:keys [paths]}]
+  (share-paths (:shortUsername current-user) paths)
+  {:coge_genome_url (:site_url (coge/get-genome-viewer-url paths))})
 
 (defn search-genomes
   "Searches for genomes in CoGe."

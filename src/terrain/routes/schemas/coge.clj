@@ -11,6 +11,9 @@
   {:notify    (describe Boolean "Set to `true` to be notified when the export is complete")
    :overwrite (describe Boolean "Set to `true` to indicate that the file should be overwritten if it exists")})
 
+(defschema GenomeLoadRequest
+  {:paths (describe [String] "The paths to the files in the data store to view in CoGe.")})
+
 (defschema Organism
   {:description (describe (maybe String) "The organism description")
    :id          (describe Long "The organism ID")
@@ -42,3 +45,6 @@
 (defschema GenomeExportResponse
   {:id      (describe Long "The genome ID")
    :success (describe Boolean "True if the genome export request was successfully submitted")})
+
+(defschema GenomeLoadResponse
+  {:coge_genome_url (describe String "The URL to use when viewing the files being imported into CoGe")})
