@@ -13,7 +13,7 @@
 (defschema SequenceType
   {:description (describe (maybe String) "The sequence type description")
    :id          (describe String "The sequence type ID")
-   :name        (describe (maybe String) "The sequence type name")})
+   :name        (describe (maybe String) "The type of genomic sequence (e.g. \"masked\", \"unmasked\")")})
 
 (defschema Genome
   {:description      (describe (maybe String) "The genome description")
@@ -23,12 +23,12 @@
    :name             (describe (maybe String) "The genome name")
    :chromosome_count (describe (maybe Long) "The number of chromosomes in the genome")
    :restricted       (describe Boolean "True if access to the genome is restricted")
-   :link             (describe (maybe String) "The link to the genome information if available")
+   :link             (describe (maybe String) "Optional user-supplied link to the genome information source")
    :id               (describe Long "The genome ID")
    :certified        (describe Boolean "True if the genome is certified")
    :info             (describe (maybe String) "General information about the genome")
    :version          (describe (maybe String) "The genome version")
-   :sequence_type    (describe SequenceType "The sequence type information")})
+   :sequence_type    (describe SequenceType "The type of genomic sequence (e.g. \"masked\", \"unmasked\")")})
 
 (defschema GenomeSearchResponse
   {:genomes (describe [Genome] "The list of genomes")})
