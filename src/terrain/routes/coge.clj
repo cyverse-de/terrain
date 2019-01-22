@@ -22,8 +22,13 @@
          :description "Searches the CoGe database for genomes matching a string."
          (ok (search-genomes params)))
 
-       (POST "/:genome-id/export-fasta" [genome-id :as {:keys [params]}]
-         (success-response (export-fasta genome-id params)))
+       (POST "/:genome-id/export-fasta" []
+         :summary "Genome Export"
+         :path-params [genome-id :- GenomeIdPathParam]
+         :query [params GenomeExportParams]
+         :return GenomeExportResponse
+         :description "Exports CoGe sequence data to a FASTA file in the CyVerse data store"
+         (ok (export-fasta genome-id params)))
 
        (POST "/load" [:as {:keys [body]}]
          (success-response (get-genome-viewer-url body)))))))

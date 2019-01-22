@@ -2,8 +2,14 @@
   (:use [common-swagger-api.schema :only [describe]]
         [schema.core :only [defschema maybe]]))
 
+(def GenomeIdPathParam (describe Long "The genome ID"))
+
 (defschema GenomeSearchParams
   {:search (describe String "The genome search string, which must be at least three characters long")})
+
+(defschema GenomeExportParams
+  {:notify    (describe Boolean "Set to `true` to be notified when the export is complete")
+   :overwrite (describe Boolean "Set to `true` to indicate that the file should be overwritten if it exists")})
 
 (defschema Organism
   {:description (describe (maybe String) "The organism description")
@@ -32,3 +38,7 @@
 
 (defschema GenomeSearchResponse
   {:genomes (describe [Genome] "The list of genomes")})
+
+(defschema GenomeExportResponse
+  {:id      (describe Long "The genome ID")
+   :success (describe Boolean "True if the genome export request was successfully submitted")})
