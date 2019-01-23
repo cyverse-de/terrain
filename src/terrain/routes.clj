@@ -183,6 +183,7 @@
                                      :description "Documentation for the Discovery Environment REST API"
                                      :version     "2.12.0"}
                :tags                [{:name "admin", :description "General Admin Endpoints"}
+                                     {:name "coge", :description "CoGe Endpoints"}
                                      {:name "token", :description "OAuth Tokens"}]
                :securityDefinitions security-definitions}})
   (middleware
