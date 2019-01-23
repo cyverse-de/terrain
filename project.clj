@@ -33,7 +33,7 @@
                  [slingshot "0.12.2"]
                  [org.cyverse/clj-icat-direct "2.8.2"]
                  [org.cyverse/clj-jargon "2.8.3"]
-                 [org.cyverse/clojure-commons "2.8.1"]
+                 [org.cyverse/clojure-commons "3.0.0"]
                  [org.cyverse/cyverse-groups-client "0.1.4"]
                  [org.cyverse/common-cfg "2.8.1"]
                  [org.cyverse/common-cli "2.8.1"]
