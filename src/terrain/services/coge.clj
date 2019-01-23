@@ -31,8 +31,8 @@
   (let [data-folder-path (coge-data-folder-path (:shortUsername current-user))]
     (create-coge-data-folder (:shortUsername current-user) data-folder-path)
     (coge/export-fasta genome-id
-                       {:notify      (Boolean/parseBoolean notify)
-                        :overwrite   (Boolean/parseBoolean overwrite)
+                       {:notify      notify
+                        :overwrite   overwrite
                         :destination data-folder-path})))
 
 (defn get-genome-viewer-url
