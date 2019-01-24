@@ -37,7 +37,7 @@
                  [org.cyverse/cyverse-groups-client "0.1.4"]
                  [org.cyverse/common-cfg "2.8.1"]
                  [org.cyverse/common-cli "2.8.1"]
-                 [org.cyverse/common-swagger-api "2.9.0"]
+                 [org.cyverse/common-swagger-api "2.9.1"]
                  [org.cyverse/kameleon "3.0.1"]
                  [org.cyverse/heuristomancer "2.8.0"]
                  [org.cyverse/metadata-client "3.0.1"]

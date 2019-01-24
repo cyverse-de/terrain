@@ -1,6 +1,8 @@
 (ns terrain.routes.collaborator
   (:use [common-swagger-api.schema]
+        [ring.util.http-response :only [ok]]
         [terrain.auth.user-attributes :only [current-user]]
+        [terrain.routes.schemas.collaborator]
         [terrain.util :only [optional-routes]])
   (:require [cheshire.core :as json]
             [clojure.string :as string]
@@ -16,31 +18,40 @@
   []
   (optional-routes
    [config/collaborator-routes-enabled]
+   (context "/collaborator-lists" []
+     :tags ["collaborator-lists"]
 
-   (GET "/collaborator-lists" [:as {:keys [params]}]
-     (service/success-response (cl/get-collaborator-lists current-user params)))
+     (GET "/" []
+       :summary "Get Collaborator Lists"
+       :query [params CollaboratorListSearchParams]
+       :return GetCollaboratorListsResponse
+       :description "Get or search for collaborator lists."
+       (ok (cl/get-collaborator-lists current-user params)))
 
-   (POST "/collaborator-lists" [:as {:keys [body]}]
-     (service/success-response (cl/add-collaborator-list current-user (service/decode-json body))))
+     (POST "/" [:as {:keys [body]}]
+       (service/success-response (cl/add-collaborator-list current-user (service/decode-json body))))
 
-   (GET "/collaborator-lists/:name" [name]
-     (service/success-response (cl/get-collaborator-list current-user name)))
+     (context "/:name" []
+       [:path-params [name :- CollaboratorListNamePathParam]]
 
-   (PATCH "/collaborator-lists/:name" [name :as {:keys [body]}]
-     (service/success-response (cl/update-collaborator-list current-user name (service/decode-json body))))
+       (GET "/" []
+         (service/success-response (cl/get-collaborator-list current-user name)))
 
-   (DELETE "/collaborator-lists/:name" [name :as {:keys [params]}]
-     (service/success-response (cl/delete-collaborator-list current-user name params)))
+       (PATCH "/" [:as {:keys [body]}]
+         (service/success-response (cl/update-collaborator-list current-user name (service/decode-json body))))
 
-   (GET "/collaborator-lists/:name/members" [name]
-     (service/success-response (cl/get-collaborator-list-members current-user name)))
+       (DELETE "/" [:as {:keys [params]}]
+         (service/success-response (cl/delete-collaborator-list current-user name params)))
 
-   (POST "/collaborator-lists/:name/members" [name :as {:keys [body]}]
-     (service/success-response (cl/add-collaborator-list-members current-user name (service/decode-json body))))
+       (GET "/members" []
+         (service/success-response (cl/get-collaborator-list-members current-user name)))
 
-   (POST "/collaborator-lists/:name/members/deleter" [name :as {:keys [body params]}]
-     (service/success-response
-      (cl/remove-collaborator-list-members current-user name (service/decode-json body) params)))))
+       (POST "/members" [:as {:keys [body]}]
+         (service/success-response (cl/add-collaborator-list-members current-user name (service/decode-json body))))
+
+       (POST "/members/deleter" [:as {:keys [body params]}]
+         (service/success-response
+          (cl/remove-collaborator-list-members current-user name (service/decode-json body) params)))))))
 
 (defn team-routes
   []
