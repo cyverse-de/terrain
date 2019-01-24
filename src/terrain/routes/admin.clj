@@ -1,10 +1,10 @@
 (ns terrain.routes.admin
-  (:use [compojure.api.core]
+  (:use [common-swagger-api.schema]
         [ring.util.http-response :only [ok]]
         [schema.core :only [Any]]
-        [terrain.routes.schemas.admin]
         [terrain.util])
   (:require [terrain.util.config :as config]
+            [terrain.routes.schemas.admin :as schemas]
             [terrain.services.admin :as admin]
             [clojure.tools.logging :as log]))
 
@@ -25,6 +25,6 @@
 
      (GET "/status" []
        :summary "Service Status Information"
-       :return StatusResponse
+       :return schemas/StatusResponse
        :description "Returns status information for required services."
        (ok (admin/status))))))

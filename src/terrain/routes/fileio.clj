@@ -1,5 +1,5 @@
 (ns terrain.routes.fileio
-  (:use [compojure.api.core])
+  (:use [common-swagger-api.schema])
   (:require [terrain.util.config :as config]
             [terrain.services.fileio.controllers :as fio]
             [terrain.util :as util]))

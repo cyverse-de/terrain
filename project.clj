@@ -23,7 +23,6 @@
                  [clj-time "0.12.2"]
                  [clojurewerkz/elastisch "2.2.0"]
                  [com.cemerick/url "0.1.1" :exclusions [com.cemerick/clojurescript.test]]
-                 [compojure "1.5.1"]
                  [metosin/compojure-api "1.1.8"]   ; should be held to the same version as the one
                                                    ; used by org.iplantc/clojure-commons
                  [dire "0.5.4"]
@@ -37,7 +36,7 @@
                  [org.cyverse/cyverse-groups-client "0.1.4"]
                  [org.cyverse/common-cfg "2.8.1"]
                  [org.cyverse/common-cli "2.8.1"]
-                 [org.cyverse/common-swagger-api "2.8.3"]
+                 [org.cyverse/common-swagger-api "2.9.0"]
                  [org.cyverse/kameleon "3.0.1"]
                  [org.cyverse/heuristomancer "2.8.0"]
                  [org.cyverse/metadata-client "3.0.1"]

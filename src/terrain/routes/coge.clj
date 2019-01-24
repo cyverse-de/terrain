@@ -1,5 +1,5 @@
 (ns terrain.routes.coge
-  (:use [compojure.api.core]
+  (:use [common-swagger-api.schema]
         [ring.util.http-response :only [ok]]
         [terrain.routes.schemas.coge]
         [terrain.services.coge]

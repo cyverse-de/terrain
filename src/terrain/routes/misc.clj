@@ -1,5 +1,5 @@
 (ns terrain.routes.misc
-  (:use [compojure.api.core]
+  (:use [common-swagger-api.schema]
         [ring.util.http-response])
   (:require [clojure.string :as string])
   (:import [java.util UUID]))

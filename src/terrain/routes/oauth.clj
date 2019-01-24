@@ -1,5 +1,5 @@
 (ns terrain.routes.oauth
-  (:use [compojure.api.core])
+  (:use [common-swagger-api.schema])
   (:require [terrain.clients.apps.raw :as apps]
             [terrain.util.service :as service]))
 

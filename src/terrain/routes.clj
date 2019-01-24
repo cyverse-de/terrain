@@ -2,8 +2,7 @@
   (:use [cheshire.core :as cheshire]
         [clojure-commons.lcase-params :only [wrap-lcase-params]]
         [clojure-commons.query-params :only [wrap-query-params]]
-        [compojure.api.middleware :only [wrap-exceptions]]
-        [compojure.api.sweet]
+        [common-swagger-api.schema]
         [ring.middleware.keyword-params :only [wrap-keyword-params]]
         [service-logging.middleware :only [wrap-logging clean-context]]
         [terrain.auth.user-attributes]
@@ -181,7 +180,7 @@
    {:ui       config/docs-uri
     :data     {:info                {:title       "Discovery Environment API"
                                      :description "Documentation for the Discovery Environment REST API"
-                                     :version     "2.12.0"}
+                                     :version     "0.1.0"}
                :tags                [{:name "admin", :description "General Admin Endpoints"}
                                      {:name "coge", :description "CoGe Endpoints"}
                                      {:name "token", :description "OAuth Tokens"}]

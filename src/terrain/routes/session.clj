@@ -1,5 +1,5 @@
 (ns terrain.routes.session
-  (:use [compojure.api.core]
+  (:use [common-swagger-api.schema]
         [terrain.services.user-sessions]
         [terrain.util])
   (:require [terrain.util.config :as config]))

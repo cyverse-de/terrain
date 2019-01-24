@@ -1,5 +1,5 @@
 (ns terrain.routes.token
-  (:use [compojure.api.core :only [context routes GET]]
+  (:use [common-swagger-api.schema :only [context routes GET]]
         [terrain.routes.schemas.token]
         [terrain.services.oauth :only [get-token]])
   (:require [clojure.string :as string]))

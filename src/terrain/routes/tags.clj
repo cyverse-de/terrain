@@ -1,5 +1,5 @@
 (ns terrain.routes.tags
-  (:use [compojure.api.core :only [DELETE GET PATCH POST]])
+  (:use [common-swagger-api.schema :only [DELETE GET PATCH POST]])
   (:require [terrain.services.metadata.tags :as tags]
             [terrain.util :as util]
             [terrain.util.config :as config]))
