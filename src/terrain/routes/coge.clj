@@ -1,5 +1,7 @@
 (ns terrain.routes.coge
-  (:use [compojure.core]
+  (:use [common-swagger-api.schema]
+        [ring.util.http-response :only [ok]]
+        [terrain.routes.schemas.coge]
         [terrain.services.coge]
         [terrain.util.service]
         [terrain.util])
@@ -8,12 +10,28 @@
 (defn coge-routes
   []
   (optional-routes
-    [config/coge-enabled]
-    (GET "/coge/genomes" [:as {:keys [params]}]
-         (success-response (search-genomes params)))
+   [config/coge-enabled]
+   (context "/coge" []
+     :tags ["coge"]
 
-    (POST "/coge/genomes/:genome-id/export-fasta" [genome-id :as {:keys [params]}]
-          (success-response (export-fasta genome-id params)))
+     (context "/genomes" []
+       (GET "/" []
+         :summary "Genome Search"
+         :query [params GenomeSearchParams]
+         :return GenomeSearchResponse
+         :description "Searches the CoGe database for genomes matching a string."
+         (ok (search-genomes params)))
 
-    (POST "/coge/genomes/load" [:as {:keys [body]}]
-          (success-response (get-genome-viewer-url body)))))
+       (POST "/:genome-id/export-fasta" []
+         :summary "Genome Export"
+         :path-params [genome-id :- GenomeIdPathParam]
+         :query [params GenomeExportParams]
+         :return GenomeExportResponse
+         :description "Exports CoGe sequence data to a FASTA file in the CyVerse data store"
+         (ok (export-fasta genome-id params)))
+
+       (POST "/load" []
+         :summary "View Genomes in CoGe"
+         :body [body GenomeLoadRequest]
+         :return GenomeLoadResponse
+         (ok (get-genome-viewer-url body)))))))

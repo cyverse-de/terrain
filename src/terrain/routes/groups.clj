@@ -1,5 +1,5 @@
 (ns terrain.routes.groups
-  (:use [compojure.core])
+  (:use [common-swagger-api.schema])
   (:require [terrain.clients.apps.raw :as apps]
             [terrain.clients.iplant-groups :as ipg]
             [terrain.util.service :as service]))

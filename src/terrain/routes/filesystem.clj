@@ -1,5 +1,5 @@
 (ns terrain.routes.filesystem
-  (:use [compojure.core]
+  (:use [common-swagger-api.schema]
         [terrain.util])
   (:require [terrain.util.config :as config]
             [clojure.tools.logging :as log]

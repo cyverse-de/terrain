@@ -5,6 +5,7 @@
             [metadata-client.core :as metadata-client]))
 
 (def de-system-id "de")
+(def docs-uri "/docs")
 
 (def ^:private props
   "A ref for storing the configuration properties."

@@ -1,5 +1,5 @@
 (ns terrain.routes.notification
-  (:use [compojure.core]
+  (:use [common-swagger-api.schema]
         [terrain.util])
   (:require [clojure.tools.logging :as log]
             [terrain.clients.notifications.raw :as rn]

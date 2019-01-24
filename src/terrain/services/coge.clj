@@ -31,17 +31,16 @@
   (let [data-folder-path (coge-data-folder-path (:shortUsername current-user))]
     (create-coge-data-folder (:shortUsername current-user) data-folder-path)
     (coge/export-fasta genome-id
-                       {:notify      (Boolean/parseBoolean notify)
-                        :overwrite   (Boolean/parseBoolean overwrite)
+                       {:notify      notify
+                        :overwrite   overwrite
                         :destination data-folder-path})))
 
 (defn get-genome-viewer-url
   "Retrieves a genome viewer URL by sharing the given paths and sending a request to the CoGe
    service."
-  [body]
-  (let [paths (:paths (decode-json body))]
-    (share-paths (:shortUsername current-user) paths)
-    {:coge_genome_url (:site_url (coge/get-genome-viewer-url paths))}))
+  [{:keys [paths]}]
+  (share-paths (:shortUsername current-user) paths)
+  {:coge_genome_url (:site_url (coge/get-genome-viewer-url paths))})
 
 (defn search-genomes
   "Searches for genomes in CoGe."

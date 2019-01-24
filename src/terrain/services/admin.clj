@@ -1,5 +1,4 @@
 (ns terrain.services.admin
-  (:use [terrain.util.service :only [success-response]])
   (:require [clojure.tools.logging :as log]
             [cemerick.url :as url]
             [clojure-commons.error-codes :as ce]
@@ -11,7 +10,7 @@
 (defn config
   "Returns JSON containing Terrain's configuration, passwords filtered out."
   []
-  (success-response (config/masked-config)))
+  (config/masked-config))
 
 
 (defn- check-irods?
@@ -83,9 +82,9 @@
   []
   (try
     (let [ezid-status-url (str (url/url (config/ezid-base-url) "status"))
-          status          (:body (get-with-timeout ezid-status-url))]
-      (log/info "HTTP Status from EZID: " status)
-      status)
+          ezid-status     (:body (get-with-timeout ezid-status-url))]
+      (log/info "HTTP Status from EZID: " ezid-status)
+      ezid-status)
     (catch Exception e
       (log/error "Error performing EZID status check:")
       (log/error (ce/format-exception e))
@@ -93,41 +92,39 @@
 
 
 (defn- status-irods
-  [status]
+  [overall-status]
   (if (check-irods?)
-    (merge status {:iRODS (data/irods-running?)})
-    status))
+    (merge overall-status {:iRODS (data/irods-running?)})
+    overall-status))
 
 (defn status-jex
-  [status]
+  [overall-status]
   (if (check-jex?)
-    (merge status {:jex (perform-jex-check)})
-    status))
+    (merge overall-status {:jex (perform-jex-check)})
+    overall-status))
 
 (defn status-apps
-  [status]
+  [overall-status]
   (if (check-apps?)
-    (merge status {:apps (perform-apps-check)})
-    status))
+    (merge overall-status {:apps (perform-apps-check)})
+    overall-status))
 
 (defn status-notificationagent
-  [status]
+  [overall-status]
   (if (check-notificationagent?)
-    (merge status {:notificationagent (perform-notificationagent-check)})
-    status))
+    (merge overall-status {:notificationagent (perform-notificationagent-check)})
+    overall-status))
 
 (defn- status-ezid
-  [status]
-  (merge status {:ezid (perform-ezid-check)}))
+  [overall-status]
+  (merge overall-status {:ezid (perform-ezid-check)}))
 
 (defn status
   "Returns JSON containing the Terrain's status."
-  [request]
+  []
   (-> {}
     (status-irods)
     (status-jex)
     (status-apps)
     (status-notificationagent)
-    (status-ezid)
-    success-response))
-
+    (status-ezid)))

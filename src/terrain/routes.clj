@@ -2,8 +2,7 @@
   (:use [cheshire.core :as cheshire]
         [clojure-commons.lcase-params :only [wrap-lcase-params]]
         [clojure-commons.query-params :only [wrap-query-params]]
-        [compojure.api.middleware :only [wrap-exceptions]]
-        [compojure.core]
+        [common-swagger-api.schema]
         [ring.middleware.keyword-params :only [wrap-keyword-params]]
         [service-logging.middleware :only [wrap-logging clean-context]]
         [terrain.auth.user-attributes]
@@ -31,19 +30,14 @@
         [terrain.routes.comments]
         [terrain.util :as util]
         [terrain.util.transformers :as transform])
-  (:require [clojure.tools.logging :as log]
+  (:require [cemerick.url :as curl]
+            [clojure.tools.logging :as log]
             [clojure-commons.exception :as cx]
             [compojure.route :as route]
             [service-logging.thread-context :as tc]
             [terrain.util :as util]
             [terrain.util.service :as service]
             [terrain.util.config :as config]))
-
-(defn- delayed-handler
-  [routes-fn]
-  (fn [req]
-    (let [handler ((memoize routes-fn))]
-      (handler req))))
 
 (defn- wrap-user-info
   [handler]
@@ -131,33 +125,33 @@
     (unsecured-notification-routes)))
 
 (def admin-handler
-  (-> (delayed-handler admin-routes)
-      (wrap-routes authenticate-current-user)
-      (wrap-routes wrap-user-info)
-      (wrap-routes validate-current-user)
-      (wrap-routes wrap-exceptions  cx/exception-handlers)
-      (wrap-routes wrap-logging)))
+  (middleware
+   [authenticate-current-user
+    wrap-user-info
+    validate-current-user
+    wrap-logging]
+   (admin-routes)))
 
 (def secured-routes-handler
-  (-> (delayed-handler secured-routes)
-      (wrap-routes authenticate-current-user)
-      (wrap-routes wrap-user-info)
-      (wrap-routes wrap-exceptions  cx/exception-handlers)
-      (wrap-routes wrap-logging)))
+  (middleware
+   [authenticate-current-user
+    wrap-user-info
+    wrap-logging]
+   (secured-routes)))
 
 (def secured-routes-no-context-handler
-  (-> (delayed-handler secured-routes-no-context)
-      (wrap-routes authenticate-current-user)
-      (wrap-routes wrap-user-info)
-      (wrap-routes wrap-exceptions  cx/exception-handlers)
-      (wrap-routes wrap-logging)))
+  (middleware
+   [authenticate-current-user
+    wrap-user-info
+    wrap-logging]
+   (secured-routes-no-context)))
 
 (def unsecured-routes-handler
-  (-> (delayed-handler unsecured-routes)
-      (wrap-routes wrap-exceptions cx/exception-handlers)
-      (wrap-routes wrap-logging)))
+  (middleware
+   [wrap-logging]
+   (unsecured-routes)))
 
-(defn terrain-routes
+(defn- terrain-routes
   []
   (util/flagged-routes
     unsecured-routes-handler
@@ -165,11 +159,36 @@
     (context "/secured" [] secured-routes-handler)
     secured-routes-no-context-handler))
 
-(defn site-handler
+(defn- site-handler
   [routes-fn]
-  (-> (delayed-handler routes-fn)
+  (-> (routes-fn)
       (wrap-context-path-remover "/terrain")
       wrap-keyword-params
       wrap-lcase-params
       wrap-query-params
       clean-context))
+
+(def ^:private security-definitions
+  {:basic  {:type "basic"}
+   :bearer {:type "apiKey"
+            :name "Authorization"
+            :in   "header"}})
+
+(defapi app
+  {:exceptions cx/exception-handlers}
+  (swagger-routes
+   {:ui       config/docs-uri
+    :data     {:info                {:title       "Discovery Environment API"
+                                     :description "Documentation for the Discovery Environment REST API"
+                                     :version     "0.1.0"}
+               :tags                [{:name "admin", :description "General Admin Endpoints"}
+                                     {:name "coge", :description "CoGe Endpoints"}
+                                     {:name "token", :description "OAuth Tokens"}]
+               :securityDefinitions security-definitions}})
+  (middleware
+   [[wrap-context-path-remover "/terrain"]
+    wrap-keyword-params
+    wrap-lcase-params
+    wrap-query-params
+    clean-context]
+   (terrain-routes)))

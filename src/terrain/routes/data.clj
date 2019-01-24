@@ -1,5 +1,5 @@
 (ns terrain.routes.data
-  (:use [compojure.core]
+  (:use [common-swagger-api.schema]
         [terrain.services.sharing :only [share unshare]]
         [terrain.auth.user-attributes]
         [terrain.util])

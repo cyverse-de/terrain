@@ -1,5 +1,5 @@
 (ns terrain.routes.collaborator
-  (:use [compojure.core]
+  (:use [common-swagger-api.schema]
         [terrain.auth.user-attributes :only [current-user]]
         [terrain.util :only [optional-routes]])
   (:require [cheshire.core :as json]

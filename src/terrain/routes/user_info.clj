@@ -1,5 +1,5 @@
 (ns terrain.routes.user-info
-  (:use [compojure.core]
+  (:use [common-swagger-api.schema]
         [terrain.services.user-info]
         [terrain.util]
         [terrain.util.service :only [success-response]])

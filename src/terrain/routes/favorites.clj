@@ -1,5 +1,5 @@
 (ns terrain.routes.favorites
-  (:use [compojure.core :only [DELETE GET POST PUT]])
+  (:use [common-swagger-api.schema :only [DELETE GET POST PUT]])
   (:require [terrain.services.metadata.favorites :as fave]
             [terrain.util :as util]
             [terrain.util.config :as config]))

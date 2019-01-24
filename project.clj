@@ -1,11 +1,6 @@
 (use '[clojure.java.shell :only (sh)])
 (require '[clojure.string :as string])
 
-;; This should be removed as soon as the need for Forester is removed.
-(require 'cemerick.pomegranate.aether)
-(cemerick.pomegranate.aether/register-wagon-factory!
- "http" #(org.apache.maven.wagon.providers.http.HttpWagon.))
-
 (defn git-ref
   []
   (or (System/getenv "GIT_COMMIT")
@@ -35,14 +30,14 @@
                  [me.raynes/fs "1.4.6"]
                  [medley "0.8.4"]
                  [org.apache.tika/tika-core "1.14"]      ; provides org.apache.tika
-                 [org.biojava.thirdparty/forester "1.005" ]
                  [slingshot "0.12.2"]
                  [org.cyverse/clj-icat-direct "2.8.2"]
                  [org.cyverse/clj-jargon "2.8.3"]
-                 [org.cyverse/clojure-commons "2.8.1"]
+                 [org.cyverse/clojure-commons "3.0.0"]
                  [org.cyverse/cyverse-groups-client "0.1.4"]
                  [org.cyverse/common-cfg "2.8.1"]
                  [org.cyverse/common-cli "2.8.1"]
+                 [org.cyverse/common-swagger-api "2.9.0"]
                  [org.cyverse/kameleon "3.0.1"]
                  [org.cyverse/heuristomancer "2.8.0"]
                  [org.cyverse/metadata-client "3.0.1"]
@@ -57,14 +52,12 @@
   :profiles {:dev     {:resource-paths ["conf/test"]}
              :uberjar {:aot :all}}
   :main ^:skip-aot terrain.core
-  :ring {:handler terrain.core/app
+  :ring {:handler terrain.core/dev-handler
          :init terrain.core/lein-ring-init
          :port 31325
          :auto-reload? false}
   :uberjar-exclusions [#".*[.]SF" #"LICENSE" #"NOTICE"]
-  :repositories [["biojava"
-                  {:url "http://biojava.org/download/maven"}]
-                 ["cyverse-de"
+  :repositories [["cyverse-de"
                   {:url "https://raw.github.com/cyverse-de/mvn/master/releases"}]
                  ["sonatype-releases"
                   {:url "https://oss.sonatype.org/content/repositories/releases/"}]]

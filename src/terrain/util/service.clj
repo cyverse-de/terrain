@@ -102,13 +102,6 @@
   (log/error e "bad request")
   (terrain-response e 400))
 
-(defn error-response
-  ([e]
-    (error-response e 500))
-  ([e status]
-    (when (>= status 500) (log/error e "internal error"))
-    (terrain-response e status)))
-
 (defn temp-dir-failure-response [{:keys [parent prefix base]}]
   (log/error "unable to create a temporary directory in" parent
              "using base name" base)

@@ -1,7 +1,7 @@
 (ns terrain.routes.search
   "the routing code for search-related URL resources"
   (:use [clojure-commons.error-codes :only [missing-arg-response]]
-        [compojure.core :only [GET POST]])
+        [common-swagger-api.schema :only [GET POST]])
   (:require [terrain.auth.user-attributes :as user]
             [terrain.services.search :as search]
             [terrain.clients.search :as c-search]

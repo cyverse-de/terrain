@@ -16,5 +16,5 @@
 
 (defn get-token [authorization]
   (if-let [[username password] (get-basic-auth-credentials authorization)]
-    (service/success-response (client/get-token username password))
+    (http-response/ok (client/get-token username password))
     (http-response/unauthorized)))

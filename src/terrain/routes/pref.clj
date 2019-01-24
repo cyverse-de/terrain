@@ -1,5 +1,5 @@
 (ns terrain.routes.pref
-  (:use [compojure.core]
+  (:use [common-swagger-api.schema]
         [terrain.services.user-prefs]
         [terrain.util])
   (:require [terrain.util.config :as config]))

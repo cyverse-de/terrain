@@ -7,7 +7,6 @@
             [clj-http.client :as http]
             [common-cli.core :as ccli]
             [terrain.services.filesystem.icat :as icat]
-            [terrain.routes :as routes]
             [clojure.tools.logging :as log]
             [service-logging.thread-context :as tc]))
 
@@ -76,14 +75,17 @@
    :art-id "terrain"
    :service "terrain"})
 
-(def app
-  (routes/site-handler routes/terrain-routes))
+(defn dev-handler
+  [req]
+  (tc/with-logging-context svc-info
+    (require 'terrain.routes)
+    ((eval 'terrain.routes/app) req)))
 
 (defn run-jetty
   []
-  (require 'ring.adapter.jetty)
+  (require 'terrain.routes 'ring.adapter.jetty)
   (log/warn "Started listening on" (config/listen-port))
-  ((eval 'ring.adapter.jetty/run-jetty) app {:port (config/listen-port)}))
+  ((eval 'ring.adapter.jetty/run-jetty) (eval 'terrain.routes/app) {:port (config/listen-port)}))
 
 (defn -main
   [& args]
