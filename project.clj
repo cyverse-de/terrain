@@ -23,6 +23,7 @@
                  [clj-time "0.12.2"]
                  [clojurewerkz/elastisch "2.2.0"]
                  [com.cemerick/url "0.1.1" :exclusions [com.cemerick/clojurescript.test]]
+                 [compojure "1.5.1"]
                  [metosin/compojure-api "1.1.8"]   ; should be held to the same version as the one
                                                    ; used by org.iplantc/clojure-commons
                  [dire "0.5.4"]
