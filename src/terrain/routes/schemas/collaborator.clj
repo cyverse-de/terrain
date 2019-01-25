@@ -10,3 +10,5 @@
    (describe String "The collaborator list name substring to search for")})
 
 (defschema GetCollaboratorListsResponse (group-schema/group-list "collaborator list" "collaborator lists"))
+(defschema AddCollaboratorListRequest (group-schema/base-group "collaborator list"))
+(defschema CollaboratorList (group-schema/group "collaborator list"))

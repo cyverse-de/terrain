@@ -28,8 +28,12 @@
        :description "Get or search for collaborator lists."
        (ok (cl/get-collaborator-lists current-user params)))
 
-     (POST "/" [:as {:keys [body]}]
-       (service/success-response (cl/add-collaborator-list current-user (service/decode-json body))))
+     (POST "/" []
+       :summary "Add a Collaborator List"
+       :body [body AddCollaboratorListRequest]
+       :return CollaboratorList
+       :description "Add a new collaborator list to the Discovery Environment."
+       (ok (cl/add-collaborator-list current-user body)))
 
      (context "/:name" []
        [:path-params [name :- CollaboratorListNamePathParam]]
