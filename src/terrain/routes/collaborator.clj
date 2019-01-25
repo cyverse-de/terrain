@@ -36,10 +36,13 @@
        (ok (cl/add-collaborator-list current-user body)))
 
      (context "/:name" []
-       [:path-params [name :- CollaboratorListNamePathParam]]
+       :path-params [name :- CollaboratorListNamePathParam]
 
        (GET "/" []
-         (service/success-response (cl/get-collaborator-list current-user name)))
+         :summary "Get Collaborator List"
+         :return CollaboratorList
+         :description "Get information about a single collaborator list."
+         (ok (cl/get-collaborator-list current-user name)))
 
        (PATCH "/" [:as {:keys [body]}]
          (service/success-response (cl/update-collaborator-list current-user name (service/decode-json body))))
