@@ -39,13 +39,17 @@
        :path-params [name :- CollaboratorListNamePathParam]
 
        (GET "/" []
-         :summary "Get Collaborator List"
+         :summary "Get a Collaborator List"
          :return CollaboratorList
          :description "Get information about a single collaborator list."
          (ok (cl/get-collaborator-list current-user name)))
 
        (PATCH "/" [:as {:keys [body]}]
-         (service/success-response (cl/update-collaborator-list current-user name (service/decode-json body))))
+         :summary "Update a Collaborator List"
+         :body [body CollaboratorListUpdate]
+         :return CollaboratorList
+         :description "update the name or description of a collaborator list."
+         (ok (cl/update-collaborator-list current-user name body)))
 
        (DELETE "/" [:as {:keys [params]}]
          (service/success-response (cl/delete-collaborator-list current-user name params)))
