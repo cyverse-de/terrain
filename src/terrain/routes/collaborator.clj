@@ -55,7 +55,7 @@
          :summary "Delete a Collaborator List"
          :query [params CollaboratorListRetainPermissionsParams]
          :return CollaboratorListStub
-         :description (str "Delete a collaborator list, optionally giveing former list members direct access to "
+         :description (str "Delete a collaborator list, optionally giving former list members direct access to "
                            "shared resources.")
          (ok (cl/delete-collaborator-list current-user name params)))
 
