@@ -30,3 +30,15 @@
 (defschema CollaboratorListMembers (group-members "collaborator list"))
 
 (def TeamNamePathParam (describe String "The name of the team"))
+
+(defschema TeamListingParams
+  {(optional-key :search)
+   (describe String "The team name substring to search for")
+
+   (optional-key :creator)
+   (describe String "Only teams created by the user with this username will be listed if specified")
+
+   (optional-key :member)
+   (describe String "Only teams to which the user with this username belongs will be listed if specified")})
+
+(defschema TeamListing (group-schema/group-list "team" "teams"))

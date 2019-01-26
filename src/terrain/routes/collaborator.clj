@@ -89,8 +89,12 @@
    (context "/teams" []
      :tags ["teams"]
 
-     (GET "/" [:as {:keys [params]}]
-       (service/success-response (teams/get-teams current-user params)))
+     (GET "/" []
+       :summary "List Teams"
+       :query [params TeamListingParams]
+       :return TeamListing
+       :description "List or search for teams."
+       (ok (teams/get-teams current-user params)))
 
      (POST "/" [:as {:keys [body]}]
        (service/success-response (teams/add-team current-user (service/decode-json body))))
