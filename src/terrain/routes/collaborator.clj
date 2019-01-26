@@ -57,7 +57,7 @@
          :query [params CollaboratorListRetainPermissionsParams]
          :return CollaboratorListStub
          :description (str "Delete a collaborator list, optionally giving former list members direct access to "
-                           "shared resources.")
+                           "resources shared with the list.")
          (ok (cl/delete-collaborator-list current-user name params)))
 
        (GET "/members" []
@@ -73,9 +73,14 @@
          :description "Add one or more users to a collaborator list."
          (ok (cl/add-collaborator-list-members current-user name body)))
 
-       (POST "/members/deleter" [:as {:keys [body params]}]
-         (service/success-response
-          (cl/remove-collaborator-list-members current-user name (service/decode-json body) params)))))))
+       (POST "/members/deleter" []
+         :summary "Remove Collaborator List Members"
+         :query [params CollaboratorListRetainPermissionsParams]
+         :body [body GroupMembersUpdate]
+         :return GroupMembersUpdateResponse
+         :description (str "Remove members from a collaborator list, optionally giving former list members direct "
+                           "access to resources shared with the list.")
+         (ok (cl/remove-collaborator-list-members current-user name body params)))))))
 
 (defn team-routes
   []

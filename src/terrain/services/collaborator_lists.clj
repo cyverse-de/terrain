@@ -47,6 +47,6 @@
   [{user :shortUsername} name {:keys [members]} {retain-permissions? :retain-permissions}]
   (let [group-id (:id (ipg/get-collaborator-list user name))
         results  (ipg/remove-collaborator-list-members user name members)]
-    (when (Boolean/parseBoolean retain-permissions?)
+    (when retain-permissions?
       (copy-collaborator-list-permissions user group-id results))
     results))
