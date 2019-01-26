@@ -1,9 +1,17 @@
 (ns terrain.routes.schemas.collaborator
   (:use [common-swagger-api.schema :only [describe]]
         [schema.core :only [defschema optional-key]])
-  (:require [common-swagger-api.schema.groups :as group-schema]))
+  (:require [common-swagger-api.schema.groups :as group-schema]
+            [common-swagger-api.schema.subjects :as subject-schema]))
 
 (def CollaboratorListNamePathParam (describe String "The name of the collaborator list"))
+
+(def GroupMember
+  (assoc subject-schema/Subject
+    :display_name (describe String "The displayable group member name.")))
+
+(defn group-members [group-descriptor]
+  {:members (describe [GroupMember] (str "The list of " group-descriptor " members."))})
 
 (defschema CollaboratorListSearchParams
   {(optional-key :search)
@@ -19,3 +27,4 @@
 (defschema CollaboratorListUpdate
   (select-keys (group-schema/group-update "collaborator list") (map optional-key [:name :description])))
 (defschema CollaboratorListStub (group-schema/group-stub "collaborator list"))
+(defschema CollaboratorListMembers (group-members "collaborator list"))

@@ -60,7 +60,10 @@
          (ok (cl/delete-collaborator-list current-user name params)))
 
        (GET "/members" []
-         (service/success-response (cl/get-collaborator-list-members current-user name)))
+         :summary "Get Collaborator List Members"
+         :return CollaboratorListMembers
+         :description "Obtain a listing of the members of a collaborator list."
+         (ok (cl/get-collaborator-list-members current-user name)))
 
        (POST "/members" [:as {:keys [body]}]
          (service/success-response (cl/add-collaborator-list-members current-user name (service/decode-json body))))
