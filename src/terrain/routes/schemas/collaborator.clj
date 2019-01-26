@@ -4,14 +4,14 @@
   (:require [common-swagger-api.schema.groups :as group-schema]
             [common-swagger-api.schema.subjects :as subject-schema]))
 
-(def CollaboratorListNamePathParam (describe String "The name of the collaborator list"))
-
 (def GroupMember
   (assoc subject-schema/Subject
     :display_name (describe String "The displayable group member name.")))
 
 (defn group-members [group-descriptor]
   {:members (describe [GroupMember] (str "The list of " group-descriptor " members."))})
+
+(def CollaboratorListNamePathParam (describe String "The name of the collaborator list"))
 
 (defschema CollaboratorListSearchParams
   {(optional-key :search)
@@ -28,3 +28,5 @@
   (select-keys (group-schema/group-update "collaborator list") (map optional-key [:name :description])))
 (defschema CollaboratorListStub (group-schema/group-stub "collaborator list"))
 (defschema CollaboratorListMembers (group-members "collaborator list"))
+
+(def TeamNamePathParam (describe String "The name of the team"))

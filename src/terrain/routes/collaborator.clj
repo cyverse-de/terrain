@@ -86,52 +86,60 @@
   []
   (optional-routes
    [config/collaborator-routes-enabled]
+   (context "/teams" []
+     :tags ["teams"]
 
-   (GET "/teams" [:as {:keys [params]}]
-     (service/success-response (teams/get-teams current-user params)))
+     (GET "/" [:as {:keys [params]}]
+       (service/success-response (teams/get-teams current-user params)))
 
-   (POST "/teams" [:as {:keys [body]}]
-     (service/success-response (teams/add-team current-user (service/decode-json body))))
+     (POST "/" [:as {:keys [body]}]
+       (service/success-response (teams/add-team current-user (service/decode-json body))))
 
-   (GET "/teams/:name" [name]
-     (service/success-response (teams/get-team current-user name)))
+     (context "/:name" []
+       :path-params [name :- TeamNamePathParam]
 
-   (PATCH "/teams/:name" [name :as {:keys [body]}]
-     (service/success-response (teams/update-team current-user name (service/decode-json body))))
+       (GET "/" [name]
+         (service/success-response (teams/get-team current-user name)))
 
-   (DELETE "/teams/:name" [name]
-     (service/success-response (teams/delete-team current-user name)))
+       (PATCH "/" [name :as {:keys [body]}]
+         (service/success-response (teams/update-team current-user name (service/decode-json body))))
 
-   (GET "/teams/:name/members" [name]
-     (service/success-response (teams/get-team-members current-user name)))
+       (DELETE "/" [name]
+         (service/success-response (teams/delete-team current-user name)))
 
-   (POST "/teams/:name/members" [name :as {:keys [body]}]
-     (service/success-response (teams/add-team-members current-user name (service/decode-json body))))
+       (context "/members" []
+         (GET "/" [name]
+           (service/success-response (teams/get-team-members current-user name)))
 
-   (POST "/teams/:name/members/deleter" [name :as {:keys [body]}]
-     (service/success-response (teams/remove-team-members current-user name (service/decode-json body))))
+         (POST "/" [name :as {:keys [body]}]
+           (service/success-response (teams/add-team-members current-user name (service/decode-json body))))
 
-   (GET "/teams/:name/privileges" [name]
-     (service/success-response (teams/list-team-privileges current-user name)))
+         (POST "/deleter" [name :as {:keys [body]}]
+           (service/success-response (teams/remove-team-members current-user name (service/decode-json body))))
 
-   (POST "/teams/:name/privileges" [name :as {:keys [body]}]
-     (service/success-response (teams/update-team-privileges current-user name (service/decode-json body))))
+         (context "/privileges" []
+           (GET "/" [name]
+             (service/success-response (teams/list-team-privileges current-user name)))
 
-   (POST "/teams/:name/join" [name]
-     (service/success-response (teams/join current-user name)))
+           (POST "/" [name :as {:keys [body]}]
+             (service/success-response (teams/update-team-privileges current-user name (service/decode-json body))))))
 
-   (POST "/teams/:name/join-request" [name :as {:keys [body]}]
-     (let [encoded (slurp body)
-           message (if-not (string/blank? encoded) (:message (service/decode-json encoded)) "")]
-       (service/success-response (teams/join-request current-user name message))))
+       (POST "/join" [name]
+         (service/success-response (teams/join current-user name)))
 
-   (POST "/teams/:name/join-request/:requester/deny" [name requester :as {:keys [body]}]
-     (let [encoded (slurp body)
-           message (if-not (string/blank? encoded) (:message (service/decode-json encoded)) "")]
-       (service/success-response (teams/deny-join-request current-user name requester message))))
+       (context "/join-request" []
+         (POST "/" [name :as {:keys [body]}]
+           (let [encoded (slurp body)
+                 message (if-not (string/blank? encoded) (:message (service/decode-json encoded)) "")]
+             (service/success-response (teams/join-request current-user name message))))
 
-   (POST "/teams/:name/leave" [name]
-     (service/success-response (teams/leave current-user name)))))
+         (POST "/:requester/deny" [name requester :as {:keys [body]}]
+           (let [encoded (slurp body)
+                 message (if-not (string/blank? encoded) (:message (service/decode-json encoded)) "")]
+             (service/success-response (teams/deny-join-request current-user name requester message)))))
+
+       (POST "/leave" [name]
+         (service/success-response (teams/leave current-user name)))))))
 
 (defn community-routes
   []

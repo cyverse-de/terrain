@@ -184,6 +184,7 @@
                :tags                [{:name "admin", :description "General Admin Endpoints"}
                                      {:name "coge", :description "CoGe Endpoints"}
                                      {:name "collaborator-lists", :description "Collaborator List Endpoints"}
+                                     {:name "teams", :description "Team Endpoints"}
                                      {:name "token", :description "OAuth Tokens"}]
                :securityDefinitions security-definitions}})
   (middleware
