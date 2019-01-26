@@ -1,5 +1,6 @@
 (ns terrain.routes.collaborator
   (:use [common-swagger-api.schema]
+        [common-swagger-api.schema.groups :only [GroupMembersUpdate GroupMembersUpdateResponse]]
         [ring.util.http-response :only [ok]]
         [terrain.auth.user-attributes :only [current-user]]
         [terrain.routes.schemas.collaborator]
@@ -65,8 +66,12 @@
          :description "Obtain a listing of the members of a collaborator list."
          (ok (cl/get-collaborator-list-members current-user name)))
 
-       (POST "/members" [:as {:keys [body]}]
-         (service/success-response (cl/add-collaborator-list-members current-user name (service/decode-json body))))
+       (POST "/members" []
+         :summary "Add Collaborator List Members"
+         :body [body GroupMembersUpdate]
+         :return GroupMembersUpdateResponse
+         :description "Add one or more users to a collaborator list."
+         (ok (cl/add-collaborator-list-members current-user name body)))
 
        (POST "/members/deleter" [:as {:keys [body params]}]
          (service/success-response
