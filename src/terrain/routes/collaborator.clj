@@ -44,15 +44,20 @@
          :description "Get information about a single collaborator list."
          (ok (cl/get-collaborator-list current-user name)))
 
-       (PATCH "/" [:as {:keys [body]}]
+       (PATCH "/" []
          :summary "Update a Collaborator List"
          :body [body CollaboratorListUpdate]
          :return CollaboratorList
-         :description "update the name or description of a collaborator list."
+         :description "Update the name or description of a collaborator list."
          (ok (cl/update-collaborator-list current-user name body)))
 
-       (DELETE "/" [:as {:keys [params]}]
-         (service/success-response (cl/delete-collaborator-list current-user name params)))
+       (DELETE "/" []
+         :summary "Delete a Collaborator List"
+         :query [params CollaboratorListRetainPermissionsParams]
+         :return CollaboratorListStub
+         :description (str "Delete a collaborator list, optionally giveing former list members direct access to "
+                           "shared resources.")
+         (ok (cl/delete-collaborator-list current-user name params)))
 
        (GET "/members" []
          (service/success-response (cl/get-collaborator-list-members current-user name)))
