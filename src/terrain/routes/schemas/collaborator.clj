@@ -42,3 +42,8 @@
    (describe String "Only teams to which the user with this username belongs will be listed if specified")})
 
 (defschema TeamListing (group-schema/group-list "team" "teams"))
+(defschema AddTeamRequest
+  (assoc (select-keys (group-schema/base-group "team") [:name (optional-key :description)])
+    (optional-key :public_privileges)
+    (describe [group-schema/ValidGroupPrivileges] "Team privileges granted to all DE users")))
+(defschema Team (group-schema/group "team"))

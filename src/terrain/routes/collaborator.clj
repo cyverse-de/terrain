@@ -96,8 +96,12 @@
        :description "List or search for teams."
        (ok (teams/get-teams current-user params)))
 
-     (POST "/" [:as {:keys [body]}]
-       (service/success-response (teams/add-team current-user (service/decode-json body))))
+     (POST "/" []
+       :summary "Add a Team"
+       :body [body AddTeamRequest]
+       :return Team
+       :description "Add a new team to the Discovery Environment."
+       (ok (teams/add-team current-user body)))
 
      (context "/:name" []
        :path-params [name :- TeamNamePathParam]
