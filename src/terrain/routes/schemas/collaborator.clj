@@ -29,7 +29,8 @@
 (defschema CollaboratorListStub (group-schema/group-stub "collaborator list"))
 (defschema CollaboratorListMembers (group-members "collaborator list"))
 
-(def TeamNamePathParam (describe String "The name of the team"))
+(def TeamNamePathParam
+  (describe String "The name of the team, including the username prefix (e.g. `username:team-name`)"))
 
 (defschema TeamListingParams
   {(optional-key :search)

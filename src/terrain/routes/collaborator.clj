@@ -106,8 +106,11 @@
      (context "/:name" []
        :path-params [name :- TeamNamePathParam]
 
-       (GET "/" [name]
-         (service/success-response (teams/get-team current-user name)))
+       (GET "/" []
+         :summary "Get a Team"
+         :return Team
+         :description "Get information about a single team."
+         (ok (teams/get-team current-user name)))
 
        (PATCH "/" [name :as {:keys [body]}]
          (service/success-response (teams/update-team current-user name (service/decode-json body))))
