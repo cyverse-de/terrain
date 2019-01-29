@@ -48,3 +48,6 @@
     (optional-key :public_privileges)
     (describe [group-schema/ValidGroupPrivileges] "Team privileges granted to all DE users")))
 (defschema Team (group-schema/group "team"))
+(defschema UpdateTeamRequest (select-keys (group-schema/group-update "team") (map optional-key [:name :description])))
+(defschema TeamStub (group-schema/group-stub "team"))
+(defschema TeamMembers (group-members "team"))

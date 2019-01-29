@@ -112,15 +112,25 @@
          :description "Get information about a single team."
          (ok (teams/get-team current-user name)))
 
-       (PATCH "/" [name :as {:keys [body]}]
-         (service/success-response (teams/update-team current-user name (service/decode-json body))))
+       (PATCH "/" []
+         :summary "Update a Team"
+         :body [body UpdateTeamRequest]
+         :return Team
+         :description "Update the name or description of a team."
+         (ok (teams/update-team current-user name body)))
 
-       (DELETE "/" [name]
-         (service/success-response (teams/delete-team current-user name)))
+       (DELETE "/" []
+         :summary "Delete a Team"
+         :return TeamStub
+         :description "Delete a team."
+         (ok (teams/delete-team current-user name)))
 
        (context "/members" []
-         (GET "/" [name]
-           (service/success-response (teams/get-team-members current-user name)))
+         (GET "/" []
+           :summary "Get Team Members"
+           :return TeamMembers
+           :description "Obtain a listing of the members of a team."
+           (ok (teams/get-team-members current-user name)))
 
          (POST "/" [name :as {:keys [body]}]
            (service/success-response (teams/add-team-members current-user name (service/decode-json body))))
