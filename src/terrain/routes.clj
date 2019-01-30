@@ -162,7 +162,6 @@
 (defn- site-handler
   [routes-fn]
   (-> (routes-fn)
-      (wrap-context-path-remover "/terrain")
       wrap-keyword-params
       wrap-lcase-params
       wrap-query-params
@@ -188,9 +187,10 @@
                                      {:name "token", :description "OAuth Tokens"}]
                :securityDefinitions security-definitions}})
   (middleware
-   [[wrap-context-path-remover "/terrain"]
-    wrap-keyword-params
+   [wrap-keyword-params
     wrap-lcase-params
     wrap-query-params
     clean-context]
    (terrain-routes)))
+
+(def app-wrapper (wrap-context-path-remover app "/terrain"))
