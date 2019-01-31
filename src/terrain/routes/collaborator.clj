@@ -1,12 +1,12 @@
 (ns terrain.routes.collaborator
   (:use [common-swagger-api.schema]
-        [common-swagger-api.schema.groups :only [GroupMembersUpdate GroupMembersUpdateResponse Privileges]]
         [ring.util.http-response :only [ok]]
         [terrain.auth.user-attributes :only [current-user]]
         [terrain.routes.schemas.collaborator]
         [terrain.util :only [optional-routes]])
   (:require [cheshire.core :as json]
             [clojure.string :as string]
+            [common-swagger-api.schema.groups :as group-schema]
             [terrain.clients.apps.raw :as apps]
             [terrain.services.collaborator-lists :as cl]
             [terrain.services.communities :as communities]
@@ -68,16 +68,16 @@
 
        (POST "/members" []
          :summary "Add Collaborator List Members"
-         :body [body GroupMembersUpdate]
-         :return GroupMembersUpdateResponse
+         :body [body group-schema/GroupMembersUpdate]
+         :return group-schema/GroupMembersUpdateResponse
          :description "Add one or more users to a collaborator list."
          (ok (cl/add-collaborator-list-members current-user name body)))
 
        (POST "/members/deleter" []
          :summary "Remove Collaborator List Members"
          :query [params CollaboratorListRetainPermissionsParams]
-         :body [body GroupMembersUpdate]
-         :return GroupMembersUpdateResponse
+         :body [body group-schema/GroupMembersUpdate]
+         :return group-schema/GroupMembersUpdateResponse
          :description (str "Remove members from a collaborator list, optionally giving former list members direct "
                            "access to resources shared with the list.")
          (ok (cl/remove-collaborator-list-members current-user name body params)))))))
@@ -134,24 +134,35 @@
 
          (POST "/" []
            :summary "Add Team Members"
-           :body [body GroupMembersUpdate]
-           :return GroupMembersUpdateResponse
+           :body [body group-schema/GroupMembersUpdate]
+           :return group-schema/GroupMembersUpdateResponse
            :description "Add one or more users to a team."
            (ok (teams/add-team-members current-user name body)))
 
          (POST "/deleter" []
            :summary "Remove Team Members"
-           :body [body GroupMembersUpdate]
-           :return GroupMembersUpdateResponse
+           :body [body group-schema/GroupMembersUpdate]
+           :return group-schema/GroupMembersUpdateResponse
            :description "Remove one or more users from a team."
            (ok (teams/remove-team-members current-user name body))))
 
        (context "/privileges" []
          (GET "/" []
-           (service/success-response (teams/list-team-privileges current-user name)))
+           :summary "List Team Privileges"
+           :return group-schema/Privileges
+           :description (str "Privileges describe what a user or set of users is allowed to do with a team. For "
+                             "example, some users may be able to administer the team whereas others may only be "
+                             "able to view it. This endpoint lists the current privileges for a team.")
+           (ok (teams/list-team-privileges current-user name)))
 
-         (POST "/" [name :as {:keys [body]}]
-           (service/success-response (teams/update-team-privileges current-user name (service/decode-json body)))))
+         (POST "/" []
+           :summary "Update Team Privileges"
+           :body [body group-schema/GroupPrivilegeUpdates]
+           :return group-schema/Privileges
+           :description (str "Privileges describe what a user or set of users is allowed to do with a team. For "
+                             "example, some users may be able to administer the team whereas others may only be "
+                             "able to view it. This endpoint assigns privleges to users.")
+           (ok (teams/update-team-privileges current-user name body))))
 
        (POST "/join" [name]
          (service/success-response (teams/join current-user name)))
