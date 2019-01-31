@@ -132,15 +132,19 @@
            :description "Obtain a listing of the members of a team."
            (ok (teams/get-team-members current-user name)))
 
-         (POST "/" [name :as {:keys [body]}]
+         (POST "/" []
            :summary "Add Team Members"
            :body [body GroupMembersUpdate]
            :return GroupMembersUpdateResponse
            :description "Add one or more users to a team."
            (ok (teams/add-team-members current-user name body)))
 
-         (POST "/deleter" [name :as {:keys [body]}]
-           (service/success-response (teams/remove-team-members current-user name (service/decode-json body))))
+         (POST "/deleter" []
+           :summary "Remove Team Members"
+           :body [body GroupMembersUpdate]
+           :return GroupMembersUpdateResponse
+           :description "Remove one or more users from a team."
+           (ok (teams/remove-team-members current-user name body)))
 
          (context "/privileges" []
            (GET "/" [name]
