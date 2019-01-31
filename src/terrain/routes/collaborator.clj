@@ -1,6 +1,6 @@
 (ns terrain.routes.collaborator
   (:use [common-swagger-api.schema]
-        [common-swagger-api.schema.groups :only [GroupMembersUpdate GroupMembersUpdateResponse]]
+        [common-swagger-api.schema.groups :only [GroupMembersUpdate GroupMembersUpdateResponse Privileges]]
         [ring.util.http-response :only [ok]]
         [terrain.auth.user-attributes :only [current-user]]
         [terrain.routes.schemas.collaborator]
@@ -144,14 +144,14 @@
            :body [body GroupMembersUpdate]
            :return GroupMembersUpdateResponse
            :description "Remove one or more users from a team."
-           (ok (teams/remove-team-members current-user name body)))
+           (ok (teams/remove-team-members current-user name body))))
 
-         (context "/privileges" []
-           (GET "/" [name]
-             (service/success-response (teams/list-team-privileges current-user name)))
+       (context "/privileges" []
+         (GET "/" []
+           (service/success-response (teams/list-team-privileges current-user name)))
 
-           (POST "/" [name :as {:keys [body]}]
-             (service/success-response (teams/update-team-privileges current-user name (service/decode-json body))))))
+         (POST "/" [name :as {:keys [body]}]
+           (service/success-response (teams/update-team-privileges current-user name (service/decode-json body)))))
 
        (POST "/join" [name]
          (service/success-response (teams/join current-user name)))
