@@ -1,16 +1,15 @@
 (ns terrain.middleware
   (:require [clojure.string :as string]))
 
-(defn- remove-context-path
-  "Removes a context path from the start of a URI path if it's present. The context path can either be followed by
-   a slash or by the end of the URL path."
+(defn- add-context-path
+  "Adds a context path to the start of a URI path if it's not present."
   [uri-path context-path]
-  (string/replace uri-path
-                  (re-pattern (str "^\\Q" context-path "\\E(?:/|$)"))
-                  "/"))
+  (if-not (re-find (re-pattern (str "^\\Q" context-path "\\E(?:/|$)")) uri-path)
+    (str context-path uri-path)
+    uri-path))
 
-(defn wrap-context-path-remover
-  "Middleware that removes a context path from the start of the URI path in the request if it's present."
+(defn wrap-context-path-adder
+  "Middleware that adds a context path to the start of a URI path in a request if it's not present."
   [handler context-path]
   (fn [request]
-    (handler (update request :uri remove-context-path context-path))))
+    (handler (update request :uri add-context-path context-path))))

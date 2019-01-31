@@ -6,7 +6,7 @@
         [ring.middleware.keyword-params :only [wrap-keyword-params]]
         [service-logging.middleware :only [wrap-logging clean-context]]
         [terrain.auth.user-attributes]
-        [terrain.middleware :only [wrap-context-path-remover]]
+        [terrain.middleware :only [wrap-context-path-adder]]
         [terrain.routes.admin]
         [terrain.routes.data]
         [terrain.routes.permanent-id-requests]
@@ -176,7 +176,8 @@
 (defapi app
   {:exceptions cx/exception-handlers}
   (swagger-routes
-   {:ui       config/docs-uri
+   {:ui       (str "/terrain" config/docs-uri)
+    :spec     "/terrain/swagger.json"
     :data     {:info                {:title       "Discovery Environment API"
                                      :description "Documentation for the Discovery Environment REST API"
                                      :version     "0.1.0"}
@@ -191,6 +192,7 @@
     wrap-lcase-params
     wrap-query-params
     clean-context]
-   (terrain-routes)))
+   (context "/terrain" []
+     (terrain-routes))))
 
-(def app-wrapper (wrap-context-path-remover app "/terrain"))
+(def app-wrapper (wrap-context-path-adder app "/terrain"))
