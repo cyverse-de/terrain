@@ -133,7 +133,11 @@
            (ok (teams/get-team-members current-user name)))
 
          (POST "/" [name :as {:keys [body]}]
-           (service/success-response (teams/add-team-members current-user name (service/decode-json body))))
+           :summary "Add Team Members"
+           :body [body GroupMembersUpdate]
+           :return GroupMembersUpdateResponse
+           :description "Add one or more users to a team."
+           (ok (teams/add-team-members current-user name body)))
 
          (POST "/deleter" [name :as {:keys [body]}]
            (service/success-response (teams/remove-team-members current-user name (service/decode-json body))))
