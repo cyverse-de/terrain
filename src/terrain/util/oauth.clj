@@ -1,7 +1,6 @@
 (ns terrain.util.oauth
   (:use [slingshot.slingshot :only [try+]])
-  (:require [clojure.tools.logging :as log]
-            [clojure-commons.error-codes :as ce]
+  (:require [clojure-commons.exception-util :as cx]
             [clojure-commons.response :as resp]
             [ring.util.http-response :as http-resp]
             [terrain.clients.oauth :as oauth]
@@ -41,15 +40,11 @@
    (doto (oauth/get-profile token)
      (validate-oauth-profile))
    (catch [:status 401] _
-     (log/warn (:throwable &throw-context) "Invalid or expired OAuth token.")
-     (resp/unauthorized "Invalid or expired OAuth token."))
+     (cx/unauthorized "Invalid or expired OAuth token."))
    (catch [:type :validation] _
-     (resp/forbidden (.getMessage (:throwable &throw-context))))
+     (cx/forbidden (.getMessage (:throwable &throw-context))))
    (catch Object _
-     (log/error (:throwable &throw-context) "Unexpected exception.")
-     (resp/error-response http-resp/internal-server-error
-                          ce/ERR_UNCHECKED_EXCEPTION
-                          "Received an unexpected exception."))))
+     (cx/internal-system-error "Received an unexpected exception."))))
 
 (defn validate-oauth-token
   [handler token-fn]
