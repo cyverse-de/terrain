@@ -164,8 +164,12 @@
                              "able to view it. This endpoint assigns privleges to users.")
            (ok (teams/update-team-privileges current-user name body))))
 
-       (POST "/join" [name]
-         (service/success-response (teams/join current-user name)))
+       (POST "/join" []
+         :summary "Join a Team"
+         :return group-schema/GroupMembersUpdateResponse
+         :description (str "Adds the authenticated user to a team, provided that he or she has permission to "
+                           "join the team.")
+         (ok (teams/join current-user name)))
 
        (context "/join-request" []
          (POST "/" [name :as {:keys [body]}]
