@@ -191,8 +191,11 @@
            (teams/deny-join-request current-user name requester message)
            (ok)))
 
-       (POST "/leave" [name]
-         (service/success-response (teams/leave current-user name)))))))
+       (POST "/leave" []
+         :summary "Leave a team"
+         :return group-schema/GroupMembersUpdateResponse
+         :description "Allows the authenticated user to leave a team."
+         (ok (teams/leave current-user name)))))))
 
 (defn community-routes
   []
