@@ -172,15 +172,24 @@
          (ok (teams/join current-user name)))
 
        (context "/join-request" []
-         (POST "/" [name :as {:keys [body]}]
-           (let [encoded (slurp body)
-                 message (if-not (string/blank? encoded) (:message (service/decode-json encoded)) "")]
-             (service/success-response (teams/join-request current-user name message))))
+         (POST "/" []
+           :summary "Request to Join a Team"
+           :body [{:keys [message]} TeamJoinRequest]
+           :description (str "Allows the authenticated user to request to be added to a team. The request "
+                             "is sent to the administrators of the team. The team administrator may then "
+                             "add the user to the team using the the POST /team/{name}/members endpoint "
+                             "or deny the request using the POST /team/{name}/join-request/{requester}/deny "
+                             "endpoint.")
+           (teams/join-request current-user name message)
+           (ok))
 
-         (POST "/:requester/deny" [name requester :as {:keys [body]}]
-           (let [encoded (slurp body)
-                 message (if-not (string/blank? encoded) (:message (service/decode-json encoded)) "")]
-             (service/success-response (teams/deny-join-request current-user name requester message)))))
+         (POST "/:requester/deny" []
+           :summary "Deny a Request to Join a Team"
+           :path-params [requester :- TeamRequesterPathParam]
+           :body [{:keys [message]} TeamJoinDenial]
+           :description (str "Allows a team administrator to deny a request for a user to be added to a team.")
+           (teams/deny-join-request current-user name requester message)
+           (ok)))
 
        (POST "/leave" [name]
          (service/success-response (teams/leave current-user name)))))))

@@ -32,6 +32,9 @@
 (def TeamNamePathParam
   (describe String "The name of the team, including the username prefix (e.g. `username:team-name`)"))
 
+(def TeamRequesterPathParam
+  (describe String "The username of the person requesting to join the team"))
+
 (defschema TeamListingParams
   {(optional-key :search)
    (describe String "The team name substring to search for")
@@ -41,6 +44,12 @@
 
    (optional-key :member)
    (describe String "Only teams to which the user with this username belongs will be listed if specified")})
+
+(defschema TeamJoinRequest
+  {:message (describe String "A brief message to send to the team administrators")})
+
+(defschema TeamJoinDenial
+  {:message (describe String "A brief message to send to the person requesting to join the team")})
 
 (defschema TeamListing (group-schema/group-list "team" "teams"))
 (defschema AddTeamRequest
