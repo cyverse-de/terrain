@@ -11,6 +11,8 @@
 (defn group-members [group-descriptor]
   {:members (describe [GroupMember] (str "The list of " group-descriptor " members."))})
 
+;; Collaborator List Schemas
+
 (def CollaboratorListNamePathParam (describe String "The name of the collaborator list"))
 
 (defschema CollaboratorListSearchParams
@@ -28,6 +30,8 @@
   (select-keys (group-schema/group-update "collaborator list") (map optional-key [:name :description])))
 (defschema CollaboratorListStub (group-schema/group-stub "collaborator list"))
 (defschema CollaboratorListMembers (group-members "collaborator list"))
+
+;; Team Schemas
 
 (def TeamNamePathParam
   (describe String "The name of the team, including the username prefix (e.g. `username:team-name`)"))
@@ -65,8 +69,16 @@
 (defschema TeamStub (group-schema/group-stub "team"))
 (defschema TeamMembers (group-members "team"))
 
+;; Community Schemas
+
 (def CommunityNamePathParam (describe String "The name of the community"))
 
 (defschema CommunityListingParams
   (dissoc (team-listing-params "community" "communities") (optional-key :creator)))
-(defschema CommunityListing (group-schema/group-list "community" "communities"))
+
+(defschema Community
+  (assoc (group-schema/group "community")
+    :member (describe Boolean "True if the authenticated user belongs to the community")))
+
+(defschema CommunityListing
+  {:groups (describe [Community] "The list of communities in the result set")})

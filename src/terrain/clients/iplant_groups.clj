@@ -258,8 +258,15 @@
 (defn get-teams [user params]
   (get-teams* group-type-teams user params))
 
-(defn get-communities [user params]
-  (get-teams* group-type-communities user params))
+(defn- format-community [memberships team]
+  (assoc team
+    :member (contains? memberships (:name team))))
+
+(defn get-communities [user {:keys [member] :as params}]
+  (let [team-listing   (get-teams* group-type-communities user params)
+        teams-for-user (if (= user member) team-listing (get-teams* group-type-communities user {:member user}))
+        memberships    (->> teams-for-user :groups (map :name) set)]
+    {:groups (mapv (partial format-community memberships) (:groups team-listing))}))
 
 (defn- grant-initial-team-privileges [client user group initial-admin public-privileges]
   (c/update-group-privileges client user group
