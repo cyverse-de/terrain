@@ -35,15 +35,19 @@
 (def TeamRequesterPathParam
   (describe String "The username of the person requesting to join the team"))
 
-(defschema TeamListingParams
+(defn team-listing-params [descriptor plural-descriptor]
   {(optional-key :search)
-   (describe String "The team name substring to search for")
+   (describe String (str "The " descriptor " name substring to search for"))
 
    (optional-key :creator)
-   (describe String "Only teams created by the user with this username will be listed if specified")
+   (describe String (str "Only " plural-descriptor " created by the user with this username will be listed if "
+                         "specified"))
 
    (optional-key :member)
-   (describe String "Only teams to which the user with this username belongs will be listed if specified")})
+   (describe String (str "Only " plural-descriptor " to which the user with this username belongs will be listed "
+                         "if specified"))})
+
+(defschema TeamListingParams (team-listing-params "team" "teams"))
 
 (defschema TeamJoinRequest
   {:message (describe String "A brief message to send to the team administrators")})
@@ -60,3 +64,9 @@
 (defschema UpdateTeamRequest (select-keys (group-schema/group-update "team") (map optional-key [:name :description])))
 (defschema TeamStub (group-schema/group-stub "team"))
 (defschema TeamMembers (group-members "team"))
+
+(def CommunityNamePathParam (describe String "The name of the community"))
+
+(defschema CommunityListingParams
+  (dissoc (team-listing-params "community" "communities") (optional-key :creator)))
+(defschema CommunityListing (group-schema/group-list "community" "communities"))

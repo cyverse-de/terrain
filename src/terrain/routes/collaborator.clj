@@ -198,42 +198,53 @@
          (ok (teams/leave current-user name)))))))
 
 (defn community-routes
-  []
-  (optional-routes
+  ([]
+   optional-routes
    [config/collaborator-routes-enabled]
 
-   (GET "/communities" [:as {:keys [params]}]
-     (service/success-response (communities/get-communities current-user params)))
+   (context "/communities" []
+     :tags ["communities"]
 
-   (POST "/communities" [:as {:keys [body]}]
-     (service/success-response (communities/add-community current-user (service/decode-json body))))
+     (GET "/" []
+       :summary "List Communities"
+       :query [params CommunityListingParams]
+       :return CommunityListing
+       :description "List or search for communities."
+       (ok (communities/get-communities current-user params)))
 
-   (GET "/communities/:name" [name]
-     (service/success-response (communities/get-community current-user name)))
+     (POST "/" [:as {:keys [body]}]
+       (service/success-response (communities/add-community current-user (service/decode-json body))))
 
-   (PATCH "/communities/:name" [name :as {:keys [params body]}]
-     (service/success-response (communities/update-community current-user name params (service/decode-json body))))
+     (context "/:name" []
+       :path-params [name :- CommunityNamePathParam]
 
-   (DELETE "/communities/:name" [name]
-     (service/success-response (communities/delete-community current-user name)))
+       (GET "/" [name]
+         (service/success-response (communities/get-community current-user name)))
 
-   (GET "/communities/:name/admins" [name]
-     (service/success-response (communities/get-community-admins current-user name)))
+       (PATCH "/" [name :as {:keys [params body]}]
+         (service/success-response (communities/update-community current-user name params (service/decode-json body))))
 
-   (POST "/communities/:name/admins" [name :as {:keys [body]}]
-     (service/success-response (communities/add-community-admins current-user name (service/decode-json body))))
+       (DELETE "/" [name]
+         (service/success-response (communities/delete-community current-user name)))
 
-   (POST "/communities/:name/admins/deleter" [name :as {:keys [body]}]
-     (service/success-response (communities/remove-community-admins current-user name (service/decode-json body))))
+       (context "/admins" []
+         (GET "/" [name]
+           (service/success-response (communities/get-community-admins current-user name)))
 
-   (GET "/communities/:name/members" [name]
-     (service/success-response (communities/get-community-members current-user name)))
+         (POST "/" [name :as {:keys [body]}]
+           (service/success-response (communities/add-community-admins current-user name (service/decode-json body))))
 
-   (POST "/communities/:name/join" [name]
-     (service/success-response (communities/join current-user name)))
+         (POST "/deleter" [name :as {:keys [body]}]
+           (service/success-response (communities/remove-community-admins current-user name (service/decode-json body)))))
 
-   (POST "/communities/:name/leave" [name]
-     (service/success-response (communities/leave current-user name)))))
+       (GET "/members" [name]
+         (service/success-response (communities/get-community-members current-user name)))
+
+       (POST "/join" [name]
+         (service/success-response (communities/join current-user name)))
+
+       (POST "/leave" [name]
+         (service/success-response (communities/leave current-user name)))))))
 
 (defn admin-community-routes
   []

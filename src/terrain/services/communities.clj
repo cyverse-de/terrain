@@ -5,7 +5,7 @@
             [terrain.util.config :as config]))
 
 (defn get-communities [{user :shortUsername} params]
-  (ipg/get-communities user (select-keys params [:search :creator :member])))
+  (ipg/get-communities user (select-keys params [:search :member])))
 
 (defn add-community [{user :shortUsername} body]
   (ipg/add-community user (assoc body :public_privileges ["read","optin"])))
