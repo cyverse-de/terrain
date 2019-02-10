@@ -78,7 +78,8 @@
 
 (defschema Community
   (assoc (group-schema/group "community")
-    :member (describe Boolean "True if the authenticated user belongs to the community")))
+    :member     (describe Boolean "True if the authenticated user belongs to the community")
+    :privileges (describe [String] "The privileges the authenticated has for the community")))
 
 (defschema CommunityListing
   {:groups (describe [Community] "The list of communities in the result set")})
