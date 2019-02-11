@@ -250,11 +250,19 @@
            :description "Lists the administrators of community in the Discovery Environment."
            (ok (communities/get-community-admins current-user name)))
 
-         (POST "/" [name :as {:keys [body]}]
-           (service/success-response (communities/add-community-admins current-user name (service/decode-json body))))
+         (POST "/" []
+           :summary "Add Community Administrators"
+           :body [body group-schema/GroupMembersUpdate]
+           :return group-schema/GroupMembersUpdateResponse
+           :description "Add one or more administrators to a community."
+           (ok (communities/add-community-admins current-user name body)))
 
          (POST "/deleter" [name :as {:keys [body]}]
-           (service/success-response (communities/remove-community-admins current-user name (service/decode-json body)))))
+           :summary "Remove Community Administrators"
+           :body [body group-schema/GroupMembersUpdate]
+           :return group-schema/GroupMembersUpdateResponse
+           :description "Remove one or more administrators from a community."
+           (ok (communities/remove-community-admins current-user name body))))
 
        (GET "/members" [name]
          (service/success-response (communities/get-community-members current-user name)))
