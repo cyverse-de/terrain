@@ -60,27 +60,28 @@
                            "resources shared with the list.")
          (ok (cl/delete-collaborator-list current-user name params)))
 
-       (GET "/members" []
-         :summary "Get Collaborator List Members"
-         :return CollaboratorListMembers
-         :description "Obtain a listing of the members of a collaborator list."
-         (ok (cl/get-collaborator-list-members current-user name)))
+       (context "/members" []
+         (GET "/" []
+           :summary "Get Collaborator List Members"
+           :return CollaboratorListMembers
+           :description "Obtain a listing of the members of a collaborator list."
+           (ok (cl/get-collaborator-list-members current-user name)))
 
-       (POST "/members" []
-         :summary "Add Collaborator List Members"
-         :body [body group-schema/GroupMembersUpdate]
-         :return group-schema/GroupMembersUpdateResponse
-         :description "Add one or more users to a collaborator list."
-         (ok (cl/add-collaborator-list-members current-user name body)))
+         (POST "/" []
+           :summary "Add Collaborator List Members"
+           :body [body group-schema/GroupMembersUpdate]
+           :return group-schema/GroupMembersUpdateResponse
+           :description "Add one or more users to a collaborator list."
+           (ok (cl/add-collaborator-list-members current-user name body)))
 
-       (POST "/members/deleter" []
-         :summary "Remove Collaborator List Members"
-         :query [params CollaboratorListRetainPermissionsParams]
-         :body [body group-schema/GroupMembersUpdate]
-         :return group-schema/GroupMembersUpdateResponse
-         :description (str "Remove members from a collaborator list, optionally giving former list members direct "
-                           "access to resources shared with the list.")
-         (ok (cl/remove-collaborator-list-members current-user name body params)))))))
+         (POST "/deleter" []
+           :summary "Remove Collaborator List Members"
+           :query [params CollaboratorListRetainPermissionsParams]
+           :body [body group-schema/GroupMembersUpdate]
+           :return group-schema/GroupMembersUpdateResponse
+           :description (str "Remove members from a collaborator list, optionally giving former list members direct "
+                             "access to resources shared with the list.")
+           (ok (cl/remove-collaborator-list-members current-user name body params))))))))
 
 (defn team-routes
   []
