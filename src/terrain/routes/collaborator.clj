@@ -270,8 +270,11 @@
          :description "Lists the members of a community in the Discoevery Environment."
          (ok (communities/get-community-members current-user name)))
 
-       (POST "/join" [name]
-         (service/success-response (communities/join current-user name)))
+       (POST "/join" []
+         :summary "Join a Community"
+         :return group-schema/GroupMembersUpdateResponse
+         :description "Allows the caller to join a community, provided that he or she has permission to do so."
+         (ok (communities/join current-user name)))
 
        (POST "/leave" [name]
          (service/success-response (communities/leave current-user name)))))))
