@@ -224,7 +224,10 @@
        :path-params [name :- CommunityNamePathParam]
 
        (GET "/" [name]
-         (service/success-response (communities/get-community current-user name)))
+         :summary "Get Community Information"
+         :return Community
+         :description "Returns information about the community with the given name."
+         (ok (communities/get-community current-user name)))
 
        (PATCH "/" [name :as {:keys [params body]}]
          (service/success-response (communities/update-community current-user name params (service/decode-json body))))
