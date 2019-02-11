@@ -76,10 +76,14 @@
 (defschema CommunityListingParams
   (dissoc (team-listing-params "community" "communities") (optional-key :creator)))
 
-(defschema Community
+(defschema CommunityListingEntry
   (assoc (group-schema/group "community")
     :member     (describe Boolean "True if the authenticated user belongs to the community")
     :privileges (describe [String] "The privileges the authenticated has for the community")))
 
 (defschema CommunityListing
-  {:groups (describe [Community] "The list of communities in the result set")})
+  {:groups (describe [CommunityListingEntry] "The list of communities in the result set")})
+
+(defschema Community (group-schema/group "community"))
+
+(defschema AddCommunityRequest (select-keys (group-schema/base-group "community") [:name (optional-key :description)]))
