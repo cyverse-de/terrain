@@ -237,12 +237,18 @@
          :description "Updates the name or description of a community."
          (ok (communities/update-community current-user name params body)))
 
-       (DELETE "/" [name]
-         (service/success-response (communities/delete-community current-user name)))
+       (DELETE "/" []
+         :summary "Delete a Community"
+         :return CommunityStub
+         :description "Removes a community from the Discoevery Environment."
+         (ok (communities/delete-community current-user name)))
 
        (context "/admins" []
-         (GET "/" [name]
-           (service/success-response (communities/get-community-admins current-user name)))
+         (GET "/" []
+           :summary "List Community Administrators"
+           :return CommunityAdmins
+           :description "Lists the administrators of community in the Discovery Environment."
+           (ok (communities/get-community-admins current-user name)))
 
          (POST "/" [name :as {:keys [body]}]
            (service/success-response (communities/add-community-admins current-user name (service/decode-json body))))

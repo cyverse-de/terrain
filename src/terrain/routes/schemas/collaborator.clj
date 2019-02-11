@@ -4,12 +4,13 @@
   (:require [common-swagger-api.schema.groups :as group-schema]
             [common-swagger-api.schema.subjects :as subject-schema]))
 
-(def GroupMember
+(defn group-member [group-descriptor member-descriptor]
   (assoc subject-schema/Subject
-    :display_name (describe String "The displayable group member name.")))
+    :display_name (describe String (str "The displayable " group-descriptor " " member-descriptor " name"))))
 
-(defn group-members [group-descriptor]
-  {:members (describe [GroupMember] (str "The list of " group-descriptor " members."))})
+(defn group-members [group-descriptor member-descriptor member-descriptor-plural]
+  {:members (describe [(group-member group-descriptor member-descriptor)]
+                      (str "The list of " group-descriptor " " member-descriptor-plural))})
 
 ;; Collaborator List Schemas
 
@@ -29,7 +30,7 @@
 (defschema CollaboratorListUpdate
   (select-keys (group-schema/group-update "collaborator list") (map optional-key [:name :description])))
 (defschema CollaboratorListStub (group-schema/group-stub "collaborator list"))
-(defschema CollaboratorListMembers (group-members "collaborator list"))
+(defschema CollaboratorListMembers (group-members "collaborator list" "member" "members"))
 
 ;; Team Schemas
 
@@ -67,7 +68,7 @@
 (defschema Team (group-schema/group "team"))
 (defschema UpdateTeamRequest (select-keys (group-schema/group-update "team") (map optional-key [:name :description])))
 (defschema TeamStub (group-schema/group-stub "team"))
-(defschema TeamMembers (group-members "team"))
+(defschema TeamMembers (group-members "team" "member" "members"))
 
 ;; Community Schemas
 
@@ -98,3 +99,8 @@
 
    (optional-key :force-rename)
    (describe Boolean "Set to `true` to force the community to be renamed even if apps are associated with it")})
+
+(defschema CommunityStub (group-schema/group-stub "community"))
+
+(defschema CommunityAdmins
+  {:members (describe [subject-schema/Subject] "The list of community administrators")})
