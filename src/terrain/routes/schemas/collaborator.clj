@@ -86,4 +86,15 @@
 
 (defschema Community (group-schema/group "community"))
 
-(defschema AddCommunityRequest (select-keys (group-schema/base-group "community") [:name (optional-key :description)]))
+(defschema AddCommunityRequest
+  (select-keys (group-schema/base-group "community") [:name (optional-key :description)]))
+
+(defschema UpdateCommunityRequest
+  (select-keys (group-schema/group-update "community") (map optional-key [:name :description])))
+
+(defschema UpdateCommunityParams
+  {(optional-key :retag-apps)
+   (describe Boolean "Set to `true` to cause apps that are associated with the community to be retagged")
+
+   (optional-key :force-rename)
+   (describe Boolean "Set to `true` to force the community to be renamed even if apps are associated with it")})

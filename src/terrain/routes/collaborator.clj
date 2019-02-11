@@ -229,8 +229,13 @@
          :description "Returns information about the community with the given name."
          (ok (communities/get-community current-user name)))
 
-       (PATCH "/" [name :as {:keys [params body]}]
-         (service/success-response (communities/update-community current-user name params (service/decode-json body))))
+       (PATCH "/" []
+         :summary "Update a Community"
+         :query [params UpdateCommunityParams]
+         :body [body UpdateCommunityRequest]
+         :return Community
+         :description "Updates the name or description of a community."
+         (ok (communities/update-community current-user name params body)))
 
        (DELETE "/" [name]
          (service/success-response (communities/delete-community current-user name)))
