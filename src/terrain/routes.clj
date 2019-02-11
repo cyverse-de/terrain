@@ -182,6 +182,7 @@
                                      :description "Documentation for the Discovery Environment REST API"
                                      :version     "0.1.0"}
                :tags                [{:name "admin", :description "General Admin Endpoints"}
+                                     {:name "admin-communities", :description "Community Administration Endpoints"}
                                      {:name "coge", :description "CoGe Endpoints"}
                                      {:name "collaborator-lists", :description "Collaborator List Endpoints"}
                                      {:name "communities", :description "Community Endpoints"}
