@@ -276,8 +276,11 @@
          :description "Allows the caller to join a community, provided that he or she has permission to do so."
          (ok (communities/join current-user name)))
 
-       (POST "/leave" [name]
-         (service/success-response (communities/leave current-user name)))))))
+       (POST "/leave" []
+         :summary "Leave a Community"
+         :return group-schema/GroupMembersUpdateResponse
+         :description "Allows the caller to leave a community."
+         (ok (communities/leave current-user name)))))))
 
 (defn admin-community-routes
   []
