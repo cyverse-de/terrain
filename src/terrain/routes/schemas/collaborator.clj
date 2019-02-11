@@ -104,3 +104,5 @@
 
 (defschema CommunityAdmins
   {:members (describe [subject-schema/Subject] "The list of community administrators")})
+
+(defschema CommunityMembers (group-members "community" "member" "members"))

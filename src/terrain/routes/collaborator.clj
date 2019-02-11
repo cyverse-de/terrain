@@ -254,18 +254,21 @@
            :summary "Add Community Administrators"
            :body [body group-schema/GroupMembersUpdate]
            :return group-schema/GroupMembersUpdateResponse
-           :description "Add one or more administrators to a community."
+           :description "Add one or more administrators to a community in the Discoevery Environment."
            (ok (communities/add-community-admins current-user name body)))
 
          (POST "/deleter" [name :as {:keys [body]}]
            :summary "Remove Community Administrators"
            :body [body group-schema/GroupMembersUpdate]
            :return group-schema/GroupMembersUpdateResponse
-           :description "Remove one or more administrators from a community."
+           :description "Remove one or more administrators from a community in the Discoevery Environment."
            (ok (communities/remove-community-admins current-user name body))))
 
-       (GET "/members" [name]
-         (service/success-response (communities/get-community-members current-user name)))
+       (GET "/members" []
+         :summary "List Community Members"
+         :return CommunityMembers
+         :description "Lists the members of a community in the Discoevery Environment."
+         (ok (communities/get-community-members current-user name)))
 
        (POST "/join" [name]
          (service/success-response (communities/join current-user name)))
