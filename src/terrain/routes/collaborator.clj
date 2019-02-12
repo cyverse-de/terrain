@@ -322,7 +322,10 @@
          (ok (communities/admin-update-community name params body)))
 
        (DELETE "/" [name]
-         (service/success-response (communities/admin-delete-community name)))
+         :summary "Delete a Community"
+         :return CommunityStub
+         :description "Removes a community from the Discoevery Environment."
+         (ok (communities/admin-delete-community name)))
 
        (context "/admins" []
          (GET "/" [name]
