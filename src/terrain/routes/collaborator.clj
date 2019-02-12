@@ -341,8 +341,12 @@
            :description "Add one or more administrators to a community in the Discoevery Environment."
            (ok (communities/admin-add-community-admins name body)))
 
-         (POST "/deleter" [name :as {:keys [body]}]
-           (service/success-response (communities/admin-remove-community-admins name (service/decode-json body)))))))))
+         (POST "/deleter" []
+           :summary "Remove Community Administrators"
+           :body [body group-schema/GroupMembersUpdate]
+           :return group-schema/GroupMembersUpdateResponse
+           :description "Remove one or more administrators from a community in the Discoevery Environment."
+           (ok (communities/admin-remove-community-admins name body))))))))
 
 (defn subject-routes
   []
