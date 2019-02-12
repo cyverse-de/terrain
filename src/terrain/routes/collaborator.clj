@@ -334,8 +334,12 @@
            :description "Lists the administrators of community in the Discovery Environment."
            (ok (communities/admin-get-community-admins name)))
 
-         (POST "/" [name :as {:keys [body]}]
-           (service/success-response (communities/admin-add-community-admins name (service/decode-json body))))
+         (POST "/" []
+           :summary "Add Community Administrators"
+           :body [body group-schema/GroupMembersUpdate]
+           :return group-schema/GroupMembersUpdateResponse
+           :description "Add one or more administrators to a community in the Discoevery Environment."
+           (ok (communities/admin-add-community-admins name body)))
 
          (POST "/deleter" [name :as {:keys [body]}]
            (service/success-response (communities/admin-remove-community-admins name (service/decode-json body)))))))))
