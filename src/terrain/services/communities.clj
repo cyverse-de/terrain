@@ -14,7 +14,7 @@
   (ipg/get-community user name))
 
 (defn update-community [{user :shortUsername} name {:keys [retag-apps force-rename]} body]
-  (ipg/update-community user name (Boolean/parseBoolean retag-apps) (Boolean/parseBoolean force-rename) body))
+  (ipg/update-community user name retag-apps force-rename body))
 
 (defn delete-community [{user :shortUsername} name]
   (let [{:keys [id] :as result} (ipg/delete-community user name)]
