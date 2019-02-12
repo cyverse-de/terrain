@@ -362,17 +362,3 @@
        :return SubjectList
        :description "Searches for users or groups matching a search string."
        (ok (subjects/find-subjects current-user params))))))
-
-(defn secured-collaborator-routes
-  []
-  (optional-routes
-   [config/collaborator-routes-enabled]
-
-   (GET "/collaborators" []
-     (service/success-response (apps/get-collaborators)))
-
-   (POST "/collaborators" [:as {:keys [body]}]
-     (service/success-response (apps/add-collaborators body)))
-
-   (POST "/remove-collaborators" [:as {:keys [body]}]
-     (service/success-response (apps/remove-collaborators body)))))

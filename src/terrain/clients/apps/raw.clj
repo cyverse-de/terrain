@@ -847,31 +847,6 @@
                   :as               :stream
                   :follow-redirects false}))
 
-(defn get-collaborators
-  []
-  (client/get (apps-url "collaborators")
-              {:query-params     (secured-params)
-               :as               :stream
-               :follow-redirects false}))
-
-(defn add-collaborators
-  [body]
-  (client/post (apps-url "collaborators")
-               {:query-params     (secured-params)
-                :as               :stream
-                :body             body
-                :content-type     :json
-                :follow-redirects false}))
-
-(defn remove-collaborators
-  [body]
-  (client/post (apps-url "collaborators" "shredder")
-               {:query-params     (secured-params)
-                :as               :stream
-                :body             body
-                :content-type     :json
-                :follow-redirects false}))
-
 (defn get-users-by-id
   [body]
   (client/post (apps-url "users" "by-id")

@@ -78,7 +78,6 @@
     (secured-notification-routes)
     (secured-metadata-routes)
     (secured-pref-routes)
-    (secured-collaborator-routes)
     (secured-user-info-routes)
     (secured-data-routes)
     (secured-session-routes)
