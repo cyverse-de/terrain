@@ -279,6 +279,9 @@
         privileges-for (get-user-community-privileges user)]
     {:groups (mapv (partial format-community memberships privileges-for) (:groups team-listing))}))
 
+(defn admin-get-communities [user params]
+  (get-teams* group-type-communities user params))
+
 (defn- grant-initial-team-privileges [client user group initial-admin public-privileges]
   (c/update-group-privileges client user group
                              {:updates [{:subject_id initial-admin :privileges ["admin"]}

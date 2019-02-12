@@ -44,7 +44,7 @@
   (ipg/leave-community user name))
 
 (defn admin-get-communities [params]
-  (get-communities {:shortUsername (config/grouper-user)} params))
+  (ipg/admin-get-communities (config/grouper-user) params))
 
 (defn admin-get-community [name]
   (get-community {:shortUsername (config/grouper-user)} name))
