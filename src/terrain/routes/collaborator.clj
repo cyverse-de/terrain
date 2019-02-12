@@ -294,10 +294,15 @@
        :summary "List Communities"
        :query [params CommunityListingParams]
        :return AdminCommunityListing
+       :description "List or search for communities."
        (ok (communities/admin-get-communities params)))
 
-     (POST "/" [:as {:keys [body]}]
-       (service/success-response (communities/add-community current-user (service/decode-json body))))
+     (POST "/" []
+       :summary "Add a Community"
+       :body [body AddCommunityRequest]
+       :return Community
+       :description "Adds a community to the Discovery Environment."
+       (ok (communities/add-community current-user body)))
 
      (context "/:name" []
        :path-params [name :- CommunityNamePathParam]
