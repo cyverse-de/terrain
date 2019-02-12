@@ -199,88 +199,88 @@
          (ok (teams/leave current-user name)))))))
 
 (defn community-routes
-  ([]
-   optional-routes
-   [config/collaborator-routes-enabled]
+  []
+  optional-routes
+  [config/collaborator-routes-enabled]
 
-   (context "/communities" []
-     :tags ["communities"]
+  (context "/communities" []
+    :tags ["communities"]
 
-     (GET "/" []
-       :summary "List Communities"
-       :query [params CommunityListingParams]
-       :return CommunityListing
-       :description "List or search for communities."
-       (ok (communities/get-communities current-user params)))
+    (GET "/" []
+      :summary "List Communities"
+      :query [params CommunityListingParams]
+      :return CommunityListing
+      :description "List or search for communities."
+      (ok (communities/get-communities current-user params)))
 
-     (POST "/" []
-       :summary "Add a Community"
-       :body [body AddCommunityRequest]
-       :return Community
-       :description "Adds a community to the Discovery Environment."
-       (ok (communities/add-community current-user body)))
+    (POST "/" []
+      :summary "Add a Community"
+      :body [body AddCommunityRequest]
+      :return Community
+      :description "Adds a community to the Discovery Environment."
+      (ok (communities/add-community current-user body)))
 
-     (context "/:name" []
-       :path-params [name :- CommunityNamePathParam]
+    (context "/:name" []
+      :path-params [name :- CommunityNamePathParam]
 
-       (GET "/" [name]
-         :summary "Get Community Information"
-         :return Community
-         :description "Returns information about the community with the given name."
-         (ok (communities/get-community current-user name)))
+      (GET "/" [name]
+        :summary "Get Community Information"
+        :return Community
+        :description "Returns information about the community with the given name."
+        (ok (communities/get-community current-user name)))
 
-       (PATCH "/" []
-         :summary "Update a Community"
-         :query [params UpdateCommunityParams]
-         :body [body UpdateCommunityRequest]
-         :return Community
-         :description "Updates the name or description of a community."
-         (ok (communities/update-community current-user name params body)))
+      (PATCH "/" []
+        :summary "Update a Community"
+        :query [params UpdateCommunityParams]
+        :body [body UpdateCommunityRequest]
+        :return Community
+        :description "Updates the name or description of a community."
+        (ok (communities/update-community current-user name params body)))
 
-       (DELETE "/" []
-         :summary "Delete a Community"
-         :return CommunityStub
-         :description "Removes a community from the Discoevery Environment."
-         (ok (communities/delete-community current-user name)))
+      (DELETE "/" []
+        :summary "Delete a Community"
+        :return CommunityStub
+        :description "Removes a community from the Discoevery Environment."
+        (ok (communities/delete-community current-user name)))
 
-       (context "/admins" []
-         (GET "/" []
-           :summary "List Community Administrators"
-           :return CommunityAdmins
-           :description "Lists the administrators of community in the Discovery Environment."
-           (ok (communities/get-community-admins current-user name)))
+      (context "/admins" []
+        (GET "/" []
+          :summary "List Community Administrators"
+          :return CommunityAdmins
+          :description "Lists the administrators of community in the Discovery Environment."
+          (ok (communities/get-community-admins current-user name)))
 
-         (POST "/" []
-           :summary "Add Community Administrators"
-           :body [body group-schema/GroupMembersUpdate]
-           :return group-schema/GroupMembersUpdateResponse
-           :description "Add one or more administrators to a community in the Discoevery Environment."
-           (ok (communities/add-community-admins current-user name body)))
+        (POST "/" []
+          :summary "Add Community Administrators"
+          :body [body group-schema/GroupMembersUpdate]
+          :return group-schema/GroupMembersUpdateResponse
+          :description "Add one or more administrators to a community in the Discoevery Environment."
+          (ok (communities/add-community-admins current-user name body)))
 
-         (POST "/deleter" [name :as {:keys [body]}]
-           :summary "Remove Community Administrators"
-           :body [body group-schema/GroupMembersUpdate]
-           :return group-schema/GroupMembersUpdateResponse
-           :description "Remove one or more administrators from a community in the Discoevery Environment."
-           (ok (communities/remove-community-admins current-user name body))))
+        (POST "/deleter" [name :as {:keys [body]}]
+          :summary "Remove Community Administrators"
+          :body [body group-schema/GroupMembersUpdate]
+          :return group-schema/GroupMembersUpdateResponse
+          :description "Remove one or more administrators from a community in the Discoevery Environment."
+          (ok (communities/remove-community-admins current-user name body))))
 
-       (GET "/members" []
-         :summary "List Community Members"
-         :return CommunityMembers
-         :description "Lists the members of a community in the Discoevery Environment."
-         (ok (communities/get-community-members current-user name)))
+      (GET "/members" []
+        :summary "List Community Members"
+        :return CommunityMembers
+        :description "Lists the members of a community in the Discoevery Environment."
+        (ok (communities/get-community-members current-user name)))
 
-       (POST "/join" []
-         :summary "Join a Community"
-         :return group-schema/GroupMembersUpdateResponse
-         :description "Allows the caller to join a community, provided that he or she has permission to do so."
-         (ok (communities/join current-user name)))
+      (POST "/join" []
+        :summary "Join a Community"
+        :return group-schema/GroupMembersUpdateResponse
+        :description "Allows the caller to join a community, provided that he or she has permission to do so."
+        (ok (communities/join current-user name)))
 
-       (POST "/leave" []
-         :summary "Leave a Community"
-         :return group-schema/GroupMembersUpdateResponse
-         :description "Allows the caller to leave a community."
-         (ok (communities/leave current-user name)))))))
+      (POST "/leave" []
+        :summary "Leave a Community"
+        :return group-schema/GroupMembersUpdateResponse
+        :description "Allows the caller to leave a community."
+        (ok (communities/leave current-user name))))))
 
 (defn admin-community-routes
   []
