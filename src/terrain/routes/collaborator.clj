@@ -321,15 +321,18 @@
          :description "Updates the name or description of a community."
          (ok (communities/admin-update-community name params body)))
 
-       (DELETE "/" [name]
+       (DELETE "/" []
          :summary "Delete a Community"
          :return CommunityStub
          :description "Removes a community from the Discoevery Environment."
          (ok (communities/admin-delete-community name)))
 
        (context "/admins" []
-         (GET "/" [name]
-           (service/success-response (communities/admin-get-community-admins name)))
+         (GET "/" []
+           :summary "List Community Administrators"
+           :return CommunityAdmins
+           :description "Lists the administrators of community in the Discovery Environment."
+           (ok (communities/admin-get-community-admins name)))
 
          (POST "/" [name :as {:keys [body]}]
            (service/success-response (communities/admin-add-community-admins name (service/decode-json body))))
