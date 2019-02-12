@@ -307,8 +307,11 @@
      (context "/:name" []
        :path-params [name :- CommunityNamePathParam]
 
-       (GET "/" [name]
-         (service/success-response (communities/admin-get-community name)))
+       (GET "/" []
+         :summary "Get Community Information"
+         :return Community
+         :description "Returns information about the community with the given name."
+         (ok (communities/admin-get-community name)))
 
        (PATCH "/" [name :as {:keys [params body]}]
          (service/success-response (communities/admin-update-community name params (service/decode-json body))))
