@@ -353,8 +353,15 @@
   (optional-routes
    [config/collaborator-routes-enabled]
 
-   (GET "/subjects" [:as {:keys [params]}]
-     (service/success-response (subjects/find-subjects current-user params)))))
+   (context "/subjects" []
+     :tags ["subjects"]
+
+     (GET "/" []
+       :summary "Search for Users or Groups"
+       :query [params SubjectSearchParams]
+       :return SubjectList
+       :description "Searches for users or groups matching a search string."
+       (ok (subjects/find-subjects current-user params))))))
 
 (defn secured-collaborator-routes
   []

@@ -1,12 +1,12 @@
 (ns terrain.routes.schemas.collaborator
-  (:use [common-swagger-api.schema :only [describe]]
+  (:use [common-swagger-api.schema :only [describe NonBlankString]]
         [schema.core :only [defschema optional-key]])
   (:require [common-swagger-api.schema.groups :as group-schema]
             [common-swagger-api.schema.subjects :as subject-schema]))
 
 (defn group-member [group-descriptor member-descriptor]
   (assoc subject-schema/Subject
-    :display_name (describe String (str "The displayable " group-descriptor " " member-descriptor " name"))))
+    :display_name (describe NonBlankString (str "The displayable " group-descriptor " " member-descriptor " name"))))
 
 (defn group-members [group-descriptor member-descriptor member-descriptor-plural]
   {:members (describe [(group-member group-descriptor member-descriptor)]
@@ -14,11 +14,11 @@
 
 ;; Collaborator List Schemas
 
-(def CollaboratorListNamePathParam (describe String "The name of the collaborator list"))
+(def CollaboratorListNamePathParam (describe NonBlankString "The name of the collaborator list"))
 
 (defschema CollaboratorListSearchParams
   {(optional-key :search)
-   (describe String "The collaborator list name substring to search for")})
+   (describe NonBlankString "The collaborator list name substring to search for")})
 
 (defschema CollaboratorListRetainPermissionsParams
   {(optional-key :retain-permissions)
@@ -35,22 +35,22 @@
 ;; Team Schemas
 
 (def TeamNamePathParam
-  (describe String "The name of the team, including the username prefix (e.g. `username:team-name`)"))
+  (describe NonBlankString "The name of the team, including the username prefix (e.g. `username:team-name`)"))
 
 (def TeamRequesterPathParam
-  (describe String "The username of the person requesting to join the team"))
+  (describe NonBlankString "The username of the person requesting to join the team"))
 
 (defn team-listing-params [descriptor plural-descriptor]
   {(optional-key :search)
-   (describe String (str "The " descriptor " name substring to search for"))
+   (describe NonBlankString (str "The " descriptor " name substring to search for"))
 
    (optional-key :creator)
-   (describe String (str "Only " plural-descriptor " created by the user with this username will be listed if "
-                         "specified"))
+   (describe NonBlankString (str "Only " plural-descriptor " created by the user with this username will be listed if "
+                                 "specified"))
 
    (optional-key :member)
-   (describe String (str "Only " plural-descriptor " to which the user with this username belongs will be listed "
-                         "if specified"))})
+   (describe NonBlankString (str "Only " plural-descriptor " to which the user with this username belongs will be "
+                                 "listed if specified"))})
 
 (defschema TeamListingParams (team-listing-params "team" "teams"))
 
@@ -72,7 +72,7 @@
 
 ;; Community Schemas
 
-(def CommunityNamePathParam (describe String "The name of the community"))
+(def CommunityNamePathParam (describe NonBlankString "The name of the community"))
 
 (defschema CommunityListingParams
   (dissoc (team-listing-params "community" "communities") (optional-key :creator)))
@@ -80,7 +80,7 @@
 (defschema CommunityListingEntry
   (assoc (group-schema/group "community")
     :member     (describe Boolean "True if the authenticated user belongs to the community")
-    :privileges (describe [String] "The privileges the authenticated has for the community")))
+    :privileges (describe [NonBlankString] "The privileges the authenticated user has for the community")))
 
 (defschema CommunityListing
   {:groups (describe [CommunityListingEntry] "The list of communities in the result set")})
@@ -110,3 +110,15 @@
 ;; Admin Community Schemas
 
 (defschema AdminCommunityListing (group-schema/group-list "community" "communities"))
+
+;; Subject Schemas
+
+(defschema SubjectSearchParams
+  {:search (describe NonBlankString "A substring to search for in the subject information")})
+
+(defschema SubjectListEntry
+  (assoc subject-schema/Subject
+    :display_name (describe NonBlankString "The displayable subject name")))
+
+(defschema SubjectList
+  {:subjects (describe [SubjectListEntry] "The list of subjects in the result set")})
