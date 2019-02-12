@@ -88,7 +88,7 @@
 
 (defn send-community-admin-add-notification
   [user team-name]
-  (send-notification {:type           "team"
+  (send-notification {:type           "community"
                       :user           (:id user)
                       :subject        (format "Added as community admin to %s" team-name)
                       :email          true
