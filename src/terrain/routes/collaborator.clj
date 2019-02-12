@@ -247,7 +247,7 @@
         (GET "/" []
           :summary "List Community Administrators"
           :return CommunityAdmins
-          :description "Lists the administrators of community in the Discovery Environment."
+          :description "Lists the administrators of a community in the Discovery Environment."
           (ok (communities/get-community-admins current-user name)))
 
         (POST "/" []
@@ -331,7 +331,7 @@
          (GET "/" []
            :summary "List Community Administrators"
            :return CommunityAdmins
-           :description "Lists the administrators of community in the Discovery Environment."
+           :description "Lists the administrators of a community in the Discovery Environment."
            (ok (communities/admin-get-community-admins name)))
 
          (POST "/" []
