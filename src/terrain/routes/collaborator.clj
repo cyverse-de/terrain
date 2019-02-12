@@ -290,8 +290,11 @@
    (context "/communities" []
      :tags ["admin-communities"]
 
-     (GET "/" [:as {:keys [params]}]
-       (service/success-response (communities/admin-get-communities params)))
+     (GET "/" []
+       :summary "List Communities"
+       :query [params CommunityListingParams]
+       :return AdminCommunityListing
+       (ok (communities/admin-get-communities params)))
 
      (POST "/" [:as {:keys [body]}]
        (service/success-response (communities/add-community current-user (service/decode-json body))))
