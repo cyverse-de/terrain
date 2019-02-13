@@ -5,9 +5,9 @@ underneath the password text box.
 
 Once you have the access token, you can use it to authorize calls to other endpoints in the Swagger UI.  First, remove
 the basic authentication credentials by clicking the Authorize button above and clicking the Logout button in the `Basic
-authenitcation` section of authorization window. Second, click the Authorization button again and type the word
-\"Bearer\" followed by a single space in the Value text box of the `Api key authorization` section of the window. Paste
-in the access token from this endpoint's response body then click the Authorize button underneath the Value text box.
+authenitcation` section of authorization window. Second, click the Authorization button again and type the word `Bearer`
+followed by a single space in the Value text box of the `Api key authorization` section of the window. Paste in the
+access token from this endpoint's response body then click the Authorize button underneath the Value text box.
 
 You can use `curl` and `jq`, which is available from [the jq web site](https://stedolan.github.io/jq/), to obtain an
 access token from the command line. The easiest way to do this on Unix-like operating systems is to define an
