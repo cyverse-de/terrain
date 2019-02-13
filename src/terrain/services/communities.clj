@@ -5,7 +5,7 @@
             [terrain.util.config :as config]))
 
 (defn get-communities [{user :shortUsername} params]
-  (ipg/get-communities user (select-keys params [:search :creator :member])))
+  (ipg/get-communities user (select-keys params [:search :member])))
 
 (defn add-community [{user :shortUsername} body]
   (ipg/add-community user (assoc body :public_privileges ["read","optin"])))
@@ -14,7 +14,7 @@
   (ipg/get-community user name))
 
 (defn update-community [{user :shortUsername} name {:keys [retag-apps force-rename]} body]
-  (ipg/update-community user name (Boolean/parseBoolean retag-apps) (Boolean/parseBoolean force-rename) body))
+  (ipg/update-community user name retag-apps force-rename body))
 
 (defn delete-community [{user :shortUsername} name]
   (let [{:keys [id] :as result} (ipg/delete-community user name)]
@@ -44,7 +44,7 @@
   (ipg/leave-community user name))
 
 (defn admin-get-communities [params]
-  (get-communities {:shortUsername (config/grouper-user)} params))
+  (ipg/admin-get-communities (config/grouper-user) params))
 
 (defn admin-get-community [name]
   (get-community {:shortUsername (config/grouper-user)} name))

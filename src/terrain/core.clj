@@ -79,13 +79,13 @@
   [req]
   (tc/with-logging-context svc-info
     (require 'terrain.routes)
-    ((eval 'terrain.routes/app) req)))
+    ((eval 'terrain.routes/app-wrapper) req)))
 
 (defn run-jetty
   []
   (require 'terrain.routes 'ring.adapter.jetty)
   (log/warn "Started listening on" (config/listen-port))
-  ((eval 'ring.adapter.jetty/run-jetty) (eval 'terrain.routes/app) {:port (config/listen-port)}))
+  ((eval 'ring.adapter.jetty/run-jetty) (eval 'terrain.routes/app-wrapper) {:port (config/listen-port)}))
 
 (defn -main
   [& args]

@@ -28,7 +28,7 @@
     list))
 
 (defn delete-collaborator-list [{user :shortUsername} name {retain-permissions? :retain-permissions}]
-  (if (Boolean/parseBoolean retain-permissions?)
+  (if retain-permissions?
     (let [subjects (mapv perms-subject-for (:members (ipg/get-collaborator-list-members user name)))]
       (delete-collaborator-list* user name (fn [group-id] (perms-client/copy-permissions "group" group-id subjects))))
     (delete-collaborator-list* user name)))
@@ -47,6 +47,6 @@
   [{user :shortUsername} name {:keys [members]} {retain-permissions? :retain-permissions}]
   (let [group-id (:id (ipg/get-collaborator-list user name))
         results  (ipg/remove-collaborator-list-members user name members)]
-    (when (Boolean/parseBoolean retain-permissions?)
+    (when retain-permissions?
       (copy-collaborator-list-permissions user group-id results))
     results))

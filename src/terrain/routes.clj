@@ -6,7 +6,7 @@
         [ring.middleware.keyword-params :only [wrap-keyword-params]]
         [service-logging.middleware :only [wrap-logging clean-context]]
         [terrain.auth.user-attributes]
-        [terrain.middleware :only [wrap-context-path-remover]]
+        [terrain.middleware :only [wrap-context-path-adder]]
         [terrain.routes.admin]
         [terrain.routes.data]
         [terrain.routes.permanent-id-requests]
@@ -78,7 +78,6 @@
     (secured-notification-routes)
     (secured-metadata-routes)
     (secured-pref-routes)
-    (secured-collaborator-routes)
     (secured-user-info-routes)
     (secured-data-routes)
     (secured-session-routes)
@@ -162,7 +161,6 @@
 (defn- site-handler
   [routes-fn]
   (-> (routes-fn)
-      (wrap-context-path-remover "/terrain")
       wrap-keyword-params
       wrap-lcase-params
       wrap-query-params
@@ -177,18 +175,26 @@
 (defapi app
   {:exceptions cx/exception-handlers}
   (swagger-routes
-   {:ui       config/docs-uri
+   {:ui       (str "/terrain" config/docs-uri)
+    :spec     "/terrain/swagger.json"
     :data     {:info                {:title       "Discovery Environment API"
                                      :description "Documentation for the Discovery Environment REST API"
                                      :version     "0.1.0"}
                :tags                [{:name "admin", :description "General Admin Endpoints"}
+                                     {:name "admin-communities", :description "Community Administration Endpoints"}
                                      {:name "coge", :description "CoGe Endpoints"}
+                                     {:name "collaborator-lists", :description "Collaborator List Endpoints"}
+                                     {:name "communities", :description "Community Endpoints"}
+                                     {:name "subjects", :description "Subject Endpoints"}
+                                     {:name "teams", :description "Team Endpoints"}
                                      {:name "token", :description "OAuth Tokens"}]
                :securityDefinitions security-definitions}})
   (middleware
-   [[wrap-context-path-remover "/terrain"]
-    wrap-keyword-params
+   [wrap-keyword-params
     wrap-lcase-params
     wrap-query-params
     clean-context]
-   (terrain-routes)))
+   (context "/terrain" []
+     (terrain-routes))))
+
+(def app-wrapper (wrap-context-path-adder app "/terrain"))

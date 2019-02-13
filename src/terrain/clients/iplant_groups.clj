@@ -258,7 +258,28 @@
 (defn get-teams [user params]
   (get-teams* group-type-teams user params))
 
-(defn get-communities [user params]
+(defn- get-user-community-privileges [user]
+  (let [client (get-client)
+        folder (get-team-folder-name client group-type-communities)
+        regex  (re-pattern (str "^\\Q" folder ":"))]
+    (->> (c/list-subject-privileges client (config/grouper-user) user {:entity-type "group" :folder folder})
+         :privileges
+         (map (fn [{privilege :name {group :name} :group}] {(string/replace group regex "") #{privilege}}))
+         (apply merge-with into))))
+
+(defn- format-community [memberships privileges-for team]
+  (assoc team
+    :member     (contains? memberships (:name team))
+    :privileges (vec (get privileges-for (:name team) []))))
+
+(defn get-communities [user {:keys [member] :as params}]
+  (let [team-listing   (get-teams* group-type-communities user params)
+        teams-for-user (if (= user member) team-listing (get-teams* group-type-communities user {:member user}))
+        memberships    (->> teams-for-user :groups (map :name) set)
+        privileges-for (get-user-community-privileges user)]
+    {:groups (mapv (partial format-community memberships privileges-for) (:groups team-listing))}))
+
+(defn admin-get-communities [user params]
   (get-teams* group-type-communities user params))
 
 (defn- grant-initial-team-privileges [client user group initial-admin public-privileges]
