@@ -95,7 +95,7 @@
 
 (defschema UpdateCommunityParams
   {(optional-key :retag-apps)
-   (describe Boolean "Set to `true` to cause apps that are associated with the community to be retagged")
+   (describe Boolean "Set to `true` to cause apps that are associated with a renamed community to be retagged")
 
    (optional-key :force-rename)
    (describe Boolean "Set to `true` to force the community to be renamed even if apps are associated with it")})
