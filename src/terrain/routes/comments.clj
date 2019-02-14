@@ -1,9 +1,10 @@
 (ns terrain.routes.comments
   (:use [common-swagger-api.schema]
-        [common-swagger-api.schema.metadata.comments]
         [ring.util.http-response :only [ok]]
+        [terrain.routes.schemas.comments]
         [terrain.routes.schemas.filesystem])
-  (:require [terrain.services.metadata.comments :as comments]
+  (:require [common-swagger-api.schema.metadata.comments :as comment-schema]
+            [terrain.services.metadata.comments :as comments]
             [terrain.util :as util]
             [terrain.util.config :as config]))
 
@@ -18,19 +19,24 @@
 
       (GET "/" []
         :summary "Get File or Folder Comments"
-        :return CommentList
+        :return comment-schema/CommentList
         :description "Lists all of the comments associated with a file or foler in the data store."
         (ok (comments/list-data-comments entry-id)))
 
       (POST "/" []
         :summary "Add a File or Folder Comment"
-        :body [body (describe CommentRequest "The comment to add")]
-        :return CommentResponse
+        :body [body (describe comment-schema/CommentRequest "The comment to add")]
+        :return comment-schema/CommentResponse
         :description "Adds a comment to the file or folder with the given ID."
         (ok (comments/add-data-comment entry-id body)))
 
-      (PATCH "/:comment-id" [entry-id comment-id retracted]
-        (comments/update-data-retract-status entry-id comment-id retracted)))))
+      (PATCH "/:comment-id" []
+        :summary "Retract or Readmit a File or Folder Comment"
+        :path-params [comment-id :- comment-schema/CommentIdPathParam]
+        :query [{:keys [retracted]} RetractCommentQueryParams]
+        :description-file "docs/patch-data-entry-comment.md"
+        (comments/update-data-retract-status entry-id comment-id retracted)
+        (ok)))))
 
 (defn admin-data-comment-routes
   []
