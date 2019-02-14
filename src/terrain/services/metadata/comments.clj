@@ -117,7 +117,7 @@
 
 (defn delete-data-comment
   [entry-id comment-id]
-  (metadata/delete-data-comment (extract-entry-id entry-id) (valid/extract-uri-uuid comment-id)))
+  (metadata/delete-data-comment entry-id comment-id))
 
 (defn delete-app-comment
   [app-id comment-id]

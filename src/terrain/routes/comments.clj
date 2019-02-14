@@ -43,9 +43,16 @@
   (util/optional-routes
     [#(and (config/filesystem-routes-enabled) (config/metadata-routes-enabled))]
 
-    (DELETE "/filesystem/entry/:entry-id/comments/:comment-id"
-      [entry-id comment-id]
-      (comments/delete-data-comment entry-id comment-id))))
+    (context "/filsystem/entry/:entry-id/comments" []
+      :path-params [entry-id :- DataIdPathParam]
+      :tags ["admin-filesystem"]
+
+      (DELETE "/:comment-id" []
+        :summary "Delete a File or Folder Comment"
+        :path-params [comment-id :- comment-schema/CommentIdPathParam]
+        :description "Allows an administrator to delete a file or folder comment."
+        (comments/delete-data-comment entry-id comment-id)
+        (ok)))))
 
 (defn app-comment-routes
   []
