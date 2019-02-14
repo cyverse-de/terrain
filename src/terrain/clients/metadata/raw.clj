@@ -69,9 +69,9 @@
 
 (defn list-data-comments
   [target-id]
-  (http/get (metadata-url "filesystem" "data" target-id "comments")
-            {:as               :stream
-             :follow_redirects false}))
+  (:body (http/get (metadata-url "filesystem" "data" target-id "comments")
+                   {:as               :json
+                    :follow_redirects false})))
 
 (defn list-app-comments
   [target-id]

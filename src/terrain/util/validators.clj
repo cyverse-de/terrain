@@ -48,9 +48,11 @@
    Throws:
      It throws an ERR_NOT_FOUND if the text isn't a UUID."
   [uuid-txt]
-  (try+
-    (UUID/fromString uuid-txt)
-    (catch IllegalArgumentException _ (throw+ {:error_code ERR_NOT_FOUND}))))
+  (if (instance? UUID uuid-txt)
+    uuid-txt
+    (try+
+     (UUID/fromString uuid-txt)
+     (catch IllegalArgumentException _ (throw+ {:error_code ERR_NOT_FOUND})))))
 
 
 (defn ^Boolean good-string?

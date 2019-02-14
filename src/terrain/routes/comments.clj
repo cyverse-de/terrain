@@ -1,5 +1,8 @@
 (ns terrain.routes.comments
-  (:use [common-swagger-api.schema :only [DELETE GET PATCH POST]])
+  (:use [common-swagger-api.schema]
+        [common-swagger-api.schema.metadata.comments]
+        [ring.util.http-response :only [ok]]
+        [terrain.routes.schemas.filesystem])
   (:require [terrain.services.metadata.comments :as comments]
             [terrain.util :as util]
             [terrain.util.config :as config]))
@@ -9,15 +12,21 @@
   (util/optional-routes
     [#(and (config/filesystem-routes-enabled) (config/metadata-routes-enabled))]
 
-    (GET "/filesystem/entry/:entry-id/comments" [entry-id]
-         (comments/list-data-comments entry-id))
+    (context "/filesystem/entry/:entry-id/comments" []
+      :path-params [entry-id :- DataIdPathParam]
+      :tags ["filesystem"]
 
-    (POST "/filesystem/entry/:entry-id/comments" [entry-id :as {body :body}]
-          (comments/add-data-comment entry-id body))
+      (GET "/" []
+        :summary "Get File or Folder Comments"
+        :return CommentList
+        :description "Lists all of the comments associated with a file or foler in the data store."
+        (ok (comments/list-data-comments entry-id)))
 
-    (PATCH "/filesystem/entry/:entry-id/comments/:comment-id"
-           [entry-id comment-id retracted]
-           (comments/update-data-retract-status entry-id comment-id retracted))))
+      (POST "/" [entry-id :as {body :body}]
+        (comments/add-data-comment entry-id body))
+
+      (PATCH "/:comment-id" [entry-id comment-id retracted]
+        (comments/update-data-retract-status entry-id comment-id retracted)))))
 
 (defn admin-data-comment-routes
   []
