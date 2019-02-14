@@ -6,7 +6,7 @@
         [ring.middleware.keyword-params :only [wrap-keyword-params]]
         [service-logging.middleware :only [wrap-logging clean-context]]
         [terrain.auth.user-attributes]
-        [terrain.middleware :only [wrap-context-path-adder]]
+        [terrain.middleware :only [wrap-context-path-adder wrap-query-param-remover]]
         [terrain.routes.admin]
         [terrain.routes.data]
         [terrain.routes.permanent-id-requests]
@@ -191,10 +191,13 @@
                :securityDefinitions security-definitions}})
   (middleware
    [wrap-keyword-params
-    wrap-lcase-params
-    wrap-query-params
     clean-context]
    (context "/terrain" []
      (terrain-routes))))
 
-(def app-wrapper (wrap-context-path-adder app "/terrain"))
+(def app-wrapper
+  (-> app
+      (wrap-query-param-remover "ip-address" #{#"^/terrain/secured/bootstrap$"})
+      (wrap-context-path-adder "/terrain")
+      wrap-lcase-params
+      wrap-query-params))
