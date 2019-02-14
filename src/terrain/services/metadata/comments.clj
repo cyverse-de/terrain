@@ -10,13 +10,11 @@
             [terrain.util.config :as config]
             [terrain.util.validators :as valid]))
 
-(defn- extract-accessible-entry-id
-  [user entry-id-txt]
+(defn- validate-entry-id-accessible
+  [user entry-id]
   (try+
-    (let [entry-id (valid/extract-uri-uuid entry-id-txt)]
-      (data/validate-uuid-accessible user entry-id)
-      entry-id)
-    (catch [:error_code err/ERR_DOES_NOT_EXIST] _ (throw+ {:error_code err/ERR_NOT_FOUND}))))
+   (data/validate-uuid-accessible user entry-id)
+   (catch [:error_code err/ERR_DOES_NOT_EXIST] _ (throw+ {:error_code err/ERR_NOT_FOUND}))))
 
 (defn- extract-entry-id
   [entry-id-txt]
@@ -48,7 +46,7 @@
      body - the request body. It should be a JSON document containing the comment"
   [entry-id body]
   (let [user     (:shortUsername user/current-user)
-        entry-id (extract-accessible-entry-id user entry-id)
+        _        (validate-entry-id-accessible user entry-id)
         tgt-type (data/resolve-data-type entry-id)]
     (metadata/add-data-comment entry-id tgt-type body)))
 
@@ -68,8 +66,8 @@
      entry-id - the `entry-id` from the request. This should be the UUID corresponding to the entry
                 being inspected"
   [entry-id]
-  (metadata/list-data-comments
-    (extract-accessible-entry-id (:shortUsername user/current-user) entry-id)))
+  (validate-entry-id-accessible (:shortUsername user/current-user) entry-id)
+  (metadata/list-data-comments entry-id))
 
 (defn list-app-comments
   "Returns a list of comments attached to a given App ID.
@@ -91,8 +89,7 @@
      retracted - the `retracted` query parameter. This should be either `true` or `false`."
   [entry-id comment-id retracted]
   (let [user        (:shortUsername user/current-user)
-        comment-id  (valid/extract-uri-uuid comment-id)
-        entry-id    (extract-accessible-entry-id user entry-id)
+        _           (validate-entry-id-accessible user entry-id)
         owns-entry? (= (keyword (:permission (data/stat-by-uuid user entry-id :filter-include "permission"))) :own)]
     (if owns-entry?
       (metadata/admin-update-data-retract-status entry-id comment-id retracted)
