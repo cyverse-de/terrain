@@ -23,5 +23,7 @@
         (handler request)
         (-> request
             (update-in [:params] dissoc query-param)
+            (update-in [:params] dissoc (keyword query-param))
             (update-in [:query-params] dissoc query-param)
+            (update-in [:query-params] dissoc (keyword query-param))
             handler)))))
