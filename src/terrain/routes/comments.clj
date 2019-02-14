@@ -22,8 +22,12 @@
         :description "Lists all of the comments associated with a file or foler in the data store."
         (ok (comments/list-data-comments entry-id)))
 
-      (POST "/" [entry-id :as {body :body}]
-        (comments/add-data-comment entry-id body))
+      (POST "/" []
+        :summary "Add a File or Folder Comment"
+        :body [body (describe CommentRequest "The comment to add")]
+        :return CommentResponse
+        :description "Adds a comment to the file or folder with the given ID."
+        (ok (comments/add-data-comment entry-id body)))
 
       (PATCH "/:comment-id" [entry-id comment-id retracted]
         (comments/update-data-retract-status entry-id comment-id retracted)))))

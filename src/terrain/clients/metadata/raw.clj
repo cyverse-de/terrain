@@ -40,13 +40,23 @@
 
 (defn post-options
   ([body]
-     (post-options body {}))
+   (post-options body {}))
   ([body params]
-     {:query-params     (user-params params)
-      :body             body
-      :content-type     :json
-      :as               :stream
-      :follow-redirects false}))
+   {:query-params     (user-params params)
+    :body             body
+    :content-type     :json
+    :as               :stream
+    :follow-redirects false}))
+
+(defn json-post-options
+  ([body]
+   (json-post-options body {}))
+  ([body params]
+   {:query-params     (user-params params)
+    :form-params      body
+    :content-type     :json
+    :as               :json
+    :follow-redirects false}))
 
 (def put-options post-options)
 
@@ -89,8 +99,8 @@
 
 (defn add-data-comment
   [target-id data-type body]
-  (http/post (metadata-url "filesystem" "data" target-id "comments")
-             (post-options body {:data-type data-type})))
+  (:body (http/post (metadata-url "filesystem" "data" target-id "comments")
+                    (json-post-options body {:data-type data-type}))))
 
 (defn add-app-comment
   [target-id body]

@@ -50,7 +50,7 @@
   (let [user     (:shortUsername user/current-user)
         entry-id (extract-accessible-entry-id user entry-id)
         tgt-type (data/resolve-data-type entry-id)]
-    (metadata/add-data-comment entry-id tgt-type (read-body body))))
+    (metadata/add-data-comment entry-id tgt-type body)))
 
 (defn add-app-comment
   "Adds a comment to an App.
