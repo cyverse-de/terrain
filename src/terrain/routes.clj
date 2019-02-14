@@ -6,7 +6,7 @@
         [ring.middleware.keyword-params :only [wrap-keyword-params]]
         [service-logging.middleware :only [wrap-logging clean-context]]
         [terrain.auth.user-attributes]
-        [terrain.middleware :only [wrap-context-path-adder]]
+        [terrain.middleware :only [wrap-context-path-adder wrap-query-param-remover]]
         [terrain.routes.admin]
         [terrain.routes.data]
         [terrain.routes.permanent-id-requests]
@@ -190,11 +190,13 @@
                                      {:name "token", :description "OAuth Tokens"}]
                :securityDefinitions security-definitions}})
   (middleware
-   [wrap-keyword-params
-    wrap-lcase-params
+   [[wrap-query-param-remover "ip-address" #{#"^/terrain/secured/bootstrap"}]
     wrap-query-params
+    wrap-lcase-params
+    wrap-keyword-params
     clean-context]
    (context "/terrain" []
      (terrain-routes))))
 
-(def app-wrapper (wrap-context-path-adder app "/terrain"))
+(def app-wrapper
+  (wrap-context-path-adder app "/terrain"))
