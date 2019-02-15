@@ -113,8 +113,11 @@
      (GET "/" []
        :summary "List Comments Added by a User"
        :return comment-schema/CommentDetailsList
-       :description "Allows and administrator to list all comments entered by a user."
+       :description "Allows an administrator to list all comments entered by a user."
        (ok (comments/list-comments-by-user commenter-id)))
 
-     (DELETE "/" [commenter-id]
-       (comments/delete-comments-by-user commenter-id)))))
+     (DELETE "/" []
+       :summary "Delete All Comments Added by a User"
+       :description "Allows an administrator to delete all comments entered by a user."
+       (comments/delete-comments-by-user commenter-id)
+       (ok)))))
