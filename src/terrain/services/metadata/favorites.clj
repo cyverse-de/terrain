@@ -46,8 +46,7 @@
      data-id - This is the `data-id` from the request.  It should be the UUID of the data item
                being marked."
   [data-id]
-  (let [user     (:shortUsername user/current-user)
-        data-id (UUID/fromString data-id)]
+  (let [user (:shortUsername user/current-user)]
     (data/validate-uuid-accessible user data-id)
     (metadata/add-favorite data-id (data/resolve-data-type data-id))))
 

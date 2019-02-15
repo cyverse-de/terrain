@@ -189,6 +189,7 @@
                                      {:name "coge", :description "CoGe Endpoints"}
                                      {:name "collaborator-lists", :description "Collaborator List Endpoints"}
                                      {:name "communities", :description "Community Endpoints"}
+                                     {:name "favorites", :description "Favorites Endpoints"}
                                      {:name "filesystem", :description "Filesystem Endpoints"}
                                      {:name "subjects", :description "Subject Endpoints"}
                                      {:name "teams", :description "Team Endpoints"}

@@ -1,5 +1,7 @@
 (ns terrain.routes.favorites
-  (:use [common-swagger-api.schema :only [DELETE GET POST PUT]])
+  (:use [common-swagger-api.schema :only [DELETE GET POST PUT context]]
+        [ring.util.http-response :only [ok]]
+        [terrain.routes.schemas.filesystem])
   (:require [terrain.services.metadata.favorites :as fave]
             [terrain.util :as util]
             [terrain.util.config :as config]))
@@ -10,17 +12,28 @@
   (util/optional-routes
    [#(and (config/filesystem-routes-enabled) (config/metadata-routes-enabled))]
 
-   (PUT "/favorites/filesystem/:entry-id" [entry-id]
-     (fave/add-favorite entry-id))
+   (context "/favorites" []
+     :tags ["favorites"]
 
-   (DELETE "/favorites/filesystem/:entry-id" [entry-id]
-     (fave/remove-favorite entry-id))
+     (context "/filesystem" []
 
-   (GET "/favorites/filesystem" [sort-col sort-dir limit offset entity-type info-type]
-     (fave/list-favorite-data-with-stat sort-col sort-dir limit offset entity-type info-type))
+       (context "/:entry-id" []
+         :path-params [entry-id :- DataIdPathParam]
 
-   (DELETE "/favorites/filesystem" [entity-type]
-     (fave/remove-selected-favorites entity-type))
+         (PUT "/" []
+           :summary "Add a Favorite File or Folder"
+           :description "Adds a file or folder to the list of favorites."
+           (fave/add-favorite entry-id)
+           (ok))
 
-   (POST "/favorites/filter" [:as {body :body}]
-     (fave/filter-accessible-favorites body))))
+         (DELETE "/" [entry-id]
+           (fave/remove-favorite entry-id)))
+
+       (GET "/" [sort-col sort-dir limit offset entity-type info-type]
+         (fave/list-favorite-data-with-stat sort-col sort-dir limit offset entity-type info-type))
+
+       (DELETE "/" [entity-type]
+         (fave/remove-selected-favorites entity-type)))
+
+     (POST "/filter" [:as {body :body}]
+       (fave/filter-accessible-favorites body)))))
