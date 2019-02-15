@@ -20,20 +20,6 @@
   [app-id]
   (apps/get-app-details config/de-system-id app-id))
 
-(defn- extract-app-id
-  [app-id]
-  (let [app-uuid (valid/extract-uri-uuid app-id)]
-    (apps/get-app-details config/de-system-id app-uuid)
-    app-uuid))
-
-(defn- read-body
-  [stream]
-  (try+
-    (slurp stream)
-    (catch OutOfMemoryError _
-      (throw+ {:error_code err/ERR_REQUEST_BODY_TOO_LARGE}))))
-
-
 (defn add-data-comment
   "Adds a comment to a filesystem entry.
 
@@ -115,7 +101,7 @@
 
 (defn delete-app-comment
   [app-id comment-id]
-  (metadata/delete-app-comment (extract-app-id app-id) (valid/extract-uri-uuid comment-id)))
+  (metadata/delete-app-comment app-id comment-id))
 
 (defn list-comments-by-user
   "Lists all of the comments that were entered by the given user.

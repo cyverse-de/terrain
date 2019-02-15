@@ -90,9 +90,16 @@
   (util/optional-routes
     [#(and (config/app-routes-enabled) (config/metadata-routes-enabled))]
 
-    (DELETE "/apps/:app-id/comments/:comment-id"
-      [app-id comment-id]
-      (comments/delete-app-comment app-id comment-id))))
+    (context "/apps/:app-id/comments" []
+      :path-params [app-id :- app-schema/AppIdParam]
+      :tags ["admin-apps"]
+
+      (DELETE "/:comment-id" []
+        :summary "Delete an App Comment"
+        :path-params [comment-id :- comment-schema/CommentIdPathParam]
+        :description "Allows an administrator to delete an app comment."
+        (comments/delete-app-comment app-id comment-id)
+        (ok)))))
 
 (defn admin-comment-routes
   []
