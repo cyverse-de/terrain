@@ -77,8 +77,13 @@
         :description "Adds a comment to the app with the given ID."
         (ok (comments/add-app-comment app-id body)))
 
-      (PATCH "/:comment-id" [app-id comment-id retracted]
-        (comments/update-app-retract-status app-id comment-id retracted)))))
+      (PATCH "/:comment-id" []
+        :summary "Retract or Readmit an App Comment"
+        :path-params [comment-id :- comment-schema/CommentIdPathParam]
+        :query [{:keys [retracted]} RetractCommentQueryParams]
+        :description-file "docs/patch-app-comment.md"
+        (comments/update-app-retract-status app-id comment-id retracted)
+        (ok)))))
 
 (defn admin-app-comment-routes
   []

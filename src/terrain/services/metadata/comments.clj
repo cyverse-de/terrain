@@ -103,9 +103,7 @@
                   comment being modified
      retracted - the `retracted` query parameter. This should be either `true` or `false`."
   [app-id comment-id retracted]
-  (let [app-id     (valid/extract-uri-uuid app-id)
-        comment-id (valid/extract-uri-uuid comment-id)
-        app        (apps/get-app-details config/de-system-id app-id)
+  (let [app        (apps/get-app-details config/de-system-id app-id)
         owns-app?  (validators/user-owns-app? user/current-user app)]
     (if owns-app?
       (metadata/admin-update-app-retract-status app-id comment-id retracted)
