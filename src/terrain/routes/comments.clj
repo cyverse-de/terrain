@@ -106,8 +106,15 @@
   (util/optional-routes
    [#(and (config/app-routes-enabled) (config/metadata-routes-enabled))]
 
-   (GET "/comments/:commenter-id" [commenter-id]
-     (comments/list-comments-by-user commenter-id))
+   (context "/comments/:commenter-id" []
+     :path-params [commenter-id :- comment-schema/CommenterId]
+     :tags ["admin-comments"]
 
-   (DELETE "/comments/:commenter-id" [commenter-id]
-     (comments/delete-comments-by-user commenter-id))))
+     (GET "/" []
+       :summary "List Comments Added by a User"
+       :return comment-schema/CommentDetailsList
+       :description "Allows and administrator to list all comments entered by a user."
+       (ok (comments/list-comments-by-user commenter-id)))
+
+     (DELETE "/" [commenter-id]
+       (comments/delete-comments-by-user commenter-id)))))

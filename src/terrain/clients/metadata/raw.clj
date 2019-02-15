@@ -28,13 +28,21 @@
 
 (defn get-options
   ([]
-     (get-options {}))
+   (get-options {}))
   ([params]
-     {:query-params     (user-params params)
-      :as               :stream
-      :follow-redirects false})
+   {:query-params     (user-params params)
+    :as               :stream
+    :follow-redirects false})
   ([params param-keys]
-    (get-options (user-params params param-keys))))
+   (get-options (user-params params param-keys))))
+
+(defn json-get-options
+  ([]
+   (json-get-options {}))
+  ([params]
+   {:query-params     (user-params params)
+    :as               :json
+    :follow-redirects false}))
 
 (def delete-options get-options)
 
@@ -91,7 +99,7 @@
 
 (defn list-comments-by-user
   [commenter-id]
-  (http/get (metadata-url "admin" "comments" commenter-id) (get-options)))
+  (:body (http/get (metadata-url "admin" "comments" commenter-id) (json-get-options))))
 
 (defn delete-comments-by-user
   [commenter-id]
