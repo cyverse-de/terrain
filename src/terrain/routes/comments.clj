@@ -21,7 +21,7 @@
       (GET "/" []
         :summary "Get File or Folder Comments"
         :return comment-schema/CommentList
-        :description "Lists all of the comments associated with a file or foler in the data store."
+        :description "Lists all of the comments associated with a file or folder in the data store."
         (ok (comments/list-data-comments entry-id)))
 
       (POST "/" []
