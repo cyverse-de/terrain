@@ -3,7 +3,8 @@
         [ring.util.http-response :only [ok]]
         [terrain.routes.schemas.comments]
         [terrain.routes.schemas.filesystem])
-  (:require [common-swagger-api.schema.metadata.comments :as comment-schema]
+  (:require [common-swagger-api.schema.apps :as app-schema]
+            [common-swagger-api.schema.metadata.comments :as comment-schema]
             [terrain.services.metadata.comments :as comments]
             [terrain.util :as util]
             [terrain.util.config :as config]))
@@ -59,15 +60,21 @@
   (util/optional-routes
     [#(and (config/app-routes-enabled) (config/metadata-routes-enabled))]
 
-    (GET "/apps/:app-id/comments" [app-id]
-      (comments/list-app-comments app-id))
+    (context "/apps/:app-id/comments" []
+      :path-params [app-id :- app-schema/AppIdParam]
+      :tags ["apps"]
 
-    (POST "/apps/:app-id/comments" [app-id :as {body :body}]
-      (comments/add-app-comment app-id body))
+      (GET "/" []
+        :summary "Get App Comments"
+        :return comment-schema/CommentList
+        :description "Lists all of the comments associated with an app."
+        (ok (comments/list-app-comments app-id)))
 
-    (PATCH "/apps/:app-id/comments/:comment-id"
-      [app-id comment-id retracted]
-      (comments/update-app-retract-status app-id comment-id retracted))))
+      (POST "/" [app-id :as {body :body}]
+        (comments/add-app-comment app-id body))
+
+      (PATCH "/:comment-id" [app-id comment-id retracted]
+        (comments/update-app-retract-status app-id comment-id retracted)))))
 
 (defn admin-app-comment-routes
   []

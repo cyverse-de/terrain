@@ -16,12 +16,9 @@
    (data/validate-uuid-accessible user entry-id)
    (catch [:error_code err/ERR_DOES_NOT_EXIST] _ (throw+ {:error_code err/ERR_NOT_FOUND}))))
 
-(defn- extract-entry-id
-  [entry-id-txt]
-  (let [entry-id (valid/extract-uri-uuid entry-id-txt)]
-    (when-not (data-uuids/uuid-exists? entry-id)
-      (throw+ {:error_code err/ERR_NOT_FOUND :uuid entry-id}))
-    entry-id))
+(defn- validate-app-id
+  [app-id]
+  (apps/get-app-details config/de-system-id app-id))
 
 (defn- extract-app-id
   [app-id]
@@ -76,7 +73,8 @@
      app-id - the `app-id` from the request. This should be the UUID corresponding to the App being
               inspected"
   [app-id]
-  (metadata/list-app-comments (extract-app-id app-id)))
+  (validate-app-id app-id)
+  (metadata/list-app-comments app-id))
 
 (defn update-data-retract-status
   "Changes the retraction status for a given comment.

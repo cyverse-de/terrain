@@ -183,6 +183,7 @@
                :tags                [{:name "admin", :description "General Admin Endpoints"}
                                      {:name "admin-communities", :description "Community Administration Endpoints"}
                                      {:name "admin-filesystem", :description "File System Administration Endpoints"}
+                                     {:name "apps", :description, "Apps Endpoints"}
                                      {:name "coge", :description "CoGe Endpoints"}
                                      {:name "collaborator-lists", :description "Collaborator List Endpoints"}
                                      {:name "communities", :description "Community Endpoints"}
