@@ -104,7 +104,7 @@
 
 (defn add-app-comment
   [target-id body]
-  (http/post (metadata-url "apps" target-id "comments") (post-options body)))
+  (:body (http/post (metadata-url "apps" target-id "comments") (json-post-options body))))
 
 (defn update-data-retract-status
   [target-id comment-id retracted]

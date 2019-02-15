@@ -54,7 +54,8 @@
      app-id - the UUID corresponding to the App being commented on
      body - the request body. It should be a JSON document containing the comment"
   [app-id body]
-  (metadata/add-app-comment (extract-app-id app-id) (read-body body)))
+  (validate-app-id app-id)
+  (metadata/add-app-comment app-id body))
 
 (defn list-data-comments
   "Returns a list of comments attached to a given filesystem entry.

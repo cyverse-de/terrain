@@ -70,8 +70,12 @@
         :description "Lists all of the comments associated with an app."
         (ok (comments/list-app-comments app-id)))
 
-      (POST "/" [app-id :as {body :body}]
-        (comments/add-app-comment app-id body))
+      (POST "/" []
+        :summary "Add an App Comment"
+        :body [body (describe comment-schema/CommentRequest "The comment to add")]
+        :return comment-schema/CommentResponse
+        :description "Adds a comment to the app with the given ID."
+        (ok (comments/add-app-comment app-id body)))
 
       (PATCH "/:comment-id" [app-id comment-id retracted]
         (comments/update-app-retract-status app-id comment-id retracted)))))
