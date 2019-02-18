@@ -1,8 +1,11 @@
 (ns terrain.routes.data
   (:use [common-swagger-api.schema]
+        [ring.util.http-response :only [ok]]
         [terrain.services.sharing :only [share unshare]]
         [terrain.auth.user-attributes]
-        [terrain.util])
+        [terrain.routes.schemas.filetypes]
+        [terrain.util]
+        [terrain.util.transformers :only [add-current-user-to-map]])
   (:require [terrain.util.config :as config]
             [terrain.clients.data-info :as data]
             [terrain.clients.saved-searches :as saved]))
@@ -13,11 +16,17 @@
   (optional-routes
    [config/data-routes-enabled]
 
-   (POST "/filetypes/type" [:as req]
-      (controller req data/set-file-type :params :body))
+   (context "/filetypes" []
+     :tags ["data"]
 
-   (GET "/filetypes/type-list" [:as req]
-      (controller req data/get-type-list))
+     (POST "/type" []
+       :summary "Set or Remove File Type Labels"
+       :body [body (describe FileType "The file type to set")]
+       :description-file "docs/post-filetypes.md"
+       (ok (data/set-file-type (add-current-user-to-map {}) body)))
+
+     (GET "/type-list" [:as req]
+       (controller req data/get-type-list)))
 
    (POST "/share" [:as req]
          (share req))
