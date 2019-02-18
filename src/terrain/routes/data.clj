@@ -22,6 +22,7 @@
      (POST "/type" []
        :summary "Set or Remove File Type Labels"
        :body [body (describe FileType "The file type to set")]
+       :return FileTypeReturn
        :description-file "docs/post-filetypes.md"
        (ok (data/set-file-type (add-current-user-to-map {}) body)))
 
