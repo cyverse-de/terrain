@@ -26,7 +26,10 @@
        (ok (data/set-file-type (add-current-user-to-map {}) body)))
 
      (GET "/type-list" [:as req]
-       (controller req data/get-type-list)))
+       :summary "List Supported File Type Labels"
+       :return TypesList
+       :description "Lists the file type labels supported by the Discovery Environment."
+       (ok (data/get-type-list))))
 
    (POST "/share" [:as req]
          (share req))

@@ -25,6 +25,15 @@
   [& url-path]
   (str (apply url/url (cfg/data-info-base-url) url-path)))
 
+(defn- get-options
+  ([]
+   (get-options {}))
+  ([params]
+   {:query-params params
+    :as           :json})
+  ([user params]
+   (get-options (assoc params :user user))))
+
 (defn- put-options
   ([user body]
    (put-options user body {}))
@@ -333,7 +342,7 @@
 (defn get-type-list
   "Uses the data-info file-types endpoint to produce a list of acceptable types."
   []
-  (request :get ["file-types"] (mk-req-map)))
+  (:body (http/get (data-info-url "file-types") (get-options))))
 
 (defn set-file-type
   "Uses the data-info set-type endpoint to change the type of a file."
