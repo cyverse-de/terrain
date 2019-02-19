@@ -1,10 +1,15 @@
 (ns terrain.routes.schemas.filesystem
-  (:use [common-swagger-api.schema :only [describe NonBlankString]])
+  (:use [common-swagger-api.schema :only [describe NonBlankString]]
+        [common-swagger-api.schema.filetypes :only [ValidInfoTypesEnum]])
   (:require [common-swagger-api.schema.data :as data-schema]
+            [common-swagger-api.schema.stats :as stats-schema]
             [schema.core :as s])
   (:import [java.util UUID]))
 
 (def DataIdPathParam data-schema/DataIdPathParam)
+(def FavoritesSortColumnEnum (s/enum :name :id :lastmodified :datecreated :size))
+(def SortDirEnum (s/enum :asc :desc))
+(def EntityTypeEnum (s/enum :any :file :folder))
 
 (s/defschema PathShareRequest
   {:path (describe NonBlankString "The path to the file or folder to share")
@@ -56,3 +61,35 @@
 
 (s/defschema UnshareResponse
   {:unshare (describe [UserUnshareResponse] "Status information about each sharing response")})
+
+(s/defschema FavoriteListingParams
+  {:sort-col
+   (describe FavoritesSortColumnEnum "The column to sort the listing by")
+
+   :sort-dir
+   (describe SortDirEnum "The direction to sort the listing")
+
+   :limit
+   (describe Long "The maximum number of entries to return in the listing")
+
+   :offset
+   (describe Long "The sequential index of the first entry to display in the listing")
+
+   (s/optional-key :entity-type)
+   (describe EntityTypeEnum "This parameter can be used to limit the listing to files or folders")
+
+   (s/optional-key :info-type)
+   (describe [ValidInfoTypesEnum] "This parameter can be used to limit the listing to specific file types")})
+
+(s/defschema DirStatInfo
+  (assoc stats-schema/DirStatInfo
+    :isFavorite (describe Boolean "True if this folder is marked as a favorite")))
+
+(s/defschema FileStatInfo
+  (assoc (dissoc stats-schema/FileStatInfo :infoType :md5)
+    :isFavorite (describe Boolean "True if this file is marked as a favorite")))
+
+(s/defschema FavoriteListing
+  {:files   (describe [FileStatInfo] "The files in the favorite listing")
+   :folders (describe [DirStatInfo] "The folders in the favorite listing")
+   :total   (describe Long "Total number of files and folders in the listing")})

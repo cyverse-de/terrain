@@ -27,13 +27,16 @@
            (ok))
 
          (DELETE "/" []
-           :summary "Remoe a Favorite File or Folder"
+           :summary "Remove a Favorite File or Folder"
            :description "Rmoves a file or folder from the list of favorites."
            (fave/remove-favorite entry-id)
            (ok)))
 
-       (GET "/" [sort-col sort-dir limit offset entity-type info-type]
-         (fave/list-favorite-data-with-stat sort-col sort-dir limit offset entity-type info-type))
+       (GET "/" []
+         :summary "List Favorite Files and Folders"
+         :query [params FavoriteListingParams]
+         :description "Lists files and folders that the user has marked as favorites."
+         (ok (fave/list-favorite-data-with-stat params)))
 
        (DELETE "/" [entity-type]
          (fave/remove-selected-favorites entity-type)))
