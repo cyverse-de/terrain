@@ -67,4 +67,7 @@
        (ok))
 
      (DELETE "/" []
-       (saved/delete-saved-searches (:username current-user))))))
+       :summary "Delete Saved Searches"
+       :description "Deletes all previously saved searches for the authenticated user."
+       (saved/delete-saved-searches (:username current-user))
+       (ok)))))

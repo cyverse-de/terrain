@@ -72,4 +72,4 @@
      (throw+ {:error_code ERR_UNCHECKED_EXCEPTION :msg "Unknown error thrown by the saved-searches service"})
 
      :else
-     (success-response))))
+     nil)))
