@@ -181,10 +181,16 @@
                                      :description "Documentation for the Discovery Environment REST API"
                                      :version     "0.1.0"}
                :tags                [{:name "admin", :description "General Admin Endpoints"}
+                                     {:name "admin-apps", :description "App Administration Endpoints"}
+                                     {:name "admin-comments", :description "Comment Administration Endpoints"}
                                      {:name "admin-communities", :description "Community Administration Endpoints"}
+                                     {:name "admin-filesystem", :description "File System Administration Endpoints"}
+                                     {:name "apps", :description, "Apps Endpoints"}
                                      {:name "coge", :description "CoGe Endpoints"}
                                      {:name "collaborator-lists", :description "Collaborator List Endpoints"}
                                      {:name "communities", :description "Community Endpoints"}
+                                     {:name "favorites", :description "Favorites Endpoints"}
+                                     {:name "filesystem", :description "Filesystem Endpoints"}
                                      {:name "subjects", :description "Subject Endpoints"}
                                      {:name "teams", :description "Team Endpoints"}
                                      {:name "token", :description "OAuth Tokens"}]
