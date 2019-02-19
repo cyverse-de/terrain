@@ -31,3 +31,28 @@
 
 (s/defschema SharingResponse
   {:sharing (describe [UserShareResponse] "Status information about each sharing request")})
+
+(s/defschema PathUnshareResponse
+  {:success
+   (describe Boolean "`true` if the file or folder was unshared successfully")
+
+   :path
+   (describe NonBlankString "The path to the file or folder being unshared")
+
+   (s/optional-key :error)
+   (describe s/Any "Additional information about the error if the file or folder was not unshared successfully")})
+
+(s/defschema UserUnshareRequest
+  {:user  (describe NonBlankString "The username of the person to revoke permissions from")
+   :paths (describe [NonBlankString] "The paths to the files or folders being unshared")})
+
+(s/defschema UserUnshareResponse
+  (assoc (dissoc UserUnshareRequest :paths)
+    :unshare
+    (describe [PathUnshareResponse] "Responses to indicate whether or not each path was unshared successfully")))
+
+(s/defschema UnshareRequest
+  {:unshare (describe [UserUnshareRequest] "The unsharing requests to process")})
+
+(s/defschema UnshareResponse
+  {:unshare (describe [UserUnshareResponse] "Status information about each sharing response")})

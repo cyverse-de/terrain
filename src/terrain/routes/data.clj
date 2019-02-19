@@ -38,10 +38,16 @@
      :summary "Share Files or Folders"
      :body [body SharingRequest]
      :return SharingResponse
+     :description "Allows users to share files and folders with other users."
      (ok (share body)))
 
    (POST "/unshare" [:as req]
-         (unshare req))
+     :tags ["data"]
+     :summary "Unshare Files or Folders"
+     :body [body UnshareRequest]
+     :return UnshareResponse
+     :description "Allows users to revoke permissions to files and folders that have been granted to other users."
+     (ok (unshare body)))
 
    (GET "/saved-searches" []
         (saved/get-saved-searches (:username current-user)))
