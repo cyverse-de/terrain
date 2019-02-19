@@ -63,8 +63,8 @@
 
    Parameters:
      entity-type: a case-insensitive-string containing {file|folder|any}"
-  [entity-type]
-  (metadata/remove-selected-favorites (name (valid/resolve-entity-type entity-type))))
+  [{:keys [entity-type]}]
+  (metadata/remove-selected-favorites (name (or entity-type :any))))
 
 
 (defn- ids-txt->uuids-set

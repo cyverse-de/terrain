@@ -93,3 +93,7 @@
   {:files   (describe [FileStatInfo] "The files in the favorite listing")
    :folders (describe [DirStatInfo] "The folders in the favorite listing")
    :total   (describe Long "Total number of files and folders in the listing")})
+
+(s/defschema RemoveFavoritesQueryParams
+  {(s/optional-key :entity-type)
+   (describe EntityTypeEnum "This parameter can be used to limit the removal to only files or folders")})

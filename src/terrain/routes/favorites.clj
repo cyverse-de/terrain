@@ -38,8 +38,12 @@
          :description "Lists files and folders that the user has marked as favorites."
          (ok (fave/list-favorite-data-with-stat params)))
 
-       (DELETE "/" [entity-type]
-         (fave/remove-selected-favorites entity-type)))
+       (DELETE "/" []
+         :summary "Remove All Favorite Files or Folders"
+         :query [params RemoveFavoritesQueryParams]
+         :description "Removes all files, folders, or both from the list of favorites."
+         (fave/remove-selected-favorites params)
+         (ok)))
 
      (POST "/filter" [:as {body :body}]
        (fave/filter-accessible-favorites body)))))
