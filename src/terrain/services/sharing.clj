@@ -207,11 +207,8 @@
 
 (defn share
   "Parses a batch share request, forwarding each user-share request to data-info."
-  [req]
-  (let [sharing (decode-stream (:body req))]
-    (walk share-with-user
-          #(success-response {:sharing %})
-          (:sharing sharing))))
+  [{:keys [sharing]}]
+  (walk share-with-user (partial hash-map :sharing) sharing))
 
 (defn unshare
   "Parses a batch unshare request, forwarding each user-unshare request to data-info."

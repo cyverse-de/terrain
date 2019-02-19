@@ -4,6 +4,7 @@
         [terrain.services.sharing :only [share unshare]]
         [terrain.auth.user-attributes]
         [terrain.routes.schemas.filetypes]
+        [terrain.routes.schemas.filesystem]
         [terrain.util]
         [terrain.util.transformers :only [add-current-user-to-map]])
   (:require [terrain.util.config :as config]
@@ -32,8 +33,12 @@
        :description "Lists the file type labels supported by the Discovery Environment."
        (ok (data/get-type-list))))
 
-   (POST "/share" [:as req]
-         (share req))
+   (POST "/share" []
+     :tags ["data"]
+     :summary "Share Files or Folders"
+     :body [body SharingRequest]
+     :return SharingResponse
+     (ok (share body)))
 
    (POST "/unshare" [:as req]
          (unshare req))
