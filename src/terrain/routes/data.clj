@@ -7,7 +7,8 @@
         [terrain.routes.schemas.filesystem]
         [terrain.util]
         [terrain.util.transformers :only [add-current-user-to-map]])
-  (:require [terrain.util.config :as config]
+  (:require [schema.core :as s]
+            [terrain.util.config :as config]
             [terrain.clients.data-info :as data]
             [terrain.clients.saved-searches :as saved]))
 
@@ -49,11 +50,21 @@
      :description "Allows users to revoke permissions to files and folders that have been granted to other users."
      (ok (unshare body)))
 
-   (GET "/saved-searches" []
-        (saved/get-saved-searches (:username current-user)))
+   (context "/saved-searches" []
+     :tags ["data"]
 
-   (POST "/saved-searches" [:as {:keys [body]}]
-         (saved/set-saved-searches (:username current-user) body))
+     (GET "/" []
+       :summary "Get Saved Searches"
+       :return (describe s/Any "Previously stored saved searches")
+       :description-file "docs/get-saved-searches.md"
+       (ok (saved/get-saved-searches (:username current-user))))
 
-   (DELETE "/saved-searches" []
-           (saved/delete-saved-searches (:username current-user)))))
+     (POST "/" [:as {:keys [body]}]
+       :summary "Set Saved Searches"
+       :body [body (describe s/Any "The saved searches to store")]
+       :description-file "docs/post-saved-searches.md"
+       (saved/set-saved-searches (:username current-user) body)
+       (ok))
+
+     (DELETE "/" []
+       (saved/delete-saved-searches (:username current-user))))))
