@@ -59,7 +59,7 @@
        :description-file "docs/get-saved-searches.md"
        (ok (saved/get-saved-searches (:username current-user))))
 
-     (POST "/" [:as {:keys [body]}]
+     (POST "/" []
        :summary "Set Saved Searches"
        :body [body (describe s/Any "The saved searches to store")]
        :description-file "docs/post-saved-searches.md"
