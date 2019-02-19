@@ -127,10 +127,8 @@
    Parameters:
      body - This is the request body. It should contain a JSON document containing a field
             `filesystem` containing an array of UUIDs."
-  [body]
-  (let [user     (:shortUsername user/current-user)
-        data-ids (->> body slurp parse-filesystem-ids ids-txt->uuids-set)]
-    (->> (filter-favorites data-ids)
+  [{data-ids :filesystem}]
+  (let [user (:shortUsername user/current-user)]
+    (->> (filter-favorites (set data-ids))
          (filter (partial data/uuid-accessible? user))
-         (hash-map :filesystem)
-         svc/success-response)))
+         (hash-map :filesystem))))

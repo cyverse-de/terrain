@@ -97,3 +97,9 @@
 (s/defschema RemoveFavoritesQueryParams
   {(s/optional-key :entity-type)
    (describe EntityTypeEnum "This parameter can be used to limit the removal to only files or folders")})
+
+(s/defschema UuidsToFilter
+  {:filesystem (describe [UUID] "The list of UUIDs to filter")})
+
+(s/defschema FilteredUuids
+  {:filesystem (describe [UUID] "The filtered list of UUIDs")})

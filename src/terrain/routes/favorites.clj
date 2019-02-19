@@ -45,5 +45,9 @@
          (fave/remove-selected-favorites params)
          (ok)))
 
-     (POST "/filter" [:as {body :body}]
-       (fave/filter-accessible-favorites body)))))
+     (POST "/filter" []
+       :summary "Filter File or Folder IDs"
+       :body [body UuidsToFilter]
+       :return FilteredUuids
+       :description "Returns only IDs that correspond to files or folders that are marked as favorites."
+       (ok (fave/filter-accessible-favorites body))))))
