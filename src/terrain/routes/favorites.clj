@@ -26,14 +26,28 @@
            (fave/add-favorite entry-id)
            (ok))
 
-         (DELETE "/" [entry-id]
-           (fave/remove-favorite entry-id)))
+         (DELETE "/" []
+           :summary "Remove a Favorite File or Folder"
+           :description "Rmoves a file or folder from the list of favorites."
+           (fave/remove-favorite entry-id)
+           (ok)))
 
-       (GET "/" [sort-col sort-dir limit offset entity-type info-type]
-         (fave/list-favorite-data-with-stat sort-col sort-dir limit offset entity-type info-type))
+       (GET "/" []
+         :summary "List Favorite Files and Folders"
+         :query [params FavoriteListingParams]
+         :description "Lists files and folders that the user has marked as favorites."
+         (ok (fave/list-favorite-data-with-stat params)))
 
-       (DELETE "/" [entity-type]
-         (fave/remove-selected-favorites entity-type)))
+       (DELETE "/" []
+         :summary "Remove All Favorite Files or Folders"
+         :query [params RemoveFavoritesQueryParams]
+         :description "Removes all files, folders, or both from the list of favorites."
+         (fave/remove-selected-favorites params)
+         (ok)))
 
-     (POST "/filter" [:as {body :body}]
-       (fave/filter-accessible-favorites body)))))
+     (POST "/filter" []
+       :summary "Filter File or Folder IDs"
+       :body [body UuidsToFilter]
+       :return FilteredUuids
+       :description "Returns only IDs that correspond to files or folders that are marked as favorites."
+       (ok (fave/filter-accessible-favorites body))))))

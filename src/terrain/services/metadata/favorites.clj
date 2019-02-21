@@ -1,5 +1,6 @@
 (ns terrain.services.metadata.favorites
   (:require [cheshire.core :as json]
+            [clojure.tools.logging :as log]
             [terrain.auth.user-attributes :as user]
             [terrain.clients.data-info :as data]
             [terrain.clients.metadata.raw :as metadata]
@@ -17,27 +18,23 @@
 
 
 (defn- user-col->api-col
-  [^String col]
-  (if col
-    (case (.toUpperCase col)
-      "NAME"         :base-name
-      "ID"           :full-path
-      "LASTMODIFIED" :modify-ts
-      "DATECREATED"  :create-ts
-      "SIZE"         :data-size
-                     :base-name)
+  [col]
+  (case col
+    :name         :base-name
+    :id           :full-path
+    :lastmodified :modify-ts
+    :datecreated  :create-ts
+    :size         :data-size
     :base-name))
 
-
 (defn- user-order->api-order
-  [^String order]
+  [order]
   (if order
-    (case (.toUpperCase order)
-      "ASC"  :asc
-      "DESC" :desc
-             :asc)
+    (case order
+      :asc  :asc
+      :desc :desc
+      :asc)
     :asc))
-
 
 (defn add-favorite
   "This function marks a given data item as a favorite of the authenticated user.
@@ -66,8 +63,8 @@
 
    Parameters:
      entity-type: a case-insensitive-string containing {file|folder|any}"
-  [entity-type]
-  (metadata/remove-selected-favorites (name (valid/resolve-entity-type entity-type))))
+  [{:keys [entity-type]}]
+  (metadata/remove-selected-favorites (name (or entity-type :any))))
 
 
 (defn- ids-txt->uuids-set
@@ -100,21 +97,18 @@
      entity-type - This is the value of the `entity-type` query parameter. It should be a case-
                    insensitive string containing one of the following: ANY|FILE|FOLDER. If it is
                    nil, ANY will be used.
-     info-types  - This is the value(s) of the `info-type` query parameter(s). It may be nil,
+     info-type   - This is the value(s) of the `info-type` query parameter(s). It may be nil,
                    meaning return all info types, a string containing a single info type, or a
                    sequence containing a set of info types."
-  [sort-col sort-dir limit offset entity-type info-types]
+  [{:keys [sort-col sort-dir limit offset entity-type info-type]}]
   (let [user        (:shortUsername user/current-user)
         col         (user-col->api-col sort-col)
         ord         (user-order->api-order sort-dir)
-        limit       (Long/valueOf limit)
-        offset      (Long/valueOf offset)
-        entity-type (valid/resolve-entity-type entity-type)
+        entity-type (or entity-type :any)
         uuids       (extract-favorite-uuids-set (metadata/list-favorites (name entity-type)))]
-    (->> (data/stats-by-uuids-paged user col ord limit offset uuids info-types)
-      format-favorites
-      (hash-map :filesystem)
-      svc/success-response)))
+    (->> (data/stats-by-uuids-paged user col ord limit offset uuids info-type)
+         format-favorites
+         (hash-map :filesystem))))
 
 
 (defn filter-favorites
@@ -133,10 +127,8 @@
    Parameters:
      body - This is the request body. It should contain a JSON document containing a field
             `filesystem` containing an array of UUIDs."
-  [body]
-  (let [user     (:shortUsername user/current-user)
-        data-ids (->> body slurp parse-filesystem-ids ids-txt->uuids-set)]
-    (->> (filter-favorites data-ids)
-      (filter (partial data/uuid-accessible? user))
-      (hash-map :filesystem)
-      svc/success-response)))
+  [{data-ids :filesystem}]
+  (let [user (:shortUsername user/current-user)]
+    (->> (filter-favorites (set data-ids))
+         (filter (partial data/uuid-accessible? user))
+         (hash-map :filesystem))))

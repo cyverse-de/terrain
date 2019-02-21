@@ -372,7 +372,7 @@
   (icat/resolve-data-type data-id))
 
 
-  (defn ^IPersistentMap share
+(defn ^IPersistentMap share
   "grants access to a list of data entities for a list of users by a user
 
    Params:
