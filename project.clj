@@ -29,6 +29,7 @@
                  [dire "0.5.4"]
                  [me.raynes/fs "1.4.6"]
                  [medley "0.8.4"]
+                 [javax.servlet/servlet-api "2.5"]
                  [org.apache.tika/tika-core "1.14"]      ; provides org.apache.tika
                  [slingshot "0.12.2"]
                  [org.cyverse/clj-icat-direct "2.8.2"]
