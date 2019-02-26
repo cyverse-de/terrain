@@ -1,5 +1,6 @@
 (ns terrain.routes.favorites
-  (:use [common-swagger-api.schema :only [DELETE GET POST PUT context]]
+  (:use [clojure-commons.lcase-params :only [wrap-lcase-query-param-values]]
+        [common-swagger-api.schema :only [DELETE GET POST PUT context]]
         [ring.util.http-response :only [ok]]
         [terrain.routes.schemas.filesystem])
   (:require [terrain.services.metadata.favorites :as fave]
@@ -35,6 +36,7 @@
        (GET "/" []
          :summary "List Favorite Files and Folders"
          :query [params FavoriteListingParams]
+         :middleware [[wrap-lcase-query-param-values #{"sort-col" "sort-dir"}]]
          :description "Lists files and folders that the user has marked as favorites."
          (ok (fave/list-favorite-data-with-stat params)))
 
