@@ -29,6 +29,7 @@
                  [dire "0.5.4"]
                  [me.raynes/fs "1.4.6"]
                  [medley "0.8.4"]
+                 [proto-repl "0.3.1"]
                  [org.apache.tika/tika-core "1.14"]      ; provides org.apache.tika
                  [ring/ring-jetty-adapter "1.5.0"]
                  [slingshot "0.12.2"]
