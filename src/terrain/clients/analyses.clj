@@ -50,10 +50,10 @@
                                :body          submission-info})
                     {:id id :submission submission-info}))
 
-(defn create-badge
-  [id submission-info]
+(defn add-badge
+  [submission-info]
   (process-response (http/post (analyses-url "/badges")
                                {:content-type :json
                                 :as           :json
                                 :body         submission-info})
-                    {:id id :submission submission-info}))
+                    {:submission submission-info}))
