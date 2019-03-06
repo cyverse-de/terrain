@@ -1,6 +1,5 @@
 (ns terrain.clients.analyses
   (:require [terrain.util.config :refer [analyses-base-uri]]
-            [cheshire.core :refer [generate-string]]
             [clj-http.client :as http]
             [cemerick.url :refer [url]]
             [terrain.auth.user-attributes :refer [current-user]]
@@ -29,7 +28,7 @@
   (:body (http/put (analyses-url ["badges" id])
                    {:content-type  :json
                     :as            :json
-                    :body          (generate-string submission-info)})
+                    :form-params   submission-info})
          {:id id :submission submission-info}))
 
 (defn add-badge
@@ -37,5 +36,5 @@
   (:body (http/post (analyses-url ["badges"])
                     {:content-type :json
                      :as           :json
-                     :body         (generate-string submission-info)})
+                     :form-params  submission-info})
          {:submission submission-info}))
