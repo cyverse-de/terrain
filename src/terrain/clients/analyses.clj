@@ -10,22 +10,17 @@
                                                  ERR_UNCHECKED_EXCEPTION]]
             [cemerick.url :refer [url]]
             [medley.core :refer [mapply]]
+            [terrain.auth.user-attributes :refer [current-user]]
             [slingshot.slingshot :refer [throw+]]))
 
-(defn- fix-user
-  [{:keys [user] :as user-map}]
-  (-> user-map
-    (assoc :user (str user "@iplantcollaborative.org"))
-    (dissoc :first-name :last-name :email)))
 
 (defn analyses-url
   ([components]
    (analyses-url components {}))
   ([components query]
-   (let [user-map (fix-user (add-current-user-to-map query))]
-     (-> (apply url (cons (analyses-base-uri) components))
-        (assoc :query user-map)
-        (str)))))
+   (-> (apply url (cons (analyses-base-uri) components))
+       (assoc :query (assoc query :user (:username current-user)))
+       (str))))
 
 (defn process-response
   [resp err-data]
