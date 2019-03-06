@@ -50,4 +50,5 @@
       :summary      "Deletes a badge"
       :description  "Deletes a badge from the database. Will returns a success
       even if called on a badge that has either already been deleted or never
-      existed in the first place")))
+      existed in the first place"
+      (ok (analyses/delete-badge id)))))

@@ -28,6 +28,7 @@
         [terrain.routes.token]
         [terrain.routes.webhooks]
         [terrain.routes.comments]
+        [terrain.routes.analyses]
         [terrain.util :as util]
         [terrain.util.transformers :as transform])
   (:require [cemerick.url :as curl]
@@ -75,6 +76,7 @@
 (defn secured-routes
   []
   (util/flagged-routes
+    (secured-analyses-routes)
     (secured-notification-routes)
     (secured-metadata-routes)
     (secured-pref-routes)
