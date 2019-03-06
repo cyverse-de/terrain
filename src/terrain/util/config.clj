@@ -496,7 +496,7 @@
 (cc/defprop-optstr analyses-base-uri
   "The base URI for the analyses service."
   [props config-valid configs]
-  "terrain.analyses.base-uri" "https://analyses")
+  "terrain.analyses.base-uri" "http://analyses")
 
 (def metadata-client
   (memoize #(metadata-client/new-metadata-client (metadata-base-url))))
