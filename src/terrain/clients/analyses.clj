@@ -26,13 +26,11 @@
   (:body (http/put (analyses-url ["badges" id])
                    {:content-type  :json
                     :as            :json
-                    :form-params   submission-info})
-         {:id id :submission submission-info}))
+                    :form-params   submission-info})))
 
 (defn add-badge
   [submission-info]
   (:body (http/post (analyses-url ["badges"])
                     {:content-type :json
                      :as           :json
-                     :form-params  submission-info})
-         {:submission submission-info}))
+                     :form-params  submission-info})))
