@@ -19,7 +19,7 @@
 
 (defn delete-badge
   [id]
-  (:body (http/delete (analyses-url ["badges" id]) {:as :json})) {:id id})
+  (:body (http/delete (analyses-url ["badges" id]) {:as :json})))
 
 (defn update-badge
   [id submission-info]
