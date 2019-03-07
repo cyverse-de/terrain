@@ -2,8 +2,7 @@
   (:require [terrain.util.config :refer [analyses-base-uri]]
             [clj-http.client :as http]
             [cemerick.url :refer [url]]
-            [terrain.auth.user-attributes :refer [current-user]]
-            [slingshot.slingshot :refer [throw+]]))
+            [terrain.auth.user-attributes :refer [current-user]]))
 
 
 (defn analyses-url
