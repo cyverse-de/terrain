@@ -9,7 +9,7 @@
   ([components]
    (analyses-url components {}))
   ([components query]
-   (-> (apply url (cons (analyses-base-uri) components))
+   (-> (apply url (analyses-base-uri) components)
        (assoc :query (assoc query :user (:username current-user)))
        (str))))
 
@@ -19,8 +19,7 @@
 
 (defn delete-badge
   [id]
-  (http/delete (analyses-url ["badges" id]) {:as :json}) {:id id}
-  {:id id})
+  (:body (http/delete (analyses-url ["badges" id]) {:as :json})) {:id id})
 
 (defn update-badge
   [id submission-info]
