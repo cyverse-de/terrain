@@ -1,6 +1,6 @@
 (ns terrain.routes.analyses
   (:require [compojure.api.sweet :refer [describe]]
-            [common-swagger-api.schema :refer [context GET PUT POST DELETE]]
+            [common-swagger-api.schema :refer [context GET PATCH POST DELETE]]
             [common-swagger-api.schema.badges :refer [Badge NewBadge UpdateBadge]]
             [common-swagger-api.schema.apps :refer [AnalysisSubmission]]
             [ring.util.http-response :refer [ok]]
@@ -28,7 +28,7 @@
       :return  Badge
       (ok (analyses/get-badge id)))
 
-    (PUT "/:id" [id]
+    (PATCH "/:id" [id]
       :body         [badge UpdateBadge]
       :return       Badge
       :summary      "Modifies an existing badge"

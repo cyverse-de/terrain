@@ -23,10 +23,10 @@
 
 (defn update-badge
   [id submission-info]
-  (:body (http/put (analyses-url ["badges" id])
-                   {:content-type  :json
-                    :as            :json
-                    :form-params   submission-info})))
+  (:body (http/patch (analyses-url ["badges" id])
+                     {:content-type  :json
+                      :as            :json
+                      :form-params   submission-info})))
 
 (defn add-badge
   [submission-info]
