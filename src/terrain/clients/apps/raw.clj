@@ -129,10 +129,11 @@
 
 (defn search-apps
   [params]
-  (client/get (apps-url "apps")
-              {:query-params     (secured-params params apps-search-params)
-               :as               :stream
-               :follow-redirects false}))
+  (:body
+    (client/get (apps-url "apps")
+                {:query-params     (secured-params params)
+                 :as               :json
+                 :follow-redirects false})))
 
 (defn create-app
   [system-id app]

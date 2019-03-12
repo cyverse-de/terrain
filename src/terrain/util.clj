@@ -4,9 +4,7 @@
   (:use [common-swagger-api.schema :only [routes]]
         [terrain.util.service]
         [terrain.util.transformers]
-        [terrain.util.validators :only [parse-body]])
-  (:require [clojure.java.io :as io]
-            [compojure.api.meta]))
+        [terrain.util.validators :only [parse-body]]))
 
 (defn as-vector
   "Returns the given parameter inside a vector if it's not a vector already."
@@ -14,10 +12,6 @@
   (cond (nil? p)    []
         (vector? p) p
         :else       [p]))
-
-(defmethod compojure.api.meta/restructure-param :description-file
-  [_ path acc]
-  (update-in acc [:swagger] assoc :description (slurp (io/resource path))))
 
 (defn optional-routes
   "Creates a set of optionally defined routes."

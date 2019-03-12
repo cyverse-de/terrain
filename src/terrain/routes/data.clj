@@ -7,7 +7,8 @@
         [terrain.routes.schemas.filesystem]
         [terrain.util]
         [terrain.util.transformers :only [add-current-user-to-map]])
-  (:require [schema.core :as s]
+  (:require [common-swagger-api.routes]                     ;; Required for :description-file
+            [schema.core :as s]
             [terrain.util.config :as config]
             [terrain.clients.data-info :as data]
             [terrain.clients.saved-searches :as saved]))

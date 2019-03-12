@@ -22,7 +22,7 @@
   (cond
     (string? v)     (string/blank? v)
     (sequential? v) (empty? v)
-    :else           true))
+    :else           (nil? v)))
 
 (defn add-current-user-to-map
   "Adds the name and e-mail address of the currently authenticated user to a
