@@ -49,7 +49,7 @@
   :plugins [[lein-ring "0.9.2" :exclusions [org.clojure/clojure]]
             [swank-clojure "1.4.2" :exclusions [org.clojure/clojure]]
             [test2junit "1.2.2"]
-            [jonase/eastwood "0.2.3"]]
+            [jonase/eastwood "0.3.5"]]
   :profiles {:dev     {:resource-paths ["conf/test"]}
              :uberjar {:aot :all}}
   :main ^:skip-aot terrain.core
