@@ -3,7 +3,8 @@
         [ring.util.http-response :only [ok]]
         [terrain.routes.schemas.comments]
         [terrain.routes.schemas.filesystem])
-  (:require [common-swagger-api.schema.apps :as app-schema]
+  (:require [common-swagger-api.routes]                     ;; Required for :description-file
+            [common-swagger-api.schema.apps :as app-schema]
             [common-swagger-api.schema.metadata.comments :as comment-schema]
             [terrain.services.metadata.comments :as comments]
             [terrain.util :as util]

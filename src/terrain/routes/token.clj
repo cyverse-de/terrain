@@ -2,8 +2,7 @@
   (:use [common-swagger-api.schema :only [context routes GET]]
         [terrain.routes.schemas.token]
         [terrain.services.oauth :only [get-token]])
-  (:require [clojure.string :as string]
-            [terrain.util]))
+  (:require [common-swagger-api.routes]))                   ;; Required for :description-file
 
 (defn token-routes
   []
