@@ -169,16 +169,10 @@
 
       (GET "/" []
            :query [params AppSearchParams]
-           :summary AppListingSummary
            :return AppListing
+           :summary AppListingSummary
            :description-file "docs/apps/apps-listing.md"
            (ok (apps/search-apps params)))
-
-      (GET "/elements" [:as {:keys [params]}]
-           (service/success-response (apps/get-all-workflow-elements params)))
-
-      (GET "/elements/:element-type" [element-type :as {:keys [params]}]
-           (service/success-response (apps/get-workflow-elements element-type params)))
 
       (POST "/pipelines" [:as {:keys [body]}]
             (service/success-response (apps/add-pipeline body)))

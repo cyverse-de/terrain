@@ -23,17 +23,19 @@
 
 (defn get-all-workflow-elements
   [params]
-  (client/get (apps-url "apps" "elements")
-              {:query-params     (secured-params params [:include-hidden])
-               :as               :stream
-               :follow-redirects false}))
+  (:body
+    (client/get (apps-url "apps" "elements")
+                {:query-params     (secured-params params)
+                 :as               :json
+                 :follow-redirects false})))
 
 (defn get-workflow-elements
   [element-type params]
-  (client/get (apps-url "apps" "elements" element-type)
-              {:query-params     (secured-params params [:include-hidden])
-               :as               :stream
-               :follow-redirects false}))
+  (:body
+    (client/get (apps-url "apps" "elements" element-type)
+                {:query-params     (secured-params params)
+                 :as               :json
+                 :follow-redirects false})))
 
 (defn list-ontologies
   []
