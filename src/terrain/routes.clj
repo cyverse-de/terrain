@@ -8,6 +8,7 @@
         [terrain.auth.user-attributes]
         [terrain.middleware :only [wrap-context-path-adder wrap-query-param-remover]]
         [terrain.routes.admin]
+        [terrain.routes.apps.elements]
         [terrain.routes.data]
         [terrain.routes.permanent-id-requests]
         [terrain.routes.fileio]
@@ -58,6 +59,7 @@
    (app-comment-routes)
    (app-ontology-routes)
    (app-community-routes)
+   (app-elements-routes)
    (apps-routes)
    (analysis-routes)
    (coge-routes)
@@ -188,6 +190,7 @@
                                      {:name "admin-communities", :description "Community Administration Endpoints"}
                                      {:name "admin-filesystem", :description "File System Administration Endpoints"}
                                      {:name "apps", :description, "Apps Endpoints"}
+                                     {:name "app-element-types", :description, "App Element Endpoints"}
                                      {:name "coge", :description "CoGe Endpoints"}
                                      {:name "collaborator-lists", :description "Collaborator List Endpoints"}
                                      {:name "communities", :description "Community Endpoints"}
