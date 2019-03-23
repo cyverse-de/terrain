@@ -157,39 +157,43 @@
 
 (defn delete-apps
   [deletion-request]
-  (client/post (apps-url "apps" "shredder")
-               {:query-params     (secured-params)
-                :body             deletion-request
-                :content-type     :json
-                :as               :stream
-                :follow-redirects false}))
+  (:body
+    (client/post (apps-url "apps" "shredder")
+                 {:query-params     (secured-params)
+                  :body             deletion-request
+                  :content-type     :json
+                  :as               :json
+                  :follow-redirects false})))
 
 (defn list-permissions
   [body params]
-  (client/post (apps-url "apps" "permission-lister")
-               {:query-params     (secured-params params permission-lister-params)
-                :body             body
-                :content-type     :json
-                :as               :stream
-                :follow-redirects false}))
+  (:body
+    (client/post (apps-url "apps" "permission-lister")
+                 {:query-params     (secured-params params)
+                  :body             body
+                  :content-type     :json
+                  :as               :json
+                  :follow-redirects false})))
 
 (defn share
   [body]
-  (client/post (apps-url "apps" "sharing")
-               {:query-params     (secured-params)
-                :body             body
-                :content-type     :json
-                :as               :stream
-                :follow-redirects false}))
+  (:body
+    (client/post (apps-url "apps" "sharing")
+                 {:query-params     (secured-params)
+                  :body             body
+                  :content-type     :json
+                  :as               :json
+                  :follow-redirects false})))
 
 (defn unshare
   [body]
-  (client/post (apps-url "apps" "unsharing")
-               {:query-params     (secured-params)
-                :body             body
-                :content-type     :json
-                :as               :stream
-                :follow-redirects false}))
+  (:body
+    (client/post (apps-url "apps" "unsharing")
+                 {:query-params     (secured-params)
+                  :body             body
+                  :content-type     :json
+                  :as               :json
+                  :follow-redirects false})))
 
 (defn get-app
   [system-id app-id]

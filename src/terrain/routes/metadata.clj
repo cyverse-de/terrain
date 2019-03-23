@@ -1,14 +1,31 @@
 (ns terrain.routes.metadata
   (:use [common-swagger-api.schema]
-        [common-swagger-api.schema.apps :only [AppListing
+        [common-swagger-api.schema.apps :only [AppDeletionRequest
+                                               AppListing
                                                AppListingSummary
+                                               AppsShredderDocs
+                                               AppsShredderSummary
                                                SystemId]]
+        [common-swagger-api.schema.apps.permission :only [AppPermissionListing
+                                                          AppPermissionListingDocs
+                                                          AppPermissionListingRequest
+                                                          AppPermissionListingSummary
+                                                          AppSharingDocs
+                                                          AppSharingRequest
+                                                          AppSharingResponse
+                                                          AppSharingSummary
+                                                          AppUnsharingDocs
+                                                          AppUnsharingRequest
+                                                          AppUnsharingResponse
+                                                          AppUnsharingSummary
+                                                          PermissionListerQueryParams]]
         [ring.util.http-response :only [ok]]
         [terrain.routes.schemas.apps]
         [terrain.services.metadata.apps]
         [terrain.services.bootstrap]
         [terrain.util])
   (:require [common-swagger-api.routes]                     ;; Required for :description-file
+            [cheshire.core :as json]
             [terrain.clients.apps.raw :as apps]
             [terrain.clients.metadata :as metadata]
             [terrain.clients.metadata.raw :as metadata-client]
@@ -186,17 +203,33 @@
       (GET "/pipelines/:app-id/ui" [app-id]
            (service/success-response (apps/edit-pipeline app-id)))
 
-      (POST "/shredder" [:as {:keys [body]}]
-            (service/success-response (apps/delete-apps body)))
+      (POST "/shredder" []
+            :body [body AppDeletionRequest]
+            :summary AppsShredderSummary
+            :description AppsShredderDocs
+            (ok (apps/delete-apps (json/encode body))))
 
-      (POST "/permission-lister" [:as {:keys [body params]}]
-            (service/success-response (apps/list-permissions body params)))
+      (POST "/permission-lister" []
+            :query [params PermissionListerQueryParams]
+            :body [body AppPermissionListingRequest]
+            :return AppPermissionListing
+            :summary AppPermissionListingSummary
+            :description AppPermissionListingDocs
+            (ok (apps/list-permissions (json/encode body) params)))
 
       (POST "/sharing" [:as {:keys [body]}]
-            (service/success-response (apps/share body)))
+            :body [body AppSharingRequest]
+            :return AppSharingResponse
+            :summary AppSharingSummary
+            :description AppSharingDocs
+            (ok (apps/share (json/encode body))))
 
       (POST "/unsharing" [:as {:keys [body]}]
-            (service/success-response (apps/unshare body)))
+            :body [body AppUnsharingRequest]
+            :return AppUnsharingResponse
+            :summary AppUnsharingSummary
+            :description AppUnsharingDocs
+            (ok (apps/unshare (json/encode body))))
 
       (POST "/:system-id" [system-id :as {:keys [body]}]
             (service/success-response (apps/create-app system-id body)))
