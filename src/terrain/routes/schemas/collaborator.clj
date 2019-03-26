@@ -25,7 +25,8 @@
    (describe Boolean "Select `true` if removed users should retain permission to shared resources")})
 
 (defschema GetCollaboratorListsResponse (group-schema/group-list "collaborator list" "collaborator lists"))
-(defschema AddCollaboratorListRequest (group-schema/base-group "collaborator list"))
+(defschema AddCollaboratorListRequest
+  (select-keys (group-schema/base-group "collaborator list") [:name (optional-key :description)]))
 (defschema CollaboratorList (group-schema/group "collaborator list"))
 (defschema CollaboratorListUpdate
   (select-keys (group-schema/group-update "collaborator list") (map optional-key [:name :description])))
