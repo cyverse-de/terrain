@@ -11,6 +11,8 @@
                 AppJobView
                 AppJobViewDocs
                 AppJobViewSummary
+                AppLabelUpdateRequest
+                AppLabelUpdateSummary
                 AppListing
                 AppListingSummary
                 AppPreviewDocs
@@ -275,8 +277,12 @@
                   :description AppDeleteDocs
                   (ok (apps/delete-app system-id app-id)))
 
-          (PATCH "/" [:as {:keys [body]}]
-                 (service/success-response (apps/relabel-app system-id app-id body)))
+          (PATCH "/" []
+                 :body [body AppLabelUpdateRequest]
+                 :return App
+                 :summary AppLabelUpdateSummary
+                 :description-file "docs/apps/app-label-update.md"
+                 (ok (apps/relabel-app system-id app-id body)))
 
           (PUT "/" [:as {:keys [body]}]
                (service/success-response (apps/update-app system-id app-id body)))

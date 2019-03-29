@@ -215,12 +215,13 @@
 
 (defn relabel-app
   [system-id app-id relabel-request]
-  (client/patch (apps-url "apps" system-id app-id)
-                {:query-params     (secured-params)
-                 :body             relabel-request
-                 :content-type     :json
-                 :as               :stream
-                 :follow-redirects false}))
+  (:body
+    (client/patch (apps-url "apps" system-id app-id)
+                  {:query-params     (secured-params)
+                   :form-params      relabel-request
+                   :content-type     :json
+                   :as               :json
+                   :follow-redirects false})))
 
 (defn update-app
   [system-id app-id update-request]
