@@ -13,24 +13,24 @@
        (assoc :query (assoc query :user (:username current-user)))
        (str))))
 
-(defn get-badge
+(defn get-quicklaunch
   [id]
-  (:body (http/get (analyses-url ["badges" id]) {:as :json})))
+  (:body (http/get (analyses-url ["quicklaunches" id]) {:as :json})))
 
-(defn delete-badge
+(defn delete-quicklaunch
   [id]
-  (:body (http/delete (analyses-url ["badges" id]) {:as :json})))
+  (:body (http/delete (analyses-url ["quicklaunches" id]) {:as :json})))
 
-(defn update-badge
+(defn update-quicklaunch
   [id submission-info]
-  (:body (http/patch (analyses-url ["badges" id])
+  (:body (http/patch (analyses-url ["quicklaunches" id])
                      {:content-type  :json
                       :as            :json
                       :form-params   submission-info})))
 
-(defn add-badge
+(defn add-quicklaunch
   [submission-info]
-  (:body (http/post (analyses-url ["badges"])
+  (:body (http/post (analyses-url ["quicklaunches"])
                     {:content-type :json
                      :as           :json
                      :form-params  submission-info})))

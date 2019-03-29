@@ -1,7 +1,7 @@
 (ns terrain.routes.analyses
   (:require [compojure.api.sweet :refer [describe]]
             [common-swagger-api.schema :refer [context GET PATCH POST DELETE]]
-            [common-swagger-api.schema.badges :refer [Badge NewBadge UpdateBadge]]
+            [common-swagger-api.schema.quicklaunches :refer [QuickLaunch NewQuickLaunch UpdateQuickLaunch]]
             [common-swagger-api.schema.apps :refer [AnalysisSubmission]]
             [ring.util.http-response :refer [ok]]
             [terrain.util :refer [optional-routes]]
@@ -14,41 +14,42 @@
   {:id (describe UUID "The UUID of the resource that was deleted")})
 
 (defn secured-analyses-routes
-  "The routes for accessing analyses information. Currently limited to badges."
+  "The routes for accessing analyses information. Currently limited to Quick
+   Launches."
   []
   (optional-routes [config/app-routes-enabled])
 
-  (context "/badges" []
+  (context "/quicklaunches" []
     :tags ["analyses"]
 
     (GET "/:id" [id]
-      :summary "Get badge information by its UUID."
-      :description "Gets badge information, including the UUID, the name of
+      :summary "Get Quick Launch information by its UUID."
+      :description "Gets Quick Launch information, including the UUID, the name of
       the user that owns it, and the submission JSON"
-      :return  Badge
-      (ok (analyses/get-badge id)))
+      :return  QuickLaunch
+      (ok (analyses/get-quicklaunch id)))
 
     (PATCH "/:id" [id]
-      :body         [badge UpdateBadge]
-      :return       Badge
-      :summary      "Modifies an existing badge"
-      :description  "Modifies an existing badge, allowing the caller to change
+      :body         [quicklaunch UpdateQuickLaunch]
+      :return       QuickLaunch
+      :summary      "Modifies an existing Quick Launch"
+      :description  "Modifies an existing Quick Launch, allowing the caller to change
       owners and the contents of the submission JSON"
-      (ok (analyses/update-badge id badge)))
+      (ok (analyses/update-quicklaunch id quicklaunch)))
 
     (POST "/" []
-      :body         [badge NewBadge]
-      :return       Badge
-      :summary      "Adds a badge to the database"
-      :description  "Adds a badge and corresponding submission information to the
+      :body         [quicklaunch NewQuickLaunch]
+      :return       QuickLaunch
+      :summary      "Adds a Quick Launch to the database"
+      :description  "Adds a Quick Launch and corresponding submission information to the
       database. The username passed in should already exist. A new UUID will be
       assigned and returned."
-      (ok (analyses/add-badge badge)))
+      (ok (analyses/add-quicklaunch quicklaunch)))
 
     (DELETE "/:id" [id]
       :return        DeletionResponse
-      :summary      "Deletes a badge"
-      :description  "Deletes a badge from the database. Will returns a success
-      even if called on a badge that has either already been deleted or never
+      :summary      "Deletes a Quick Launch"
+      :description  "Deletes a Quick Launch from the database. Will returns a success
+      even if called on a Quick Launch that has either already been deleted or never
       existed in the first place"
-      (ok (analyses/delete-badge id)))))
+      (ok (analyses/delete-quicklaunch id)))))
