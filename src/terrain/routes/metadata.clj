@@ -2,6 +2,8 @@
   (:use [common-swagger-api.schema]
         [common-swagger-api.schema.apps
          :only [App
+                AppCopyDocs
+                AppCopySummary
                 AppCreateDocs
                 AppCreateRequest
                 AppCreateSummary
@@ -294,7 +296,10 @@
                (ok (apps/update-app system-id app-id body)))
 
           (POST "/copy" []
-                (service/success-response (apps/copy-app system-id app-id)))
+                :return App
+                :summary AppCopySummary
+                :description AppCopyDocs
+                (ok (apps/copy-app system-id app-id)))
 
           (GET "/details" []
                (service/success-response (apps/get-app-details system-id app-id)))

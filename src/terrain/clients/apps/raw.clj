@@ -235,10 +235,11 @@
 
 (defn copy-app
   [system-id app-id]
-  (client/post (apps-url "apps" system-id app-id "copy")
-               {:query-params     (secured-params)
-                :as               :stream
-                :follow-redirects false}))
+  (:body
+    (client/post (apps-url "apps" system-id app-id "copy")
+                 {:query-params     (secured-params)
+                  :as               :json
+                  :follow-redirects false})))
 
 (defn get-admin-app-details
   [system-id app-id]
