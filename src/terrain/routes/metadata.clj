@@ -10,6 +10,8 @@
                 AppDeleteDocs
                 AppDeleteSummary
                 AppDeletionRequest
+                AppDetails
+                AppDetailsSummary
                 AppJobView
                 AppJobViewDocs
                 AppJobViewSummary
@@ -302,7 +304,10 @@
                 (ok (apps/copy-app system-id app-id)))
 
           (GET "/details" []
-               (service/success-response (apps/get-app-details system-id app-id)))
+               :return AppDetails
+               :summary AppDetailsSummary
+               :description-file "docs/apps/app-details.md"
+               (ok (apps/get-app-details system-id app-id)))
 
           (GET "/documentation" []
                (service/success-response (apps/get-app-docs system-id app-id)))

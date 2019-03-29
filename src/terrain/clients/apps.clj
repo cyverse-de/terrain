@@ -3,12 +3,6 @@
             [terrain.clients.apps.raw :as raw]
             [terrain.util.service :as service]))
 
-(defn get-app-details
-  [system-id app-id]
-  (->> (raw/get-app-details system-id app-id)
-       (:body)
-       (service/decode-json)))
-
 (defn admin-list-tool-requests
   [params]
   (->> (raw/admin-list-tool-requests params)

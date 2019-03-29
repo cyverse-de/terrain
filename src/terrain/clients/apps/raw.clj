@@ -250,10 +250,11 @@
 
 (defn get-app-details
   [system-id app-id]
-  (client/get (apps-url "apps" system-id app-id "details")
-              {:query-params     (secured-params)
-               :as               :stream
-               :follow-redirects false}))
+  (:body
+    (client/get (apps-url "apps" system-id app-id "details")
+                {:query-params     (secured-params)
+                 :as               :json
+                 :follow-redirects false})))
 
 (defn remove-favorite-app
   [system-id app-id]
