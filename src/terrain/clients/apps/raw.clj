@@ -207,10 +207,11 @@
 
 (defn delete-app
   [system-id app-id]
-  (client/delete (apps-url "apps" system-id app-id)
-                 {:query-params     (secured-params)
-                  :as               :stream
-                  :follow-redirects false}))
+  (:body
+    (client/delete (apps-url "apps" system-id app-id)
+                   {:query-params     (secured-params)
+                    :as               :json
+                    :follow-redirects false})))
 
 (defn relabel-app
   [system-id app-id relabel-request]

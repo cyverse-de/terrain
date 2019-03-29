@@ -5,6 +5,8 @@
                 AppCreateDocs
                 AppCreateRequest
                 AppCreateSummary
+                AppDeleteDocs
+                AppDeleteSummary
                 AppDeletionRequest
                 AppJobView
                 AppJobViewDocs
@@ -269,7 +271,9 @@
                (ok (apps/get-app system-id app-id)))
 
           (DELETE "/" []
-                  (service/success-response (apps/delete-app system-id app-id)))
+                  :summary AppDeleteSummary
+                  :description AppDeleteDocs
+                  (ok (apps/delete-app system-id app-id)))
 
           (PATCH "/" [:as {:keys [body]}]
                  (service/success-response (apps/relabel-app system-id app-id body)))
