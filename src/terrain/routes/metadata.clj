@@ -1,24 +1,30 @@
 (ns terrain.routes.metadata
   (:use [common-swagger-api.schema]
-        [common-swagger-api.schema.apps :only [AppDeletionRequest
-                                               AppListing
-                                               AppListingSummary
-                                               AppsShredderDocs
-                                               AppsShredderSummary
-                                               SystemId]]
-        [common-swagger-api.schema.apps.permission :only [AppPermissionListing
-                                                          AppPermissionListingDocs
-                                                          AppPermissionListingRequest
-                                                          AppPermissionListingSummary
-                                                          AppSharingDocs
-                                                          AppSharingRequest
-                                                          AppSharingResponse
-                                                          AppSharingSummary
-                                                          AppUnsharingDocs
-                                                          AppUnsharingRequest
-                                                          AppUnsharingResponse
-                                                          AppUnsharingSummary
-                                                          PermissionListerQueryParams]]
+        [common-swagger-api.schema.apps
+         :only [App
+                AppCreateDocs
+                AppCreateRequest
+                AppCreateSummary
+                AppDeletionRequest
+                AppListing
+                AppListingSummary
+                AppsShredderDocs
+                AppsShredderSummary
+                SystemId]]
+        [common-swagger-api.schema.apps.permission
+         :only [AppPermissionListing
+                AppPermissionListingDocs
+                AppPermissionListingRequest
+                AppPermissionListingSummary
+                AppSharingDocs
+                AppSharingRequest
+                AppSharingResponse
+                AppSharingSummary
+                AppUnsharingDocs
+                AppUnsharingRequest
+                AppUnsharingResponse
+                AppUnsharingSummary
+                PermissionListerQueryParams]]
         [ring.util.http-response :only [ok]]
         [terrain.routes.schemas.apps]
         [terrain.services.metadata.apps]
@@ -216,82 +222,89 @@
             :description AppPermissionListingDocs
             (ok (apps/list-permissions body params)))
 
-      (POST "/sharing" [:as {:keys [body]}]
+      (POST "/sharing" []
             :body [body AppSharingRequest]
             :return AppSharingResponse
             :summary AppSharingSummary
             :description AppSharingDocs
             (ok (apps/share body)))
 
-      (POST "/unsharing" [:as {:keys [body]}]
+      (POST "/unsharing" []
             :body [body AppUnsharingRequest]
             :return AppUnsharingResponse
             :summary AppUnsharingSummary
             :description AppUnsharingDocs
             (ok (apps/unshare body)))
 
-      (POST "/:system-id" [system-id :as {:keys [body]}]
-            (service/success-response (apps/create-app system-id body)))
+      (context "/:system-id" []
+        :path-params [system-id :- SystemId]
 
-      (POST "/:system-id/arg-preview" [system-id :as {:keys [body]}]
-            (service/success-response (apps/preview-args system-id body)))
+        (POST "/" []
+              :body [body AppCreateRequest]
+              :return App
+              :summary AppCreateSummary
+              :description AppCreateDocs
+              (ok (apps/create-app system-id body)))
 
-      (GET "/:system-id/:app-id" [system-id app-id]
-           (service/success-response (apps/get-app system-id app-id)))
+        (POST "/arg-preview" [:as {:keys [body]}]
+              (service/success-response (apps/preview-args system-id body)))
 
-      (DELETE "/:system-id/:app-id" [system-id app-id]
-              (service/success-response (apps/delete-app system-id app-id)))
+        (GET "/:app-id" [app-id]
+             (service/success-response (apps/get-app system-id app-id)))
 
-      (PATCH "/:system-id/:app-id" [system-id app-id :as {:keys [body]}]
-             (service/success-response (apps/relabel-app system-id app-id body)))
+        (DELETE "/:app-id" [app-id]
+                (service/success-response (apps/delete-app system-id app-id)))
 
-      (PUT "/:system-id/:app-id" [system-id app-id :as {:keys [body]}]
-           (service/success-response (apps/update-app system-id app-id body)))
+        (PATCH "/:app-id" [app-id :as {:keys [body]}]
+               (service/success-response (apps/relabel-app system-id app-id body)))
 
-      (POST "/:system-id/:app-id/copy" [system-id app-id]
-            (service/success-response (apps/copy-app system-id app-id)))
+        (PUT "/:app-id" [app-id :as {:keys [body]}]
+             (service/success-response (apps/update-app system-id app-id body)))
 
-      (GET "/:system-id/:app-id/details" [system-id app-id]
-           (service/success-response (apps/get-app-details system-id app-id)))
+        (POST "/:app-id/copy" [app-id]
+              (service/success-response (apps/copy-app system-id app-id)))
 
-      (GET "/:system-id/:app-id/documentation" [system-id app-id]
-           (service/success-response (apps/get-app-docs system-id app-id)))
+        (GET "/:app-id/details" [app-id]
+             (service/success-response (apps/get-app-details system-id app-id)))
 
-      (POST "/:system-id/:app-id/documentation" [system-id app-id :as {:keys [body]}]
-            (service/success-response (apps/add-app-docs system-id app-id body)))
+        (GET "/:app-id/documentation" [app-id]
+             (service/success-response (apps/get-app-docs system-id app-id)))
 
-      (PATCH "/:system-id/:app-id/documentation" [system-id app-id :as {:keys [body]}]
-             (service/success-response (apps/edit-app-docs system-id app-id body)))
+        (POST "/:app-id/documentation" [app-id :as {:keys [body]}]
+              (service/success-response (apps/add-app-docs system-id app-id body)))
 
-      (DELETE "/:system-id/:app-id/favorite" [system-id app-id]
-              (service/success-response (apps/remove-favorite-app system-id app-id)))
+        (PATCH "/:app-id/documentation" [app-id :as {:keys [body]}]
+               (service/success-response (apps/edit-app-docs system-id app-id body)))
 
-      (PUT "/:system-id/:app-id/favorite" [system-id app-id]
-           (service/success-response (apps/add-favorite-app system-id app-id)))
+        (DELETE "/:app-id/favorite" [app-id]
+                (service/success-response (apps/remove-favorite-app system-id app-id)))
 
-      (GET "/:system-id/:app-id/integration-data" [system-id app-id]
-           (service/success-response (apps/get-app-integration-data system-id app-id)))
+        (PUT "/:app-id/favorite" [app-id]
+             (service/success-response (apps/add-favorite-app system-id app-id)))
 
-      (GET "/:system-id/:app-id/is-publishable" [system-id app-id]
-           (service/success-response (apps/app-publishable? system-id app-id)))
+        (GET "/:app-id/integration-data" [app-id]
+             (service/success-response (apps/get-app-integration-data system-id app-id)))
 
-      (POST "/:system-id/:app-id/publish" [system-id app-id :as {:keys [body]}]
-            (service/success-response (apps/make-app-public system-id app-id body)))
+        (GET "/:app-id/is-publishable" [app-id]
+             (service/success-response (apps/app-publishable? system-id app-id)))
 
-      (DELETE "/:system-id/:app-id/rating" [system-id app-id]
-              (service/success-response (apps/delete-rating system-id app-id)))
+        (POST "/:app-id/publish" [app-id :as {:keys [body]}]
+              (service/success-response (apps/make-app-public system-id app-id body)))
 
-      (POST "/:system-id/:app-id/rating" [system-id app-id :as {body :body}]
-            (service/success-response (apps/rate-app system-id app-id body)))
+        (DELETE "/:app-id/rating" [app-id]
+                (service/success-response (apps/delete-rating system-id app-id)))
 
-      (GET "/:system-id/:app-id/tasks" [system-id app-id]
-           (service/success-response (apps/list-app-tasks system-id app-id)))
+        (POST "/:app-id/rating" [app-id :as {body :body}]
+              (service/success-response (apps/rate-app system-id app-id body)))
 
-      (GET "/:system-id/:app-id/tools" [system-id app-id]
-           (service/success-response (apps/get-tools-in-app system-id app-id)))
+        (GET "/:app-id/tasks" [app-id]
+             (service/success-response (apps/list-app-tasks system-id app-id)))
 
-      (GET "/:system-id/:app-id/ui" [system-id app-id]
-           (service/success-response (apps/get-app-ui system-id app-id))))))
+        (GET "/:app-id/tools" [app-id]
+             (service/success-response (apps/get-tools-in-app system-id app-id)))
+
+        (GET "/:app-id/ui" [app-id]
+             (service/success-response (apps/get-app-ui system-id app-id)))))))
 
 (defn admin-app-avu-routes
   []
