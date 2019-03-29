@@ -46,7 +46,7 @@
                  [org.cyverse/service-logging "2.8.0"]]
   :eastwood {:exclude-namespaces [terrain.util.jwt :test-paths]
              :linters [:wrong-arity :wrong-ns-form :wrong-pre-post :wrong-tag :misplaced-docstrings]}
-  :plugins [[lein-ring "0.9.2" :exclusions [org.clojure/clojure]]
+  :plugins [[lein-ring "0.12.5" :exclusions [org.clojure/clojure]]
             [swank-clojure "1.4.2" :exclusions [org.clojure/clojure]]
             [test2junit "1.2.2"]
             [jonase/eastwood "0.3.5"]]

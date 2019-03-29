@@ -500,6 +500,13 @@
                 :as               :stream
                 :follow-redirects false}))
 
+(defn get-job-history
+  [analysis-id]
+  (client/get (apps-url "analyses" analysis-id "history")
+              {:query-params      (secured-params)
+               :as                :stream
+               :follow-redirecrts false}))
+
 (defn admin-get-apps
   [params]
   (client/get (apps-url "admin" "apps")

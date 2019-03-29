@@ -321,6 +321,9 @@
    (POST "/analyses/shredder" [:as {:keys [body]}]
      (service/success-response (apps/delete-jobs body)))
 
+   (GET "/analyses/:analysis-id/history" [analysis-id]
+     (service/success-response (apps/get-job-history analysis-id)))
+
    (GET "/analyses/:analysis-id/parameters" [analysis-id]
      (service/success-response (apps/get-job-params analysis-id)))
 
