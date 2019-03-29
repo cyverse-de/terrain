@@ -225,12 +225,13 @@
 
 (defn update-app
   [system-id app-id update-request]
-  (client/put (apps-url "apps" system-id app-id)
-              {:query-params     (secured-params)
-               :body             update-request
-               :content-type     :json
-               :as               :stream
-               :follow-redirects false}))
+  (:body
+    (client/put (apps-url "apps" system-id app-id)
+                {:query-params     (secured-params)
+                 :form-params      update-request
+                 :content-type     :json
+                 :as               :json
+                 :follow-redirects false})))
 
 (defn copy-app
   [system-id app-id]

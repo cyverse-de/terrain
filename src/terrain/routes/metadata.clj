@@ -20,6 +20,8 @@
                 AppPreviewSummary
                 AppsShredderDocs
                 AppsShredderSummary
+                AppUpdateRequest
+                AppUpdateSummary
                 StringAppIdParam
                 SystemId]]
         [common-swagger-api.schema.apps.permission
@@ -284,8 +286,12 @@
                  :description-file "docs/apps/app-label-update.md"
                  (ok (apps/relabel-app system-id app-id body)))
 
-          (PUT "/" [:as {:keys [body]}]
-               (service/success-response (apps/update-app system-id app-id body)))
+          (PUT "/" []
+               :body [body AppUpdateRequest]
+               :return App
+               :summary AppUpdateSummary
+               :description-file "docs/apps/app-update.md"
+               (ok (apps/update-app system-id app-id body)))
 
           (POST "/copy" []
                 (service/success-response (apps/copy-app system-id app-id)))
