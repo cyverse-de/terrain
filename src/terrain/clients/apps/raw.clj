@@ -149,12 +149,13 @@
 
 (defn preview-args
   [system-id app]
-  (client/post (apps-url "apps" system-id "arg-preview")
-               {:query-params     (secured-params)
-                :body             app
-                :content-type     :json
-                :as               :stream
-                :follow-redirects false}))
+  (:body
+    (client/post (apps-url "apps" system-id "arg-preview")
+                 {:query-params     (secured-params)
+                  :form-params      app
+                  :content-type     :json
+                  :as               :json
+                  :follow-redirects false})))
 
 (defn delete-apps
   [deletion-request]

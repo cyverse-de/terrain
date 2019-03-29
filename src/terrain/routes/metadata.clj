@@ -8,6 +8,9 @@
                 AppDeletionRequest
                 AppListing
                 AppListingSummary
+                AppPreviewDocs
+                AppPreviewRequest
+                AppPreviewSummary
                 AppsShredderDocs
                 AppsShredderSummary
                 SystemId]]
@@ -246,8 +249,11 @@
               :description AppCreateDocs
               (ok (apps/create-app system-id body)))
 
-        (POST "/arg-preview" [:as {:keys [body]}]
-              (service/success-response (apps/preview-args system-id body)))
+        (POST "/arg-preview" []
+              :body [body AppPreviewRequest]
+              :summary AppPreviewSummary
+              :description AppPreviewDocs
+              (ok (apps/preview-args system-id body)))
 
         (GET "/:app-id" [app-id]
              (service/success-response (apps/get-app system-id app-id)))
