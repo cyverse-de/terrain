@@ -609,12 +609,13 @@
 
 (defn edit-app-docs
   [system-id app-id docs]
-  (client/patch (apps-url "apps" system-id app-id "documentation")
-                {:query-params     (secured-params)
-                 :content-type     :json
-                 :body             docs
-                 :as               :stream
-                 :follow-redirects false}))
+  (:body
+    (client/patch (apps-url "apps" system-id app-id "documentation")
+                  {:query-params     (secured-params)
+                   :form-params      docs
+                   :content-type     :json
+                   :as               :json
+                   :follow-redirects false})))
 
 (defn add-app-docs
   [system-id app-id docs]

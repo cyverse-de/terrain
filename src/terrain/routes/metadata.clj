@@ -14,7 +14,10 @@
                 AppDetailsSummary
                 AppDocumentation
                 AppDocumentationDocs
+                AppDocumentationRequest
                 AppDocumentationSummary
+                AppDocumentationUpdateDocs
+                AppDocumentationUpdateSummary
                 AppJobView
                 AppJobViewDocs
                 AppJobViewSummary
@@ -318,11 +321,15 @@
                :description AppDocumentationDocs
                (ok (apps/get-app-docs system-id app-id)))
 
+          (PATCH "/documentation" []
+                 :body [body AppDocumentationRequest]
+                 :return AppDocumentation
+                 :summary AppDocumentationUpdateSummary
+                 :description AppDocumentationUpdateDocs
+                 (ok (apps/edit-app-docs system-id app-id body)))
+
           (POST "/documentation" [:as {:keys [body]}]
                 (service/success-response (apps/add-app-docs system-id app-id body)))
-
-          (PATCH "/documentation" [:as {:keys [body]}]
-                 (service/success-response (apps/edit-app-docs system-id app-id body)))
 
           (DELETE "/favorite" []
                   (service/success-response (apps/remove-favorite-app system-id app-id)))
