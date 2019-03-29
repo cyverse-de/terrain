@@ -258,10 +258,11 @@
 
 (defn remove-favorite-app
   [system-id app-id]
-  (client/delete (apps-url "apps" system-id app-id "favorite")
-                 {:query-params     (secured-params)
-                  :as               :stream
-                  :follow-redirects false}))
+  (:body
+    (client/delete (apps-url "apps" system-id app-id "favorite")
+                   {:query-params     (secured-params)
+                    :as               :json
+                    :follow-redirects false})))
 
 (defn add-favorite-app
   [system-id app-id]

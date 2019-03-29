@@ -20,6 +20,8 @@
                 AppDocumentationSummary
                 AppDocumentationUpdateDocs
                 AppDocumentationUpdateSummary
+                AppFavoriteDeleteDocs
+                AppFavoriteDeleteSummary
                 AppJobView
                 AppJobViewDocs
                 AppJobViewSummary
@@ -338,7 +340,9 @@
                 (ok (apps/add-app-docs system-id app-id body)))
 
           (DELETE "/favorite" []
-                  (service/success-response (apps/remove-favorite-app system-id app-id)))
+                  :summary AppFavoriteDeleteSummary
+                  :description AppFavoriteDeleteDocs
+                  (ok (apps/remove-favorite-app system-id app-id)))
 
           (PUT "/favorite" []
                (service/success-response (apps/add-favorite-app system-id app-id)))
