@@ -20,6 +20,8 @@
                 AppDocumentationSummary
                 AppDocumentationUpdateDocs
                 AppDocumentationUpdateSummary
+                AppFavoriteAddDocs
+                AppFavoriteAddSummary
                 AppFavoriteDeleteDocs
                 AppFavoriteDeleteSummary
                 AppJobView
@@ -345,7 +347,9 @@
                   (ok (apps/remove-favorite-app system-id app-id)))
 
           (PUT "/favorite" []
-               (service/success-response (apps/add-favorite-app system-id app-id)))
+               :summary AppFavoriteAddSummary
+               :description AppFavoriteAddDocs
+               (ok (apps/add-favorite-app system-id app-id)))
 
           (GET "/integration-data" []
                (service/success-response (apps/get-app-integration-data system-id app-id)))

@@ -266,10 +266,11 @@
 
 (defn add-favorite-app
   [system-id app-id]
-  (client/put (apps-url "apps" system-id app-id "favorite")
-              {:query-params     (secured-params)
-               :as               :stream
-               :follow-redirects false}))
+  (:body
+    (client/put (apps-url "apps" system-id app-id "favorite")
+                {:query-params     (secured-params)
+                 :as               :json
+                 :follow-redirects false})))
 
 (defn app-publishable?
   [system-id app-id]
