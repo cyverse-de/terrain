@@ -12,6 +12,9 @@
                 AppDeletionRequest
                 AppDetails
                 AppDetailsSummary
+                AppDocumentation
+                AppDocumentationDocs
+                AppDocumentationSummary
                 AppJobView
                 AppJobViewDocs
                 AppJobViewSummary
@@ -310,7 +313,10 @@
                (ok (apps/get-app-details system-id app-id)))
 
           (GET "/documentation" []
-               (service/success-response (apps/get-app-docs system-id app-id)))
+               :return AppDocumentation
+               :summary AppDocumentationSummary
+               :description AppDocumentationDocs
+               (ok (apps/get-app-docs system-id app-id)))
 
           (POST "/documentation" [:as {:keys [body]}]
                 (service/success-response (apps/add-app-docs system-id app-id body)))
