@@ -331,7 +331,10 @@
      (service/success-response (apps/list-job-steps analysis-id)))
 
    (POST "/analyses/:analysis-id/stop" [analysis-id :as {:keys [params]}]
-     (service/success-response (apps/stop-job analysis-id params)))))
+     (service/success-response (apps/stop-job analysis-id params)))
+
+   (GET "/analyses/:analysis-id/history" [analysis-id]
+     (service/success-response (apps/get-job-history analysis-id)))))
 
 (defn admin-reference-genomes-routes
   []
