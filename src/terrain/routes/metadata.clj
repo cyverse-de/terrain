@@ -24,6 +24,8 @@
                 AppFavoriteAddSummary
                 AppFavoriteDeleteDocs
                 AppFavoriteDeleteSummary
+                AppIntegrationDataDocs
+                AppIntegrationDataSummary
                 AppJobView
                 AppJobViewDocs
                 AppJobViewSummary
@@ -54,6 +56,7 @@
                 AppUnsharingResponse
                 AppUnsharingSummary
                 PermissionListerQueryParams]]
+        [common-swagger-api.schema.integration-data :only [IntegrationData]]
         [ring.util.http-response :only [ok]]
         [terrain.routes.schemas.apps]
         [terrain.services.metadata.apps]
@@ -352,7 +355,10 @@
                (ok (apps/add-favorite-app system-id app-id)))
 
           (GET "/integration-data" []
-               (service/success-response (apps/get-app-integration-data system-id app-id)))
+               :return IntegrationData
+               :summary AppIntegrationDataSummary
+               :description AppIntegrationDataDocs
+               (ok (apps/get-app-integration-data system-id app-id)))
 
           (GET "/is-publishable" []
                (service/success-response (apps/app-publishable? system-id app-id)))
