@@ -3,12 +3,6 @@
             [terrain.clients.apps.raw :as raw]
             [terrain.util.service :as service]))
 
-(defn get-app
-  [system-id app-id]
-  (->> (raw/get-app system-id app-id)
-       (:body)
-       (service/decode-json)))
-
 (defn get-app-details
   [system-id app-id]
   (->> (raw/get-app-details system-id app-id)
@@ -35,12 +29,6 @@
   [submission]
   (raw/submit-job (cheshire/encode submission)))
 
-(defn get-users-by-id
-  [ids]
-  (-> (raw/get-users-by-id (cheshire/encode {:ids ids}))
-      (:body)
-      (service/decode-json)))
-
 (defn get-authenticated-user
   []
   (-> (raw/get-authenticated-user)
@@ -57,12 +45,6 @@
   [ip-address login-time]
   (raw/record-logout ip-address login-time)
   nil)
-
-(defn get-auth-redirect-uris
-  []
-  (-> (raw/get-oauth-redirect-uris)
-      :body
-      service/decode-json))
 
 (defn bootstrap
   []

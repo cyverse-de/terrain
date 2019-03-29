@@ -199,10 +199,11 @@
 
 (defn get-app
   [system-id app-id]
-  (client/get (apps-url "apps" system-id app-id)
-              {:query-params     (secured-params)
-               :as               :stream
-               :follow-redirects false}))
+  (:body
+    (client/get (apps-url "apps" system-id app-id)
+                {:query-params     (secured-params)
+                 :as               :json
+                 :follow-redirects false})))
 
 (defn delete-app
   [system-id app-id]
@@ -862,15 +863,6 @@
                  {:query-params     (secured-params params [:permanent])
                   :as               :stream
                   :follow-redirects false}))
-
-(defn get-users-by-id
-  [body]
-  (client/post (apps-url "users" "by-id")
-               {:query-params     (secured-params)
-                :as               :stream
-                :body             body
-                :content-type     :json
-                :follow-redirects false}))
 
 (defn get-authenticated-user
   []
