@@ -160,7 +160,7 @@
   (:body
     (client/post (apps-url "apps" "shredder")
                  {:query-params     (secured-params)
-                  :body             deletion-request
+                  :form-params      deletion-request
                   :content-type     :json
                   :as               :json
                   :follow-redirects false})))
@@ -170,7 +170,7 @@
   (:body
     (client/post (apps-url "apps" "permission-lister")
                  {:query-params     (secured-params params)
-                  :body             body
+                  :form-params      body
                   :content-type     :json
                   :as               :json
                   :follow-redirects false})))
@@ -180,7 +180,7 @@
   (:body
     (client/post (apps-url "apps" "sharing")
                  {:query-params     (secured-params)
-                  :body             body
+                  :form-params      body
                   :content-type     :json
                   :as               :json
                   :follow-redirects false})))
@@ -190,7 +190,7 @@
   (:body
     (client/post (apps-url "apps" "unsharing")
                  {:query-params     (secured-params)
-                  :body             body
+                  :form-params      body
                   :content-type     :json
                   :as               :json
                   :follow-redirects false})))

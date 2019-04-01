@@ -25,7 +25,6 @@
         [terrain.services.bootstrap]
         [terrain.util])
   (:require [common-swagger-api.routes]                     ;; Required for :description-file
-            [cheshire.core :as json]
             [terrain.clients.apps.raw :as apps]
             [terrain.clients.metadata :as metadata]
             [terrain.clients.metadata.raw :as metadata-client]
@@ -207,7 +206,7 @@
             :body [body AppDeletionRequest]
             :summary AppsShredderSummary
             :description AppsShredderDocs
-            (ok (apps/delete-apps (json/encode body))))
+            (ok (apps/delete-apps body)))
 
       (POST "/permission-lister" []
             :query [params PermissionListerQueryParams]
@@ -215,21 +214,21 @@
             :return AppPermissionListing
             :summary AppPermissionListingSummary
             :description AppPermissionListingDocs
-            (ok (apps/list-permissions (json/encode body) params)))
+            (ok (apps/list-permissions body params)))
 
       (POST "/sharing" [:as {:keys [body]}]
             :body [body AppSharingRequest]
             :return AppSharingResponse
             :summary AppSharingSummary
             :description AppSharingDocs
-            (ok (apps/share (json/encode body))))
+            (ok (apps/share body)))
 
       (POST "/unsharing" [:as {:keys [body]}]
             :body [body AppUnsharingRequest]
             :return AppUnsharingResponse
             :summary AppUnsharingSummary
             :description AppUnsharingDocs
-            (ok (apps/unshare (json/encode body))))
+            (ok (apps/unshare body)))
 
       (POST "/:system-id" [system-id :as {:keys [body]}]
             (service/success-response (apps/create-app system-id body)))
