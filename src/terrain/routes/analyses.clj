@@ -173,7 +173,7 @@
       :summary     "Edit a globally-defined Quick Launch default"
       :description "Edit a globally-defined Quick Launch default. Note that most
       or all of the fields in the JSON body are optional"
-      (ok (analyses/update-quicklaunch-user-default id update)))
+      (ok (analyses/update-quicklaunch-global-default id update)))
 
     (POST "/" []
       :body        [new NewQuickLaunchGlobalDefault]
