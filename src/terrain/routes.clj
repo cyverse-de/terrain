@@ -78,7 +78,10 @@
 (defn secured-routes
   []
   (util/flagged-routes
-    (secured-analyses-routes)
+    (secured-quicklaunch-routes)
+    (secured-quicklaunch-favorites-routes)
+    (secured-quicklaunch-user-defaults-routes)
+    (secured-quicklaunch-global-defaults-routes)
     (secured-notification-routes)
     (secured-metadata-routes)
     (secured-pref-routes)

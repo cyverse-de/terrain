@@ -34,3 +34,74 @@
                     {:content-type :json
                      :as           :json
                      :form-params  submission-info})))
+
+(defn get-quicklaunch-favorite
+  [id]
+  (:body (http/get (analyses-url ["quicklaunch" "favorites" id]) {:as :json})))
+
+(defn get-all-quicklaunch-favorites
+  []
+  (:body (http/get (analyses-url ["quicklaunch" "favorites"]) {:as :json})))
+
+(defn delete-quicklaunch-favorite
+  [id]
+  (:body (http/delete (analyses-url ["quicklaunch" "favorites" id]) {:as :json})))
+
+(defn add-quicklaunch-favorite
+  [ql]
+  (:body (http/post (analyses-url ["quicklaunch" "favorites"])
+                    {:content-type :json
+                     :as           :json
+                     :form-params  ql})))
+
+(defn get-quicklaunch-user-default
+  [id]
+  (:body (http/get (analyses-url ["quicklaunch" "defaults" "user" id]) {:as :json})))
+
+(defn get-all-quicklaunch-user-defaults
+  []
+  (:body (http/get (analyses-url ["quicklaunch" "defaults" "user"]) {:as :json})))
+
+(defn delete-quicklaunch-user-default
+  [id]
+  (:body (http/delete (analyses-url ["quicklaunch" "defaults" "user" id]) {:as :json})))
+
+(defn update-quicklaunch-user-default
+  [id ql]
+  (:body (http/patch (analyses-url ["quicklaunch" "defaults" "user" id])
+                     {:content-type :json
+                      :as           :json
+                      :form-params   ql})))
+
+(defn add-quicklaunch-user-default
+  [ql]
+  (:body (http/post (analyses-url ["quicklaunch" "defaults" "user"])
+                    {:content-type :json
+                     :as           :json
+                     :form-params  ql})))
+
+(defn get-quicklaunch-global-default
+  [id]
+  (:body (http/get (analyses-url ["quicklaunch" "defaults" "global" id]) {:as :json})))
+
+(defn get-all-quicklaunch-global-defaults
+  []
+  (:body (http/get (analyses-url ["quicklaunch" "defaults" "global"]) {:as :json})))
+
+(defn delete-quicklaunch-global-default
+  [id]
+  (:body (http/delete (analyses-url ["quicklaunch" "defaults" "global"]) {:as :json})))
+
+(defn update-quicklaunch-global-default
+  [id ql]
+  (:body (http/patch (analyses-url ["quicklaunch" "defaults" "global" id])
+                     {:content-type :json
+                      :as           :json
+                      :form-params  ql})))
+
+(defn add-quicklaunch-global-default
+  [ql]
+  (:body (http/post (analyses-url ["quicklaunch" "defaults" "global"])
+                    {:content-type :json
+                     :as           :json
+                     :form-params  ql})))
