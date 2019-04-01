@@ -17,6 +17,10 @@
   [id]
   (:body (http/get (analyses-url ["quicklaunches" id]) {:as :json})))
 
+(defn get-all-quicklaunches
+  []
+  (:body (http/get (analyses-url ["quicklaunches"]) {:as :json})))
+
 (defn delete-quicklaunch
   [id]
   (:body (http/delete (analyses-url ["quicklaunches" id]) {:as :json})))
@@ -90,7 +94,7 @@
 
 (defn delete-quicklaunch-global-default
   [id]
-  (:body (http/delete (analyses-url ["quicklaunch" "defaults" "global"]) {:as :json})))
+  (:body (http/delete (analyses-url ["quicklaunch" "defaults" "global" id]) {:as :json})))
 
 (defn update-quicklaunch-global-default
   [id ql]
