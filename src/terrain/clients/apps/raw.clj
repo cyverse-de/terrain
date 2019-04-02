@@ -368,12 +368,13 @@
 
 (defn rate-app
   [system-id app-id rating]
-  (client/post (apps-url "apps" system-id app-id "rating")
-               {:query-params     (secured-params)
-                :body             rating
-                :content-type     :json
-                :as               :stream
-                :follow-redirects false}))
+  (:body
+    (client/post (apps-url "apps" system-id app-id "rating")
+                 {:query-params     (secured-params)
+                  :form-params      rating
+                  :content-type     :json
+                  :as               :json
+                  :follow-redirects false})))
 
 (defn list-app-tasks
   [system-id app-id]

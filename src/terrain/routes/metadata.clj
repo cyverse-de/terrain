@@ -41,6 +41,8 @@
                 AppPublishableSummary
                 AppRatingDeleteDocs
                 AppRatingDeleteSummary
+                AppRatingDocs
+                AppRatingSummary
                 AppsShredderDocs
                 AppsShredderSummary
                 AppUpdateRequest
@@ -387,8 +389,12 @@
                   :description AppRatingDeleteDocs
                   (ok (apps/delete-rating system-id app-id)))
 
-          (POST "/rating" [:as {body :body}]
-                (service/success-response (apps/rate-app system-id app-id body)))
+          (POST "/rating" []
+                :body [body RatingRequest]
+                :return RatingResponse
+                :summary AppRatingSummary
+                :description AppRatingDocs
+                (ok (apps/rate-app system-id app-id body)))
 
           (GET "/tasks" []
                (service/success-response (apps/list-app-tasks system-id app-id)))
