@@ -378,10 +378,11 @@
 
 (defn list-app-tasks
   [system-id app-id]
-  (client/get (apps-url "apps" system-id app-id "tasks")
-              {:query-params     (secured-params)
-               :as               :stream
-               :follow-redirects false}))
+  (:body
+    (client/get (apps-url "apps" system-id app-id "tasks")
+                {:query-params     (secured-params)
+                 :as               :json
+                 :follow-redirects false})))
 
 (defn get-app-ui
   [system-id app-id]

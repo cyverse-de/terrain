@@ -45,6 +45,9 @@
                 AppRatingSummary
                 AppsShredderDocs
                 AppsShredderSummary
+                AppTaskListing
+                AppTaskListingDocs
+                AppTaskListingSummary
                 AppUpdateRequest
                 AppUpdateSummary
                 PublishAppDocs
@@ -397,7 +400,10 @@
                 (ok (apps/rate-app system-id app-id body)))
 
           (GET "/tasks" []
-               (service/success-response (apps/list-app-tasks system-id app-id)))
+               :return AppTaskListing
+               :summary AppTaskListingSummary
+               :description AppTaskListingDocs
+               (ok (apps/list-app-tasks system-id app-id)))
 
           (GET "/tools" []
                (service/success-response (apps/get-tools-in-app system-id app-id)))
