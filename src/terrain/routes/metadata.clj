@@ -39,6 +39,8 @@
                 AppPublishableDocs
                 AppPublishableResponse
                 AppPublishableSummary
+                AppRatingDeleteDocs
+                AppRatingDeleteSummary
                 AppsShredderDocs
                 AppsShredderSummary
                 AppUpdateRequest
@@ -62,6 +64,7 @@
                 AppUnsharingResponse
                 AppUnsharingSummary
                 PermissionListerQueryParams]]
+        [common-swagger-api.schema.apps.rating]
         [common-swagger-api.schema.integration-data :only [IntegrationData]]
         [ring.util.http-response :only [ok]]
         [terrain.routes.schemas.apps]
@@ -379,7 +382,10 @@
                 (ok (apps/make-app-public system-id app-id body)))
 
           (DELETE "/rating" []
-                  (service/success-response (apps/delete-rating system-id app-id)))
+                  :return RatingResponse
+                  :summary AppRatingDeleteSummary
+                  :description AppRatingDeleteDocs
+                  (ok (apps/delete-rating system-id app-id)))
 
           (POST "/rating" [:as {body :body}]
                 (service/success-response (apps/rate-app system-id app-id body)))

@@ -360,10 +360,11 @@
 
 (defn delete-rating
   [system-id app-id]
-  (client/delete (apps-url "apps" system-id app-id "rating")
-                 {:query-params     (secured-params)
-                  :as               :stream
-                  :follow-redirects false}))
+  (:body
+    (client/delete (apps-url "apps" system-id app-id "rating")
+                   {:query-params     (secured-params)
+                    :as               :json
+                    :follow-redirects false})))
 
 (defn rate-app
   [system-id app-id rating]
