@@ -274,10 +274,11 @@
 
 (defn app-publishable?
   [system-id app-id]
-  (client/get (apps-url "apps" system-id app-id "is-publishable")
-              {:query-params     (secured-params)
-               :as               :stream
-               :follow-redirects false}))
+  (:body
+    (client/get (apps-url "apps" system-id app-id "is-publishable")
+                {:query-params     (secured-params)
+                 :as               :json
+                 :follow-redirects false})))
 
 (defn remove-app-from-communities
   [app-id body]

@@ -36,6 +36,9 @@
                 AppPreviewDocs
                 AppPreviewRequest
                 AppPreviewSummary
+                AppPublishableDocs
+                AppPublishableResponse
+                AppPublishableSummary
                 AppsShredderDocs
                 AppsShredderSummary
                 AppUpdateRequest
@@ -361,7 +364,10 @@
                (ok (apps/get-app-integration-data system-id app-id)))
 
           (GET "/is-publishable" []
-               (service/success-response (apps/app-publishable? system-id app-id)))
+               :return AppPublishableResponse
+               :summary AppPublishableSummary
+               :description AppPublishableDocs
+               (ok (apps/app-publishable? system-id app-id)))
 
           (POST "/publish" [:as {:keys [body]}]
                 (service/success-response (apps/make-app-public system-id app-id body)))
