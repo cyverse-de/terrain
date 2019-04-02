@@ -20,6 +20,8 @@
                 AppDocumentationSummary
                 AppDocumentationUpdateDocs
                 AppDocumentationUpdateSummary
+                AppEditingViewDocs
+                AppEditingViewSummary
                 AppFavoriteAddDocs
                 AppFavoriteAddSummary
                 AppFavoriteDeleteDocs
@@ -415,7 +417,10 @@
                (ok (apps/get-tools-in-app system-id app-id)))
 
           (GET "/ui" []
-               (service/success-response (apps/get-app-ui system-id app-id))))))))
+               :return App
+               :summary AppEditingViewSummary
+               :description AppEditingViewDocs
+               (ok (apps/get-app-ui system-id app-id))))))))
 
 (defn admin-app-avu-routes
   []

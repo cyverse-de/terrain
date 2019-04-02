@@ -386,10 +386,11 @@
 
 (defn get-app-ui
   [system-id app-id]
-  (client/get (apps-url "apps" system-id app-id "ui")
-              {:query-params     (secured-params)
-               :as               :stream
-               :follow-redirects false}))
+  (:body
+    (client/get (apps-url "apps" system-id app-id "ui")
+                {:query-params     (secured-params)
+                 :as               :json
+                 :follow-redirects false})))
 
 (defn add-pipeline
   [pipeline]
