@@ -725,10 +725,11 @@
 
 (defn get-tools-in-app
   [system-id app-id]
-  (client/get (apps-url "apps" system-id app-id "tools")
-              {:query-params     (secured-params)
-               :as               :stream
-               :follow-redirects false}))
+  (:body
+    (client/get (apps-url "apps" system-id app-id "tools")
+                {:query-params     (secured-params)
+                 :as               :json
+                 :follow-redirects false})))
 
 (defn admin-list-tools
   [params]

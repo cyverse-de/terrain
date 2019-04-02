@@ -48,6 +48,9 @@
                 AppTaskListing
                 AppTaskListingDocs
                 AppTaskListingSummary
+                AppToolListing
+                AppToolListingDocs
+                AppToolListingSummary
                 AppUpdateRequest
                 AppUpdateSummary
                 PublishAppDocs
@@ -406,7 +409,10 @@
                (ok (apps/list-app-tasks system-id app-id)))
 
           (GET "/tools" []
-               (service/success-response (apps/get-tools-in-app system-id app-id)))
+               :return AppToolListing
+               :summary AppToolListingSummary
+               :description AppToolListingDocs
+               (ok (apps/get-tools-in-app system-id app-id)))
 
           (GET "/ui" []
                (service/success-response (apps/get-app-ui system-id app-id))))))))
