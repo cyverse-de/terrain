@@ -43,6 +43,9 @@
                 AppsShredderSummary
                 AppUpdateRequest
                 AppUpdateSummary
+                PublishAppDocs
+                PublishAppRequest
+                PublishAppSummary
                 StringAppIdParam
                 SystemId]]
         [common-swagger-api.schema.apps.permission
@@ -369,8 +372,11 @@
                :description AppPublishableDocs
                (ok (apps/app-publishable? system-id app-id)))
 
-          (POST "/publish" [:as {:keys [body]}]
-                (service/success-response (apps/make-app-public system-id app-id body)))
+          (POST "/publish" []
+                :body [body PublishAppRequest]
+                :summary PublishAppSummary
+                :description PublishAppDocs
+                (ok (apps/make-app-public system-id app-id body)))
 
           (DELETE "/rating" []
                   (service/success-response (apps/delete-rating system-id app-id)))

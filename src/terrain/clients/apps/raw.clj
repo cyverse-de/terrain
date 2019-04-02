@@ -350,12 +350,13 @@
 
 (defn make-app-public
   [system-id app-id app]
-  (client/post (apps-url "apps" system-id app-id "publish")
-               {:query-params     (secured-params)
-                :body             app
-                :content-type     :json
-                :as               :stream
-                :follow-redirects false}))
+  (:body
+    (client/post (apps-url "apps" system-id app-id "publish")
+                 {:query-params     (secured-params)
+                  :form-params      app
+                  :content-type     :json
+                  :as               :json
+                  :follow-redirects false})))
 
 (defn delete-rating
   [system-id app-id]
