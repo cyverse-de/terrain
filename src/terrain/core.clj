@@ -1,6 +1,6 @@
 (ns terrain.core
   (:gen-class)
-  (:use [clojure.java.io :only [file]])
+  (:use [clojure.java.io :only [file resource]])
   (:require [terrain.util.config :as config]
             [clojure.tools.nrepl.server :as nrepl]
             [me.raynes.fs :as fs]
@@ -27,11 +27,7 @@
 
 (defn- classpath-file
   [filename]
-  (some-> (Thread/currentThread)
-          (.getContextClassLoader)
-          (.findResource filename)
-          (.toURI)
-          (file)))
+  (some-> (resource filename) file))
 
 (defn- no-configuration-found
   [filename]
