@@ -23,6 +23,7 @@
                  [clj-time "0.15.1"]
                  [clojurewerkz/elastisch "3.0.0"]
                  [com.cemerick/url "0.1.1" :exclusions [com.cemerick/clojurescript.test]]
+                 [compojure "1.6.1"]
                  [dire "0.5.4"]
                  [me.raynes/fs "1.4.6"]
                  [medley "1.1.0"]
