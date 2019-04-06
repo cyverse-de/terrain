@@ -36,9 +36,10 @@
 
 (defn- terrain-response-from-response-map
   [e status-code]
-  (if-not (content-type-specified? e)
-    (update-in e [:headers] assoc "Content-Type" default-content-type)
-    e))
+  (let [e (select-keys e [:headers :status :length :body])]
+    (if-not (content-type-specified? e)
+      (update-in e [:headers] assoc "Content-Type" default-content-type)
+      e)))
 
 (defn- terrain-response-from-map
   [e status-code]

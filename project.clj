@@ -19,7 +19,7 @@
                  [org.clojure/data.xml "0.0.8"]
                  [org.clojure/tools.nrepl "0.2.13"]
                  [cheshire "5.8.1"]
-                 [clj-http "3.4.1"]
+                 [clj-http "3.9.1"]
                  [clj-time "0.15.1"]
                  [clojurewerkz/elastisch "3.0.0"]
                  [com.cemerick/url "0.1.1" :exclusions [com.cemerick/clojurescript.test]]
