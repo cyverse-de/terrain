@@ -9,6 +9,7 @@
         [terrain.middleware :only [wrap-context-path-adder wrap-query-param-remover]]
         [terrain.routes.admin]
         [terrain.routes.apps.elements]
+        [terrain.routes.apps.pipelines]
         [terrain.routes.data]
         [terrain.routes.permanent-id-requests]
         [terrain.routes.fileio]
@@ -60,6 +61,7 @@
    (app-ontology-routes)
    (app-community-routes)
    (app-elements-routes)
+   (app-pipeline-routes)
    (apps-routes)
    (analysis-routes)
    (coge-routes)
@@ -191,6 +193,7 @@
                                      {:name "admin-filesystem", :description "File System Administration Endpoints"}
                                      {:name "apps", :description, "Apps Endpoints"}
                                      {:name "app-element-types", :description, "App Element Endpoints"}
+                                     {:name "app-pipelines", :description "App Pipeline Endpoints"}
                                      {:name "coge", :description "CoGe Endpoints"}
                                      {:name "collaborator-lists", :description "Collaborator List Endpoints"}
                                      {:name "communities", :description "Community Endpoints"}

@@ -188,18 +188,6 @@
            :description-file "docs/apps/apps-listing.md"
            (ok (apps/search-apps params)))
 
-      (POST "/pipelines" [:as {:keys [body]}]
-            (service/success-response (apps/add-pipeline body)))
-
-      (PUT "/pipelines/:app-id" [app-id :as {:keys [body]}]
-           (service/success-response (apps/update-pipeline app-id body)))
-
-      (POST "/pipelines/:app-id/copy" [app-id]
-            (service/success-response (apps/copy-pipeline app-id)))
-
-      (GET "/pipelines/:app-id/ui" [app-id]
-           (service/success-response (apps/edit-pipeline app-id)))
-
       (POST "/shredder" []
             :body [body schema/AppDeletionRequest]
             :summary schema/AppsShredderSummary
