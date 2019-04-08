@@ -1,30 +1,28 @@
 (ns terrain.routes.metadata
   (:use [common-swagger-api.schema]
-        [common-swagger-api.schema.apps :only [AppDeletionRequest
-                                               AppListing
-                                               AppListingSummary
-                                               AppsShredderDocs
-                                               AppsShredderSummary
-                                               SystemId]]
-        [common-swagger-api.schema.apps.permission :only [AppPermissionListing
-                                                          AppPermissionListingDocs
-                                                          AppPermissionListingRequest
-                                                          AppPermissionListingSummary
-                                                          AppSharingDocs
-                                                          AppSharingRequest
-                                                          AppSharingResponse
-                                                          AppSharingSummary
-                                                          AppUnsharingDocs
-                                                          AppUnsharingRequest
-                                                          AppUnsharingResponse
-                                                          AppUnsharingSummary
-                                                          PermissionListerQueryParams]]
+        [common-swagger-api.schema.apps.permission
+         :only [AppPermissionListing
+                AppPermissionListingDocs
+                AppPermissionListingRequest
+                AppPermissionListingSummary
+                AppSharingDocs
+                AppSharingRequest
+                AppSharingResponse
+                AppSharingSummary
+                AppUnsharingDocs
+                AppUnsharingRequest
+                AppUnsharingResponse
+                AppUnsharingSummary
+                PermissionListerQueryParams]]
+        [common-swagger-api.schema.apps.rating]
+        [common-swagger-api.schema.integration-data :only [IntegrationData]]
         [ring.util.http-response :only [ok]]
         [terrain.routes.schemas.apps]
         [terrain.services.metadata.apps]
         [terrain.services.bootstrap]
         [terrain.util])
   (:require [common-swagger-api.routes]                     ;; Required for :description-file
+            [common-swagger-api.schema.apps :as schema]
             [terrain.clients.apps.raw :as apps]
             [terrain.clients.metadata :as metadata]
             [terrain.clients.metadata.raw :as metadata-client]
@@ -185,8 +183,8 @@
 
       (GET "/" []
            :query [params AppSearchParams]
-           :return AppListing
-           :summary AppListingSummary
+           :return schema/AppListing
+           :summary schema/AppListingSummary
            :description-file "docs/apps/apps-listing.md"
            (ok (apps/search-apps params)))
 
@@ -203,9 +201,9 @@
            (service/success-response (apps/edit-pipeline app-id)))
 
       (POST "/shredder" []
-            :body [body AppDeletionRequest]
-            :summary AppsShredderSummary
-            :description AppsShredderDocs
+            :body [body schema/AppDeletionRequest]
+            :summary schema/AppsShredderSummary
+            :description schema/AppsShredderDocs
             (ok (apps/delete-apps body)))
 
       (POST "/permission-lister" []
@@ -216,82 +214,154 @@
             :description AppPermissionListingDocs
             (ok (apps/list-permissions body params)))
 
-      (POST "/sharing" [:as {:keys [body]}]
+      (POST "/sharing" []
             :body [body AppSharingRequest]
             :return AppSharingResponse
             :summary AppSharingSummary
             :description AppSharingDocs
             (ok (apps/share body)))
 
-      (POST "/unsharing" [:as {:keys [body]}]
+      (POST "/unsharing" []
             :body [body AppUnsharingRequest]
             :return AppUnsharingResponse
             :summary AppUnsharingSummary
             :description AppUnsharingDocs
             (ok (apps/unshare body)))
 
-      (POST "/:system-id" [system-id :as {:keys [body]}]
-            (service/success-response (apps/create-app system-id body)))
+      (context "/:system-id" []
+        :path-params [system-id :- schema/SystemId]
 
-      (POST "/:system-id/arg-preview" [system-id :as {:keys [body]}]
-            (service/success-response (apps/preview-args system-id body)))
+        (POST "/" []
+              :body [body schema/AppCreateRequest]
+              :return schema/App
+              :summary schema/AppCreateSummary
+              :description schema/AppCreateDocs
+              (ok (apps/create-app system-id body)))
 
-      (GET "/:system-id/:app-id" [system-id app-id]
-           (service/success-response (apps/get-app system-id app-id)))
+        (POST "/arg-preview" []
+              :body [body schema/AppPreviewRequest]
+              :summary schema/AppPreviewSummary
+              :description schema/AppPreviewDocs
+              (ok (apps/preview-args system-id body)))
 
-      (DELETE "/:system-id/:app-id" [system-id app-id]
-              (service/success-response (apps/delete-app system-id app-id)))
+        (context "/:app-id" []
+          :path-params [app-id :- schema/StringAppIdParam]
 
-      (PATCH "/:system-id/:app-id" [system-id app-id :as {:keys [body]}]
-             (service/success-response (apps/relabel-app system-id app-id body)))
+          (GET "/" []
+               :summary schema/AppJobViewSummary
+               :return schema/AppJobView
+               :description schema/AppJobViewDocs
+               (ok (apps/get-app system-id app-id)))
 
-      (PUT "/:system-id/:app-id" [system-id app-id :as {:keys [body]}]
-           (service/success-response (apps/update-app system-id app-id body)))
+          (DELETE "/" []
+                  :summary schema/AppDeleteSummary
+                  :description schema/AppDeleteDocs
+                  (ok (apps/delete-app system-id app-id)))
 
-      (POST "/:system-id/:app-id/copy" [system-id app-id]
-            (service/success-response (apps/copy-app system-id app-id)))
+          (PATCH "/" []
+                 :body [body schema/AppLabelUpdateRequest]
+                 :return schema/App
+                 :summary schema/AppLabelUpdateSummary
+                 :description-file "docs/apps/app-label-update.md"
+                 (ok (apps/relabel-app system-id app-id body)))
 
-      (GET "/:system-id/:app-id/details" [system-id app-id]
-           (service/success-response (apps/get-app-details system-id app-id)))
+          (PUT "/" []
+               :body [body schema/AppUpdateRequest]
+               :return schema/App
+               :summary schema/AppUpdateSummary
+               :description-file "docs/apps/app-update.md"
+               (ok (apps/update-app system-id app-id body)))
 
-      (GET "/:system-id/:app-id/documentation" [system-id app-id]
-           (service/success-response (apps/get-app-docs system-id app-id)))
+          (POST "/copy" []
+                :return schema/App
+                :summary schema/AppCopySummary
+                :description schema/AppCopyDocs
+                (ok (apps/copy-app system-id app-id)))
 
-      (POST "/:system-id/:app-id/documentation" [system-id app-id :as {:keys [body]}]
-            (service/success-response (apps/add-app-docs system-id app-id body)))
+          (GET "/details" []
+               :return schema/AppDetails
+               :summary schema/AppDetailsSummary
+               :description-file "docs/apps/app-details.md"
+               (ok (apps/get-app-details system-id app-id)))
 
-      (PATCH "/:system-id/:app-id/documentation" [system-id app-id :as {:keys [body]}]
-             (service/success-response (apps/edit-app-docs system-id app-id body)))
+          (GET "/documentation" []
+               :return schema/AppDocumentation
+               :summary schema/AppDocumentationSummary
+               :description schema/AppDocumentationDocs
+               (ok (apps/get-app-docs system-id app-id)))
 
-      (DELETE "/:system-id/:app-id/favorite" [system-id app-id]
-              (service/success-response (apps/remove-favorite-app system-id app-id)))
+          (PATCH "/documentation" []
+                 :body [body schema/AppDocumentationRequest]
+                 :return schema/AppDocumentation
+                 :summary schema/AppDocumentationUpdateSummary
+                 :description schema/AppDocumentationUpdateDocs
+                 (ok (apps/edit-app-docs system-id app-id body)))
 
-      (PUT "/:system-id/:app-id/favorite" [system-id app-id]
-           (service/success-response (apps/add-favorite-app system-id app-id)))
+          (POST "/documentation" []
+                :body [body schema/AppDocumentationRequest]
+                :return schema/AppDocumentation
+                :summary schema/AppDocumentationAddSummary
+                :description schema/AppDocumentationAddDocs
+                (ok (apps/add-app-docs system-id app-id body)))
 
-      (GET "/:system-id/:app-id/integration-data" [system-id app-id]
-           (service/success-response (apps/get-app-integration-data system-id app-id)))
+          (DELETE "/favorite" []
+                  :summary schema/AppFavoriteDeleteSummary
+                  :description schema/AppFavoriteDeleteDocs
+                  (ok (apps/remove-favorite-app system-id app-id)))
 
-      (GET "/:system-id/:app-id/is-publishable" [system-id app-id]
-           (service/success-response (apps/app-publishable? system-id app-id)))
+          (PUT "/favorite" []
+               :summary schema/AppFavoriteAddSummary
+               :description schema/AppFavoriteAddDocs
+               (ok (apps/add-favorite-app system-id app-id)))
 
-      (POST "/:system-id/:app-id/publish" [system-id app-id :as {:keys [body]}]
-            (service/success-response (apps/make-app-public system-id app-id body)))
+          (GET "/integration-data" []
+               :return IntegrationData
+               :summary schema/AppIntegrationDataSummary
+               :description schema/AppIntegrationDataDocs
+               (ok (apps/get-app-integration-data system-id app-id)))
 
-      (DELETE "/:system-id/:app-id/rating" [system-id app-id]
-              (service/success-response (apps/delete-rating system-id app-id)))
+          (GET "/is-publishable" []
+               :return schema/AppPublishableResponse
+               :summary schema/AppPublishableSummary
+               :description schema/AppPublishableDocs
+               (ok (apps/app-publishable? system-id app-id)))
 
-      (POST "/:system-id/:app-id/rating" [system-id app-id :as {body :body}]
-            (service/success-response (apps/rate-app system-id app-id body)))
+          (POST "/publish" []
+                :body [body schema/PublishAppRequest]
+                :summary schema/PublishAppSummary
+                :description schema/PublishAppDocs
+                (ok (apps/make-app-public system-id app-id body)))
 
-      (GET "/:system-id/:app-id/tasks" [system-id app-id]
-           (service/success-response (apps/list-app-tasks system-id app-id)))
+          (DELETE "/rating" []
+                  :return RatingResponse
+                  :summary schema/AppRatingDeleteSummary
+                  :description schema/AppRatingDeleteDocs
+                  (ok (apps/delete-rating system-id app-id)))
 
-      (GET "/:system-id/:app-id/tools" [system-id app-id]
-           (service/success-response (apps/get-tools-in-app system-id app-id)))
+          (POST "/rating" []
+                :body [body RatingRequest]
+                :return RatingResponse
+                :summary schema/AppRatingSummary
+                :description schema/AppRatingDocs
+                (ok (apps/rate-app system-id app-id body)))
 
-      (GET "/:system-id/:app-id/ui" [system-id app-id]
-           (service/success-response (apps/get-app-ui system-id app-id))))))
+          (GET "/tasks" []
+               :return schema/AppTaskListing
+               :summary schema/AppTaskListingSummary
+               :description schema/AppTaskListingDocs
+               (ok (apps/list-app-tasks system-id app-id)))
+
+          (GET "/tools" []
+               :return schema/AppToolListing
+               :summary schema/AppToolListingSummary
+               :description schema/AppToolListingDocs
+               (ok (apps/get-tools-in-app system-id app-id)))
+
+          (GET "/ui" []
+               :return schema/App
+               :summary schema/AppEditingViewSummary
+               :description schema/AppEditingViewDocs
+               (ok (apps/get-app-ui system-id app-id))))))))
 
 (defn admin-app-avu-routes
   []

@@ -4,11 +4,9 @@
             [clojure-commons.validators :as validators]
             [terrain.auth.user-attributes :as user]
             [terrain.clients.data-info :as data]
-            [terrain.clients.apps :as apps]
+            [terrain.clients.apps.raw :as apps]
             [terrain.clients.metadata.raw :as metadata]
-            [terrain.services.filesystem.uuids :as data-uuids]
-            [terrain.util.config :as config]
-            [terrain.util.validators :as valid]))
+            [terrain.util.config :as config]))
 
 (defn- validate-entry-id-accessible
   [user entry-id]

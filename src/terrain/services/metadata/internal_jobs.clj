@@ -3,6 +3,7 @@
         [terrain.auth.user-attributes :only [current-user]])
   (:require [clojure-commons.error-codes :as ce]
             [terrain.clients.apps :as apps]
+            [terrain.clients.apps.raw :as apps-client]
             [terrain.clients.user-prefs :as prefs]
             [terrain.util.config :as config]))
 
@@ -14,7 +15,7 @@
 
 (defn- load-param-map
   [app-id]
-  (->> (apps/get-app config/de-system-id app-id)
+  (->> (apps-client/get-app config/de-system-id app-id)
        (:groups)
        (mapcat :parameters)
        (map (juxt :label :id))

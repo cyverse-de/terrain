@@ -139,21 +139,23 @@
 
 (defn create-app
   [system-id app]
-  (client/post (apps-url "apps" system-id)
-               {:query-params     (secured-params)
-                :body             app
-                :content-type     :json
-                :as               :stream
-                :follow-redirects false}))
+  (:body
+    (client/post (apps-url "apps" system-id)
+                 {:query-params     (secured-params)
+                  :form-params      app
+                  :content-type     :json
+                  :as               :json
+                  :follow-redirects false})))
 
 (defn preview-args
   [system-id app]
-  (client/post (apps-url "apps" system-id "arg-preview")
-               {:query-params     (secured-params)
-                :body             app
-                :content-type     :json
-                :as               :stream
-                :follow-redirects false}))
+  (:body
+    (client/post (apps-url "apps" system-id "arg-preview")
+                 {:query-params     (secured-params)
+                  :form-params      app
+                  :content-type     :json
+                  :as               :json
+                  :follow-redirects false})))
 
 (defn delete-apps
   [deletion-request]
@@ -197,42 +199,47 @@
 
 (defn get-app
   [system-id app-id]
-  (client/get (apps-url "apps" system-id app-id)
-              {:query-params     (secured-params)
-               :as               :stream
-               :follow-redirects false}))
+  (:body
+    (client/get (apps-url "apps" system-id app-id)
+                {:query-params     (secured-params)
+                 :as               :json
+                 :follow-redirects false})))
 
 (defn delete-app
   [system-id app-id]
-  (client/delete (apps-url "apps" system-id app-id)
-                 {:query-params     (secured-params)
-                  :as               :stream
-                  :follow-redirects false}))
+  (:body
+    (client/delete (apps-url "apps" system-id app-id)
+                   {:query-params     (secured-params)
+                    :as               :json
+                    :follow-redirects false})))
 
 (defn relabel-app
   [system-id app-id relabel-request]
-  (client/patch (apps-url "apps" system-id app-id)
-                {:query-params     (secured-params)
-                 :body             relabel-request
-                 :content-type     :json
-                 :as               :stream
-                 :follow-redirects false}))
+  (:body
+    (client/patch (apps-url "apps" system-id app-id)
+                  {:query-params     (secured-params)
+                   :form-params      relabel-request
+                   :content-type     :json
+                   :as               :json
+                   :follow-redirects false})))
 
 (defn update-app
   [system-id app-id update-request]
-  (client/put (apps-url "apps" system-id app-id)
-              {:query-params     (secured-params)
-               :body             update-request
-               :content-type     :json
-               :as               :stream
-               :follow-redirects false}))
+  (:body
+    (client/put (apps-url "apps" system-id app-id)
+                {:query-params     (secured-params)
+                 :form-params      update-request
+                 :content-type     :json
+                 :as               :json
+                 :follow-redirects false})))
 
 (defn copy-app
   [system-id app-id]
-  (client/post (apps-url "apps" system-id app-id "copy")
-               {:query-params     (secured-params)
-                :as               :stream
-                :follow-redirects false}))
+  (:body
+    (client/post (apps-url "apps" system-id app-id "copy")
+                 {:query-params     (secured-params)
+                  :as               :json
+                  :follow-redirects false})))
 
 (defn get-admin-app-details
   [system-id app-id]
@@ -243,31 +250,35 @@
 
 (defn get-app-details
   [system-id app-id]
-  (client/get (apps-url "apps" system-id app-id "details")
-              {:query-params     (secured-params)
-               :as               :stream
-               :follow-redirects false}))
+  (:body
+    (client/get (apps-url "apps" system-id app-id "details")
+                {:query-params     (secured-params)
+                 :as               :json
+                 :follow-redirects false})))
 
 (defn remove-favorite-app
   [system-id app-id]
-  (client/delete (apps-url "apps" system-id app-id "favorite")
-                 {:query-params     (secured-params)
-                  :as               :stream
-                  :follow-redirects false}))
+  (:body
+    (client/delete (apps-url "apps" system-id app-id "favorite")
+                   {:query-params     (secured-params)
+                    :as               :json
+                    :follow-redirects false})))
 
 (defn add-favorite-app
   [system-id app-id]
-  (client/put (apps-url "apps" system-id app-id "favorite")
-              {:query-params     (secured-params)
-               :as               :stream
-               :follow-redirects false}))
+  (:body
+    (client/put (apps-url "apps" system-id app-id "favorite")
+                {:query-params     (secured-params)
+                 :as               :json
+                 :follow-redirects false})))
 
 (defn app-publishable?
   [system-id app-id]
-  (client/get (apps-url "apps" system-id app-id "is-publishable")
-              {:query-params     (secured-params)
-               :as               :stream
-               :follow-redirects false}))
+  (:body
+    (client/get (apps-url "apps" system-id app-id "is-publishable")
+                {:query-params     (secured-params)
+                 :as               :json
+                 :follow-redirects false})))
 
 (defn remove-app-from-communities
   [app-id body]
@@ -339,42 +350,47 @@
 
 (defn make-app-public
   [system-id app-id app]
-  (client/post (apps-url "apps" system-id app-id "publish")
-               {:query-params     (secured-params)
-                :body             app
-                :content-type     :json
-                :as               :stream
-                :follow-redirects false}))
+  (:body
+    (client/post (apps-url "apps" system-id app-id "publish")
+                 {:query-params     (secured-params)
+                  :form-params      app
+                  :content-type     :json
+                  :as               :json
+                  :follow-redirects false})))
 
 (defn delete-rating
   [system-id app-id]
-  (client/delete (apps-url "apps" system-id app-id "rating")
-                 {:query-params     (secured-params)
-                  :as               :stream
-                  :follow-redirects false}))
+  (:body
+    (client/delete (apps-url "apps" system-id app-id "rating")
+                   {:query-params     (secured-params)
+                    :as               :json
+                    :follow-redirects false})))
 
 (defn rate-app
   [system-id app-id rating]
-  (client/post (apps-url "apps" system-id app-id "rating")
-               {:query-params     (secured-params)
-                :body             rating
-                :content-type     :json
-                :as               :stream
-                :follow-redirects false}))
+  (:body
+    (client/post (apps-url "apps" system-id app-id "rating")
+                 {:query-params     (secured-params)
+                  :form-params      rating
+                  :content-type     :json
+                  :as               :json
+                  :follow-redirects false})))
 
 (defn list-app-tasks
   [system-id app-id]
-  (client/get (apps-url "apps" system-id app-id "tasks")
-              {:query-params     (secured-params)
-               :as               :stream
-               :follow-redirects false}))
+  (:body
+    (client/get (apps-url "apps" system-id app-id "tasks")
+                {:query-params     (secured-params)
+                 :as               :json
+                 :follow-redirects false})))
 
 (defn get-app-ui
   [system-id app-id]
-  (client/get (apps-url "apps" system-id app-id "ui")
-              {:query-params     (secured-params)
-               :as               :stream
-               :follow-redirects false}))
+  (:body
+    (client/get (apps-url "apps" system-id app-id "ui")
+                {:query-params     (secured-params)
+                 :as               :json
+                 :follow-redirects false})))
 
 (defn add-pipeline
   [pipeline]
@@ -593,28 +609,31 @@
 
 (defn get-app-docs
   [system-id app-id]
-  (client/get (apps-url "apps" system-id app-id "documentation")
-              {:query-params     (secured-params)
-               :as               :stream
-               :follow-redirects false}))
+  (:body
+    (client/get (apps-url "apps" system-id app-id "documentation")
+                {:query-params     (secured-params)
+                 :as               :json
+                 :follow-redirects false})))
 
 (defn edit-app-docs
   [system-id app-id docs]
-  (client/patch (apps-url "apps" system-id app-id "documentation")
-                {:query-params     (secured-params)
-                 :content-type     :json
-                 :body             docs
-                 :as               :stream
-                 :follow-redirects false}))
+  (:body
+    (client/patch (apps-url "apps" system-id app-id "documentation")
+                  {:query-params     (secured-params)
+                   :form-params      docs
+                   :content-type     :json
+                   :as               :json
+                   :follow-redirects false})))
 
 (defn add-app-docs
   [system-id app-id docs]
-  (client/post (apps-url "apps" system-id app-id "documentation")
-               {:query-params     (secured-params)
-                :content-type     :json
-                :body             docs
-                :as               :stream
-                :follow-redirects false}))
+  (:body
+    (client/post (apps-url "apps" system-id app-id "documentation")
+                 {:query-params     (secured-params)
+                  :form-params      docs
+                  :content-type     :json
+                  :as               :json
+                  :follow-redirects false})))
 
 (defn admin-edit-app-docs
   [system-id app-id docs]
@@ -707,10 +726,11 @@
 
 (defn get-tools-in-app
   [system-id app-id]
-  (client/get (apps-url "apps" system-id app-id "tools")
-              {:query-params     (secured-params)
-               :as               :stream
-               :follow-redirects false}))
+  (:body
+    (client/get (apps-url "apps" system-id app-id "tools")
+                {:query-params     (secured-params)
+                 :as               :json
+                 :follow-redirects false})))
 
 (defn admin-list-tools
   [params]
@@ -861,15 +881,6 @@
                   :as               :stream
                   :follow-redirects false}))
 
-(defn get-users-by-id
-  [body]
-  (client/post (apps-url "users" "by-id")
-               {:query-params     (secured-params)
-                :as               :stream
-                :body             body
-                :content-type     :json
-                :follow-redirects false}))
-
 (defn get-authenticated-user
   []
   (client/get (apps-url "users" "authenticated")
@@ -934,10 +945,11 @@
 
 (defn get-app-integration-data
   [system-id app-id]
-  (client/get (apps-url "apps" system-id app-id "integration-data")
-              {:query-params     (secured-params)
-               :as               :stream
-               :follow-redirects false}))
+  (:body
+    (client/get (apps-url "apps" system-id app-id "integration-data")
+                {:query-params     (secured-params)
+                 :as               :json
+                 :follow-redirects false})))
 
 (defn get-tool-integration-data
   [tool-id]
