@@ -394,35 +394,39 @@
 
 (defn add-pipeline
   [pipeline]
-  (client/post (apps-url "apps" "pipelines")
-               {:query-params     (secured-params)
-                :content-type     :json
-                :body             pipeline
-                :as               :stream
-                :follow-redirects false}))
+  (:body
+    (client/post (apps-url "apps" "pipelines")
+                 {:query-params     (secured-params)
+                  :form-params      pipeline
+                  :content-type     :json
+                  :as               :json
+                  :follow-redirects false})))
 
 (defn update-pipeline
   [app-id pipeline]
-  (client/put (apps-url "apps" "pipelines" app-id)
-              {:query-params     (secured-params)
-               :content-type     :json
-               :body             pipeline
-               :as               :stream
-               :follow-redirects false}))
+  (:body
+    (client/put (apps-url "apps" "pipelines" app-id)
+                {:query-params     (secured-params)
+                 :form-params      pipeline
+                 :content-type     :json
+                 :as               :json
+                 :follow-redirects false})))
 
 (defn copy-pipeline
   [app-id]
-  (client/post (apps-url "apps" "pipelines" app-id "copy")
-               {:query-params     (secured-params)
-                :as               :stream
-                :follow-redirects false}))
+  (:body
+    (client/post (apps-url "apps" "pipelines" app-id "copy")
+                 {:query-params     (secured-params)
+                  :as               :json
+                  :follow-redirects false})))
 
 (defn edit-pipeline
   [app-id]
-  (client/get (apps-url "apps" "pipelines" app-id "ui")
-              {:query-params     (secured-params)
-               :as               :stream
-               :follow-redirects false}))
+  (:body
+    (client/get (apps-url "apps" "pipelines" app-id "ui")
+                {:query-params     (secured-params)
+                 :as               :json
+                 :follow-redirects false})))
 
 (defn list-jobs
   [params]
