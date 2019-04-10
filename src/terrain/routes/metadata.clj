@@ -29,17 +29,6 @@
             [terrain.util.config :as config]
             [terrain.util.service :as service]))
 
-(defn app-category-routes
-  []
-  (optional-routes
-   [config/app-routes-enabled]
-
-   (GET "/apps/categories" [:as {params :params}]
-     (service/success-response (apps/get-app-categories params)))
-
-   (GET "/apps/categories/:system-id/:category-id" [system-id category-id :as {params :params}]
-     (service/success-response (apps/apps-in-category system-id category-id params)))))
-
 (defn admin-category-routes
   []
   (optional-routes

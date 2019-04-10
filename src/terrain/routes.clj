@@ -8,6 +8,7 @@
         [terrain.auth.user-attributes]
         [terrain.middleware :only [wrap-context-path-adder wrap-query-param-remover]]
         [terrain.routes.admin]
+        [terrain.routes.apps.categories]
         [terrain.routes.apps.elements]
         [terrain.routes.apps.pipelines]
         [terrain.routes.data]
@@ -192,6 +193,7 @@
                                      {:name "admin-communities", :description "Community Administration Endpoints"}
                                      {:name "admin-filesystem", :description "File System Administration Endpoints"}
                                      {:name "apps", :description, "Apps Endpoints"}
+                                     {:name "app-categories", :description "App Category Endpoints"}
                                      {:name "app-element-types", :description, "App Element Endpoints"}
                                      {:name "app-pipelines", :description "App Pipeline Endpoints"}
                                      {:name "coge", :description "CoGe Endpoints"}
