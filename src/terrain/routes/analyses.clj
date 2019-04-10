@@ -13,7 +13,7 @@
                                                              UpdateQuickLaunchGlobalDefault
                                                              NewQuickLaunchGlobalDefault]]
 
-            [common-swagger-api.schema.apps :refer [AnalysisSubmission]]
+            [common-swagger-api.schema.apps :refer [AnalysisSubmission AppIdParam]]
             [ring.util.http-response :refer [ok]]
             [terrain.util :refer [optional-routes]]
             [schema.core :as s]
@@ -43,6 +43,17 @@
 
   (context "/quicklaunches" []
     :tags ["analyses-quicklaunches"]
+
+    (context "/apps" []
+      (context "/:app-id" []
+        :path-params [app-id :- AppIdParam]
+
+        (GET "/" []
+          :return [QuickLaunch]
+          :summary "Get all of the Quick Launches for a user by app UUID"
+          :description "Get all of the Quick Launches for a user by app UUID.
+          The user must have access to the Quick Launch"
+          (ok (analyses/get-quicklaunches-by-app app-id)))))
 
     ;; Quick Launch Favorites
     (context "/favorites" []
