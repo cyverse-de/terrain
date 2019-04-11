@@ -194,6 +194,7 @@
                                      {:name "admin-filesystem", :description "File System Administration Endpoints"}
                                      {:name "apps", :description, "Apps Endpoints"}
                                      {:name "app-categories", :description "App Category Endpoints"}
+                                     {:name "app-hierarchies", :description "App Hierarchy Endpoints"}
                                      {:name "app-element-types", :description, "App Element Endpoints"}
                                      {:name "app-pipelines", :description "App Pipeline Endpoints"}
                                      {:name "coge", :description "CoGe Endpoints"}

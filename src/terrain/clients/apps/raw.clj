@@ -65,17 +65,19 @@
                 :as               :stream
                 :follow-redirects false}))
   ([root-iri params]
-   (client/get (apps-url-encoded "apps" "hierarchies" root-iri)
-               {:query-params     (secured-params params [:attr])
-                :as               :stream
-                :follow-redirects false})))
+   (:body
+     (client/get (apps-url-encoded "apps" "hierarchies" root-iri)
+                 {:query-params     (secured-params params [:attr])
+                  :as               :json
+                  :follow-redirects false}))))
 
 (defn get-app-category-hierarchies
   []
-  (client/get (apps-url "apps" "hierarchies")
-              {:query-params     (secured-params)
-               :as               :stream
-               :follow-redirects false}))
+  (:body
+    (client/get (apps-url "apps" "hierarchies")
+                {:query-params     (secured-params)
+                 :as               :json
+                 :follow-redirects false})))
 
 (defn get-hierarchy-app-listing
   ([ontology-version root-iri params]
@@ -84,10 +86,11 @@
                 :as               :stream
                 :follow-redirects false}))
   ([root-iri params]
-   (client/get (apps-url-encoded "apps" "hierarchies" root-iri "apps")
-               {:query-params     (secured-params params apps-hierarchy-sort-params)
-                :as               :stream
-                :follow-redirects false})))
+   (:body
+     (client/get (apps-url-encoded "apps" "hierarchies" root-iri "apps")
+                 {:query-params     (secured-params params apps-hierarchy-sort-params)
+                  :as               :json
+                  :follow-redirects false}))))
 
 (defn get-unclassified-app-listing
   ([ontology-version root-iri params]
@@ -96,10 +99,11 @@
                 :as               :stream
                 :follow-redirects false}))
   ([root-iri params]
-   (client/get (apps-url-encoded "apps" "hierarchies" root-iri "unclassified")
-               {:query-params     (secured-params params apps-hierarchy-sort-params)
-                :as               :stream
-                :follow-redirects false})))
+   (:body
+     (client/get (apps-url-encoded "apps" "hierarchies" root-iri "unclassified")
+                 {:query-params     (secured-params params apps-hierarchy-sort-params)
+                  :as               :json
+                  :follow-redirects false}))))
 
 (defn get-app-categories
   [params]
