@@ -50,24 +50,6 @@
    (PATCH "/apps/categories/:system-id/:category-id" [system-id category-id :as {:keys [body]}]
      (service/success-response (apps/update-category system-id category-id body)))))
 
-(defn app-ontology-routes
-  []
-  (optional-routes
-   [#(and (config/app-routes-enabled)
-          (config/metadata-routes-enabled))]
-
-   (GET "/apps/hierarchies" []
-     (service/success-response (apps/get-app-category-hierarchies)))
-
-   (GET "/apps/hierarchies/:root-iri" [root-iri :as {params :params}]
-     (service/success-response (apps/get-app-category-hierarchy root-iri params)))
-
-   (GET "/apps/hierarchies/:root-iri/apps" [root-iri :as {params :params}]
-     (service/success-response (apps/get-hierarchy-app-listing root-iri params)))
-
-   (GET "/apps/hierarchies/:root-iri/unclassified" [root-iri :as {params :params}]
-     (service/success-response (apps/get-unclassified-app-listing root-iri params)))))
-
 (defn admin-ontology-routes
   []
   (optional-routes
