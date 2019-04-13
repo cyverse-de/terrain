@@ -3,7 +3,9 @@
         [common-swagger-api.schema.apps :only [AppIdParam AppListing]]
         [common-swagger-api.schema.apps.pipeline]
         [common-swagger-api.schema.ontologies :only [OntologyClassIRIParam
-                                                     OntologyHierarchyFilterParams]]
+                                                     OntologyHierarchy
+                                                     OntologyHierarchyFilterParams
+                                                     OntologyHierarchyList]]
         [ring.util.http-response :only [ok]]
         [terrain.routes.schemas.categories]
         [terrain.util :only [optional-routes]])
@@ -47,8 +49,9 @@
       :tags ["app-hierarchies"]
 
       (GET "/" []
+           :return OntologyHierarchyList
            :summary schema/AppHierarchiesListingSummary
-           :description-file "docs/apps/categories/hierarchies-listing.md"
+           :description schema/AppHierarchiesListingDocs
            (ok (apps/get-app-category-hierarchies)))
 
       (context "/:root-iri" []
@@ -56,20 +59,21 @@
 
         (GET "/" []
              :query [params OntologyHierarchyFilterParams]
+             :return OntologyHierarchy
              :summary schema/AppCategoryHierarchyListingSummary
-             :description-file "docs/apps/categories/category-hierarchy-listing.md"
+             :description schema/AppCategoryHierarchyListingDocs
              (ok (apps/get-app-category-hierarchy root-iri params)))
 
         (GET "/apps" []
              :query [params OntologyAppListingPagingParams]
              :return AppListing
              :summary schema/AppCategoryAppListingSummary
-             :description-file "docs/apps/categories/hierarchy-app-listing.md"
+             :description schema/AppHierarchyAppListingDocs
              (ok (apps/get-hierarchy-app-listing root-iri params)))
 
         (GET "/unclassified" []
              :query [params OntologyAppListingPagingParams]
              :return AppListing
              :summary schema/AppHierarchyUnclassifiedListingSummary
-             :description-file "docs/apps/categories/hierarchy-unclassified-app-listing.md"
+             :description schema/AppHierarchyUnclassifiedListingDocs
              (ok (apps/get-unclassified-app-listing root-iri params)))))))

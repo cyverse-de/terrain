@@ -156,7 +156,7 @@
            :query [params AppSearchParams]
            :return schema/AppListing
            :summary schema/AppListingSummary
-           :description-file "docs/apps/apps-listing.md"
+           :description schema/AppListingDocs
            (ok (apps/search-apps params)))
 
       (POST "/shredder" []
@@ -228,7 +228,7 @@
                :body [body schema/AppUpdateRequest]
                :return schema/App
                :summary schema/AppUpdateSummary
-               :description-file "docs/apps/app-update.md"
+               :description schema/AppUpdateDocs
                (ok (apps/update-app system-id app-id body)))
 
           (POST "/copy" []
@@ -240,7 +240,7 @@
           (GET "/details" []
                :return schema/AppDetails
                :summary schema/AppDetailsSummary
-               :description-file "docs/apps/app-details.md"
+               :description schema/AppDetailsDocs
                (ok (apps/get-app-details system-id app-id)))
 
           (GET "/documentation" []
