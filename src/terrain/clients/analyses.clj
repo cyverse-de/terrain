@@ -17,6 +17,10 @@
   [id]
   (:body (http/get (analyses-url ["quicklaunches" id]) {:as :json})))
 
+(defn get-quicklaunch-app-info
+  [id]
+  (:body (http/get (analyses-url ["quicklaunches" id "app-info"]) {:as :json})))
+
 (defn get-all-quicklaunches
   []
   (:body (http/get (analyses-url ["quicklaunches"]) {:as :json})))

@@ -13,7 +13,7 @@
                                                              UpdateQuickLaunchGlobalDefault
                                                              NewQuickLaunchGlobalDefault]]
 
-            [common-swagger-api.schema.apps :refer [AnalysisSubmission AppIdParam]]
+            [common-swagger-api.schema.apps :refer [AnalysisSubmission AppIdParam AppJobView]]
             [ring.util.http-response :refer [ok]]
             [terrain.util :refer [optional-routes]]
             [schema.core :as s]
@@ -198,6 +198,16 @@
 
     (context "/:ql-id" []
       :path-params [ql-id :- QuickLaunchID]
+
+      (GET "/app-info" []
+        :return      AppJobView
+        :summary     "Returns app launch info based on the Quick Launch"
+        :description "Returns app launch info based on the Quick Launch. Uses
+        the Quick Launch submission along with the app definition to form JSON
+        that the UI can use to create and populate an app launch window with
+        parameter values filled in"
+        (ok (analyses/get-quicklaunch-app-info ql-id)))
+
 
       (GET "/" []
         :summary     "Get Quick Launch information by its UUID."
