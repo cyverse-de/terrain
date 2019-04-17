@@ -77,12 +77,12 @@
    (webhook-routes)
    (misc-metadata-routes)
    (oauth-routes)
+   (quicklaunch-routes)
    (route/not-found (service/unrecognized-path-response))))
 
 (defn secured-routes
   []
   (util/flagged-routes
-    (secured-quicklaunch-routes)
     (secured-notification-routes)
     (secured-metadata-routes)
     (secured-pref-routes)

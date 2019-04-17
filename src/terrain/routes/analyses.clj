@@ -35,7 +35,7 @@
 (def QuickLaunchGlobalDefaultID
   (describe UUID "The UUID of a global Quick Launch default"))
 
-(defn secured-quicklaunch-routes
+(defn quicklaunch-routes
   "The routes for accessing analyses information. Currently limited to Quick
    Launches."
   []
