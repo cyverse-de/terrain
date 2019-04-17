@@ -77,12 +77,12 @@
    (webhook-routes)
    (misc-metadata-routes)
    (oauth-routes)
+   (quicklaunch-routes)
    (route/not-found (service/unrecognized-path-response))))
 
 (defn secured-routes
   []
   (util/flagged-routes
-    (secured-quicklaunch-routes)
     (secured-notification-routes)
     (secured-metadata-routes)
     (secured-pref-routes)
@@ -193,6 +193,7 @@
                                      {:name "admin-comments", :description "Comment Administration Endpoints"}
                                      {:name "admin-communities", :description "Community Administration Endpoints"}
                                      {:name "admin-filesystem", :description "File System Administration Endpoints"}
+                                     {:name "analyses-quicklaunches", :description "Quick Launch Endpoints"}
                                      {:name "apps", :description, "Apps Endpoints"}
                                      {:name "app-categories", :description "App Category Endpoints"}
                                      {:name "app-communities", :description "App Community Endpoints"}
