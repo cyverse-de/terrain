@@ -77,3 +77,20 @@
              :summary schema/AppHierarchyUnclassifiedListingSummary
              :description schema/AppHierarchyUnclassifiedListingDocs
              (ok (apps/get-unclassified-app-listing root-iri params)))))))
+
+(defn app-community-routes
+  []
+  (optional-routes
+    [#(and (config/app-routes-enabled)
+           (config/metadata-routes-enabled))]
+
+    (context "/apps/communities" []
+      :tags ["app-communities"]
+
+      (GET "/:community-id/apps" []
+           :path-params [community-id :- schema/AppCommunityGroupNameParam]
+           :query [params AppListingPagingParams]
+           :return AppListing
+           :summary schema/AppCommunityAppListingSummary
+           :description schema/AppCommunityAppListingDocs
+           (ok (apps/apps-in-community community-id))))))

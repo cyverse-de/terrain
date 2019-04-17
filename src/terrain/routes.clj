@@ -61,6 +61,7 @@
    (app-comment-routes)
    (app-ontology-routes)
    (app-community-routes)
+   (app-community-tag-routes)
    (app-elements-routes)
    (app-pipeline-routes)
    (apps-routes)
@@ -194,6 +195,7 @@
                                      {:name "admin-filesystem", :description "File System Administration Endpoints"}
                                      {:name "apps", :description, "Apps Endpoints"}
                                      {:name "app-categories", :description "App Category Endpoints"}
+                                     {:name "app-communities", :description "App Community Endpoints"}
                                      {:name "app-hierarchies", :description "App Hierarchy Endpoints"}
                                      {:name "app-element-types", :description, "App Element Endpoints"}
                                      {:name "app-pipelines", :description "App Pipeline Endpoints"}
