@@ -193,6 +193,7 @@
                                      {:name "admin-comments", :description "Comment Administration Endpoints"}
                                      {:name "admin-communities", :description "Community Administration Endpoints"}
                                      {:name "admin-filesystem", :description "File System Administration Endpoints"}
+                                     {:name "analyses-quicklaunches", :description "Quick Launch Endpoints"}
                                      {:name "apps", :description, "Apps Endpoints"}
                                      {:name "app-categories", :description "App Category Endpoints"}
                                      {:name "app-communities", :description "App Community Endpoints"}
