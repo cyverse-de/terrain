@@ -10,6 +10,7 @@
         [terrain.routes.admin]
         [terrain.routes.apps.categories]
         [terrain.routes.apps.elements]
+        [terrain.routes.apps.metadata]
         [terrain.routes.apps.pipelines]
         [terrain.routes.data]
         [terrain.routes.permanent-id-requests]
@@ -199,6 +200,7 @@
                                      {:name "app-communities", :description "App Community Endpoints"}
                                      {:name "app-hierarchies", :description "App Hierarchy Endpoints"}
                                      {:name "app-element-types", :description, "App Element Endpoints"}
+                                     {:name "app-metadata", :description "App Metadata Endpoints"}
                                      {:name "app-pipelines", :description "App Pipeline Endpoints"}
                                      {:name "coge", :description "CoGe Endpoints"}
                                      {:name "collaborator-lists", :description "Collaborator List Endpoints"}
