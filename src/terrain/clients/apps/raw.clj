@@ -289,21 +289,23 @@
 
 (defn remove-app-from-communities
   [app-id body]
-  (client/delete (apps-url "apps" app-id "communities")
-                 {:query-params     (secured-params)
-                  :body             body
-                  :content-type     :json
-                  :as               :stream
-                  :follow-redirects false}))
+  (:body
+    (client/delete (apps-url "apps" app-id "communities")
+                   {:query-params     (secured-params)
+                    :form-params      body
+                    :content-type     :json
+                    :as               :json
+                    :follow-redirects false})))
 
 (defn update-app-communities
   [app-id body]
-  (client/post (apps-url "apps" app-id "communities")
-               {:query-params     (secured-params)
-                :body             body
-                :content-type     :json
-                :as               :stream
-                :follow-redirects false}))
+  (:body
+    (client/post (apps-url "apps" app-id "communities")
+                 {:query-params     (secured-params)
+                  :form-params      body
+                  :content-type     :json
+                  :as               :json
+                  :follow-redirects false})))
 
 (defn admin-list-avus
   [app-id]

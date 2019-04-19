@@ -9,6 +9,7 @@
         [terrain.middleware :only [wrap-context-path-adder wrap-query-param-remover]]
         [terrain.routes.admin]
         [terrain.routes.apps.categories]
+        [terrain.routes.apps.communities]
         [terrain.routes.apps.elements]
         [terrain.routes.apps.metadata]
         [terrain.routes.apps.pipelines]
@@ -198,6 +199,7 @@
                                      {:name "apps", :description, "Apps Endpoints"}
                                      {:name "app-categories", :description "App Category Endpoints"}
                                      {:name "app-communities", :description "App Community Endpoints"}
+                                     {:name "app-community-tags", :description "App Community Tag Endpoints"}
                                      {:name "app-hierarchies", :description "App Hierarchy Endpoints"}
                                      {:name "app-element-types", :description, "App Element Endpoints"}
                                      {:name "app-metadata", :description "App Metadata Endpoints"}
