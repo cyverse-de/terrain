@@ -87,18 +87,6 @@
    (GET "/ontologies/:ontology-version/:root-iri/unclassified" [ontology-version root-iri :as {params :params}]
      (service/success-response (apps/get-unclassified-app-listing ontology-version root-iri params)))))
 
-(defn app-community-tag-routes
-  []
-  (optional-routes
-    [#(and (config/app-routes-enabled)
-           (config/metadata-routes-enabled))]
-
-    (DELETE "/apps/:app-id/communities" [app-id :as {:keys [body]}]
-      (service/success-response (apps/remove-app-from-communities app-id body)))
-
-    (POST "/apps/:app-id/communities" [app-id :as {:keys [body]}]
-      (service/success-response (apps/update-app-communities app-id body)))))
-
 (defn admin-app-community-routes
   []
   (optional-routes
