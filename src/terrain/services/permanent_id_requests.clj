@@ -4,10 +4,11 @@
         [terrain.auth.user-attributes :only [current-user]])
   (:require [cheshire.core :as json]
             [clj-time.core :as time]
+            [clojure.data.xml :as xml]
             [clojure.string :as string]
             [clojure.tools.logging :as log]
             [clojure-commons.file-utils :as ft]
-            [terrain.clients.datacite :as datacite]
+            [org.cyverse.metadata-files.datacite-4-1 :as datacite]
             [terrain.clients.data-info :as data-info]
             [terrain.clients.data-info.raw :as data-info-client]
             [terrain.clients.ezid :as ezid]
@@ -267,7 +268,10 @@ For example, https://doi.org/10.7946/P2G596 links to the DOI 10.7946/P2G596.")
   [request-type {:keys [path]} avus]
   (validate-ezid-metadata avus)
   {ezid-target-attr (format-metadata-target-url path)
-   :datacite        (datacite/avus->datacite-xml (append-placeholder-identifier request-type avus))})
+   :datacite        (->> avus
+                         (append-placeholder-identifier request-type)
+                         datacite/build-datacite
+                         xml/emit-str)})
 
 (defn- get-validated-data-item
   "Gets data-info stat for the given ID and checks if the data item is valid for a Permanent ID request.
