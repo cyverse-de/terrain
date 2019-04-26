@@ -34,18 +34,19 @@
   (:body (http/delete (analyses-url ["quicklaunches" id]) {:as :json})))
 
 (defn update-quicklaunch
-  [id submission-info]
+  [id ql-info]
   (:body (http/patch (analyses-url ["quicklaunches" id])
                      {:content-type  :json
                       :as            :json
-                      :form-params   submission-info})))
+                      :form-params   ql-info})))
 
 (defn add-quicklaunch
-  [submission-info]
-  (:body (http/post (analyses-url ["quicklaunches"])
-                    {:content-type :json
-                     :as           :json
-                     :form-params  submission-info})))
+  [ql-info]
+  (let [ql-info (assoc ql-info :creator (:username current-user))]
+    (:body (http/post (analyses-url ["quicklaunches"])
+                      {:content-type :json
+                       :as           :json
+                       :form-params  ql-info}))))
 
 (defn get-quicklaunch-favorite
   [id]

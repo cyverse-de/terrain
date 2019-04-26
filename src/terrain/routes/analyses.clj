@@ -17,6 +17,7 @@
             [ring.util.http-response :refer [ok]]
             [terrain.util :refer [optional-routes]]
             [schema.core :as s]
+            [schema-tools.core :as st]
             [terrain.util.config :as config]
             [terrain.clients.analyses :as analyses])
   (:import [java.util UUID]))
@@ -34,6 +35,9 @@
 
 (def QuickLaunchGlobalDefaultID
   (describe UUID "The UUID of a global Quick Launch default"))
+
+(def NewQuickLaunchForTerrain
+  (st/dissoc NewQuickLaunch :creator))
 
 (defn quicklaunch-routes
   "The routes for accessing analyses information. Currently limited to Quick
@@ -188,7 +192,7 @@
       (ok (analyses/get-all-quicklaunches)))
 
     (POST "/" []
-      :body        [quicklaunch NewQuickLaunch]
+      :body        [quicklaunch NewQuickLaunchForTerrain]
       :return      QuickLaunch
       :summary     "Adds a Quick Launch to the database"
       :description "Adds a Quick Launch and corresponding submission information to the
