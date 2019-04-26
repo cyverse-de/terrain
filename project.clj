@@ -16,7 +16,6 @@
   :uberjar-name "terrain-standalone.jar"
   :dependencies [[org.clojure/clojure "1.10.0"]
                  [org.clojure/data.codec "0.1.1"]
-                 [org.clojure/data.xml "0.0.8"]
                  [org.clojure/tools.nrepl "0.2.13"]
                  [cheshire "5.8.1"]
                  [clj-http "3.9.1"]
@@ -41,6 +40,7 @@
                  [org.cyverse/common-swagger-api "2.10.7"]
                  [org.cyverse/kameleon "3.0.3"]
                  [org.cyverse/metadata-client "3.0.1"]
+                 [org.cyverse/metadata-files "1.0.3"]
                  [org.cyverse/permissions-client "2.8.1"]
                  [org.cyverse/service-logging "2.8.1"]]
   :eastwood {:exclude-namespaces [terrain.util.jwt :test-paths]
