@@ -4,9 +4,7 @@
         [common-swagger-api.schema]
         [ring.util.http-response :only [ok]]
         [terrain.routes.schemas.search])
-  (:require [terrain.auth.user-attributes :as user]
-            [terrain.services.search :as search]
-            [terrain.clients.search :as c-search]
+  (:require [terrain.clients.search :as c-search]
             [terrain.util :as util]
             [terrain.util.config :as config]))
 
@@ -33,9 +31,4 @@
              This endpoint automatically filters results to those the user can see, and adds a
              \"permission\" field that summarizes the requesting user's effective permission on each result."
              (ok (c-search/do-data-search body)))
-
-       (GET "/index" [q tags & opts]
-            (if (or q tags)
-              (search/search (:shortUsername user/current-user) q tags opts)
-              (missing-arg-response "`q` or `tags`")))
        )))
