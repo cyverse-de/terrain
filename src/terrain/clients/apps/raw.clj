@@ -805,76 +805,85 @@
 
 (defn list-tools
   [params]
-  (client/get (apps-url "tools")
-              {:query-params     (secured-params params tools-search-params)
-               :as               :stream
-               :follow-redirects :false}))
+  (:body
+    (client/get (apps-url "tools")
+                {:query-params     (secured-params params)
+                 :as               :json
+                 :follow-redirects :false})))
 
 (defn create-private-tool
   [body]
-  (client/post (apps-url "tools")
-               {:query-params     (secured-params)
-                :body             body
-                :content-type     :json
-                :as               :stream
-                :follow-redirects false}))
+  (:body
+    (client/post (apps-url "tools")
+                 {:query-params     (secured-params)
+                  :form-params      body
+                  :content-type     :json
+                  :as               :json
+                  :follow-redirects false})))
 
 (defn list-tool-permissions
   [body params]
-  (client/post (apps-url "tools" "permission-lister")
-               {:query-params     (secured-params params permission-lister-params)
-                :body             body
-                :content-type     :json
-                :as               :stream
-                :follow-redirects false}))
+  (:body
+    (client/post (apps-url "tools" "permission-lister")
+                 {:query-params     (secured-params params)
+                  :form-params      body
+                  :content-type     :json
+                  :as               :json
+                  :follow-redirects false})))
 
 (defn share-tool
   [body]
-  (client/post (apps-url "tools" "sharing")
-               {:query-params     (secured-params)
-                :body             body
-                :content-type     :json
-                :as               :stream
-                :follow-redirects false}))
+  (:body
+    (client/post (apps-url "tools" "sharing")
+                 {:query-params     (secured-params)
+                  :form-params      body
+                  :content-type     :json
+                  :as               :json
+                  :follow-redirects false})))
 
 (defn unshare-tool
   [body]
-  (client/post (apps-url "tools" "unsharing")
-               {:query-params     (secured-params)
-                :body             body
-                :content-type     :json
-                :as               :stream
-                :follow-redirects false}))
+  (:body
+    (client/post (apps-url "tools" "unsharing")
+                 {:query-params     (secured-params)
+                  :form-params      body
+                  :content-type     :json
+                  :as               :json
+                  :follow-redirects false})))
 
 (defn delete-private-tool
   [tool-id params]
-  (client/delete (apps-url "tools" tool-id)
-                 {:query-params     (secured-params params [:force-delete])
-                  :as               :stream
-                  :follow-redirects false}))
+  (:body
+    (client/delete (apps-url "tools" tool-id)
+                   {:query-params     (secured-params params)
+                    :as               :json
+                    :follow-redirects false})))
 
 (defn get-tool
   [tool-id]
-  (client/get (apps-url "tools" tool-id)
-              {:query-params     (secured-params)
-               :as               :stream
-               :follow-redirects false}))
+  (:body
+    (client/get (apps-url "tools" tool-id)
+                {:query-params     (secured-params)
+                 :as               :json
+                 :follow-redirects false})))
 
 (defn update-private-tool
-  [tool-id tool]
-  (client/patch (apps-url "tools" tool-id)
-                {:query-params     (secured-params)
-                 :as               :stream
-                 :body             tool
-                 :content-type     :json
-                 :follow-redirects false}))
+  [tool-id body]
+  (:body
+    (client/patch (apps-url "tools" tool-id)
+                  {:query-params     (secured-params)
+                   :form-params      body
+                   :as               :json
+                   :content-type     :json
+                   :follow-redirects false})))
 
 (defn get-apps-by-tool
   [tool-id]
-  (client/get (apps-url "tools" tool-id "apps")
-              {:query-params     (secured-params)
-               :as               :stream
-               :follow-redirects false}))
+  (:body
+    (client/get (apps-url "tools" tool-id "apps")
+                {:query-params     (secured-params)
+                 :as               :json
+                 :follow-redirects false})))
 
 (defn list-reference-genomes
   [params]
@@ -969,10 +978,11 @@
 
 (defn get-tool-integration-data
   [tool-id]
-  (client/get (apps-url "tools" tool-id "integration-data")
-              {:query-params     (secured-params)
-               :as               :stream
-               :follow-redirects false}))
+  (:body
+    (client/get (apps-url "tools" tool-id "integration-data")
+                {:query-params     (secured-params)
+                 :as               :json
+                 :follow-redirects false})))
 
 (defn update-app-integration-data
   [system-id app-id integration-data-id]

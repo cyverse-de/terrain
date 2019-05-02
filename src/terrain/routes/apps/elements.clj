@@ -1,6 +1,6 @@
 (ns terrain.routes.apps.elements
   (:use [common-swagger-api.schema]
-        [common-swagger-api.schema.apps :only [IncludeHiddenParams]]
+        [common-swagger-api.schema.common :only [IncludeHiddenParams]]
         [common-swagger-api.schema.apps.elements]
         [ring.util.http-response :only [ok]]
         [terrain.util])

@@ -438,40 +438,10 @@
    (POST "/tool-requests/:request-id/status" [request-id :as req]
      (update-tool-request req request-id))))
 
-(defn tool-routes
+(defn tool-request-routes
   []
   (optional-routes
    [config/app-routes-enabled]
-
-   (GET "/tools" [:as {:keys [params]}]
-     (service/success-response (apps/list-tools params)))
-
-   (POST "/tools" [:as {:keys [body]}]
-     (service/success-response (apps/create-private-tool body)))
-
-   (POST "/tools/permission-lister" [:as {:keys [body params]}]
-     (service/success-response (apps/list-tool-permissions body params)))
-
-   (POST "/tools/sharing" [:as {:keys [body]}]
-     (service/success-response (apps/share-tool body)))
-
-   (POST "/tools/unsharing" [:as {:keys [body]}]
-     (service/success-response (apps/unshare-tool body)))
-
-   (DELETE "/tools/:tool-id" [tool-id :as {:keys [params]}]
-     (apps/delete-private-tool tool-id params))
-
-   (GET "/tools/:tool-id" [tool-id]
-     (service/success-response (apps/get-tool tool-id)))
-
-   (PATCH "/tools/:tool-id" [tool-id :as {:keys [body]}]
-     (apps/update-private-tool tool-id body))
-
-   (GET "/tools/:tool-id/apps" [tool-id]
-     (service/success-response (apps/get-apps-by-tool tool-id)))
-
-   (GET "/tools/:tool-id/integration-data" [tool-id]
-     (service/success-response (apps/get-tool-integration-data tool-id)))
 
    (GET "/tool-requests" []
      (list-tool-requests))

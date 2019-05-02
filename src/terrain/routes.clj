@@ -13,6 +13,7 @@
         [terrain.routes.apps.elements]
         [terrain.routes.apps.metadata]
         [terrain.routes.apps.pipelines]
+        [terrain.routes.apps.tools]
         [terrain.routes.data]
         [terrain.routes.permanent-id-requests]
         [terrain.routes.fileio]
@@ -75,6 +76,7 @@
    (subject-routes)
    (reference-genomes-routes)
    (tool-routes)
+   (tool-request-routes)
    (permanent-id-request-routes)
    (webhook-routes)
    (misc-metadata-routes)
@@ -212,6 +214,7 @@
                                      {:name "filesystem", :description "Filesystem Endpoints"}
                                      {:name "subjects", :description "Subject Endpoints"}
                                      {:name "teams", :description "Team Endpoints"}
+                                     {:name "tools", :description "Tool Endpoints"}
                                      {:name "token", :description "OAuth Tokens"}]
                :securityDefinitions security-definitions}})
   (middleware
