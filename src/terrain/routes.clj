@@ -8,6 +8,7 @@
         [terrain.auth.user-attributes]
         [terrain.middleware :only [wrap-context-path-adder wrap-query-param-remover]]
         [terrain.routes.admin]
+        [terrain.routes.analyses]
         [terrain.routes.apps.categories]
         [terrain.routes.apps.communities]
         [terrain.routes.apps.elements]
@@ -34,7 +35,6 @@
         [terrain.routes.token]
         [terrain.routes.webhooks]
         [terrain.routes.comments]
-        [terrain.routes.analyses]
         [terrain.util :as util]
         [terrain.util.transformers :as transform])
   (:require [cemerick.url :as curl]
@@ -197,6 +197,7 @@
                                      {:name "admin-comments", :description "Comment Administration Endpoints"}
                                      {:name "admin-communities", :description "Community Administration Endpoints"}
                                      {:name "admin-filesystem", :description "File System Administration Endpoints"}
+                                     {:name "analyses", :description "Analysis Endpoints"}
                                      {:name "analyses-quicklaunches", :description "Quick Launch Endpoints"}
                                      {:name "apps", :description, "Apps Endpoints"}
                                      {:name "app-categories", :description "App Category Endpoints"}

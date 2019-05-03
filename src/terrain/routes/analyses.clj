@@ -1,26 +1,125 @@
 (ns terrain.routes.analyses
-  (:require [compojure.api.sweet :refer [describe]]
-            [common-swagger-api.schema :refer [context GET PATCH POST DELETE]]
-            [common-swagger-api.schema.quicklaunches :refer [QuickLaunch
-                                                             NewQuickLaunch
-                                                             UpdateQuickLaunch
-                                                             QuickLaunchFavorite
-                                                             NewQuickLaunchFavorite
-                                                             QuickLaunchUserDefault
-                                                             UpdateQuickLaunchUserDefault
-                                                             NewQuickLaunchUserDefault
-                                                             QuickLaunchGlobalDefault
-                                                             UpdateQuickLaunchGlobalDefault
-                                                             NewQuickLaunchGlobalDefault]]
-
-            [common-swagger-api.schema.apps :refer [AnalysisSubmission AppIdParam AppJobView]]
-            [ring.util.http-response :refer [ok]]
-            [terrain.util :refer [optional-routes]]
+  (:use [common-swagger-api.schema]
+        [common-swagger-api.schema.apps :only [AppIdParam AppJobView]]
+        [common-swagger-api.schema.quicklaunches
+         :only [QuickLaunch
+                NewQuickLaunch
+                UpdateQuickLaunch
+                QuickLaunchFavorite
+                NewQuickLaunchFavorite
+                QuickLaunchUserDefault
+                UpdateQuickLaunchUserDefault
+                NewQuickLaunchUserDefault
+                QuickLaunchGlobalDefault
+                UpdateQuickLaunchGlobalDefault
+                NewQuickLaunchGlobalDefault]]
+        [ring.util.http-response :only [ok]]
+        [terrain.util :only [optional-routes]])
+  (:require [common-swagger-api.schema.analyses :as schema]
+            [common-swagger-api.schema.analyses.listing :as listing-schema]
+            [common-swagger-api.schema.apps.permission :as perms-schema]
             [schema.core :as s]
             [schema-tools.core :as st]
-            [terrain.util.config :as config]
-            [terrain.clients.analyses :as analyses])
+            [terrain.clients.analyses :as analyses]
+            [terrain.clients.apps.raw :as apps]
+            [terrain.util.config :as config])
   (:import [java.util UUID]))
+
+(defn analysis-routes
+  []
+  (optional-routes
+    [config/app-routes-enabled]
+
+    (context "/analyses" []
+      :tags ["analyses"]
+
+      (GET "/" []
+           :query [params listing-schema/AnalysisListingParams]
+           :return listing-schema/AnalysisList
+           :summary listing-schema/AnalysesListingSummary
+           :description listing-schema/AnalysesListingDocs
+           (ok (apps/list-jobs params)))
+
+      (POST "/" []
+            :body [body schema/AnalysisSubmission]
+            :return schema/AnalysisResponse
+            :summary listing-schema/AnalysisSubmitSummary
+            :description listing-schema/AnalysisSubmitDocs
+            (ok (apps/submit-job body)))
+
+      (POST "/permission-lister" []
+            :query [params perms-schema/PermissionListerQueryParams]
+            :body [body perms-schema/AnalysisIdList]
+            :return perms-schema/AnalysisPermissionListing
+            :summary perms-schema/AnalysisPermissionListingSummary
+            :description perms-schema/AnalysisPermissionListingDocs
+            (ok (apps/list-job-permissions body params)))
+
+      (POST "/sharing" []
+            :body [body perms-schema/AnalysisSharingRequest]
+            :return perms-schema/AnalysisSharingResponse
+            :summary perms-schema/AnalysisSharingSummary
+            :description perms-schema/AnalysisSharingDocs
+            (ok (apps/share-jobs body)))
+
+      (POST "/unsharing" []
+            :body [body perms-schema/AnalysisUnsharingRequest]
+            :return perms-schema/AnalysisUnsharingResponse
+            :summary perms-schema/AnalysisUnsharingSummary
+            :description perms-schema/AnalysisUnsharingDocs
+            (ok (apps/unshare-jobs body)))
+
+      (POST "/shredder" []
+            :body [body schema/AnalysisShredderRequest]
+            :summary listing-schema/AnalysesDeleteSummary
+            :description listing-schema/AnalysesDeleteDocs
+            (ok (apps/delete-jobs body)))
+
+      (context "/:analysis-id" []
+        :path-params [analysis-id :- schema/AnalysisIdPathParam]
+
+        (PATCH "/" []
+               :body [body listing-schema/AnalysisUpdate]
+               :return listing-schema/AnalysisUpdateResponse
+               :summary listing-schema/AnalysisUpdateSummary
+               :description listing-schema/AnalysisUpdateDocs
+               (ok (apps/update-job analysis-id body)))
+
+        (DELETE "/" []
+                :summary listing-schema/AnalysisDeleteSummary
+                :description listing-schema/AnalysisDeleteDocs
+                (ok (apps/delete-job analysis-id)))
+
+        (GET "/history" []
+             :return listing-schema/AnalysisHistory
+             :summary listing-schema/AnalysisHistorySummary
+             :description listing-schema/AnalysisHistoryDocs
+             (ok (apps/get-job-history analysis-id)))
+
+        (GET "/parameters" []
+             :return schema/AnalysisParameters
+             :summary schema/AnalysisParametersSummary
+             :description schema/AnalysisParametersDocs
+             (ok (apps/get-job-params analysis-id)))
+
+        (GET "/relaunch-info" []
+             :return AppJobView
+             :summary schema/AnalysisRelaunchSummary
+             :description schema/AnalysisRelaunchDocs
+             (ok (apps/get-job-relaunch-info analysis-id)))
+
+        (GET "/steps" []
+             :return listing-schema/AnalysisStepList
+             :summary listing-schema/AnalysisStepsSummary
+             :description listing-schema/AnalysisStepsDocs
+             (ok (apps/list-job-steps analysis-id)))
+
+        (POST "/stop" []
+              :query [params schema/StopAnalysisRequest]
+              :return schema/StopAnalysisResponse
+              :summary schema/AnalysisStopSummary
+              :description schema/AnalysisStopDocs
+              (ok (apps/stop-job analysis-id params)))))))
 
 (s/defschema DeletionResponse
   {:id (describe UUID "The UUID of the resource that was deleted")})
