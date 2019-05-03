@@ -2,6 +2,7 @@
   "the routing code for search-related URL resources"
   (:use [clojure-commons.error-codes :only [missing-arg-response]]
         [common-swagger-api.schema]
+        [ring.util.http-response :only [ok]]
   (:require [terrain.auth.user-attributes :as user]
             [terrain.services.search :as search]
             [terrain.clients.search :as c-search]
@@ -18,8 +19,12 @@
     (context "/filesystem" []
        :tags ["filesystem"]
 
-       (GET "/search-documentation" [:as req]
-            (util/controller req c-search/get-data-search-documentation))
+       (GET "/search-documentation" []
+            :summary "Get additional documentation for the search endpoint"
+            :description "Returns documentation of the available querydsl clauses and their
+            arguments/types, plus the list of available sort fields."
+            (ok (c-search/get-data-search-documentation)))
+
        (POST "/search" [:as req]
              (util/controller req c-search/do-data-search :params :body))
 

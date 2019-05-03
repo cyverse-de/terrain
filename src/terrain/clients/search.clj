@@ -14,4 +14,6 @@
 
 (defn get-data-search-documentation
   []
-  (http/get (str (url (search-base-url) "data" "documentation"))))
+  (:body (http/get (str (url (search-base-url) "data" "documentation"))
+                   {:as           :json
+                    :content-type :json})))
