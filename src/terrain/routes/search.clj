@@ -3,6 +3,7 @@
   (:use [clojure-commons.error-codes :only [missing-arg-response]]
         [common-swagger-api.schema]
         [ring.util.http-response :only [ok]]
+        [terrain.routes.schemas.search])
   (:require [terrain.auth.user-attributes :as user]
             [terrain.services.search :as search]
             [terrain.clients.search :as c-search]
@@ -25,8 +26,13 @@
             arguments/types, plus the list of available sort fields."
             (ok (c-search/get-data-search-documentation)))
 
-       (POST "/search" [:as req]
-             (util/controller req c-search/do-data-search :params :body))
+       (POST "/search" []
+             :summary "Perform a data search"
+             :body [body (doc-only SearchQuery SearchQueryDocs)]
+             :description "Search utilizing the querydsl.
+             This endpoint automatically filters results to those the user can see, and adds a
+             \"permission\" field that summarizes the requesting user's effective permission on each result."
+             (ok (c-search/do-data-search body)))
 
        (GET "/index" [q tags & opts]
             (if (or q tags)
