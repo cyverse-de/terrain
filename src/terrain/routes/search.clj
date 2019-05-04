@@ -26,9 +26,9 @@
 
        (POST "/search" []
              :summary "Perform a data search"
-             :body [body (doc-only SearchQuery SearchQueryDocs)]
+             :body [body SearchRequest]
              :description "Search utilizing the querydsl.
              This endpoint automatically filters results to those the user can see, and adds a
-             \"permission\" field that summarizes the requesting user's effective permission on each result."
+             `permission` field that summarizes the requesting user's effective permission on each result."
              (ok (c-search/do-data-search body)))
        )))
