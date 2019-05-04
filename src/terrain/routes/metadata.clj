@@ -323,50 +323,6 @@
    (PUT "/apps/:app-id/metadata" [app-id :as {:keys [body]}]
      (service/success-response (apps/admin-set-avus app-id body)))))
 
-(defn analysis-routes
-  []
-  (optional-routes
-   [config/app-routes-enabled]
-
-   (GET "/analyses" [:as {:keys [params]}]
-     (service/success-response (apps/list-jobs params)))
-
-   (POST "/analyses" [:as {:keys [body]}]
-     (service/success-response (apps/submit-job body)))
-
-   (POST "/analyses/permission-lister" [:as {:keys [body params]}]
-     (service/success-response (apps/list-job-permissions body params)))
-
-   (POST "/analyses/sharing" [:as {:keys [body]}]
-     (service/success-response (apps/share-jobs body)))
-
-   (POST "/analyses/unsharing" [:as {:keys [body]}]
-     (service/success-response (apps/unshare-jobs body)))
-
-   (PATCH "/analyses/:analysis-id" [analysis-id :as {body :body}]
-          (service/success-response (apps/update-job analysis-id body)))
-
-   (DELETE "/analyses/:analysis-id" [analysis-id]
-     (service/success-response (apps/delete-job analysis-id)))
-
-   (POST "/analyses/shredder" [:as {:keys [body]}]
-     (service/success-response (apps/delete-jobs body)))
-
-   (GET "/analyses/:analysis-id/history" [analysis-id]
-     (service/success-response (apps/get-job-history analysis-id)))
-
-   (GET "/analyses/:analysis-id/parameters" [analysis-id]
-     (service/success-response (apps/get-job-params analysis-id)))
-
-   (GET "/analyses/:analysis-id/relaunch-info" [analysis-id]
-     (service/success-response (apps/get-job-relaunch-info analysis-id)))
-
-   (GET "/analyses/:analysis-id/steps" [analysis-id]
-     (service/success-response (apps/list-job-steps analysis-id)))
-
-   (POST "/analyses/:analysis-id/stop" [analysis-id :as {:keys [params]}]
-     (service/success-response (apps/stop-job analysis-id params)))))
-
 (defn admin-reference-genomes-routes
   []
   (optional-routes

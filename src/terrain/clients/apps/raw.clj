@@ -6,12 +6,10 @@
 
 (def apps-sort-params [:limit :offset :sort-field :sort-dir :app-type])
 (def base-search-params (conj apps-sort-params :search))
-(def apps-analysis-listing-params (conj apps-sort-params :include-hidden :filter))
 (def apps-search-params (conj base-search-params :start_date :end_date))
 (def admin-apps-search-params (conj apps-search-params :app-subset))
 (def apps-hierarchy-sort-params (conj apps-sort-params :attr))
 (def tools-search-params (conj base-search-params :include-hidden :public))
-(def permission-lister-params [:full-listing])
 
 (defn- apps-url
   [& components]
@@ -442,106 +440,119 @@
 
 (defn list-jobs
   [params]
-  (client/get (apps-url "analyses")
-              {:query-params     (secured-params params apps-analysis-listing-params)
-               :as               :stream
-               :follow-redirects false}))
+  (:body
+    (client/get (apps-url "analyses")
+                {:query-params     (secured-params params)
+                 :as               :json
+                 :follow-redirects false})))
 
 (defn list-job-permissions
   [body params]
-  (client/post (apps-url "analyses" "permission-lister")
-               {:query-params     (secured-params params permission-lister-params)
-                :content-type     :json
-                :body             body
-                :as               :stream
-                :follow-redirects false}))
+  (:body
+    (client/post (apps-url "analyses" "permission-lister")
+                 {:query-params     (secured-params params)
+                  :form-params      body
+                  :content-type     :json
+                  :as               :json
+                  :follow-redirects false})))
 
 (defn share-jobs
   [body]
-  (client/post (apps-url "analyses" "sharing")
-               {:query-params     (secured-params)
-                :content-type     :json
-                :body             body
-                :as               :stream
-                :follow-redirects false}))
+  (:body
+    (client/post (apps-url "analyses" "sharing")
+                 {:query-params     (secured-params)
+                  :form-params      body
+                  :content-type     :json
+                  :as               :json
+                  :follow-redirects false})))
 
 (defn unshare-jobs
   [body]
-  (client/post (apps-url "analyses" "unsharing")
-               {:query-params     (secured-params)
-                :content-type     :json
-                :body             body
-                :as               :stream
-                :follow-redirects false}))
+  (:body
+    (client/post (apps-url "analyses" "unsharing")
+                 {:query-params     (secured-params)
+                  :form-params      body
+                  :content-type     :json
+                  :as               :json
+                  :follow-redirects false})))
 
 (defn submit-job
-  [submission]
-  (client/post (apps-url "analyses")
-               {:query-params     (secured-params)
-                :content-type     :json
-                :body             submission
-                :as               :stream
-                :follow-redirects false}))
+  [body]
+  (:body
+    (client/post (apps-url "analyses")
+                 {:query-params     (secured-params)
+                  :form-params      body
+                  :content-type     :json
+                  :as               :json
+                  :follow-redirects false})))
 
 (defn update-job
   [analysis-id body]
-  (client/patch (apps-url "analyses" analysis-id)
-                {:query-params     (secured-params)
-                 :content-type     :json
-                 :body             body
-                 :as               :stream
-                 :follow-redirects false}))
+  (:body
+    (client/patch (apps-url "analyses" analysis-id)
+                  {:query-params     (secured-params)
+                   :form-params      body
+                   :content-type     :json
+                   :as               :json
+                   :follow-redirects false})))
 
 (defn delete-job
   [analysis-id]
-  (client/delete (apps-url "analyses" analysis-id)
-                 {:query-params     (secured-params)
-                  :as               :stream
-                  :follow-redirects false}))
+  (:body
+    (client/delete (apps-url "analyses" analysis-id)
+                   {:query-params     (secured-params)
+                    :as               :json
+                    :follow-redirects false})))
 
 (defn delete-jobs
   [body]
-  (client/post (apps-url "analyses" "shredder")
-               {:query-params     (secured-params)
-                :content-type     :json
-                :body             body
-                :as               :stream
-                :follow-redirects false}))
+  (:body
+    (client/post (apps-url "analyses" "shredder")
+                 {:query-params     (secured-params)
+                  :form-params      body
+                  :content-type     :json
+                  :as               :json
+                  :follow-redirects false})))
 
 (defn get-job-params
   [analysis-id]
-  (client/get (apps-url "analyses" analysis-id "parameters")
-              {:query-params     (secured-params)
-               :as               :stream
-               :follow-redirects false}))
+  (:body
+    (client/get (apps-url "analyses" analysis-id "parameters")
+                {:query-params     (secured-params)
+                 :as               :json
+                 :follow-redirects false})))
 
 (defn get-job-relaunch-info
   [analysis-id]
-  (client/get (apps-url "analyses" analysis-id "relaunch-info")
-              {:query-params     (secured-params)
-               :as               :stream
-               :follow-redirects false}))
+  (:body
+    (client/get (apps-url "analyses" analysis-id "relaunch-info")
+                {:query-params     (secured-params)
+                 :as               :json
+                 :follow-redirects false})))
 
 (defn list-job-steps
   [analysis-id]
-  (client/get (apps-url "analyses" analysis-id "steps")
-              {:query-params     (secured-params)
-               :as               :stream
-               :follow-redirects false}))
+  (:body
+    (client/get (apps-url "analyses" analysis-id "steps")
+                {:query-params     (secured-params)
+                 :as               :json
+                 :follow-redirects false})))
 
 (defn stop-job
   [analysis-id params]
-  (client/post (apps-url "analyses" analysis-id "stop")
-               {:query-params     (secured-params params [:job_status])
-                :as               :stream
-                :follow-redirects false}))
+  (:body
+    (client/post (apps-url "analyses" analysis-id "stop")
+                 {:query-params     (secured-params params)
+                  :as               :json
+                  :follow-redirects false})))
 
 (defn get-job-history
   [analysis-id]
-  (client/get (apps-url "analyses" analysis-id "history")
-              {:query-params      (secured-params)
-               :as                :stream
-               :follow-redirecrts false}))
+  (:body
+    (client/get (apps-url "analyses" analysis-id "history")
+                {:query-params      (secured-params)
+                 :as                :json
+                 :follow-redirecrts false})))
 
 (defn admin-get-apps
   [params]
