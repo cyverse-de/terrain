@@ -19,10 +19,6 @@
   [body]
   (raw/admin-add-tools (cheshire/encode body)))
 
-(defn submit-job
-  [submission]
-  (raw/submit-job (cheshire/encode submission)))
-
 (defn get-authenticated-user
   []
   (-> (raw/get-authenticated-user)
