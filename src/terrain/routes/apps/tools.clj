@@ -27,6 +27,7 @@
            (ok (apps/list-tools params)))
 
       (POST "/" []
+            :middleware [schema/coerce-tool-import-requests]
             :body [body schema/PrivateToolImportRequest]
             :responses schema/PrivateToolImportResponses
             :summary schema/ToolAddSummary
@@ -73,6 +74,7 @@
              (ok (apps/get-tool tool-id)))
 
         (PATCH "/" []
+               :middleware [schema/coerce-tool-import-requests]
                :body [body schema/PrivateToolUpdateRequest]
                :responses schema/ToolUpdateResponses
                :summary schema/ToolUpdateSummary
