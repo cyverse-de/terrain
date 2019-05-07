@@ -27,7 +27,7 @@
 
 (defn export-fasta
   "Exports the FastA file corresponding to a Genome into the user's CoGe data folder."
-  [genome-id {:keys [notify overwrite]}]
+  [genome-id {:keys [notify overwrite] :or {notify false overwrite false}}]
   (let [data-folder-path (coge-data-folder-path (:shortUsername current-user))]
     (create-coge-data-folder (:shortUsername current-user) data-folder-path)
     (coge/export-fasta genome-id

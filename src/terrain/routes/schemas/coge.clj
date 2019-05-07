@@ -1,6 +1,6 @@
 (ns terrain.routes.schemas.coge
   (:use [common-swagger-api.schema :only [describe]]
-        [schema.core :only [defschema maybe]]))
+        [schema.core :only [defschema maybe optional-key]]))
 
 (def GenomeIdPathParam (describe Long "The genome ID"))
 
@@ -8,8 +8,12 @@
   {:search (describe String "The genome search string, which must be at least three characters long")})
 
 (defschema GenomeExportParams
-  {:notify    (describe Boolean "Set to `true` to be notified when the export is complete")
-   :overwrite (describe Boolean "Set to `true` to indicate that the file should be overwritten if it exists")})
+  {(optional-key :notify)
+   (describe Boolean "Set to `true` to be notified when the export is complete (defaults to `false`)")
+
+   (optional-key :overwrite)
+   (describe Boolean (str "Set to `true` to indicate that the file should be overwritten if it exists "
+                          "(defaults to `false`)"))})
 
 (defschema GenomeLoadRequest
   {:paths (describe [String] "The paths to the files in the data store to view in CoGe.")})
