@@ -216,7 +216,8 @@
                                      {:name "subjects", :description "Subject Endpoints"}
                                      {:name "teams", :description "Team Endpoints"}
                                      {:name "tools", :description "Tool Endpoints"}
-                                     {:name "token", :description "OAuth Tokens"}]
+                                     {:name "token", :description "OAuth Tokens"}
+                                     {:name "user-info", :description "User Information Endpoints"}]
                :securityDefinitions security-definitions}})
   (middleware
    [[wrap-query-param-remover "ip-address" #{#"^/terrain/secured/bootstrap"}]

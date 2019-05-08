@@ -11,9 +11,11 @@
   (optional-routes
    [config/user-info-routes-enabled]
 
-   (GET "/user-info" [:as {:keys [params]}]
-     (user-info (as-vector (:username params))))))
+   (context "/user-info" []
+     :tags ["user-info"]
 
+     (GET "/" [:as {:keys [params]}]
+          (user-info (as-vector (:username params)))))))
 
 (defn admin-user-info-routes
   []
