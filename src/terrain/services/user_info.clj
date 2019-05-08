@@ -5,14 +5,6 @@
             [terrain.auth.user-attributes :as user]
             [clojure.tools.logging :as log]))
 
-(defn user-search
-  "Performs user searches by username, name and e-mail address and returns the
-   merged results."
-  [search-string]
-     (let [results (ipg/find-subjects (:shortUsername user/current-user) search-string)
-           users   (:subjects results)]
-       (success-response {:users users :truncated false})))
-
 (defn- add-user-info
   "Adds the information for a single user to a user-info lookup result."
   [result [username user-info]]
