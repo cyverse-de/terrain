@@ -197,6 +197,7 @@
                                      {:name "admin-comments", :description "Comment Administration Endpoints"}
                                      {:name "admin-communities", :description "Community Administration Endpoints"}
                                      {:name "admin-filesystem", :description "File System Administration Endpoints"}
+                                     {:name "admin-user-info", :description "User Info Administration Endpoints"}
                                      {:name "analyses", :description "Analysis Endpoints"}
                                      {:name "analyses-quicklaunches", :description "Quick Launch Endpoints"}
                                      {:name "apps", :description, "Apps Endpoints"}

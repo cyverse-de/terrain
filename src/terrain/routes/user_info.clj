@@ -31,5 +31,11 @@
   (optional-routes
    [config/user-info-routes-enabled]
 
-   (GET "/users/:username/groups" [username]
-     (success-response (ipg/list-groups-for-user username)))))
+   (context "/users" []
+     :tags ["admin-user-info"]
+     (GET "/:username/groups" []
+          :path-params [username :- UsernameParam]
+          :summary "Get a user's groups"
+          :description "Lists all groups to which a user belongs"
+          :return GroupListing
+          (ok (ipg/list-groups-for-user username))))))
