@@ -26,6 +26,12 @@
             :description schema/PutWebhooksDesc
             (ok (apps-client/save-webhooks body)))
 
+       (GET "/topics" []
+            :return schema/TopicList
+            :summary schema/GetWebhooksTopicSummary
+            :description schema/GetWebhooksTopicDesc
+            (ok (apps-client/get-webhook-topics)))
+
        (GET "/types" []
             :return schema/WebhookTypeList
             :summary schema/GetWebhookTypesSummary

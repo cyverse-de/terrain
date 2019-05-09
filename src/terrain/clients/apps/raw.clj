@@ -1069,6 +1069,13 @@
                :as               :json
                :follow-redirects false})))
 
+(defn get-webhook-topics
+  []
+  (:body (client/get (apps-url "webhooks" "topics")
+              {:query-params     (secured-params)
+               :as               :json
+               :follow-redirects false})))
+
 (defn get-webhooks
   []
   (:body (client/get (apps-url "webhooks")
