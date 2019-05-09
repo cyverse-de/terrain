@@ -9,8 +9,11 @@
   (optional-routes
     [config/app-routes-enabled]
 
-    (PUT "/webhooks" [:as {:keys [body]}]
-      (service/success-response (apps-client/save-webhooks body)))
+    (context "/webhooks" []
+       :tags ["webhooks"]
 
-    (GET "/webhooks/types" [:as {:keys []}]
-      (service/success-response (apps-client/get-webhook-types)))))
+       (PUT "/" [:as {:keys [body]}]
+            (service/success-response (apps-client/save-webhooks body)))
+
+       (GET "/types" [:as {:keys []}]
+            (service/success-response (apps-client/get-webhook-types))))))
