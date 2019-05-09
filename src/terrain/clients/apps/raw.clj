@@ -1041,12 +1041,12 @@
 
 (defn save-webhooks
   [webhooks]
-  (client/put (apps-url "webhooks")
+  (:body (client/put (apps-url "webhooks")
             {:query-params     (secured-params)
-             :as               :stream
-             :body             webhooks
+             :as               :json
+             :form-params      webhooks
              :content-type     :json
-             :follow-redirects false}))
+             :follow-redirects false})))
 
 (defn admin-list-workspaces
   [params]
