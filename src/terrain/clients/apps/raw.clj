@@ -1068,3 +1068,10 @@
               {:query-params     (secured-params)
                :as               :json
                :follow-redirects false})))
+
+(defn get-webhooks
+  []
+  (:body (client/get (apps-url "webhooks")
+              {:query-params     (secured-params)
+               :as               :json
+               :follow-redirects false})))

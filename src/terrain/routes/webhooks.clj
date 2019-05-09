@@ -13,6 +13,12 @@
     (context "/webhooks" []
        :tags ["webhooks"]
 
+       (GET "/" []
+            :return schema/WebhookList
+            :summary schema/GetWebhooksSummary
+            :description schema/GetWebhooksDesc
+            (ok (apps-client/get-webhooks)))
+
        (PUT "/" []
             :body [body schema/WebhookList]
             :return schema/WebhookList
