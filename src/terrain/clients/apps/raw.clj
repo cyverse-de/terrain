@@ -1064,7 +1064,7 @@
 
 (defn get-webhook-types
   []
-  (client/get (apps-url "webhooks" "types")
+  (:body (client/get (apps-url "webhooks" "types")
               {:query-params     (secured-params)
-               :as               :stream
-               :follow-redirects false}))
+               :as               :json
+               :follow-redirects false})))
