@@ -1,9 +1,7 @@
 (ns terrain.services.user-info
   (:use [terrain.util.service :only [success-response]])
-  (:require [cheshire.core :as cheshire]
-            [terrain.clients.iplant-groups :as ipg]
-            [terrain.auth.user-attributes :as user]
-            [clojure.tools.logging :as log]))
+  (:require [terrain.clients.iplant-groups :as ipg]
+            [terrain.auth.user-attributes :as user]))
 
 (defn- add-user-info
   "Adds the information for a single user to a user-info lookup result."
@@ -24,7 +22,4 @@
   "Performs a user search for one or more usernames, returning a response whose
    body consists of a JSON object indexed by username."
   [usernames]
-  (let [body (reduce add-user-info {} (map get-user-info usernames))]
-    {:status       200
-     :body         (cheshire/encode body)
-     :content-type :json}))
+  (reduce add-user-info {} (map get-user-info usernames)))
