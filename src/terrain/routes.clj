@@ -197,6 +197,7 @@
                                      {:name "admin-comments", :description "Comment Administration Endpoints"}
                                      {:name "admin-communities", :description "Community Administration Endpoints"}
                                      {:name "admin-filesystem", :description "File System Administration Endpoints"}
+                                     {:name "admin-user-info", :description "User Info Administration Endpoints"}
                                      {:name "analyses", :description "Analysis Endpoints"}
                                      {:name "analyses-quicklaunches", :description "Quick Launch Endpoints"}
                                      {:name "apps", :description, "Apps Endpoints"}
@@ -216,7 +217,8 @@
                                      {:name "subjects", :description "Subject Endpoints"}
                                      {:name "teams", :description "Team Endpoints"}
                                      {:name "tools", :description "Tool Endpoints"}
-                                     {:name "token", :description "OAuth Tokens"}]
+                                     {:name "token", :description "OAuth Tokens"}
+                                     {:name "user-info", :description "User Information Endpoints"}]
                :securityDefinitions security-definitions}})
   (middleware
    [[wrap-query-param-remover "ip-address" #{#"^/terrain/secured/bootstrap"}]

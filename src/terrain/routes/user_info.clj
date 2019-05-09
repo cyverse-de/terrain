@@ -1,5 +1,7 @@
 (ns terrain.routes.user-info
   (:use [common-swagger-api.schema]
+        [ring.util.http-response :only [ok]]
+        [terrain.routes.schemas.user-info]
         [terrain.services.user-info]
         [terrain.util]
         [terrain.util.service :only [success-response]])
@@ -11,17 +13,29 @@
   (optional-routes
    [config/user-info-routes-enabled]
 
-   (GET "/user-search" [:as {:keys [params]}]
-     (user-search (:search params)))
+   (context "/user-info" []
+     :tags ["user-info"]
 
-   (GET "/user-info" [:as {:keys [params]}]
-     (user-info (as-vector (:username params))))))
-
+     (GET "/" []
+          :query [params UserInfoRequest]
+          :return (doc-only UserInfoResponse UserInfoResponseDocs)
+          :summary "Get user information"
+          :description "Returns account information associated with each username or ID.  If the ID
+          belongs to an individual user, information like first and last name, as well as institution and
+          email will be returned.  If the ID belongs to a group, such as a team or collaborator list,
+          then the name and description of the group will be returned."
+          (ok (user-info (:username params)))))))
 
 (defn admin-user-info-routes
   []
   (optional-routes
    [config/user-info-routes-enabled]
 
-   (GET "/users/:username/groups" [username]
-     (success-response (ipg/list-groups-for-user username)))))
+   (context "/users" []
+     :tags ["admin-user-info"]
+     (GET "/:username/groups" []
+          :path-params [username :- UsernameParam]
+          :summary "Get a user's groups"
+          :description "Lists all groups to which a user belongs"
+          :return GroupListing
+          (ok (ipg/list-groups-for-user username))))))
