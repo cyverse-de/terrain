@@ -19,7 +19,6 @@
         [ring.util.http-response :only [ok]]
         [terrain.routes.schemas.apps]
         [terrain.services.metadata.apps]
-        [terrain.services.bootstrap]
         [terrain.util])
   (:require [common-swagger-api.routes]                     ;; Required for :description-file
             [common-swagger-api.schema.apps :as schema]
@@ -415,17 +414,6 @@
 
    (POST "/support-email" [:as {body :body}]
      (send-support-email body))))
-
-(defn secured-metadata-routes
-  []
-  (optional-routes
-   [config/app-routes-enabled]
-
-   (GET "/bootstrap" [:as req]
-     (bootstrap req))
-
-   (GET "/logout" [:as {params :params}]
-     (logout params))))
 
 (defn admin-integration-data-routes
   []

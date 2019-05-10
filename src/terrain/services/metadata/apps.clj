@@ -36,14 +36,6 @@
     (dorun (map dn/send-tool-notification (:tools json))))
   (success-response))
 
-(defn logout
-  "This service records the fact that the user logged out."
-  [{:keys [ip-address login-time]}]
-  (assert-valid ip-address "Missing or empty query string parameter: ip-address")
-  (assert-valid login-time "Missing or empty query string parameter: login-time")
-  (dm/record-logout ip-address login-time)
-  (success-response))
-
 (defn add-reference-genome
   "Adds a reference genome via apps."
   [req]

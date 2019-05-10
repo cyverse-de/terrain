@@ -4,7 +4,7 @@
     [terrain.auth.user-attributes :only [current-user]])
   (:require
     [clojure.tools.logging :as log]
-    [terrain.clients.apps :as apps-client]
+    [terrain.clients.apps.raw :as apps-client]
     [terrain.clients.data-info :as data-info-client]
     [terrain.services.user-prefs :as prefs]
     [terrain.util.service :as service]))
@@ -54,21 +54,19 @@
 (defn bootstrap
   "This service obtains information about and initializes the workspace for the authenticated user.
    It also records the fact that the user logged in."
-  [{{:keys [ip-address]} :params {user-agent "user-agent"} :headers}]
-  (service/assert-valid ip-address "Missing or empty query string parameter: ip-address")
+  [ip-address user-agent]
   (service/assert-valid user-agent "Missing or empty request parameter: user-agent")
   (let [{user :shortUsername :keys [email firstName lastName username]} current-user
         login-session (future (get-login-session ip-address user-agent))
         apps-info     (future (get-apps-info))
         data-info     (future (get-user-data-info user))
         preferences   (future (get-user-prefs username))]
-    (service/success-response
-      {:user_info   {:username      user
-                     :full_username username
-                     :email         email
-                     :first_name    firstName
-                     :last_name     lastName}
-       :session     @login-session
-       :apps_info   @apps-info
-       :data_info   @data-info
-       :preferences @preferences})))
+    {:user_info   {:username      user
+                   :full_username username
+                   :email         email
+                   :first_name    firstName
+                   :last_name     lastName}
+     :session     @login-session
+     :apps_info   @apps-info
+     :data_info   @data-info
+     :preferences @preferences}))

@@ -1,12 +1,11 @@
 (ns terrain.services.user-prefs.output-dir
-  (:use [terrain.auth.user-attributes :only [current-user]])
+  (:use [terrain.auth.user-attributes :only [current-user]]
+        [terrain.routes.schemas.user-prefs :only [default-output-dir-key]])
   (:require [clojure.string :as string]
             [clojure.tools.logging :as log]
             [clojure-commons.file-utils :as ft]
             [terrain.clients.data-info :as di]
             [terrain.util.config :as cfg]))
-
-(def default-output-dir-key :default_output_folder)
 
 (defn- convert-default-output-dir-keys
   [prefs]

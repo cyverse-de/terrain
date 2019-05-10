@@ -15,6 +15,7 @@
         [terrain.routes.apps.metadata]
         [terrain.routes.apps.pipelines]
         [terrain.routes.apps.tools]
+        [terrain.routes.bootstrap]
         [terrain.routes.data]
         [terrain.routes.permanent-id-requests]
         [terrain.routes.fileio]
@@ -88,7 +89,7 @@
   []
   (util/flagged-routes
     (secured-notification-routes)
-    (secured-metadata-routes)
+    (secured-bootstrap-routes)
     (secured-pref-routes)
     (secured-user-info-routes)
     (secured-data-routes)
@@ -208,6 +209,7 @@
                                      {:name "app-element-types", :description, "App Element Endpoints"}
                                      {:name "app-metadata", :description "App Metadata Endpoints"}
                                      {:name "app-pipelines", :description "App Pipeline Endpoints"}
+                                     {:name "bootstrap", :description "Bootstrap Endpoints"}
                                      {:name "coge", :description "CoGe Endpoints"}
                                      {:name "collaborator-lists", :description "Collaborator List Endpoints"}
                                      {:name "communities", :description "Community Endpoints"}
@@ -222,7 +224,8 @@
                                      {:name "webhooks", :description "Webhook Endpoints"}]
                :securityDefinitions security-definitions}})
   (middleware
-   [[wrap-query-param-remover "ip-address" #{#"^/terrain/secured/bootstrap"}]
+   [[wrap-query-param-remover "ip-address" #{#"^/terrain/secured/bootstrap"
+                                             #"^/terrain/secured/logout"}]
     wrap-query-params
     wrap-lcase-params
     wrap-keyword-params
