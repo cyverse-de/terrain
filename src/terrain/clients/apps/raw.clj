@@ -927,17 +927,18 @@
 (defn record-login
   [ip-address user-agent]
   (let [params {:ip-address ip-address :user-agent user-agent}]
-    (client/post (apps-url "users" "login")
-                 {:query-params     (secured-params params)
-                  :as               :stream
-                  :follow-redirects false})))
+    (:body
+      (client/post (apps-url "users" "login")
+                   {:query-params     (secured-params params)
+                    :as               :json
+                    :follow-redirects false}))))
 
 (defn record-logout
-  [ip-address login-time]
-  (let [params {:ip-address ip-address :login-time login-time}]
+  [params]
+  (:body
     (client/post (apps-url "users" "logout")
                  {:query-params     (secured-params params)
-                  :as               :stream
+                  :as               :json
                   :follow-redirects false})))
 
 (defn list-integration-data
@@ -1034,10 +1035,11 @@
 
 (defn bootstrap
   []
-  (client/get (apps-url "bootstrap")
-              {:query-params     (secured-params)
-               :as               :stream
-               :follow-redirects false}))
+  (:body
+    (client/get (apps-url "bootstrap")
+                {:query-params     (secured-params)
+                 :as               :json
+                 :follow-redirects false})))
 
 (defn save-webhooks
   [webhooks]

@@ -1,7 +1,8 @@
 (ns terrain.services.user-prefs
   (:use [slingshot.slingshot :only [throw+]]
-        [terrain.util.service :only [success-response]]
-        [terrain.auth.user-attributes :only [current-user]])
+        [terrain.auth.user-attributes :only [current-user]]
+        [terrain.routes.schemas.user-prefs :only [default-output-dir-key]]
+        [terrain.util.service :only [success-response]])
   (:require [cheshire.core :as cheshire]
             [clojure.tools.logging :as log]
             [clojure-commons.error-codes :as ce]
@@ -32,9 +33,9 @@
 
 (defn validate-user-prefs
   [prefs]
-  (if-not (contains? prefs output-dir/default-output-dir-key)
+  (if-not (contains? prefs default-output-dir-key)
     (throw+ {:error_code ce/ERR_BAD_REQUEST
-             :msg        (str "Missing " (name output-dir/default-output-dir-key))})))
+             :msg        (str "Missing " (name default-output-dir-key))})))
 
 (defn user-prefs
   "Retrieves or saves the user's preferences."

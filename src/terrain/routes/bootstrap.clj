@@ -1,0 +1,34 @@
+(ns terrain.routes.bootstrap
+  (:use [common-swagger-api.schema]
+        [ring.util.http-response :only [ok]]
+        [terrain.services.bootstrap :only [bootstrap]]
+        [terrain.util :only [optional-routes]])
+  (:require [common-swagger-api.schema.sessions :as sessions-schema]
+            [terrain.clients.apps.raw :as apps-client]
+            [terrain.routes.schemas.bootstrap :as schema]
+            [terrain.util.config :as config]))
+
+(defn secured-bootstrap-routes
+  []
+  (optional-routes
+    [config/app-routes-enabled]
+
+    (context "/bootstrap" []
+      :tags ["bootstrap"]
+
+      (GET "/" [:as {{user-agent "user-agent"} :headers}]
+           :query [{:keys [ip-address]} sessions-schema/IPAddrParam]
+           :return schema/TerrainBootstrapResponse
+           :summary "Bootstrap Service"
+           :description "This service obtains information about and initializes the workspace for the authenticated user.
+           It also records the fact that the user logged in."
+           (ok (bootstrap ip-address user-agent))))
+
+    (context "/logout" []
+      :tags ["bootstrap"]
+
+      (GET "/" []
+           :query [params sessions-schema/LogoutParams]
+           :summary sessions-schema/LogoutSummary
+           :description sessions-schema/LogoutDocs
+           (ok (apps-client/record-logout params))))))
