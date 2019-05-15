@@ -393,20 +393,6 @@
    (POST "/tool-requests/:request-id/status" [request-id :as req]
      (update-tool-request req request-id))))
 
-(defn tool-request-routes
-  []
-  (optional-routes
-   [config/app-routes-enabled]
-
-   (GET "/tool-requests" []
-     (list-tool-requests))
-
-   (POST "/tool-requests" [:as req]
-     (submit-tool-request req))
-
-   (GET "/tool-requests/status-codes" [:as {params :params}]
-     (list-tool-request-status-codes params))))
-
 (defn misc-metadata-routes
   []
   (optional-routes

@@ -9,12 +9,6 @@
        (:body)
        (service/decode-json)))
 
-(defn list-tool-request-status-codes
-  [params]
-  (-> (raw/list-tool-request-status-codes params)
-      (:body)
-      (service/decode-json)))
-
 (defn admin-add-tools
   [body]
   (raw/admin-add-tools (cheshire/encode body)))

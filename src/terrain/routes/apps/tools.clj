@@ -9,6 +9,7 @@
             [common-swagger-api.schema.tools :as schema]
             [compojure.api.middleware :as middleware]
             [terrain.clients.apps.raw :as apps]
+            [terrain.services.metadata.apps :as apps-services]
             [terrain.util.config :as config]))
 
 (defn tool-routes
@@ -92,3 +93,32 @@
              :summary schema/ToolIntegrationDataListingSummary
              :description schema/ToolIntegrationDataListingDocs
              (ok (apps/get-tool-integration-data tool-id)))))))
+
+(defn tool-request-routes
+  []
+  (optional-routes
+    [config/app-routes-enabled]
+
+    (context "/tool-requests" []
+      :tags ["tool-requests"]
+
+      (GET "/" []
+           :query [params schema/ToolRequestListingParams]
+           :return schema/ToolRequestListing
+           :summary schema/ToolInstallRequestListingSummary
+           :description schema/ToolInstallRequestListingDocs
+           (ok (apps/list-tool-requests params)))
+
+      (POST "/" []
+            :body [body schema/ToolRequest]
+            :return schema/ToolRequestDetails
+            :summary schema/ToolInstallRequestSummary
+            :description schema/ToolInstallRequestDocs
+            (ok (apps-services/submit-tool-request body)))
+
+      (GET "/status-codes" []
+           :query [params schema/ToolRequestStatusCodeListingParams]
+           :return schema/ToolRequestStatusCodeListing
+           :summary schema/ToolInstallRequestStatusCodeListingSummary
+           :description schema/ToolInstallRequestStatusCodeListingDocs
+           (ok (apps/list-tool-request-status-codes params))))))
