@@ -219,6 +219,7 @@
                                      {:name "subjects", :description "Subject Endpoints"}
                                      {:name "teams", :description "Team Endpoints"}
                                      {:name "tools", :description "Tool Endpoints"}
+                                     {:name "tool-requests", :description "Tool Request Endpoints"}
                                      {:name "token", :description "OAuth Tokens"}
                                      {:name "user-info", :description "User Information Endpoints"}
                                      {:name "webhooks", :description "Webhook Endpoints"}]

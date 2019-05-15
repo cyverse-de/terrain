@@ -9,6 +9,7 @@
             [clojure.string :as string]
             [terrain.clients.iplant-groups :as ipg]
             [terrain.clients.apps :as dm]
+            [terrain.clients.apps.raw :as apps-client]
             [terrain.clients.notifications :as dn]
             [terrain.util.email :as email]))
 
@@ -51,52 +52,33 @@
     (forward-patch url req)))
 
 (defn- postprocess-tool-request
-  "Postprocesses a tool request update or submission. The postprocessing function
-   should take the tool request and user details as arguments."
-  [res f]
+  "Postprocesses a tool request update."
+  [res]
   (if (<= 200 (:status res) 299)
-    (let [tool-req     (cheshire/decode-stream (reader (:body res)) true)
-          username     (string/replace (:submitted_by tool-req) #"@.*" "")
-          user-details (ipg/format-like-trellis (ipg/lookup-subject-add-empty username username))]
-      (f tool-req user-details))
+    (let [tool-req (cheshire/decode-stream (reader (:body res)) true)]
+      (success-response tool-req))
     res))
 
 (defn submit-tool-request
   "Submits a tool request on behalf of the user found in the request params."
-  [req]
-  (let [tool-request-url (apps-url {} "tool-requests")
-        req (apps-request req)]
-    (postprocess-tool-request
-      (forward-post tool-request-url req)
-      (fn [tool-req user-details]
-        (email/send-tool-request-email tool-req user-details)
-        (success-response tool-req)))))
-
-(defn list-tool-requests
-  "Lists the tool requests that were submitted by the authenticated user."
-  []
-  (client/get (apps-url {} "tool-requests")
-              {:as :stream}))
+  [body]
+  (let [tool-req     (apps-client/submit-tool-request body)
+        username     (string/replace (:submitted_by tool-req) #"@.*" "")
+        user-details (ipg/format-like-trellis (ipg/lookup-subject-add-empty username username))]
+    (email/send-tool-request-email tool-req user-details)
+    tool-req))
 
 (defn admin-list-tool-requests
   "Lists the tool requests that were submitted by any user."
   [params]
   (success-response (dm/admin-list-tool-requests params)))
 
-(defn list-tool-request-status-codes
-  "Lists the known tool request status codes."
-  [params]
-  (success-response (dm/list-tool-request-status-codes params)))
-
 (defn update-tool-request
   "Updates a tool request with comments and possibly a new status."
   [req request-id]
   (let [url (apps-url {} "admin" "tool-requests" request-id "status")
         req (apps-request req)]
-    (postprocess-tool-request
-      (forward-post url req)
-      (fn [tool-req user-details]
-        (success-response tool-req)))))
+    (postprocess-tool-request (forward-post url req))))
 
 (defn get-tool-request
   "Lists details about a specific tool request."

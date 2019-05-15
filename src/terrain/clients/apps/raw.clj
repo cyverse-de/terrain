@@ -744,12 +744,33 @@
                   :as               :stream
                   :follow-redirects false}))
 
+(defn list-tool-requests
+  "Lists the tool requests that were submitted by the authenticated user."
+  [params]
+  (:body
+    (client/get (apps-url "tool-requests")
+                {:query-params     (secured-params params)
+                 :as               :json
+                 :follow-redirects false})))
+
+(defn submit-tool-request
+  "Submits a tool request on behalf of the user found in the request params."
+  [body]
+  (:body
+    (client/post (apps-url "tool-requests")
+                 {:query-params     (secured-params)
+                  :form-params      body
+                  :content-type     :json
+                  :as               :json
+                  :follow-redirects false})))
+
 (defn list-tool-request-status-codes
   [params]
-  (client/get (apps-url "tool-requests" "status-codes")
-              {:query-params     (secured-params params [:filter])
-               :as               :stream
-               :follow-redirects false}))
+  (:body
+    (client/get (apps-url "tool-requests" "status-codes")
+                {:query-params     (secured-params params)
+                 :as               :json
+                 :follow-redirects false})))
 
 (defn get-tools-in-app
   [system-id app-id]
