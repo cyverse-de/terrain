@@ -33,10 +33,14 @@
    (s/optional-key :none) (describe [Clause] NoneDocs)})
 
 (s/defschema SearchRequest
-  {:query (describe Query "A querydsl-compatible JSON query inside a JSON object")
+  {(s/optional-key :query) (describe Query "A querydsl-compatible JSON query inside a JSON object. Mutually exclusive with 'scroll_id'.")
    (s/optional-key :size) (describe (s/both Long (s/pred pos? 'positive-integer?))
                                     "Limits the response to X number of results. Default is 10")
    (s/optional-key :from) (describe (s/both Long (s/pred (partial <= 0) 'non-negative-integer?))
                                     "Skips the first X number of results. Default is 0")
    (s/optional-key :sort) (describe [SearchSortParams]
-                                    "Sorts the results based on a list of criteria")})
+                                    "Sorts the results based on a list of criteria")
+   (s/optional-key :scroll) (describe String
+                                    "Sets a scroll timeout for this search. Required if scroll_id is present.")
+   (s/optional-key :scroll_id) (describe String
+                                    "Gets the next set of results for a given scroll ID. Mutually exclusive with 'query'.")})
