@@ -337,17 +337,6 @@
    (PATCH "/reference-genomes/:reference-genome-id" [reference-genome-id :as req]
           (update-reference-genome req reference-genome-id))))
 
-(defn reference-genomes-routes
-  []
-  (optional-routes
-   [config/app-routes-enabled]
-
-   (GET "/reference-genomes" [:as {params :params}]
-     (service/success-response (apps/list-reference-genomes params)))
-
-   (GET "/reference-genomes/:reference-genome-id" [reference-genome-id]
-     (service/success-response (apps/get-reference-genome reference-genome-id)))))
-
 (defn admin-tool-routes
   []
   (optional-routes
