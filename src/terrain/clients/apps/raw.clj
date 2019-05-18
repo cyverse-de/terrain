@@ -919,17 +919,19 @@
 
 (defn list-reference-genomes
   [params]
-  (client/get (apps-url "reference-genomes")
-              {:query-params     (secured-params params [:deleted])
-               :as               :stream
-               :follow-redirects false}))
+  (:body
+    (client/get (apps-url "reference-genomes")
+                {:query-params     (secured-params params)
+                 :as               :json
+                 :follow-redirects false})))
 
 (defn get-reference-genome
   [reference-genome-id]
-  (client/get (apps-url "reference-genomes" reference-genome-id)
-              {:query-params     (secured-params)
-               :as               :stream
-               :follow-redirects false}))
+  (:body
+    (client/get (apps-url "reference-genomes" reference-genome-id)
+                {:query-params     (secured-params)
+                 :as               :json
+                 :follow-redirects false})))
 
 (defn admin-delete-reference-genome
   [reference-genome-id params]

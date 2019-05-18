@@ -14,6 +14,7 @@
         [terrain.routes.apps.elements]
         [terrain.routes.apps.metadata]
         [terrain.routes.apps.pipelines]
+        [terrain.routes.apps.reference-genomes]
         [terrain.routes.apps.tools]
         [terrain.routes.bootstrap]
         [terrain.routes.data]
@@ -216,6 +217,7 @@
                                      {:name "data", :description "Data Endpoints"}
                                      {:name "favorites", :description "Favorites Endpoints"}
                                      {:name "filesystem", :description "Filesystem Endpoints"}
+                                     {:name "reference-genomes", :description "Reference Genome Endpoints"}
                                      {:name "subjects", :description "Subject Endpoints"}
                                      {:name "teams", :description "Team Endpoints"}
                                      {:name "tools", :description "Tool Endpoints"}
