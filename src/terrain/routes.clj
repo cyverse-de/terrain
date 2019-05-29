@@ -9,6 +9,7 @@
         [terrain.middleware :only [wrap-context-path-adder wrap-query-param-remover]]
         [terrain.routes.admin]
         [terrain.routes.analyses]
+        [terrain.routes.apps.admin.apps]
         [terrain.routes.apps.categories]
         [terrain.routes.apps.communities]
         [terrain.routes.apps.elements]

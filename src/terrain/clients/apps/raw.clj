@@ -6,8 +6,6 @@
 
 (def apps-sort-params [:limit :offset :sort-field :sort-dir :app-type])
 (def base-search-params (conj apps-sort-params :search))
-(def apps-search-params (conj base-search-params :start_date :end_date))
-(def admin-apps-search-params (conj apps-search-params :app-subset))
 (def apps-hierarchy-sort-params (conj apps-sort-params :attr))
 (def tools-search-params (conj base-search-params :include-hidden :public))
 
@@ -248,10 +246,11 @@
 
 (defn get-admin-app-details
   [system-id app-id]
-  (client/get (apps-url "admin" "apps" system-id app-id "details")
-              {:query-params      (secured-params)
-               :as                :stream
-               :follow-redirects  false}))
+  (:body
+    (client/get (apps-url "admin" "apps" system-id app-id "details")
+                {:query-params     (secured-params)
+                 :as               :json
+                 :follow-redirects false})))
 
 (defn get-app-details
   [system-id app-id]
@@ -556,44 +555,49 @@
 
 (defn admin-get-apps
   [params]
-  (client/get (apps-url "admin" "apps")
-              {:query-params     (secured-params params admin-apps-search-params)
-               :as               :stream
-               :follow-redirects false}))
+  (:body
+    (client/get (apps-url "admin" "apps")
+                {:query-params     (secured-params params)
+                 :as               :json
+                 :follow-redirects false})))
 
 (defn categorize-apps
   [body]
-  (client/post (apps-url "admin" "apps")
-               {:query-params     (secured-params)
-                :content-type     :json
-                :body             body
-                :as               :stream
-                :follow-redirects false}))
+  (:body
+    (client/post (apps-url "admin" "apps")
+                 {:query-params     (secured-params)
+                  :form-params      body
+                  :content-type     :json
+                  :as               :json
+                  :follow-redirects false})))
 
 (defn permanently-delete-apps
   [body]
-  (client/post (apps-url "admin" "apps" "shredder")
-               {:query-params     (secured-params)
-                :content-type     :json
-                :body             body
-                :as               :stream
-                :follow-redirects false}))
+  (:body
+    (client/post (apps-url "admin" "apps" "shredder")
+                 {:query-params     (secured-params)
+                  :form-params      body
+                  :content-type     :json
+                  :as               :json
+                  :follow-redirects false})))
 
 (defn admin-delete-app
   [system-id app-id]
-  (client/delete (apps-url "admin" "apps" system-id app-id)
-                 {:query-params     (secured-params)
-                  :as               :stream
-                  :follow-redirects false}))
+  (:body
+    (client/delete (apps-url "admin" "apps" system-id app-id)
+                   {:query-params     (secured-params)
+                    :as               :json
+                    :follow-redirects false})))
 
 (defn admin-update-app
   [system-id app-id body]
-  (client/patch (apps-url "admin" "apps" system-id app-id)
-                {:query-params     (secured-params)
-                 :content-type     :json
-                 :body             body
-                 :as               :stream
-                 :follow-redirects false}))
+  (:body
+    (client/patch (apps-url "admin" "apps" system-id app-id)
+                  {:query-params     (secured-params)
+                   :form-params      body
+                   :content-type     :json
+                   :as               :json
+                   :follow-redirects false})))
 
 (defn get-admin-app-categories
   [params]
@@ -664,21 +668,23 @@
 
 (defn admin-edit-app-docs
   [system-id app-id docs]
-  (client/patch (apps-url "admin" "apps" system-id app-id "documentation")
-                {:query-params     (secured-params)
-                 :content-type     :json
-                 :body             docs
-                 :as               :stream
-                 :follow-redirects false}))
+  (:body
+    (client/patch (apps-url "admin" "apps" system-id app-id "documentation")
+                  {:query-params     (secured-params)
+                   :form-params      docs
+                   :content-type     :json
+                   :as               :json
+                   :follow-redirects false})))
 
 (defn admin-add-app-docs
   [system-id app-id docs]
-  (client/post (apps-url "admin" "apps" system-id app-id "documentation")
-               {:query-params     (secured-params)
-                :content-type     :json
-                :body             docs
-                :as               :stream
-                :follow-redirects false}))
+  (:body
+    (client/post (apps-url "admin" "apps" system-id app-id "documentation")
+                 {:query-params     (secured-params)
+                  :form-params      docs
+                  :content-type     :json
+                  :as               :json
+                  :follow-redirects false})))
 
 
 (defn get-oauth-access-token
@@ -1021,10 +1027,11 @@
 
 (defn update-app-integration-data
   [system-id app-id integration-data-id]
-  (client/put (apps-url "admin" "apps" system-id app-id "integration-data" integration-data-id)
-              {:query-params     (secured-params)
-               :as               :stream
-               :follow-redirects false}))
+  (:body
+    (client/put (apps-url "admin" "apps" system-id app-id "integration-data" integration-data-id)
+                {:query-params     (secured-params)
+                 :as               :json
+                 :follow-redirects false})))
 
 (defn update-tool-integration-data
   [tool-id integration-data-id]
