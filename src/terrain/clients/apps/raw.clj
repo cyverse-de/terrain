@@ -939,12 +939,33 @@
                  :as               :json
                  :follow-redirects false})))
 
+(defn admin-add-reference-genome
+  [body]
+  (:body
+    (client/post (apps-url "admin" "reference-genomes")
+                 {:query-params     (secured-params)
+                  :form-params      body
+                  :as               :json
+                  :content-type     :json
+                  :follow-redirects false})))
+
 (defn admin-delete-reference-genome
   [reference-genome-id params]
-  (client/delete (apps-url "admin" "reference-genomes" reference-genome-id)
-                 {:query-params     (secured-params params [:permanent])
-                  :as               :stream
-                  :follow-redirects false}))
+  (:body
+    (client/delete (apps-url "admin" "reference-genomes" reference-genome-id)
+                   {:query-params     (secured-params params)
+                    :as               :json
+                    :follow-redirects false})))
+
+(defn admin-update-reference-genome
+  [body reference-genome-id]
+  (:body
+    (client/patch (apps-url "admin" "reference-genomes" reference-genome-id)
+                  {:query-params     (secured-params)
+                   :form-params      body
+                   :as               :json
+                   :content-type     :json
+                   :follow-redirects false})))
 
 (defn get-authenticated-user
   []
