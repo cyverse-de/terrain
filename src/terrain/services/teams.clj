@@ -1,8 +1,8 @@
 (ns terrain.services.teams
-  (:require [terrain.clients.iplant-groups :as ipg]
+  (:require [clojure-commons.assertions :as assertions]
+            [terrain.clients.iplant-groups :as ipg]
             [terrain.clients.permissions :as perms-client]
-            [terrain.clients.notifications :as cn]
-            [terrain.util.service :as service]))
+            [terrain.clients.notifications :as cn]))
 
 (defn get-teams [{user :shortUsername} params]
   (ipg/get-teams user (select-keys params [:search :creator :member])))
@@ -54,7 +54,7 @@
   (ipg/verify-team-exists user name)
   (if-let [email (:email (ipg/lookup-subject user requester))]
     (cn/send-team-join-denial requester email name message)
-    (service/not-found "user" requester)))
+    (assertions/not-found "user" requester)))
 
 (defn leave [{user :shortUsername} name]
   (ipg/leave-team user name))
