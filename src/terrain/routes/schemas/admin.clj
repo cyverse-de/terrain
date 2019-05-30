@@ -1,22 +1,30 @@
 (ns terrain.routes.schemas.admin
   (:use [common-swagger-api.schema
          :only [describe
+                NonBlankString
                 SortFieldDocs
                 SortFieldOptionalKey]]
         [schema.core :only [defschema enum]])
-  (:require [common-swagger-api.schema.apps.admin.apps :as apps-schema]))
+  (:require [common-swagger-api.schema.apps :as apps-schema]
+            [common-swagger-api.schema.apps.admin.apps :as admin-apps-schema]))
 
-;; Convert the keywords in AdminAppSearchValidSortFields to strings,
-;; so that the correct param format is passed through to the apps service.
+;; Convert Date params and keywords in enum values to strings,
+;; so that the correct param formats are passed through to the apps service.
 (defschema AdminAppSearchParams
-  (merge apps-schema/AdminAppSearchParams
-         {SortFieldOptionalKey
-          (describe (apply enum (map name apps-schema/AdminAppSearchValidSortFields))
+  (merge admin-apps-schema/AdminAppSearchParams
+         {apps-schema/AppJobStatsStartDateOptionalParam
+          (describe NonBlankString apps-schema/AppJobStatsStartDateParamDocs)
+
+          apps-schema/AppJobStatsEndDateOptionalParam
+          (describe NonBlankString apps-schema/AppJobStatsEndDateParamDocs)
+
+          SortFieldOptionalKey
+          (describe (apply enum (map name admin-apps-schema/AdminAppSearchValidSortFields))
                     SortFieldDocs)
 
-          apps-schema/AppSubsetOptionalKey
-          (describe (apply enum (map name apps-schema/AppSubsets))
-                    apps-schema/AppSubsetDocs :default :public)}))
+          admin-apps-schema/AppSubsetOptionalKey
+          (describe (apply enum (map name admin-apps-schema/AppSubsets))
+                    admin-apps-schema/AppSubsetDocs :default :public)}))
 
 (defschema StatusResponse
   {:iRODS             (describe Boolean "True if the data store appears to be functional")
