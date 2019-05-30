@@ -37,20 +37,6 @@
     (dorun (map dn/send-tool-notification (:tools json))))
   (success-response))
 
-(defn add-reference-genome
-  "Adds a reference genome via apps."
-  [req]
-  (let [url (apps-url {} "admin" "reference-genomes")
-        req (apps-request req)]
-    (forward-post url req)))
-
-(defn update-reference-genome
-  "Updates a reference genome via apps."
-  [req reference-genome-id]
-  (let [url (apps-url {} "admin" "reference-genomes" reference-genome-id)
-        req (apps-request req)]
-    (forward-patch url req)))
-
 (defn- postprocess-tool-request
   "Postprocesses a tool request update."
   [res]

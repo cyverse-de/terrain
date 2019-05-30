@@ -289,21 +289,6 @@
    (PUT "/apps/:app-id/metadata" [app-id :as {:keys [body]}]
      (service/success-response (apps/admin-set-avus app-id body)))))
 
-(defn admin-reference-genomes-routes
-  []
-  (optional-routes
-   [#(and (config/admin-routes-enabled)
-          (config/app-routes-enabled))]
-
-   (POST "/reference-genomes" [:as req]
-     (add-reference-genome req))
-
-   (DELETE "/reference-genomes/:reference-genome-id" [reference-genome-id :as {:keys [params]}]
-     (apps/admin-delete-reference-genome reference-genome-id params))
-
-   (PATCH "/reference-genomes/:reference-genome-id" [reference-genome-id :as req]
-          (update-reference-genome req reference-genome-id))))
-
 (defn admin-tool-routes
   []
   (optional-routes
