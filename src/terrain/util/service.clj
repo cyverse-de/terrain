@@ -87,55 +87,6 @@
   ([retval]
     (terrain-response retval 200)))
 
-(defn create-response
-  "Generates a 201 response indicating that a new resource has been created. Optionally, a JSON
-   document may be included and will form part of the response body."
-  ([]
-    (create-response {}))
-  ([retval]
-    (terrain-response retval 201)))
-
-(defn successful-delete-response
-  []
-  (terrain-response nil 204))
-
-(defn failure-response [e]
-  (log/error e "bad request")
-  (terrain-response e 400))
-
-(defn temp-dir-failure-response [{:keys [parent prefix base]}]
-  (log/error "unable to create a temporary directory in" parent
-             "using base name" base)
-  {:status       500
-   :content-type :json
-   :body         (cheshire/encode {:error_code ce/ERR_REQUEST_FAILED
-                                   :parent     parent
-                                   :prefix     prefix
-                                   :base       base})})
-
-(defn common-error-code [exception]
-  (log/error ce/format-exception exception)
-  (ce/err-resp (:object exception)))
-
-(def ^:private param-type-descriptions
-  {ce/ERR_MISSING_FORM_FIELD      "request body field"
-   ce/ERR_MISSING_QUERY_PARAMETER "query string parameter"})
-
-(defn- required-argument-missing-reason
-  [err-code k]
-  (str "required " (param-type-descriptions err-code) ", " (name k) ", missing"))
-
-(defn- required-argument
-  [err-code m k]
-  (let [v (m k)]
-    (when (or (nil? v) (and (string? v) (blank? v)))
-      (throw+ {:error_code err-code
-               :reason     (required-argument-missing-reason err-code k)}))
-    v))
-
-(def required-param (partial required-argument ce/ERR_MISSING_QUERY_PARAMETER))
-(def required-field (partial required-argument ce/ERR_MISSING_FORM_FIELD))
-
 (defn unrecognized-path-response
   "Builds the response to send for an unrecognized service path."
   []
@@ -158,47 +109,12 @@
   ([request]
      (prepare-forwarded-request request nil)))
 
-(defn forward-get
-  "Forwards a GET request to a remote service.  If no body is provided, the
-   request body is stripped off.
-
-   Parameters:
-     addr - the URL receiving the request
-     request - the request to send structured by compojure
-     body - the body to attach to the request
-
-   Returns:
-     the response from the remote service"
-  ([addr request]
-     (client/get addr (prepare-forwarded-request request)))
-  ([addr request body]
-     (client/get addr (prepare-forwarded-request request body))))
-
 (defn forward-post
   "Forwards a POST request to a remote service."
   ([addr request]
      (forward-post addr request (slurp (:body request))))
   ([addr request body]
      (client/post addr (prepare-forwarded-request request body))))
-
-(defn forward-put
-  "Forwards a PUT request to a remote service."
-  ([addr request]
-     (forward-put addr request (slurp (:body request))))
-  ([addr request body]
-     (client/put addr (prepare-forwarded-request request body))))
-
-(defn forward-patch
-  "Forwards a PATCH request to a remote service."
-  ([addr request]
-   (forward-patch addr request (slurp (:body request))))
-  ([addr request body]
-   (client/patch addr (prepare-forwarded-request request body))))
-
-(defn forward-delete
-  "Forwards a DELETE request to a remote service."
-  [addr request]
-  (client/delete addr (prepare-forwarded-request request)))
 
 (defn decode-stream
   "Decodes a stream containing a JSON object."
@@ -211,71 +127,3 @@
   (if (string? source)
     (cheshire/decode source true)
     (cheshire/decode-stream (reader source) true)))
-
-(defn- contains-form?
-  "Determines if a request contains a URL encoded form."
-  [req]
-  (re-find #"^application/x-www-form-urlencoded" (str (:content-type req))))
-
-(defn parse-form
-  "Parses a URL encoded form from a request."
-  [req]
-  (or (if-let [body (and (contains-form? req) (:body req))]
-        (let [encoding (or (:character-encoding req) "UTF-8")
-              content  (slurp body :encoding encoding)
-              params   (codec/form-decode content encoding)]
-          (when (map? params) params)))
-      {}))
-
-(defn not-found
-  "Throws an exception indicating that an object wasn't found."
-  [desc id]
-  (throw+ {:error_code ce/ERR_NOT_FOUND
-           :reason     (string/join " " [desc id "not found"])}))
-
-(defn not-owner
-  "Throws an exception indicating that the user isn't permitted to perform the requested option."
-  [desc id]
-  (throw+ {:error_code ce/ERR_NOT_OWNER
-           :reason     (str "authenticated user doesn't own " desc ", " id)}))
-
-(defn not-unique
-  "Throws an exception indicating that multiple objects were found when only one was expected."
-  [desc id]
-  (throw+ {:error_code ce/ERR_NOT_UNIQUE
-           :reason     (string/join " " [desc id "not unique"])}))
-
-(defn bad-request
-  "Throws an exception indicating that the incoming request is invalid."
-  [reason]
-  (throw+ {:error_code ce/ERR_BAD_REQUEST
-           :reason     reason}))
-
-(defn assert-found
-  "Asserts that an object to modify or retrieve was found."
-  [obj desc id]
-  (if (nil? obj)
-    (not-found desc id)
-    obj))
-
-(defn assert-valid
-  "Throws an exception if an arbitrary expression is false."
-  [valid? & msgs]
-  (when-not valid?
-    (throw+ {:error_code ce/ERR_ILLEGAL_ARGUMENT
-             :message    (string/join " " msgs)})))
-
-(defn string->long
-  "Converts a String to a long."
-  [string & msgs]
-  (try
-    (Long/parseLong string)
-    (catch NumberFormatException e
-           (throw+ {:error_code ce/ERR_ILLEGAL_ARGUMENT
-                    :message    (string/join " " msgs)}))))
-
-(defn request-failure
-  "Throws an exception indicating that a request failed for an unexpected reason."
-  [& msgs]
-  (throw+ {:error_code ce/ERR_REQUEST_FAILED
-           :message    (string/join " " msgs)}))

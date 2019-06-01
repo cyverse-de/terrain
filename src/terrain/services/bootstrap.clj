@@ -4,6 +4,7 @@
     [terrain.auth.user-attributes :only [current-user]])
   (:require
     [clojure.tools.logging :as log]
+    [clojure-commons.assertions :as assertions]
     [terrain.clients.apps.raw :as apps-client]
     [terrain.clients.data-info :as data-info-client]
     [terrain.services.user-prefs :as prefs]
@@ -55,7 +56,7 @@
   "This service obtains information about and initializes the workspace for the authenticated user.
    It also records the fact that the user logged in."
   [ip-address user-agent]
-  (service/assert-valid user-agent "Missing or empty request parameter: user-agent")
+  (assertions/assert-valid user-agent "Missing or empty request parameter: user-agent")
   (let [{user :shortUsername :keys [email firstName lastName username]} current-user
         login-session (future (get-login-session ip-address user-agent))
         apps-info     (future (get-apps-info))

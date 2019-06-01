@@ -20,8 +20,7 @@
             [terrain.services.filesystem.users :as users]
             [terrain.services.filesystem.uuids :as uuids]
             [terrain.services.filesystem.validators :as validators]
-            [terrain.util.config :as cfg]
-            [terrain.util.service :as svc])
+            [terrain.util.config :as cfg])
   (:import [clojure.lang IPersistentMap ISeq Keyword]
            [java.util UUID]))
 
@@ -423,14 +422,14 @@
   [method url msg]
   (let [full-msg (str method " " url " had a service error: " msg)]
     (log/error full-msg)
-    (svc/request-failure full-msg)))
+    (assertions/request-failure full-msg)))
 
 
 (defn- handle-client-error
   [method url err msg]
   (let [full-msg (str "interal error related to usage of " method " " url ": " msg)]
     (log/error err full-msg)
-    (svc/request-failure full-msg)))
+    (assertions/request-failure full-msg)))
 
 
 (defn ^String mk-data-path-url-path
