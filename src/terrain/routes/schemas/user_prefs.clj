@@ -8,8 +8,9 @@
 (def AnyPreferenceValue (describe Any "Any preference value"))
 
 (defschema DefaultOutputDirPreference
-  (-> {:id   DataItemPathParam
-       :path DataItemPathParam}
+  (-> {:id     DataItemPathParam
+       :path   DataItemPathParam
+       Keyword Any}
       (describe "The user's default analyses output directory, required by this terrain service.")))
 
 (defschema UserPreferencesResponse
