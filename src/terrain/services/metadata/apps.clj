@@ -31,11 +31,10 @@
   "This service will import deployed components into the DE and send
    notifications if notification information is included and the deployed
    components are successfully imported."
-  [body]
-  (let [json (decode-json body)]
-    (dm/admin-add-tools json)
-    (dorun (map dn/send-tool-notification (:tools json))))
-  (success-response))
+  [json]
+  (let [response (apps-client/admin-add-tools json)]
+    (dorun (map dn/send-tool-notification (:tools json)))
+    response))
 
 (defn- postprocess-tool-request
   "Postprocesses a tool request update."
