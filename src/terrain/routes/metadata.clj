@@ -289,35 +289,11 @@
    (PUT "/apps/:app-id/metadata" [app-id :as {:keys [body]}]
      (service/success-response (apps/admin-set-avus app-id body)))))
 
-(defn admin-tool-routes
+(defn admin-tool-request-routes
   []
   (optional-routes
    [#(and (config/admin-routes-enabled)
           (config/app-routes-enabled))]
-
-   (GET "/tools" [:as {:keys [params]}]
-     (service/success-response (apps/admin-list-tools params)))
-
-   (POST "/tools" [:as {:keys [body]}]
-     (import-tools body))
-
-   (DELETE "/tools/:tool-id" [tool-id]
-     (apps/admin-delete-tool tool-id))
-
-   (GET "/tools/:tool-id" [tool-id]
-     (service/success-response (apps/admin-get-tool tool-id)))
-
-   (PATCH "/tools/:tool-id" [tool-id :as {:keys [params body]}]
-     (apps/admin-update-tool tool-id params body))
-
-   (GET "/tools/:tool-id/apps" [tool-id]
-     (service/success-response (apps/admin-get-apps-by-tool tool-id)))
-
-   (PUT "/tools/:tool-id/integration-data/:integration-data-id" [tool-id integration-data-id]
-     (service/success-response (apps/update-tool-integration-data tool-id integration-data-id)))
-
-   (POST "/tools/:tool-id/publish" [tool-id :as {:keys [body]}]
-     (apps/admin-publish-tool tool-id body))
 
    (GET "/tool-requests" [:as {params :params}]
      (admin-list-tool-requests params))

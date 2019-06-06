@@ -11,6 +11,7 @@
         [terrain.routes.analyses]
         [terrain.routes.apps.admin.apps]
         [terrain.routes.apps.admin.reference-genomes]
+        [terrain.routes.apps.admin.tools]
         [terrain.routes.apps.categories]
         [terrain.routes.apps.communities]
         [terrain.routes.apps.elements]
@@ -125,6 +126,7 @@
     (admin-ontology-routes)
     (admin-reference-genomes-routes)
     (admin-tool-routes)
+    (admin-tool-request-routes)
     (admin-permanent-id-request-routes)
     (oauth-admin-routes)
     (admin-integration-data-routes)
@@ -202,6 +204,7 @@
                                      {:name "admin-communities", :description "Community Administration Endpoints"}
                                      {:name "admin-filesystem", :description "File System Administration Endpoints"}
                                      {:name "admin-reference-genomes", :description "Admin Reference Genome Endpoints"}
+                                     {:name "admin-tools", :description "Admin Tool Endpoints"}
                                      {:name "admin-user-info", :description "User Info Administration Endpoints"}
                                      {:name "analyses", :description "Analysis Endpoints"}
                                      {:name "analyses-quicklaunches", :description "Quick Launch Endpoints"}

@@ -788,58 +788,65 @@
 
 (defn admin-list-tools
   [params]
-  (client/get (apps-url "admin" "tools")
-              {:query-params     (secured-params params tools-search-params)
-               :as               :stream
-               :follow-redirects :false}))
+  (:body
+    (client/get (apps-url "admin" "tools")
+                {:query-params     (secured-params params tools-search-params)
+                 :as               :json
+                 :follow-redirects :false})))
 
 (defn admin-add-tools
   [body]
-  (client/post (apps-url "admin" "tools")
-               {:query-params     (secured-params)
-                :as               :stream
-                :body             body
-                :content-type     :json
-                :follow-redirects false}))
+  (:body
+    (client/post (apps-url "admin" "tools")
+                 {:query-params     (secured-params)
+                  :form-params      body
+                  :as               :json
+                  :content-type     :json
+                  :follow-redirects false})))
 
 (defn admin-delete-tool
   [tool-id]
-  (client/delete (apps-url "admin" "tools" tool-id)
-                 {:query-params     (secured-params)
-                  :as               :stream
-                  :follow-redirects false}))
+  (:body
+    (client/delete (apps-url "admin" "tools" tool-id)
+                   {:query-params     (secured-params)
+                    :as               :json
+                    :follow-redirects false})))
 
 (defn admin-get-tool
   [tool-id]
-  (client/get (apps-url "admin" "tools" tool-id)
-              {:query-params     (secured-params)
-               :as               :stream
-               :follow-redirects false}))
+  (:body
+    (client/get (apps-url "admin" "tools" tool-id)
+                {:query-params     (secured-params)
+                 :as               :json
+                 :follow-redirects false})))
 
 (defn admin-update-tool
   [tool-id params tool]
-  (client/patch (apps-url "admin" "tools" tool-id)
-                {:query-params     (secured-params params [:overwrite-public])
-                 :as               :stream
-                 :body             tool
-                 :content-type     :json
-                 :follow-redirects false}))
+  (:body
+    (client/patch (apps-url "admin" "tools" tool-id)
+                  {:query-params     (secured-params params [:overwrite-public])
+                   :form-params      tool
+                   :as               :json
+                   :content-type     :json
+                   :follow-redirects false})))
 
 (defn admin-get-apps-by-tool
   [tool-id]
-  (client/get (apps-url "admin" "tools" tool-id "apps")
-              {:query-params     (secured-params)
-               :as               :stream
-               :follow-redirects false}))
+  (:body
+    (client/get (apps-url "admin" "tools" tool-id "apps")
+                {:query-params     (secured-params)
+                 :as               :json
+                 :follow-redirects false})))
 
 (defn admin-publish-tool
   [tool-id body]
-  (client/post (apps-url "admin" "tools" tool-id "publish")
-               {:query-params     (secured-params)
-                :body             body
-                :content-type     :json
-                :as               :stream
-                :follow-redirects false}))
+  (:body
+    (client/post (apps-url "admin" "tools" tool-id "publish")
+                 {:query-params     (secured-params)
+                  :form-params      body
+                  :content-type     :json
+                  :as               :json
+                  :follow-redirects false})))
 
 (defn list-tools
   [params]
@@ -1056,10 +1063,11 @@
 
 (defn update-tool-integration-data
   [tool-id integration-data-id]
-  (client/put (apps-url "admin" "tools" tool-id "integration-data" integration-data-id)
-              {:query-params     (secured-params)
-               :as               :stream
-               :follow-redirects false}))
+  (:body
+    (client/put (apps-url "admin" "tools" tool-id "integration-data" integration-data-id)
+                {:query-params     (secured-params)
+                 :as               :json
+                 :follow-redirects false})))
 
 (defn get-workshop-group
   []
