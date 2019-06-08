@@ -205,6 +205,7 @@
                                      {:name "admin-filesystem", :description "File System Administration Endpoints"}
                                      {:name "admin-reference-genomes", :description "Admin Reference Genome Endpoints"}
                                      {:name "admin-tools", :description "Admin Tool Endpoints"}
+                                     {:name "admin-tool-requests", :description "Admin Tool Request Endpoints"}
                                      {:name "admin-user-info", :description "User Info Administration Endpoints"}
                                      {:name "analyses", :description "Analysis Endpoints"}
                                      {:name "analyses-quicklaunches", :description "Quick Launch Endpoints"}
