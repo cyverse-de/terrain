@@ -1,24 +1,16 @@
 (ns terrain.util.service
-  (:use [ring.util.codec :only [url-encode]]
-        [clojure.java.io :only [reader]]
-        [clojure.string :only [join blank?] :as string]
-        [slingshot.slingshot :only [throw+]])
-  (:require [cheshire.core :as cheshire]
-            [clj-http.client :as client]
-            [clojure.tools.logging :as log]
-            [clojure-commons.error-codes :as ce]
-            [ring.util.codec :as codec]))
+  (:use [clojure.java.io :only [reader]])
+  (:require [cheshire.core :as cheshire]))
 
-
-(defn error-body [e]
+(defn- error-body [e]
   (cheshire/encode {:reason (.getMessage e)}))
 
-(defn success?
+(defn- success?
   "Returns true if status-code is between 200 and 299, inclusive."
   [status-code]
   (<= 200 status-code 299))
 
-(defn response-map?
+(defn- response-map?
   "Returns true if 'm' can be used as a response map. We're defining a
    response map as a map that contains a :status and :body field."
   [m]
@@ -63,7 +55,7 @@
   {:status status-code
    :body   e})
 
-(defn terrain-response
+(defn- terrain-response
   "Generates a Terrain HTTP response map based on a value and a status code.
 
    If a response map is passed in, it is preserved.
@@ -92,34 +84,6 @@
   []
   (let [msg "unrecognized service path"]
     (cheshire/encode {:reason msg})))
-
-(defn prepare-forwarded-request
-  "Prepares a request to be forwarded to a remote service."
-  ([request body]
-    {:content-type (or (get-in request [:headers :content-type])
-                       (get-in request [:content-type]))
-      :headers (dissoc
-                (:headers request)
-                "content-length"
-                "content-type"
-                "transfer-encoding")
-      :body body
-      :throw-exceptions false
-      :as :stream})
-  ([request]
-     (prepare-forwarded-request request nil)))
-
-(defn forward-post
-  "Forwards a POST request to a remote service."
-  ([addr request]
-     (forward-post addr request (slurp (:body request))))
-  ([addr request body]
-     (client/post addr (prepare-forwarded-request request body))))
-
-(defn decode-stream
-  "Decodes a stream containing a JSON object."
-  [stream]
-  (cheshire/decode-stream (reader stream) true))
 
 (defn decode-json
   "Decodes JSON from either a string or an input stream."

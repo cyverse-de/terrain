@@ -3,7 +3,6 @@
         [clojure.string :only [join]]
         [slingshot.slingshot :only [try+]]
         [clojure-commons.file-utils :only [basename]]
-        [terrain.util.service :only [decode-stream success-response]]
         [terrain.auth.user-attributes])
   (:require [clojure.tools.logging :as log]
             [terrain.clients.data-info :as data]
