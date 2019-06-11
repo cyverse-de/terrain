@@ -18,7 +18,7 @@
         [common-swagger-api.schema.integration-data :only [IntegrationData]]
         [ring.util.http-response :only [ok]]
         [terrain.routes.schemas.apps]
-        [terrain.services.metadata.apps]
+        [terrain.services.metadata.apps :only [send-support-email]]
         [terrain.util])
   (:require [common-swagger-api.routes]                     ;; Required for :description-file
             [common-swagger-api.schema.apps :as schema]
@@ -288,27 +288,6 @@
 
    (PUT "/apps/:app-id/metadata" [app-id :as {:keys [body]}]
      (service/success-response (apps/admin-set-avus app-id body)))))
-
-(defn admin-tool-request-routes
-  []
-  (optional-routes
-   [#(and (config/admin-routes-enabled)
-          (config/app-routes-enabled))]
-
-   (GET "/tool-requests" [:as {params :params}]
-     (admin-list-tool-requests params))
-
-   (DELETE "/tool-requests/status-codes/:status-code-id" [status-code-id]
-     (apps/admin-delete-tool-request-status-code status-code-id))
-
-   (GET "/tool-requests/:request-id" [request-id]
-     (get-tool-request request-id))
-
-   (DELETE "/tool-requests/:request-id" [request-id]
-     (apps/admin-delete-tool-request request-id))
-
-   (POST "/tool-requests/:request-id/status" [request-id :as req]
-     (update-tool-request req request-id))))
 
 (defn misc-metadata-routes
   []

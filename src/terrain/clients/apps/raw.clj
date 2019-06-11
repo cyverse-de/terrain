@@ -731,24 +731,45 @@
 
 (defn admin-delete-tool-request-status-code
   [status-code-id]
-  (client/delete (apps-url "admin" "tool-requests" "status-codes" status-code-id)
-                 {:query-params     (secured-params)
-                  :as               :stream
-                  :follow-redirects false}))
+  (:body
+    (client/delete (apps-url "admin" "tool-requests" "status-codes" status-code-id)
+                   {:query-params     (secured-params)
+                    :as               :json
+                    :follow-redirects false})))
 
 (defn admin-list-tool-requests
   [params]
-  (client/get (apps-url "admin" "tool-requests")
-              {:query-params     (secured-params params (conj apps-sort-params :status))
-               :as               :stream
-               :follow-redirects false}))
+  (:body
+    (client/get (apps-url "admin" "tool-requests")
+                {:query-params     (secured-params params)
+                 :as               :json
+                 :follow-redirects false})))
 
 (defn admin-delete-tool-request
   [request-id]
-  (client/delete (apps-url "admin" "tool-requests" request-id)
+  (:body
+    (client/delete (apps-url "admin" "tool-requests" request-id)
+                   {:query-params     (secured-params)
+                    :as               :json
+                    :follow-redirects false})))
+
+(defn admin-get-tool-request
+  [request-id]
+  (:body
+    (client/get (apps-url "admin" "tool-requests" request-id)
+                {:query-params     (secured-params)
+                 :as               :json
+                 :follow-redirects false})))
+
+(defn admin-update-tool-request
+  [body request-id]
+  (:body
+    (client/post (apps-url "admin" "tool-requests" request-id "status")
                  {:query-params     (secured-params)
-                  :as               :stream
-                  :follow-redirects false}))
+                  :form-params      body
+                  :content-type     :json
+                  :as               :json
+                  :follow-redirects false})))
 
 (defn list-tool-requests
   "Lists the tool requests that were submitted by the authenticated user."
@@ -973,13 +994,6 @@
                    :as               :json
                    :content-type     :json
                    :follow-redirects false})))
-
-(defn get-authenticated-user
-  []
-  (client/get (apps-url "users" "authenticated")
-              {:query-params     (secured-params)
-               :as               :stream
-               :follow-redirects false}))
 
 (defn record-login
   [ip-address user-agent]

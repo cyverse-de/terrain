@@ -83,3 +83,46 @@
               :summary admin-schema/ToolPublishSummary
               :description admin-schema/ToolPublishDocs
               (ok (apps/admin-publish-tool tool-id body)))))))
+
+(defn admin-tool-request-routes
+  []
+  (optional-routes
+    [#(and (config/admin-routes-enabled)
+           (config/app-routes-enabled))]
+
+    (context "/tool-requests" []
+      :tags ["admin-tool-requests"]
+
+      (GET "/" []
+           :query [params schema/ToolRequestListingParams]
+           :return schema/ToolRequestListing
+           :summary schema/ToolInstallRequestListingSummary
+           :description admin-schema/ToolInstallRequestListingDocs
+           (ok (apps/admin-list-tool-requests params)))
+
+      (DELETE "/status-codes/:status-code-id" []
+              :path-params [status-code-id :- schema/ToolRequestStatusCodeId]
+              :summary admin-schema/ToolInstallRequestStatusCodeDeleteSummary
+              :description admin-schema/ToolInstallRequestStatusCodeDeleteDocs
+              (ok (apps/admin-delete-tool-request-status-code status-code-id)))
+
+      (context "/:request-id" []
+        :path-params [request-id :- schema/ToolRequestIdParam]
+
+        (DELETE "/" []
+                :summary admin-schema/ToolInstallRequestDeleteSummary
+                :description admin-schema/ToolInstallRequestDeleteDocs
+                (ok (apps/admin-delete-tool-request request-id)))
+
+        (GET "/" []
+             :return schema/ToolRequestDetails
+             :summary admin-schema/ToolInstallRequestDetailsSummary
+             :description admin-schema/ToolInstallRequestDetailsDocs
+             (ok (apps/admin-get-tool-request request-id)))
+
+        (POST "/status" []
+              :body [body admin-schema/ToolRequestStatusUpdate]
+              :return schema/ToolRequestDetails
+              :summary admin-schema/ToolInstallRequestStatusUpdateSummary
+              :description admin-schema/ToolInstallRequestStatusUpdateDocs
+              (ok (apps/admin-update-tool-request body request-id)))))))
