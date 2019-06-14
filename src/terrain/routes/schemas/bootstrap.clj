@@ -1,6 +1,11 @@
 (ns terrain.routes.schemas.bootstrap
   (:use [common-swagger-api.schema :only [describe doc-only]]
-        [schema.core :only [defschema]])
+        [schema.core
+         :only [conditional
+                defschema
+                optional-key
+                Any
+                Int]])
   (:require [common-swagger-api.schema.apps.bootstrap :as apps-schema]
             [common-swagger-api.schema.data.navigation :as navigation-schema]
             [common-swagger-api.schema.sessions :as sessions-schema]
@@ -14,10 +19,33 @@
        :last_name     (describe String "The authenticated user's last name")}
       (describe "User attributes obtained during the authentication process.")))
 
+(defschema BootstrapServiceError
+  {(optional-key :status) (describe Int "Status Code")
+   :error                 (describe Any "Error Message")})
+
+(defschema AppsBootstrapResponse
+  (doc-only (conditional :error BootstrapServiceError
+                         :else apps-schema/AppsBootstrapResponse)
+            apps-schema/AppsBootstrapResponse))
+
+(defschema DataInfoResponse
+  (doc-only (conditional :error BootstrapServiceError
+                         :else navigation-schema/UserBasePaths)
+            navigation-schema/UserBasePaths))
+
+(defschema UserPreferencesResponse
+  (doc-only (conditional :error BootstrapServiceError
+                         :else user-prefs-schema/UserPreferencesResponse)
+            user-prefs-schema/UserPreferencesResponseDocs))
+
+(defschema UserSessionResponse
+  (doc-only (conditional :error BootstrapServiceError
+                         :else sessions-schema/LoginResponse)
+            sessions-schema/LoginResponse))
+
 (defschema TerrainBootstrapResponse
   {:user_info   UserInfo
-   :session     sessions-schema/LoginResponse
-   :apps_info   apps-schema/AppsBootstrapResponse
-   :data_info   navigation-schema/UserBasePaths
-   :preferences (doc-only user-prefs-schema/UserPreferencesResponse
-                          user-prefs-schema/UserPreferencesResponseDocs)})
+   :session     UserSessionResponse
+   :apps_info   AppsBootstrapResponse
+   :data_info   DataInfoResponse
+   :preferences UserPreferencesResponse})
