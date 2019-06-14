@@ -1,8 +1,6 @@
 (ns terrain.services.coge
-  (:use [terrain.auth.user-attributes]
-        [terrain.util.service :only [decode-json prepare-forwarded-request success-response]])
-  (:require [clojure.tools.logging :as log]
-            [clojure-commons.file-utils :as ft]
+  (:use [terrain.auth.user-attributes :only [current-user]])
+  (:require [clojure-commons.file-utils :as ft]
             [terrain.clients.coge :as coge]
             [terrain.clients.data-info :as data]
             [terrain.util.config :as config]))

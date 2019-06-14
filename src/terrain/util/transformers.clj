@@ -1,20 +1,7 @@
 (ns terrain.util.transformers
-  (:use [cemerick.url :only [url]]
-        [terrain.util.service :only [decode-stream]]
-        [terrain.auth.user-attributes]
+  (:use [terrain.auth.user-attributes]
         [medley.core :only [remove-vals]])
-  (:require [cheshire.core :as cheshire]
-            [clojure.string :as string]))
-
-(def remove-nil-vals (partial remove-vals nil?))
-
-(defn add-username-to-json
-  "Adds the name of the currently authenticated user to a JSON object in the
-   body of a request, and returns only the updated body."
-  [req]
-  (let [m (decode-stream (:body req))
-        username (get-in req [:user-attributes "uid"])]
-    (cheshire/encode (assoc m :user username))))
+  (:require [clojure.string :as string]))
 
 (defn- invalid-query-param-value?
   "Determines whether the argument represents a valid query parameter value."
@@ -54,12 +41,3 @@
      (assoc existing-params :user (:shortUsername current-user)))
   ([existing-params param-keys]
      (user-params (select-keys existing-params param-keys))))
-
-(defn add-current-user-to-url
-  "Adds the name of the currently authenticated user to the query string of a
-   URL."
-  [addr]
-  (let [url-map (url addr)
-        query   (add-current-user-to-map (:query url-map))
-        url-map (assoc url-map :query query)]
-    (str url-map)))
