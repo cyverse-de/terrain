@@ -47,20 +47,22 @@
 
 
 (defn- fmt-folder
-  [user favorite-ids data-item]
-  (let [id   (:id data-item)
-        path (:path data-item)]
-    {:id            id
-     :path          path
-     :label         (:label data-item)
-     :isFavorite    (is-favorite? favorite-ids id)
-     :badName       (or (is-bad? user path)
-                        (is-bad? user (fs/base-name path)))
-     :permission    (:permission data-item)
-     :date-created  (:dateCreated data-item)
-     :date-modified (:dateModified data-item)
-     :file-size     0
-     :hasSubDirs    true}))
+  [user favorite-ids {:keys [id
+                             path
+                             label
+                             permission
+                             date-created
+                             date-modified]}]
+  {:id            id
+   :path          path
+   :label         label
+   :permission    permission
+   :date-created  date-created
+   :date-modified date-modified
+   :isFavorite    (is-favorite? favorite-ids id)
+   :badName       (or (is-bad? user path)
+                      (is-bad? user (fs/base-name path)))
+   :hasSubDirs    true})
 
 
 (defn- fmt-dir-resp

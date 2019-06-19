@@ -6,7 +6,7 @@
             [terrain.services.filesystem.common-paths :as paths]))
 
 (defn- format-roots
-  [roots user]
+  [roots]
   (letfn [(format-subdir [root] (assoc root :hasSubDirs true))
           (update-subdirs [root-list] (map format-subdir root-list))]
     (update-in roots [:roots] update-subdirs)))
@@ -16,7 +16,7 @@
   (-> (data-raw/list-roots user)
       :body
       (json/string->json true)
-      (format-roots user)))
+      format-roots))
 
 (with-pre-hook! #'do-root-listing
   (fn [params]

@@ -21,17 +21,18 @@
         [terrain.routes.apps.tools]
         [terrain.routes.bootstrap]
         [terrain.routes.data]
-        [terrain.routes.permanent-id-requests]
         [terrain.routes.fileio]
+        [terrain.routes.filesystem]
+        [terrain.routes.filesystem.navigation]
         [terrain.routes.groups]
         [terrain.routes.metadata]
         [terrain.routes.misc]
         [terrain.routes.notification]
+        [terrain.routes.permanent-id-requests]
         [terrain.routes.pref]
         [terrain.routes.session]
         [terrain.routes.user-info]
         [terrain.routes.collaborator]
-        [terrain.routes.filesystem]
         [terrain.routes.search]
         [terrain.routes.coge]
         [terrain.routes.oauth]
@@ -99,6 +100,7 @@
     (secured-data-routes)
     (secured-session-routes)
     (secured-fileio-routes)
+    (filesystem-navigation-routes)
     (secured-filesystem-routes)
     (secured-filesystem-metadata-routes)
     (secured-search-routes)
