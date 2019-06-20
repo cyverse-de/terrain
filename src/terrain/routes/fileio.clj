@@ -8,19 +8,23 @@
 (defn secured-fileio-routes
   "The routes for file IO endpoints."
   []
-  (util/optional-routes [config/data-routes-enabled]
+  (util/optional-routes
+   [config/data-routes-enabled]
 
-    (GET "/fileio/download" [:as req]
-      (util/controller req fio/download :params))
+   (context "/fileio" []
+     :tags ["fileio"]
 
-    (POST "/fileio/upload" [dest :as req]
-      (util/controller req fio/upload :params req))
+     (GET "/download" [:as req]
+       (util/controller req fio/download :params))
 
-    (POST "/fileio/urlupload" [:as req]
-      (util/controller req fio/urlupload :params :body))
+     (POST "/upload" [dest :as req]
+       (util/controller req fio/upload :params req))
 
-    (POST "/fileio/save" [:as req]
-      (util/controller req fio/save :params :body))
+     (POST "/urlupload" [:as req]
+       (util/controller req fio/urlupload :params :body))
 
-    (POST "/fileio/saveas" [:as req]
-      (util/controller req fio/saveas :params :body))))
+     (POST "/save" [:as req]
+       (util/controller req fio/save :params :body))
+
+     (POST "/saveas" [:as req]
+       (util/controller req fio/saveas :params :body)))))
