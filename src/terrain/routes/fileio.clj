@@ -1,5 +1,8 @@
 (ns terrain.routes.fileio
-  (:use [common-swagger-api.schema])
+  (:use [common-swagger-api.schema]
+        [ring.util.http-response :only [ok]]
+        [terrain.auth.user-attributes :only [current-user]]
+        [terrain.routes.schemas.fileio])
   (:require [terrain.util.config :as config]
             [terrain.services.fileio.controllers :as fio]
             [terrain.util :as util]))
@@ -14,8 +17,11 @@
    (context "/fileio" []
      :tags ["fileio"]
 
-     (GET "/download" [:as req]
-       (util/controller req fio/download :params))
+     (GET "/download" []
+       :summary "Retrieve File Contents"
+       :description "Retrieves the contents of a file in the CyVerse Data Store."
+       :query [params FileDownloadQueryParams]
+       (fio/download current-user params))
 
      (POST "/upload" [dest :as req]
        (util/controller req fio/upload :params req))

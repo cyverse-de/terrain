@@ -17,13 +17,8 @@
 
 
 (defn download
-  [params]
-  (actions/download (:user params) (:path params)))
-
-(with-pre-hook! #'download
-  (fn [params]
-    (ccv/validate-map params {:user string? :path string?})))
-
+  [{user :shortUsername} {:keys [path]}]
+  (actions/download user path))
 
 (defn- store-from-form
   [user dest-dir {istream :stream filename :filename content-type :content-type}]
