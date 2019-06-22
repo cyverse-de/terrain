@@ -20,25 +20,21 @@
   [{user :shortUsername} {:keys [path]}]
   (actions/download user path))
 
-(defn- store-from-form
-  [user dest-dir {istream :stream filename :filename content-type :content-type}]
-  (data-raw/upload-file user dest-dir filename content-type istream))
+(defn store-fn
+  "Returns a function that can be used to forward a file upload request to the data-info service. The function
+  that is returned can be passed to ring.middleware.multipart-params/multipart-params-request as the :store option."
+  [user dest]
+  (fn [{:keys [filename content-type stream] :as file-info}]
+    (merge (select-keys file-info [:filename :content-type])
+           (:body (data-raw/upload-file user dest filename content-type stream :as :json)))))
 
-(defn upload
-  "This is the business logic of behind the POST /secured/fileio/upload endpoint.
-
-   Params:
-     user - the who will own the data object being uploaded
-     dest - the value of the dest query parameter
-     req  - the ring request map"
-  [{:keys [user dest]} ^IPersistentMap req]
-  (let [store                   (partial store-from-form user dest)
-        {{file-info "file"} :params} (multipart/multipart-params-request req {:store store})]
-    (success-response file-info)))
-
-(with-pre-hook! #'upload
-  (fn [params req]
-    (ccv/validate-map params {:user string? :dest string?})))
+(defn wrap-file-upload
+  "This is a specialized replacement for ring.middleware.multipart-params/wrap-mutlipart-params that forwards uploads
+  to the data-info service. The username and file destination are extracted from the request before processing the
+  multipart parameters."
+  [handler]
+  (fn [{{:keys [user]} :user-info {:keys [dest]} :params :as req}]
+    (handler (multipart/multipart-params-request req {:store (store-fn user dest)}))))
 
 (defn saveas
   "Save a file to a location given the content in a (utf-8) string.

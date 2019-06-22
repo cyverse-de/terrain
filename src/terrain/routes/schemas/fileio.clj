@@ -1,7 +1,22 @@
 (ns terrain.routes.schemas.fileio
-  (:use [common-swagger-api.schema :only [describe]]
-        [common-swagger-api.schema.stats :only [DataItemPathParam]]
-        [schema.core :only [defschema]]))
+  (:use [common-swagger-api.schema :only [describe NonBlankString]]
+        [common-swagger-api.schema.stats :only [FileStat]])
+  (:require [ring.swagger.upload :as upload]
+            [schema.core :as s]))
 
-(defschema FileDownloadQueryParams
-  {:path (describe DataItemPathParam "The path to the file to download in the data store.")})
+(s/defschema FileDownloadQueryParams
+  {:path (describe NonBlankString "The path to the file to download in the data store.")})
+
+(s/defschema FileUploadQueryParams
+  {:dest (describe NonBlankString "The destination directory for the uploaded file.")})
+
+(def DataStoreUpload
+  "Schema for a data store upload file parameter. The multipart request has to be processed in middleware because
+  the input stream for the file contents is closed before the body of the endpoint implementation is reached. We're
+  handling this by forwarding the request to the data-info service in custom middleware. The custom middleware then
+  places the file stat information in the multipart params, which can then be returned as the response body to the
+  upload endpoint."
+  (upload/->Upload
+   (assoc FileStat
+     :filename     (describe String "The name of the file being uploaded")
+     :content-type (describe String "The MIME type of the file being uploaded"))))

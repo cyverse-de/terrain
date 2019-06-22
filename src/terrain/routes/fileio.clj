@@ -3,7 +3,8 @@
         [ring.util.http-response :only [ok]]
         [terrain.auth.user-attributes :only [current-user]]
         [terrain.routes.schemas.fileio])
-  (:require [terrain.util.config :as config]
+  (:require [common-swagger-api.schema.stats :as stats-schema]
+            [terrain.util.config :as config]
             [terrain.services.fileio.controllers :as fio]
             [terrain.util :as util]))
 
@@ -21,10 +22,20 @@
        :summary "Retrieve File Contents"
        :description "Retrieves the contents of a file in the CyVerse Data Store."
        :query [params FileDownloadQueryParams]
+
+       ;; fio/download returns a Ring response map.
        (fio/download current-user params))
 
-     (POST "/upload" [dest :as req]
-       (util/controller req fio/upload :params req))
+     (POST "/upload" []
+       :summary "Upload a File"
+       :description "Uploads a file to the CyVerse Data Store."
+       :query [params FileUploadQueryParams]
+       :multipart-params [file :- DataStoreUpload]
+       :middleware [fio/wrap-file-upload]
+       :return stats-schema/FileStat
+
+       ;; The upload is handled in the middleware. All that remains to be done is to return the response body.
+       (ok (select-keys file [:file])))
 
      (POST "/urlupload" [:as req]
        (util/controller req fio/urlupload :params :body))
