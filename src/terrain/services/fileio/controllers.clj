@@ -70,29 +70,19 @@
   (let [parsed-url (url-parser/url address)]
     (when-not (:protocol parsed-url)
       (throw+ {:error_code ERR_INVALID_URL
-                :url address}))
+               :url        address}))
 
     (when-not (:host parsed-url)
       (throw+ {:error_code ERR_INVALID_URL
-               :url address}))
+               :url        address}))
 
     (if-not (string/blank? (:path parsed-url))
       (ft/basename (:path parsed-url))
       (:host parsed-url))))
 
 (defn urlupload
-  [params body]
-    (let [user    (:user params)
-          dest    (string/trim (:dest body))
-          addr    (string/trim (:address body))
-          fname   (url-filename addr)]
-      (log/warn (str "User: " user))
-      (log/warn (str "Dest: " dest))
-      (log/warn (str "Fname: " fname))
-      (log/warn (str "Addr: " addr))
-      (actions/urlimport user addr fname dest)))
-
-(with-pre-hook! #'urlupload
-  (fn [params body]
-    (ccv/validate-map params {:user string?})
-    (ccv/validate-map body {:dest string? :address string?})))
+  [{user :shortUsername} {:keys [dest addr]}]
+  (let [dest  (string/trim dest)
+        addr  (string/trim addr)
+        fname (url-filename addr)]
+    (log/spy :warn (actions/urlimport user addr fname dest))))

@@ -37,8 +37,13 @@
        ;; The upload is handled in the middleware. All that remains to be done is to return the response body.
        (ok (select-keys file [:file])))
 
-     (POST "/urlupload" [:as req]
-       (util/controller req fio/urlupload :params :body))
+     (POST "/urlupload" []
+       :summary "Upload a File from a URL"
+       :description (str "Schedules a task to have the DE retrieve the contents of a new file in the data store from "
+                         "an FTP, HTTP, or HTTPS URL.")
+       :body [body UrlUploadRequestBody]
+       :return UrlUploadResponseBody
+       (ok (fio/urlupload current-user body)))
 
      (POST "/save" [:as req]
        (util/controller req fio/save :params :body))

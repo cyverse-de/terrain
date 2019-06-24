@@ -20,3 +20,13 @@
    (assoc FileStat
      :filename     (describe String "The name of the file being uploaded")
      :content-type (describe String "The MIME type of the file being uploaded"))))
+
+(s/defschema UrlUploadRequestBody
+  {:dest (describe NonBlankString "The destination directory for the uploaded file.")
+   :addr (describe NonBlankString "The URL to retrieve the file contents from.")})
+
+(s/defschema UrlUploadResponseBody
+  {:msg   (describe NonBlankString "A brief message indicating the result of the request.")
+   :url   (describe NonBlankString "The URL that the file contents are being retrieved from.")
+   :label (describe NonBlankString "The name of the uploaded file.")
+   :dest  (describe NonBlankString "The destination directory for the uploaded file.")})
