@@ -21,8 +21,7 @@
   (let [dest-path (str "/iplant/home/" user)
         filename  (str "integration-test-file-" (java.util.UUID/randomUUID) ".txt")
         istream   (java.io.ByteArrayInputStream. (.getBytes "testing" "UTF-8"))]
-    (-> (data-info-client/upload-file user dest-path filename "text/plain" istream :as :json)
-        :body
+    (-> (data-info-client/upload-file user dest-path filename "text/plain" istream)
         :file)))
 
 (defn with-test-data-item

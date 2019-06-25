@@ -131,16 +131,16 @@
 ;; CREATE
 
 (defn upload-file
-  [user dest-path filename content-type istream & {:keys [as] :or {as :stream}}]
-  (http/post (str (url/url (cfg/data-info-base-url) "data"))
-             {:query-params {:user user
-                             :dest dest-path}
-              :accept :json
-              :multipart [{:part-name "file"
-                           :name filename
-                           :mime-type content-type
-                           :content istream}]
-              :as as}))
+  [user dest-path filename content-type istream]
+  (:body (http/post (str (url/url (cfg/data-info-base-url) "data"))
+                    {:query-params {:user user
+                                    :dest dest-path}
+                     :accept       :json
+                     :as           :json
+                     :multipart    [{:part-name "file"
+                                     :name      filename
+                                     :mime-type content-type
+                                     :content   istream}]})))
 (defn create-dirs
   "Uses the data-info directories endpoint to create several directories."
   [user paths]

@@ -53,5 +53,10 @@
        :return stats-schema/FileStat
        (ok (fio/save current-user body)))
 
-     (POST "/saveas" [:as req]
-       (util/controller req fio/saveas :params :body)))))
+     (POST "/saveas" []
+       :summary "Save a New File"
+       :description (str "Creates a new file in the data store. The file must not exist for this ednpoint to work. "
+                         "To overwrite an existing file, use the POST /terrain/secured/fileio/save endpoint.")
+       :body [body FileSaveRequestBody]
+       :return stats-schema/FileStat
+       (ok (fio/saveas current-user body))))))

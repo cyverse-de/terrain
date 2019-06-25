@@ -26,7 +26,7 @@
   [user dest]
   (fn [{:keys [filename content-type stream] :as file-info}]
     (merge (select-keys file-info [:filename :content-type])
-           (:body (data-raw/upload-file user dest filename content-type stream :as :json)))))
+           (data-raw/upload-file user dest filename content-type stream))))
 
 (defn wrap-file-upload
   "This is a specialized replacement for ring.middleware.multipart-params/wrap-mutlipart-params that forwards uploads
@@ -37,21 +37,13 @@
     (handler (multipart/multipart-params-request req {:store (store-fn user dest)}))))
 
 (defn saveas
-  "Save a file to a location given the content in a (utf-8) string.
-
-   This reuses the upload endpoint logic by converting the string into an input stream to be sent to data-info."
-  [{:keys [user]} {:keys [dest content]}]
-  (let [dest (string/trim dest)
-        dir  (ft/dirname dest)
-        file (ft/basename dest)
-        istream (ByteArrayInputStream. (.getBytes content "UTF-8"))
-        info (data-raw/upload-file user dir file "application/octet-stream" istream)]
-    (success-response info)))
-
-(with-pre-hook! #'saveas
-  (fn [params body]
-    (ccv/validate-map params {:user string?})
-    (ccv/validate-map body {:dest string? :content string?})))
+  "Save a file to a location given the content in a (utf-8) string."
+  [{user :shortUsername} {:keys [dest content]}]
+  (let [dest    (string/trim dest)
+        dir     (ft/dirname dest)
+        file    (ft/basename dest)
+        istream (ByteArrayInputStream. (.getBytes content "UTF-8"))]
+    (data-raw/upload-file user dir file "application/octet-stream" istream)))
 
 (defn save
   [{user :shortUsername} {:keys [dest content]}]
