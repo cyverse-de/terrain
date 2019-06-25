@@ -5,7 +5,6 @@
   (:require [terrain.services.fileio.actions :as actions]
             [clojure-commons.file-utils :as ft]
             [clojure.string :as string]
-            [clojure.tools.logging :as log]
             [cemerick.url :as url-parser]
             [dire.core :refer [with-pre-hook!]]
             [ring.middleware.multipart-params :as multipart]
@@ -71,4 +70,4 @@
   (let [dest  (string/trim dest)
         addr  (string/trim addr)
         fname (url-filename addr)]
-    (log/spy :warn (actions/urlimport user addr fname dest))))
+    (actions/urlimport user addr fname dest)))
