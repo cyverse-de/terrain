@@ -55,7 +55,7 @@
 
      (POST "/saveas" []
        :summary "Save a New File"
-       :description (str "Creates a new file in the data store. The file must not exist for this ednpoint to work. "
+       :description (str "Creates a new file in the data store. The file must not exist for this endpoint to work. "
                          "To overwrite an existing file, use the POST /terrain/secured/fileio/save endpoint.")
        :body [body FileSaveRequestBody]
        :return stats-schema/FileStat

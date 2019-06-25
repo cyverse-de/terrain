@@ -1,18 +1,14 @@
 (ns terrain.services.fileio.controllers
   (:use [clojure-commons.error-codes]
-        [terrain.util.service :only [success-response]]
-        [slingshot.slingshot :only [try+ throw+]])
+        [slingshot.slingshot :only [throw+]])
   (:require [terrain.services.fileio.actions :as actions]
             [clojure-commons.file-utils :as ft]
             [clojure.string :as string]
             [cemerick.url :as url-parser]
-            [dire.core :refer [with-pre-hook!]]
             [ring.middleware.multipart-params :as multipart]
-            [clojure-commons.validators :as ccv]
             [terrain.clients.data-info :as data]
             [terrain.clients.data-info.raw :as data-raw])
-  (:import [clojure.lang IPersistentMap]
-           [java.io IOException ByteArrayInputStream]))
+  (:import [java.io IOException ByteArrayInputStream]))
 
 
 (defn download
