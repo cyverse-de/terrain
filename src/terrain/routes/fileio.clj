@@ -45,8 +45,13 @@
        :return UrlUploadResponseBody
        (ok (fio/urlupload current-user body)))
 
-     (POST "/save" [:as req]
-       (util/controller req fio/save :params :body))
+     (POST "/save" []
+       :summary "Save a File"
+       :description (str "Overwrites the contents of a file in the Data Store. The file must exist already for this "
+                         "endpoint to work. To save a new file, use the POST /terrain/secured/fileio/saveas endpoint.")
+       :body [body FileSaveRequestBody]
+       :return stats-schema/FileStat
+       (ok (fio/save current-user body)))
 
      (POST "/saveas" [:as req]
        (util/controller req fio/saveas :params :body)))))

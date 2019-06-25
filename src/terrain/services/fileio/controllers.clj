@@ -54,16 +54,10 @@
     (ccv/validate-map body {:dest string? :content string?})))
 
 (defn save
-  [{:keys [user]} {:keys [dest content]}]
-  (let [dest      (string/trim dest)
-        istream   (ByteArrayInputStream. (.getBytes content "UTF-8"))
-        info      (data/overwrite-file user dest istream)]
-    (success-response info)))
-
-(with-pre-hook! #'save
-  (fn [params body]
-    (ccv/validate-map params {:user string?})
-    (ccv/validate-map body {:dest string? :content string?})))
+  [{user :shortUsername} {:keys [dest content]}]
+  (let [dest    (string/trim dest)
+        istream (ByteArrayInputStream. (.getBytes content "UTF-8"))]
+    (data/overwrite-file user dest istream)))
 
 (defn- url-filename
   [address]

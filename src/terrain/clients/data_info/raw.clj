@@ -151,11 +151,12 @@
 
 (defn overwrite-file
   [user path-uuid istream]
-  (http/put (str (url/url (cfg/data-info-base-url) "data" path-uuid))
-            {:query-params {:user user}
-             :accept :json
-             :multipart [{:name "file"
-                          :content istream}]}))
+  (:body (http/put (str (url/url (cfg/data-info-base-url) "data" path-uuid))
+                   {:query-params {:user user}
+                    :accept       :json
+                    :as           :json
+                    :multipart    [{:name    "file"
+                                    :content istream}]})))
 
 ;; MOVE AND RENAME
 

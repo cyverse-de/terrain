@@ -30,3 +30,7 @@
    :url   (describe NonBlankString "The URL that the file contents are being retrieved from.")
    :label (describe NonBlankString "The name of the uploaded file.")
    :dest  (describe NonBlankString "The destination directory for the uploaded file.")})
+
+(s/defschema FileSaveRequestBody
+  {:content (describe String "The contents of the file to save.")
+   :dest    (describe NonBlankString "The path to the file to save in the data store.")})
