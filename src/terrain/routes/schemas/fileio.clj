@@ -22,8 +22,8 @@
      :content-type (describe String "The MIME type of the file being uploaded"))))
 
 (s/defschema UrlUploadRequestBody
-  {:dest (describe NonBlankString "The destination directory for the uploaded file.")
-   :addr (describe NonBlankString "The URL to retrieve the file contents from.")})
+  {:dest    (describe NonBlankString "The destination directory for the uploaded file.")
+   :address (describe NonBlankString "The URL to retrieve the file contents from.")})
 
 (s/defschema UrlUploadResponseBody
   {:msg   (describe NonBlankString "A brief message indicating the result of the request.")

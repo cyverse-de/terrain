@@ -62,8 +62,8 @@
       (:host parsed-url))))
 
 (defn urlupload
-  [{user :shortUsername} {:keys [dest addr]}]
-  (let [dest  (string/trim dest)
-        addr  (string/trim addr)
-        fname (url-filename addr)]
-    (actions/urlimport user addr fname dest)))
+  [{user :shortUsername} {:keys [dest address]}]
+  (let [dest    (string/trim dest)
+        address (string/trim address)
+        fname   (url-filename address)]
+    (actions/urlimport user address fname dest)))
