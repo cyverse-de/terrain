@@ -223,6 +223,7 @@
                                      {:name "communities", :description "Community Endpoints"}
                                      {:name "data", :description "Data Endpoints"}
                                      {:name "favorites", :description "Favorites Endpoints"}
+                                     {:name "fileio", :description "File Input/Output Endpoints"}
                                      {:name "filesystem", :description "Filesystem Endpoints"}
                                      {:name "reference-genomes", :description "Reference Genome Endpoints"}
                                      {:name "subjects", :description "Subject Endpoints"}

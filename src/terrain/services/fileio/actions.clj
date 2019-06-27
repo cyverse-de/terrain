@@ -33,11 +33,10 @@
       (validators/path-writeable cm user dest-path)
       (validators/path-not-exists cm (ft/path-join dest-path filename)))
     (internal-jobs/submit :url-import [address filename dest-path])
-    (success-response
-     {:msg   "Upload scheduled."
-      :url   address
-      :label filename
-      :dest  dest-path})))
+    {:msg   "Upload scheduled."
+     :url   address
+     :label filename
+     :dest  dest-path}))
 
 (defn download
   "Returns a response map filled out with info that lets the client download
