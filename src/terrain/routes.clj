@@ -23,6 +23,7 @@
         [terrain.routes.data]
         [terrain.routes.fileio]
         [terrain.routes.filesystem]
+        [terrain.routes.filesystem.exists]
         [terrain.routes.filesystem.navigation]
         [terrain.routes.groups]
         [terrain.routes.metadata]
@@ -101,6 +102,7 @@
     (secured-session-routes)
     (secured-fileio-routes)
     (filesystem-navigation-routes)
+    (filesystem-existence-routes)
     (secured-filesystem-routes)
     (secured-filesystem-metadata-routes)
     (secured-search-routes)

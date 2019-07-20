@@ -119,6 +119,13 @@
   [{:keys [user]} {:keys [tickets]}]
   (raw/delete-tickets user tickets))
 
+(defn check-existence
+  "Uses the data-info existence-marker endpoint to query existence for a set of files/folders."
+  [user paths]
+  (-> (raw/check-existence user paths)
+      :body
+      (json/decode true)))
+
 (defn- url-encoded?
   [string-to-check]
   (re-seq #"\%[A-Fa-f0-9]{2}" string-to-check))
@@ -132,10 +139,8 @@
 (defn path-exists?
   [user path]
   (let [path (url-decode (ft/rm-last-slash path))]
-    (-> (raw/check-existence user [path])
-        :body
-        json/decode
-        (get-in ["paths" path]))))
+    (-> (check-existence user [path])
+        (get-in [:paths (keyword path)]))))
 
 (defn get-or-create-dir
   "Returns the path argument if the path exists and refers to a directory.  If
@@ -222,11 +227,6 @@
      (raw/restore-files (:user params)))
     ([params body]
      (raw/restore-files (:user params) (:paths body))))
-
-(defn check-existence
-    "Uses the data-info existence-marker endpoint to query existence for a set of files/folders."
-    [params body]
-    (raw/check-existence (:user params) (:paths body)))
 
 (defn collect-permissions
     "Uses the data-info permissions-gatherer endpoint to query user permissions for a set of files/folders."
