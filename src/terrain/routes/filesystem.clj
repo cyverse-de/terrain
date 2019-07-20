@@ -1,26 +1,20 @@
 (ns terrain.routes.filesystem
   (:use [common-swagger-api.schema]
-        [terrain.util])
-  (:require [terrain.util.config :as config]
-            [clojure.tools.logging :as log]
-            [terrain.clients.data-info :as data]
+        [terrain.util :only [controller optional-routes]])
+  (:require [terrain.clients.data-info :as data]
+            [terrain.clients.metadata.raw :as meta-raw]
             [terrain.services.filesystem.directory :as dir]
             [terrain.services.filesystem.metadata :as meta]
             [terrain.services.filesystem.metadata-templates :as mt]
-            [terrain.clients.metadata.raw :as meta-raw]
-            [terrain.services.filesystem.root :as root]
-            [terrain.services.filesystem.sharing :as sharing]
             [terrain.services.filesystem.stat :as stat]
-            [terrain.services.filesystem.updown :as ud]))
+            [terrain.services.filesystem.updown :as ud]
+            [terrain.util.config :as config]))
 
 (defn secured-filesystem-routes
   "The routes for file IO endpoints."
   []
   (optional-routes
     [config/filesystem-routes-enabled]
-
-    (GET "/filesystem/root" [:as req]
-      (controller req root/do-root-listing :params))
 
     (POST "/filesystem/exists" [:as req]
       (controller req data/check-existence :params :body))
@@ -30,9 +24,6 @@
 
     (GET "/filesystem/display-download" [:as req]
       (controller req ud/do-special-download :params))
-
-    (GET "/filesystem/directory" [:as req]
-      (controller req dir/do-directory :params))
 
     (GET "/filesystem/paged-directory" [:as req]
       (controller req dir/do-paged-listing :params))
