@@ -16,9 +16,6 @@
   (optional-routes
     [config/filesystem-routes-enabled]
 
-    (POST "/filesystem/exists" [:as req]
-      (controller req data/check-existence :params :body))
-
     (POST "/filesystem/stat" [:as req]
       (controller req stat/do-stat :params :body))
 
