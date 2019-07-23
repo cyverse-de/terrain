@@ -25,7 +25,7 @@ RUN lein uberjar && \
     cp target/terrain-standalone.jar .
 
 # Add the Internet2 InCommon intermediate CA certificate.
-ADD "https://incommon.org/wp-content/uploads/2019/06/sha384-Intermediate-cert.txt" "/uyr/local/share/ca-certificates/"
+ADD "https://incommon.org/wp-content/uploads/2019/06/sha384-Intermediate-cert.txt" "/usr/local/share/ca-certificates/"
 RUN "update-ca-certificates"
 
 ENTRYPOINT ["terrain", "-Dlogback.confonFile=/etc/iplant/de/logging/terrain-logging.xml", "-cp", ".:terrain-standalone.jar", "terrain.core"]
