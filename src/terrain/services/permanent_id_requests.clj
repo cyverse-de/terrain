@@ -125,22 +125,22 @@ For example, https://doi.org/10.7946/P2G596 links to the DOI 10.7946/P2G596.")
 (defn- validate-publish-dest
   [{:keys [path] :as data-item}]
   (let [publish-dest (format-publish-path path)
-        paths-exist (parse-service-json (data-info/check-existence {:user (config/permanent-id-curators-group)}
-                                                                   {:paths [publish-dest]}))]
+        paths-exist (data-info/check-existence (config/permanent-id-curators-group)
+                                               [publish-dest])]
     (validate-publish-dest-available paths-exist publish-dest))
   data-item)
 
 (defn- validate-data-item
-  "Validate then return a data item. Needs: path, plus what's needed by called validate- functions"
+  "Validate then return a data item. Needs: path"
   [user {:keys [path] :as data-item}]
   (validate-owner user data-item)
   (validate-request-target-type data-item)
   (validate-folder-not-empty data-item)
   (let [staging-dest (format-staging-path path)
         publish-dest (format-publish-path path)
-        paths-exist  (parse-service-json (data-info/check-existence {:user (config/permanent-id-curators-group)}
-                                                                    {:paths [staging-dest
-                                                                             publish-dest]}))]
+        paths-exist  (data-info/check-existence (config/permanent-id-curators-group)
+                                                [staging-dest
+                                                 publish-dest])]
     (validate-staging-dest-available paths-exist staging-dest)
     (validate-publish-dest-available paths-exist publish-dest))
   data-item)
