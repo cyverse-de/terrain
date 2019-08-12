@@ -21,6 +21,7 @@
             [schema.core :as s]
             [schema-tools.core :as st]
             [terrain.clients.analyses :as analyses]
+            [terrain.clients.app-exposer :as app-exposer]
             [terrain.clients.apps.raw :as apps]
             [terrain.util.config :as config])
   (:import [java.util UUID]))
@@ -119,7 +120,26 @@
               :return schema/StopAnalysisResponse
               :summary schema/AnalysisStopSummary
               :description schema/AnalysisStopDocs
-              (ok (apps/stop-job analysis-id params)))))))
+              (ok (apps/stop-job analysis-id params)))
+
+        (context "/pods" []
+          (GET "/" []
+               :return schema/AnalysisPodList
+               :summary schema/AnalysisPodListSummary
+               :description schema/AnalysisPodListDescription
+               (ok (app-exposer/list-analysis-pods analysis-id)))
+
+          (context "/:pod-name" []
+            :path-params [pod-name :- NonBlankString]
+
+            (GET "/logs" []
+                 :query [params schema/AnalysisPodLogParameters]
+                 :return s/Any
+                 :summary schema/AnalysisPodLogSummary
+                 :description schema/AnalysisPodLogDescription
+                 (ok (app-exposer/analysis-pod-logs analysis-id pod-name params)))))))))
+
+
 
 (s/defschema DeletionResponse
   {:id (describe UUID "The UUID of the resource that was deleted")})
