@@ -23,10 +23,15 @@
 (def ^:private status-code-completion "Completion")
 (def ^:private status-code-failed "Failed")
 (def ^:private completion-comment-fmt
-"%s
+"The DOI Permanent ID has been created for
+%s
 
-To create a link to your data using the DOI, append https://doi.org to the identifier.
-For example, https://doi.org/10.7946/P2G596 links to the DOI 10.7946/P2G596.")
+The dataset is available via its landing page at https://doi.org/%s.
+
+Your dataset is now available to CyVerse users and the public.
+If you need to make any changes to the dataset, including the metadata, please contact doi@cyverse.org.
+
+If this dataset accompanies a paper, please contact us with the DOI for that paper once it is published.")
 
 (def ^:private ezid-target-attr "_target")
 
@@ -404,9 +409,10 @@ For example, https://doi.org/10.7946/P2G596 links to the DOI 10.7946/P2G596.")
           publish-path    (publish-data-item user folder)]
       (email/send-permanent-id-request-complete type
                                                 publish-path
-                                                (json/encode ezid-response {:pretty true}))
+                                                (json/encode ezid-response {:pretty true})
+                                                identifier)
       (publish-metadata folder publish-avus)
-      identifier)
+      [identifier publish-path])
     (catch Object e
       (log/error e)
       (update-permanent-id-request request-id (json/encode {:status status-code-failed}))
@@ -416,9 +422,9 @@ For example, https://doi.org/10.7946/P2G596 links to the DOI 10.7946/P2G596.")
   [request-id]
   (create-publish-dir)
   (let [{request-type :type :as request} (admin-get-permanent-id-request request-id)
-        identifier                       (complete-permanent-id-request (:shortUsername current-user) request)
+        [identifier publish-path]        (complete-permanent-id-request (:shortUsername current-user) request)
         comments                         (if (= "DOI" request-type)
-                                           (format completion-comment-fmt identifier)
+                                           (format completion-comment-fmt publish-path identifier)
                                            identifier)]
     (update-permanent-id-request request-id (json/encode {:status       status-code-completion
                                                           :comments     comments

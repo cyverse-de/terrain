@@ -69,11 +69,12 @@
 
 (defn send-permanent-id-request-complete
   "Sends an email message informing data curators of a Permanent ID Request completion."
-  [request-type path identifiers]
+  [request-type path identifiers doi]
   (let [template-values {:environment  (config/environment-name)
                          :request_type request-type
                          :path         path
-                         :identifiers  identifiers}]
+                         :identifiers  identifiers
+                         :doi          doi}]
     (send-permanent-id-request
       "Permanent ID Request Complete"
       "permanent_id_request_complete"
