@@ -3,8 +3,7 @@
   (:require [cemerick.url :as curl]
             [clj-http.client :as client]
             [terrain.util.config :as config]
-            [terrain.clients.apps.raw :as apps]
-            [clojure.tools.logging :as log]))
+            [terrain.clients.apps.raw :as apps]))
 
 
 (defn- app-exposer-url
@@ -41,9 +40,7 @@
 (defn analysis-pod-logs
   [analysis-id pod-name params]
   (let [pods-index  (into {} (map external-id->podmap (analysis-external-ids analysis-id)))]
-    (log/warn pods-index)
     (when-let [extid (get pods-index pod-name)]
-      (log/warn analysis-id extid pod-name)
-      (:body
-       (client/get (app-exposer-url "vice" extid "pods" pod-name "logs")
-                   {:query-params params})))))
+      (client/get (app-exposer-url "vice" extid "pods" pod-name "logs")
+                  {:query-params params
+                   :as           :stream}))))

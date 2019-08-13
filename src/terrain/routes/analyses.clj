@@ -134,10 +134,9 @@
 
             (GET "/logs" []
                  :query [params schema/AnalysisPodLogParameters]
-                 :return s/Any
                  :summary schema/AnalysisPodLogSummary
                  :description schema/AnalysisPodLogDescription
-                 (ok (app-exposer/analysis-pod-logs analysis-id pod-name params)))))))))
+                 (app-exposer/analysis-pod-logs analysis-id pod-name params))))))))
 
 
 
