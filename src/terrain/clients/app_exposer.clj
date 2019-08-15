@@ -4,7 +4,9 @@
             [clj-http.client :as client]
             [terrain.util.config :as config]
             [terrain.clients.apps.raw :as apps]
-            [ring.util.io :as ring-io]))
+            [ring.util.io :as ring-io]
+            [clojure.tools.logging :as log]
+            [clojure.java.io :as io]))
 
 
 (defn- app-exposer-url
@@ -54,4 +56,7 @@
       (let [response-stream (:body (client/get (app-exposer-url "vice" extid "pods" pod-name "logs")
                                                {:query-params params
                                                 :as           :stream}))]
-        (ring-io/piped-input-stream #(copy response-stream %))))))
+        {:headers {"Content-Type" "text/plain"
+                   "Transfer-Encoding" "chunked"}
+         :body
+          (ring-io/piped-input-stream #(copy response-stream %))}))))
