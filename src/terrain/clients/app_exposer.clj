@@ -15,7 +15,8 @@
 
 (defn- list-pods-by-external-id
   [external-id]
-  (:body (client/get (app-exposer-url "vice" external-id "pods") {:as :json})))
+  (let [pods-map (:body (client/get (app-exposer-url "vice" external-id "pods") {:as :json}))]
+    {:pods (map #(assoc %1 :external_id external-id) (:pods pods-map))}))
 
 (defn- analysis-steps
   "Returns the steps for the analysis"
