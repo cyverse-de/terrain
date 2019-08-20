@@ -127,16 +127,7 @@
                :return schema/AnalysisPodList
                :summary schema/AnalysisPodListSummary
                :description schema/AnalysisPodListDescription
-               (ok (app-exposer/list-analysis-pods analysis-id)))
-
-          (context "/:pod-name" []
-            :path-params [pod-name :- NonBlankString]
-
-            (GET "/logs" []
-                 :query [params schema/AnalysisPodLogParameters]
-                 :summary schema/AnalysisPodLogSummary
-                 :description schema/AnalysisPodLogDescription
-                 (app-exposer/analysis-pod-logs analysis-id pod-name params))))))))
+               (ok (app-exposer/list-analysis-pods analysis-id))))))))
 
 
 
