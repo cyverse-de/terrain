@@ -498,6 +498,11 @@
   [props config-valid configs]
   "terrain.analyses.base-uri" "http://analyses")
 
+(cc/defprop-optstr app-exposer-base-uri
+  "The base URI for the app-exposer service."
+  [props config-valid configs]
+  "terrain.app-exposer.base-uri" "http://app-exposer")
+
 (def metadata-client
   (memoize #(metadata-client/new-metadata-client (metadata-base-url))))
 
