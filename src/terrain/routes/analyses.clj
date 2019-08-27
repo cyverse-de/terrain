@@ -122,14 +122,12 @@
               :description schema/AnalysisStopDocs
               (ok (apps/stop-job analysis-id params)))
 
-        (context "/pods" []
-          (GET "/" []
-               :return schema/AnalysisPodList
-               :summary schema/AnalysisPodListSummary
-               :description schema/AnalysisPodListDescription
-               (ok (app-exposer/list-analysis-pods analysis-id))))))))
-
-
+        (GET "/logs" []
+             :query [params schema/AnalysisPodLogParameters]
+             :return schema/AnalysisPodLogEntry
+             :summary schema/AnalysisPodLogSummary
+             :description schema/AnalysisPodLogDescription
+             (ok (app-exposer/get-pod-logs analysis-id params)))))))
 
 (s/defschema DeletionResponse
   {:id (describe UUID "The UUID of the resource that was deleted")})
