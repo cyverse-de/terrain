@@ -127,7 +127,23 @@
              :return schema/AnalysisPodLogEntry
              :summary schema/AnalysisPodLogSummary
              :description schema/AnalysisPodLogDescription
-             (ok (app-exposer/get-pod-logs analysis-id params)))))))
+             (ok (app-exposer/get-pod-logs analysis-id params)))
+
+        (GET "/time-limit" []
+             :return schema/AnalysisTimeLimit
+             :summary "Get the time limit for an analysis."
+             :description "Get the time limit for an analysis. Returns seconds
+             since the epoch for the time limit as a string or returns the
+             string null if the time limit has not been set."
+             (ok (app-exposer/get-time-limit analysis-id)))
+
+        (POST "/time-limit" []
+              :return schema/AnalysisTimeLimit
+              :summary "Extend the time limit for an analysis."
+              :description "Adds three days to the time limit for an analysis.
+              Returns seconds since the epoch for the time limit as a string.
+              Returns an error if the time limit is null."
+              (ok (app-exposer/set-time-limit analysis-id)))))))
 
 (s/defschema DeletionResponse
   {:id (describe UUID "The UUID of the resource that was deleted")})
