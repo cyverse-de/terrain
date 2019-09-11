@@ -61,15 +61,6 @@
     (POST "/filesystem/restore-all" [:as req]
       (controller req data/restore-files :params))
 
-    (POST "/filesystem/tickets" [:as req]
-      (controller req data/add-tickets :params :body))
-
-    (POST "/filesystem/delete-tickets" [:as req]
-      (controller req data/delete-tickets :params :body))
-
-    (POST "/filesystem/list-tickets" [:as req]
-      (controller req data/list-tickets :params :body))
-
     (DELETE "/filesystem/trash" [:as req]
       (controller req data/delete-trash :params))
 

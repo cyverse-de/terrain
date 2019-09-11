@@ -109,15 +109,21 @@
 
 (defn list-tickets
   [{:keys [user]} {:keys [paths]}]
-  (raw/list-tickets user paths))
+  (-> (raw/list-tickets user paths)
+      :body
+      (json/decode true)))
 
 (defn add-tickets
-  [{:keys [user public]} {:keys [paths]}]
-  (raw/add-tickets user paths (and public (= public "1"))))
+  [{:keys [user]} paths params]
+  (-> (raw/add-tickets user paths params)
+      :body
+      (json/decode true)))
 
 (defn delete-tickets
   [{:keys [user]} {:keys [tickets]}]
-  (raw/delete-tickets user tickets))
+  (-> (raw/delete-tickets user tickets)
+      :body
+      (json/decode true)))
 
 (defn check-existence
   "Uses the data-info existence-marker endpoint to query existence for a set of files/folders."
