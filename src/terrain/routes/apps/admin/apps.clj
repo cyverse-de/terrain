@@ -38,6 +38,13 @@
             :description AppCategorizationDocs
             (ok (apps/categorize-apps body)))
 
+      (GET "/publication-requests" []
+            :query [params schema/AppPublicationRequestSearchParams]
+            :summary schema/AppPublicationRequestsSummary
+            :description schema/AppPublicationRequestsDocs
+            :return schema/AppPublicationRequestListing
+            (ok (apps/list-app-publication-requests params)))
+
       (POST "/shredder" []
             :body [body apps-schema/AppDeletionRequest]
             :summary schema/AppShredderSummary

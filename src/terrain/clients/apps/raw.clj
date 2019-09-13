@@ -571,6 +571,14 @@
                   :as               :json
                   :follow-redirects false})))
 
+(defn list-app-publication-requests
+  [params]
+  (:body
+   (client/get (apps-url "admin" "apps" "publication-requests")
+               {:query-params     (secured-params params)
+                :as               :json
+                :follow-redirects false})))
+
 (defn permanently-delete-apps
   [body]
   (:body
