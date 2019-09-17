@@ -295,9 +295,9 @@
 
 (defn add-tickets
   "Create potentially-public tickets for a list of paths."
-  [user paths public?]
+  [user paths params]
   (request :post ["tickets"]
-           (mk-req-map user (json/encode {:paths paths}) {:public public?})))
+           (mk-req-map user (json/encode {:paths paths}) params)))
 
 (defn delete-tickets
   "Delete tickets for a list of ticket IDs"

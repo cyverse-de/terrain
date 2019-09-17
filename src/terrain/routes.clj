@@ -25,6 +25,7 @@
         [terrain.routes.filesystem]
         [terrain.routes.filesystem.exists]
         [terrain.routes.filesystem.navigation]
+        [terrain.routes.filesystem.tickets]
         [terrain.routes.groups]
         [terrain.routes.metadata]
         [terrain.routes.misc]
@@ -103,6 +104,7 @@
     (secured-fileio-routes)
     (filesystem-navigation-routes)
     (filesystem-existence-routes)
+    (filesystem-ticket-routes)
     (secured-filesystem-routes)
     (secured-filesystem-metadata-routes)
     (secured-search-routes)
