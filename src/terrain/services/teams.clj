@@ -5,7 +5,7 @@
             [terrain.clients.notifications :as cn]))
 
 (defn get-teams [{user :shortUsername} params]
-  (ipg/get-teams user (select-keys params [:search :creator :member])))
+  (ipg/get-teams user (select-keys params [:search :creator :details :member])))
 
 (defn add-team [{user :shortUsername} body]
   (ipg/add-team user body))
