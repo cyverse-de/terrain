@@ -37,7 +37,7 @@
                  [org.cyverse/cyverse-groups-client "0.1.7"]
                  [org.cyverse/common-cfg "2.8.1"]
                  [org.cyverse/common-cli "2.8.1"]
-                 [org.cyverse/common-swagger-api "2.11.19"]
+                 [org.cyverse/common-swagger-api "2.11.20"]
                  [org.cyverse/kameleon "3.0.4"]
                  [org.cyverse/metadata-client "3.0.1"]
                  [org.cyverse/metadata-files "1.0.3"]
@@ -45,7 +45,8 @@
                  [org.cyverse/service-logging "2.8.1"]]
   :eastwood {:exclude-namespaces [terrain.util.jwt :test-paths]
              :linters [:wrong-arity :wrong-ns-form :wrong-pre-post :wrong-tag :misplaced-docstrings]}
-  :plugins [[lein-ring "0.12.5" :exclusions [org.clojure/clojure]]
+  :plugins [[lein-cljfmt "0.6.4"]
+            [lein-ring "0.12.5" :exclusions [org.clojure/clojure]]
             [swank-clojure "1.4.2" :exclusions [org.clojure/clojure]]
             [test2junit "1.2.2"]
             [jonase/eastwood "0.3.5"]]

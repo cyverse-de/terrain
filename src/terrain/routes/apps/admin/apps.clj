@@ -92,4 +92,10 @@
          :return IntegrationData
          :summary schema/AppIntegrationDataUpdateSummary
          :description schema/AppIntegrationDataUpdateDocs
-         (ok (apps/update-app-integration-data system-id app-id integration-data-id)))))))
+         (ok (apps/update-app-integration-data system-id app-id integration-data-id)))
+
+       (POST "/publish" []
+         :body [body apps-schema/PublishAppRequest]
+         :summary apps-schema/PublishAppSummary
+         :description apps-schema/PublishAppDocs
+         (ok (apps/admin-publish-app system-id app-id body)))))))
