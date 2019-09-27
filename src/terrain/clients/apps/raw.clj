@@ -367,6 +367,16 @@
                   :as               :json
                   :follow-redirects false})))
 
+(defn admin-publish-app
+  [system-id app-id body]
+  (:body
+   (client/post (apps-url "admin" "apps" system-id app-id "publish")
+                {:query-params     (secured-params)
+                 :form-params      body
+                 :content-type     :json
+                 :as               :json
+                 :follow-redirects false})))
+
 (defn delete-rating
   [system-id app-id]
   (:body
@@ -570,6 +580,14 @@
                   :content-type     :json
                   :as               :json
                   :follow-redirects false})))
+
+(defn list-app-publication-requests
+  [params]
+  (:body
+   (client/get (apps-url "admin" "apps" "publication-requests")
+               {:query-params     (secured-params params)
+                :as               :json
+                :follow-redirects false})))
 
 (defn permanently-delete-apps
   [body]
