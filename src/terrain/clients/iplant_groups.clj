@@ -129,21 +129,14 @@
   (when name
     (format "%s:%s" folder name)))
 
-(defn- format-group-base
-  [folder detail group]
-  (let [regex (re-pattern (str "^\\Q" folder ":"))
-        group (if detail
-                group
-                (dissoc group :detail))]
-    (update-in group [:name] (fn [s] (string/replace s regex "")))))
-
 (defn- format-group-with-detail
   [folder group]
-  (format-group-base folder true group))
+  (let [regex (re-pattern (str "^\\Q" folder ":"))]
+    (update-in group [:name] (fn [s] (string/replace s regex "")))))
 
 (defn- format-group
   [folder group]
-  (format-group-base folder false group))
+  (dissoc (format-group-with-detail folder group)))
 
 (defn- get-groups* [folder format-fn client user lookup-fn]
   (if (folder-exists? client user folder)
