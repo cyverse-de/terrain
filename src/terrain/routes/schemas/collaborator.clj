@@ -18,13 +18,16 @@
 
 (defschema CollaboratorListSearchParams
   {(optional-key :search)
-   (describe NonBlankString "The collaborator list name substring to search for")})
+   (describe NonBlankString "The collaborator list name substring to search for")
+
+   group-schema/GroupDetailsParamKey
+   (group-schema/GroupDetailsParamDesc "collaborator list")})
 
 (defschema CollaboratorListRetainPermissionsParams
   {(optional-key :retain-permissions)
    (describe Boolean "Select `true` if removed users should retain permission to shared resources")})
 
-(defschema GetCollaboratorListsResponse (group-schema/group-list "collaborator list" "collaborator lists"))
+(defschema GetCollaboratorListsResponse (group-schema/group-list-with-detail "collaborator list" "collaborator lists"))
 (defschema AddCollaboratorListRequest
   (select-keys (group-schema/base-group "collaborator list") [:name (optional-key :description)]))
 (defschema CollaboratorList (group-schema/group "collaborator list"))
@@ -49,6 +52,9 @@
    (describe NonBlankString (str "Only " plural-descriptor " created by the user with this username will be listed if "
                                  "specified"))
 
+   group-schema/GroupDetailsParamKey
+   (group-schema/GroupDetailsParamDesc descriptor)
+
    (optional-key :member)
    (describe NonBlankString (str "Only " plural-descriptor " to which the user with this username belongs will be "
                                  "listed if specified"))})
@@ -61,7 +67,7 @@
 (defschema TeamJoinDenial
   {:message (describe String "A brief message to send to the person requesting to join the team")})
 
-(defschema TeamListing (group-schema/group-list "team" "teams"))
+(defschema TeamListing (group-schema/group-list-with-detail "team" "teams"))
 (defschema AddTeamRequest
   (assoc (select-keys (group-schema/base-group "team") [:name (optional-key :description)])
     (optional-key :public_privileges)
@@ -79,7 +85,7 @@
   (dissoc (team-listing-params "community" "communities") (optional-key :creator)))
 
 (defschema CommunityListingEntry
-  (assoc (group-schema/group "community")
+  (assoc (group-schema/group-with-detail "community")
     :member     (describe Boolean "True if the authenticated user belongs to the community")
     :privileges (describe [NonBlankString] "The privileges the authenticated user has for the community")))
 
@@ -110,7 +116,7 @@
 
 ;; Admin Community Schemas
 
-(defschema AdminCommunityListing (group-schema/group-list "community" "communities"))
+(defschema AdminCommunityListing (group-schema/group-list-with-detail "community" "communities"))
 
 ;; Subject Schemas
 

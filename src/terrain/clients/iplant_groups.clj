@@ -129,9 +129,14 @@
   (when name
     (format "%s:%s" folder name)))
 
-(defn- format-group [folder group]
+(defn- format-group-with-detail
+  [folder group]
   (let [regex (re-pattern (str "^\\Q" folder ":"))]
-    (update-in (dissoc group :detail) [:name] (fn [s] (string/replace s regex "")))))
+    (update-in group [:name] (fn [s] (string/replace s regex "")))))
+
+(defn- format-group
+  [folder group]
+  (dissoc (format-group-with-detail folder group)))
 
 (defn- get-groups* [folder format-fn client user lookup-fn]
   (if (folder-exists? client user folder)
@@ -160,18 +165,18 @@
 
 (defn- get-collaborator-lists* [client user lookup-fn]
   (let [folder (get-collaborator-list-folder-name client user)]
-    (get-groups* folder (partial format-group folder) client user lookup-fn)))
+    (get-groups* folder (partial format-group-with-detail folder) client user lookup-fn)))
 
 ;; This function kind of uses a hack. A search string is required, but if we make it the
 ;; same as the folder name then that approximates listing all groups in the folder. An
 ;; update to iplant-groups will be required to eliminate this hack.
 (defn get-collaborator-lists
-  ([user]
+  ([user details]
    (let [client (get-client)]
-     (get-collaborator-lists* client user (partial c/find-groups client user))))
-  ([user search]
+     (get-collaborator-lists* client user (partial c/find-groups client user details))))
+  ([user details search]
    (let [client (get-client)]
-     (get-collaborator-lists* client user (partial c/find-groups client user search)))))
+     (get-collaborator-lists* client user (partial c/find-groups client user details search)))))
 
 (defn add-collaborator-list [user {:keys [name description]}]
   (let [client (get-client)
@@ -233,13 +238,13 @@
 
 (defn- find-teams* [client team-type user search-folder lookup-fn]
   (let [folder (get-team-folder-name client team-type)]
-    (get-groups* search-folder (partial format-group folder) client user lookup-fn)))
+    (get-groups* search-folder (partial format-group-with-detail folder) client user lookup-fn)))
 
 (defn- filter-teams [search result]
   (update-in result [:groups] (partial filter (comp (partial re-find (re-pattern (str "\\Q" search))) :name))))
 
-(defn- find-groups-with-member [client user member search-folder search]
-  (let [result (c/list-subject-groups client user member search-folder)]
+(defn- find-groups-with-member [client user member details search-folder search]
+  (let [result (c/list-subject-groups client user member details search-folder)]
     (if search
       (filter-teams search result)
       result)))
@@ -247,12 +252,12 @@
 ;; This function kind of uses a hack. A search string is required, but if we make it the
 ;; same as the folder name then that approximates listing all groups in the folder. An
 ;; update to iplant-groups will be required to eliminate this hack.
-(defn- get-teams* [team-type user {:keys [search creator member]}]
+(defn- get-teams* [team-type user {:keys [search creator details member]}]
   (let [client (get-client)
         folder (get-team-folder-name client team-type creator)]
-    (->> (cond member (fn [_] (find-groups-with-member client user member folder search))
-               search (partial c/find-groups client user search)
-               :else (partial c/find-groups client user))
+    (->> (cond member (fn [_] (find-groups-with-member client user member details folder search))
+               search (partial c/find-groups client user details search)
+               :else (partial c/find-groups client user details))
          (find-teams* client team-type user folder))))
 
 (defn get-teams [user params]
@@ -534,5 +539,5 @@
         group  (full-group-name (config/de-users-group) folder)]
     (c/remove-group-member client (config/grouper-user) group subject-id)))
 
-(defn list-groups-for-user [subject-id]
-  (c/list-subject-groups (get-client) (config/grouper-user) subject-id))
+(defn list-groups-for-user [subject-id details]
+  (c/list-subject-groups (get-client) (config/grouper-user) subject-id details))

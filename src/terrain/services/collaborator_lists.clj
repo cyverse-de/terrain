@@ -2,10 +2,10 @@
   (:require [terrain.clients.iplant-groups :as ipg]
             [terrain.clients.permissions :as perms-client]))
 
-(defn get-collaborator-lists [{user :shortUsername} {:keys [search]}]
+(defn get-collaborator-lists [{user :shortUsername} {:keys [search details]}]
   (if-not search
-    (ipg/get-collaborator-lists user)
-    (ipg/get-collaborator-lists user search)))
+    (ipg/get-collaborator-lists user details)
+    (ipg/get-collaborator-lists user details search)))
 
 (defn add-collaborator-list [{user :shortUsername} body]
   (ipg/add-collaborator-list user body))
