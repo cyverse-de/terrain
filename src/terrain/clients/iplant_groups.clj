@@ -136,7 +136,7 @@
 
 (defn- format-group
   [folder group]
-  (dissoc (format-group-with-detail folder group)))
+  (dissoc (format-group-with-detail folder group) :detail))
 
 (defn- get-groups* [folder format-fn client user lookup-fn]
   (if (folder-exists? client user folder)
