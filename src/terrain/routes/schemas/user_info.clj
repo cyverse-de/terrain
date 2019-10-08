@@ -6,7 +6,9 @@
             [schema.core :as s]))
 
 (def UsernameParam (describe NonBlankString "The user's ID"))
-(def DetailsParam (groups/GroupDetailsParamDesc "group"))
+(s/defschema DetailsParam
+  {groups/GroupDetailsParamKey
+   (groups/GroupDetailsParamDesc "group")})
 
 (s/defschema UserInfoRequest
   {:username (describe [s/Str] "A list containing user IDs")})
