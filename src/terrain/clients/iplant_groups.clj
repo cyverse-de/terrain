@@ -539,5 +539,5 @@
         group  (full-group-name (config/de-users-group) folder)]
     (c/remove-group-member client (config/grouper-user) group subject-id)))
 
-(defn list-groups-for-user [subject-id {:keys [details]}]
+(defn list-groups-for-user [subject-id details]
   (c/list-subject-groups (get-client) (config/grouper-user) subject-id details))

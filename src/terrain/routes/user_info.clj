@@ -35,8 +35,8 @@
      :tags ["admin-user-info"]
      (GET "/:username/groups" []
           :path-params [username :- UsernameParam]
-          :query [params DetailsParam]
+          :query [{:keys [details]} DetailsParam]
           :summary "Get a user's groups"
           :description "Lists all groups to which a user belongs"
           :return GroupListing
-          (ok (ipg/list-groups-for-user username params))))))
+          (ok (ipg/list-groups-for-user username details))))))
