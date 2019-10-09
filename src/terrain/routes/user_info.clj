@@ -34,8 +34,8 @@
    (context "/users" []
      :tags ["admin-user-info"]
      (GET "/:username/groups" []
-          :path-params [username :- UsernameParam
-                        details :- DetailsParam]
+          :path-params [username :- UsernameParam]
+          :query [{:keys [details]} DetailsParam]
           :summary "Get a user's groups"
           :description "Lists all groups to which a user belongs"
           :return GroupListing
