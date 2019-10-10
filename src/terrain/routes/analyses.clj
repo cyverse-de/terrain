@@ -29,121 +29,121 @@
 (defn analysis-routes
   []
   (optional-routes
-    [config/app-routes-enabled]
+   [config/app-routes-enabled]
 
-    (context "/analyses" []
-      :tags ["analyses"]
+   (context "/analyses" []
+     :tags ["analyses"]
 
-      (GET "/" []
-           :query [params listing-schema/AnalysisListingParams]
-           :return listing-schema/AnalysisList
-           :summary listing-schema/AnalysesListingSummary
-           :description listing-schema/AnalysesListingDocs
-           (ok (apps/list-jobs params)))
+     (GET "/" []
+       :query [params listing-schema/AnalysisListingParams]
+       :return listing-schema/AnalysisList
+       :summary listing-schema/AnalysesListingSummary
+       :description listing-schema/AnalysesListingDocs
+       (ok (apps/list-jobs params)))
 
-      (POST "/" []
-            :body [body schema/AnalysisSubmission]
-            :return schema/AnalysisResponse
-            :summary listing-schema/AnalysisSubmitSummary
-            :description listing-schema/AnalysisSubmitDocs
-            (ok (apps/submit-job body)))
+     (POST "/" []
+       :body [body schema/AnalysisSubmission]
+       :return schema/AnalysisResponse
+       :summary listing-schema/AnalysisSubmitSummary
+       :description listing-schema/AnalysisSubmitDocs
+       (ok (apps/submit-job body)))
 
-      (POST "/permission-lister" []
-            :query [params perms-schema/PermissionListerQueryParams]
-            :body [body perms-schema/AnalysisIdList]
-            :return perms-schema/AnalysisPermissionListing
-            :summary perms-schema/AnalysisPermissionListingSummary
-            :description perms-schema/AnalysisPermissionListingDocs
-            (ok (apps/list-job-permissions body params)))
+     (POST "/permission-lister" []
+       :query [params perms-schema/PermissionListerQueryParams]
+       :body [body perms-schema/AnalysisIdList]
+       :return perms-schema/AnalysisPermissionListing
+       :summary perms-schema/AnalysisPermissionListingSummary
+       :description perms-schema/AnalysisPermissionListingDocs
+       (ok (apps/list-job-permissions body params)))
 
-      (POST "/sharing" []
-            :body [body perms-schema/AnalysisSharingRequest]
-            :return perms-schema/AnalysisSharingResponse
-            :summary perms-schema/AnalysisSharingSummary
-            :description perms-schema/AnalysisSharingDocs
-            (ok (apps/share-jobs body)))
+     (POST "/sharing" []
+       :body [body perms-schema/AnalysisSharingRequest]
+       :return perms-schema/AnalysisSharingResponse
+       :summary perms-schema/AnalysisSharingSummary
+       :description perms-schema/AnalysisSharingDocs
+       (ok (apps/share-jobs body)))
 
-      (POST "/unsharing" []
-            :body [body perms-schema/AnalysisUnsharingRequest]
-            :return perms-schema/AnalysisUnsharingResponse
-            :summary perms-schema/AnalysisUnsharingSummary
-            :description perms-schema/AnalysisUnsharingDocs
-            (ok (apps/unshare-jobs body)))
+     (POST "/unsharing" []
+       :body [body perms-schema/AnalysisUnsharingRequest]
+       :return perms-schema/AnalysisUnsharingResponse
+       :summary perms-schema/AnalysisUnsharingSummary
+       :description perms-schema/AnalysisUnsharingDocs
+       (ok (apps/unshare-jobs body)))
 
-      (POST "/shredder" []
-            :body [body schema/AnalysisShredderRequest]
-            :summary listing-schema/AnalysesDeleteSummary
-            :description listing-schema/AnalysesDeleteDocs
-            (ok (apps/delete-jobs body)))
+     (POST "/shredder" []
+       :body [body schema/AnalysisShredderRequest]
+       :summary listing-schema/AnalysesDeleteSummary
+       :description listing-schema/AnalysesDeleteDocs
+       (ok (apps/delete-jobs body)))
 
-      (context "/:analysis-id" []
-        :path-params [analysis-id :- schema/AnalysisIdPathParam]
+     (context "/:analysis-id" []
+       :path-params [analysis-id :- schema/AnalysisIdPathParam]
 
-        (PATCH "/" []
-               :body [body listing-schema/AnalysisUpdate]
-               :return listing-schema/AnalysisUpdateResponse
-               :summary listing-schema/AnalysisUpdateSummary
-               :description listing-schema/AnalysisUpdateDocs
-               (ok (apps/update-job analysis-id body)))
+       (PATCH "/" []
+         :body [body listing-schema/AnalysisUpdate]
+         :return listing-schema/AnalysisUpdateResponse
+         :summary listing-schema/AnalysisUpdateSummary
+         :description listing-schema/AnalysisUpdateDocs
+         (ok (apps/update-job analysis-id body)))
 
-        (DELETE "/" []
-                :summary listing-schema/AnalysisDeleteSummary
-                :description listing-schema/AnalysisDeleteDocs
-                (ok (apps/delete-job analysis-id)))
+       (DELETE "/" []
+         :summary listing-schema/AnalysisDeleteSummary
+         :description listing-schema/AnalysisDeleteDocs
+         (ok (apps/delete-job analysis-id)))
 
-        (GET "/history" []
-             :return listing-schema/AnalysisHistory
-             :summary listing-schema/AnalysisHistorySummary
-             :description listing-schema/AnalysisHistoryDocs
-             (ok (apps/get-job-history analysis-id)))
+       (GET "/history" []
+         :return listing-schema/AnalysisHistory
+         :summary listing-schema/AnalysisHistorySummary
+         :description listing-schema/AnalysisHistoryDocs
+         (ok (apps/get-job-history analysis-id)))
 
-        (GET "/parameters" []
-             :return schema/AnalysisParameters
-             :summary schema/AnalysisParametersSummary
-             :description schema/AnalysisParametersDocs
-             (ok (apps/get-job-params analysis-id)))
+       (GET "/parameters" []
+         :return schema/AnalysisParameters
+         :summary schema/AnalysisParametersSummary
+         :description schema/AnalysisParametersDocs
+         (ok (apps/get-job-params analysis-id)))
 
-        (GET "/relaunch-info" []
-             :return AppJobView
-             :summary schema/AnalysisRelaunchSummary
-             :description schema/AnalysisRelaunchDocs
-             (ok (apps/get-job-relaunch-info analysis-id)))
+       (GET "/relaunch-info" []
+         :return AppJobView
+         :summary schema/AnalysisRelaunchSummary
+         :description schema/AnalysisRelaunchDocs
+         (ok (apps/get-job-relaunch-info analysis-id)))
 
-        (GET "/steps" []
-             :return listing-schema/AnalysisStepList
-             :summary listing-schema/AnalysisStepsSummary
-             :description listing-schema/AnalysisStepsDocs
-             (ok (apps/list-job-steps analysis-id)))
+       (GET "/steps" []
+         :return listing-schema/AnalysisStepList
+         :summary listing-schema/AnalysisStepsSummary
+         :description listing-schema/AnalysisStepsDocs
+         (ok (apps/list-job-steps analysis-id)))
 
-        (POST "/stop" []
-              :query [params schema/StopAnalysisRequest]
-              :return schema/StopAnalysisResponse
-              :summary schema/AnalysisStopSummary
-              :description schema/AnalysisStopDocs
-              (ok (apps/stop-job analysis-id params)))
+       (POST "/stop" []
+         :query [params schema/StopAnalysisRequest]
+         :return schema/StopAnalysisResponse
+         :summary schema/AnalysisStopSummary
+         :description schema/AnalysisStopDocs
+         (ok (apps/stop-job analysis-id params)))
 
-        (GET "/logs" []
-             :query [params schema/AnalysisPodLogParameters]
-             :return schema/AnalysisPodLogEntry
-             :summary schema/AnalysisPodLogSummary
-             :description schema/AnalysisPodLogDescription
-             (ok (app-exposer/get-pod-logs analysis-id params)))
+       (GET "/logs" []
+         :query [params schema/AnalysisPodLogParameters]
+         :return schema/AnalysisPodLogEntry
+         :summary schema/AnalysisPodLogSummary
+         :description schema/AnalysisPodLogDescription
+         (ok (app-exposer/get-pod-logs analysis-id params)))
 
-        (GET "/time-limit" []
-             :return schema/AnalysisTimeLimit
-             :summary "Get the time limit for an analysis."
-             :description "Get the time limit for an analysis. Returns seconds
+       (GET "/time-limit" []
+         :return schema/AnalysisTimeLimit
+         :summary "Get the time limit for an analysis."
+         :description "Get the time limit for an analysis. Returns seconds
              since the epoch for the time limit as a string or returns the
              string null if the time limit has not been set."
-             (ok (app-exposer/get-time-limit analysis-id)))
+         (ok (app-exposer/get-time-limit analysis-id)))
 
-        (POST "/time-limit" []
-              :return schema/AnalysisTimeLimit
-              :summary "Extend the time limit for an analysis."
-              :description "Adds three days to the time limit for an analysis.
+       (POST "/time-limit" []
+         :return schema/AnalysisTimeLimit
+         :summary "Extend the time limit for an analysis."
+         :description "Adds three days to the time limit for an analysis.
               Returns seconds since the epoch for the time limit as a string.
               Returns an error if the time limit is null."
-              (ok (app-exposer/set-time-limit analysis-id)))))))
+         (ok (app-exposer/set-time-limit analysis-id)))))))
 
 (s/defschema DeletionResponse
   {:id (describe UUID "The UUID of the resource that was deleted")})
@@ -218,6 +218,8 @@
 
 
     ;; Quick Launch Defaults
+
+
     (context "/defaults" []
 
       ;; User Defaults
@@ -334,7 +336,6 @@
         that the UI can use to create and populate an app launch window with
         parameter values filled in"
         (ok (analyses/get-quicklaunch-app-info ql-id)))
-
 
       (GET "/" []
         :summary     "Get Quick Launch information by its UUID."
