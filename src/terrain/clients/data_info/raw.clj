@@ -321,7 +321,7 @@
 
 (defn collect-stats
   "Uses the data-info stat-gatherer endpoint to gather stat information for a set of files/folders."
-  [user & {:keys [paths ids]}]
+  [user {:keys [paths ids]}]
   (request :post ["stat-gatherer"]
            (mk-req-map user
                        (json/encode (remove-vals nil? {:paths paths :ids ids})))))

@@ -16,9 +16,6 @@
   (optional-routes
     [config/filesystem-routes-enabled]
 
-    (POST "/filesystem/stat" [:as req]
-      (controller req stat/do-stat :params :body))
-
     (GET "/filesystem/display-download" [:as req]
       (controller req ud/do-special-download :params))
 

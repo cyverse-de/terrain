@@ -25,6 +25,7 @@
         [terrain.routes.filesystem]
         [terrain.routes.filesystem.exists]
         [terrain.routes.filesystem.navigation]
+        [terrain.routes.filesystem.stats]
         [terrain.routes.filesystem.tickets]
         [terrain.routes.groups]
         [terrain.routes.metadata]
@@ -45,8 +46,7 @@
         [terrain.routes.comments]
         [terrain.util :as util]
         [terrain.util.transformers :as transform])
-  (:require [cemerick.url :as curl]
-            [clojure.tools.logging :as log]
+  (:require [clojure.tools.logging :as log]
             [clojure-commons.exception :as cx]
             [compojure.route :as route]
             [service-logging.thread-context :as tc]
@@ -95,57 +95,58 @@
 (defn secured-routes
   []
   (util/flagged-routes
-    (secured-notification-routes)
-    (secured-bootstrap-routes)
-    (secured-pref-routes)
-    (secured-user-info-routes)
-    (secured-data-routes)
-    (secured-session-routes)
-    (secured-fileio-routes)
-    (filesystem-navigation-routes)
-    (filesystem-existence-routes)
-    (filesystem-ticket-routes)
-    (secured-filesystem-routes)
-    (secured-filesystem-metadata-routes)
-    (secured-search-routes)
-    (secured-oauth-routes)
-    (secured-favorites-routes)
-    (secured-tag-routes)
-    (data-comment-routes)
-    (route/not-found (service/unrecognized-path-response))))
+   (secured-notification-routes)
+   (secured-bootstrap-routes)
+   (secured-pref-routes)
+   (secured-user-info-routes)
+   (secured-data-routes)
+   (secured-session-routes)
+   (secured-fileio-routes)
+   (filesystem-navigation-routes)
+   (filesystem-existence-routes)
+   (filesystem-stat-routes)
+   (filesystem-ticket-routes)
+   (secured-filesystem-routes)
+   (secured-filesystem-metadata-routes)
+   (secured-search-routes)
+   (secured-oauth-routes)
+   (secured-favorites-routes)
+   (secured-tag-routes)
+   (data-comment-routes)
+   (route/not-found (service/unrecognized-path-response))))
 
 (defn admin-routes
   []
   (util/flagged-routes
-    (secured-admin-routes)
-    (admin-data-comment-routes)
-    (admin-category-routes)
-    (admin-apps-routes)
-    (admin-app-avu-routes)
-    (admin-app-comment-routes)
-    (admin-app-community-routes)
-    (admin-comment-routes)
-    (admin-community-routes)
-    (admin-filesystem-metadata-routes)
-    (admin-groups-routes)
-    (admin-notification-routes)
-    (admin-ontology-routes)
-    (admin-reference-genomes-routes)
-    (admin-tool-routes)
-    (admin-tool-request-routes)
-    (admin-permanent-id-request-routes)
-    (oauth-admin-routes)
-    (admin-integration-data-routes)
-    (admin-workspace-routes)
-    (admin-user-info-routes)
-    (route/not-found (service/unrecognized-path-response))))
+   (secured-admin-routes)
+   (admin-data-comment-routes)
+   (admin-category-routes)
+   (admin-apps-routes)
+   (admin-app-avu-routes)
+   (admin-app-comment-routes)
+   (admin-app-community-routes)
+   (admin-comment-routes)
+   (admin-community-routes)
+   (admin-filesystem-metadata-routes)
+   (admin-groups-routes)
+   (admin-notification-routes)
+   (admin-ontology-routes)
+   (admin-reference-genomes-routes)
+   (admin-tool-routes)
+   (admin-tool-request-routes)
+   (admin-permanent-id-request-routes)
+   (oauth-admin-routes)
+   (admin-integration-data-routes)
+   (admin-workspace-routes)
+   (admin-user-info-routes)
+   (route/not-found (service/unrecognized-path-response))))
 
 (defn unsecured-routes
   []
   (util/flagged-routes
-    (token-routes)
-    (unsecured-misc-routes)
-    (unsecured-notification-routes)))
+   (token-routes)
+   (unsecured-misc-routes)
+   (unsecured-notification-routes)))
 
 (def admin-handler
   (middleware
@@ -177,10 +178,10 @@
 (defn- terrain-routes
   []
   (util/flagged-routes
-    unsecured-routes-handler
-    (context "/admin" [] admin-handler)
-    (context "/secured" [] secured-routes-handler)
-    secured-routes-no-context-handler))
+   unsecured-routes-handler
+   (context "/admin" [] admin-handler)
+   (context "/secured" [] secured-routes-handler)
+   secured-routes-no-context-handler))
 
 (defn- site-handler
   [routes-fn]

@@ -104,8 +104,7 @@
   (let [paths-request {:paths [path]}]
     (create-dirs params paths-request)
     (-> (st/do-stat params paths-request)
-        json/decode
-        (get-in ["paths" path]))))
+        (get-in [:paths (keyword path)]))))
 
 (defn list-tickets
   [{:keys [user]} {:keys [paths]}]

@@ -5,10 +5,9 @@
         [clj-jargon.item-ops :only [input-stream]]
         [clj-jargon.metadata :only [get-attribute]]
         [clj-jargon.permissions :only [is-writeable? list-user-perms permission-for owns?]])
-  (:require [clojure.tools.logging :as log]
-            [clojure.string :as string]
+  (:require [cheshire.core :as json]
+            [clojure.tools.logging :as log]
             [clojure-commons.file-utils :as ft]
-            [dire.core :refer [with-pre-hook! with-post-hook!]]
             [terrain.services.filesystem.validators :as validators]
             [terrain.services.filesystem.garnish.irods :as filetypes]
             [clj-icat-direct.icat :as icat]
@@ -59,8 +58,8 @@
   [stat-map cm user path]
   (if-not (is-dir? cm path)
     (-> stat-map
-      (merge {:infoType (filetypes/get-types cm user path)})
-      (merge {:content-type (detect-content-type cm path)}))
+        (merge {:infoType (filetypes/get-types cm user path)})
+        (merge {:content-type (detect-content-type cm path)}))
     stat-map))
 
 (defn- merge-label
@@ -85,7 +84,6 @@
         (merge-shares cm user path)
         (merge-counts cm user path))))
 
-
 (defn path-stat
   ([cm user path]
    (let [path (ft/rm-last-slash path)]
@@ -97,39 +95,26 @@
    (with-jargon (jargon/jargon-cfg) [cm]
      (path-stat cm user path))))
 
-
 (defn- dir-stack
   "Obtains a stack of parent directories for a directory path."
   [path]
   (take-while (complement nil?) (iterate ft/dirname path)))
-
 
 (defn- deepest-extant-parent
   "Finds the deepest parent of a path that exists."
   [cm path]
   (first (filter (partial exists? cm) (dir-stack path))))
 
-
 (defn can-create-dir?
   ([cm user path]
-     ((every-pred (partial is-dir? cm) (partial is-writeable? cm user))
-      (log/spy :warn (deepest-extant-parent cm path))))
+   ((every-pred (partial is-dir? cm) (partial is-writeable? cm user))
+    (log/spy :warn (deepest-extant-parent cm path))))
   ([user path]
-     (with-jargon (jargon/jargon-cfg) [cm]
-       (can-create-dir? cm user path))))
-
+   (with-jargon (jargon/jargon-cfg) [cm]
+     (can-create-dir? cm user path))))
 
 (defn do-stat
-  [{user :user} {paths :paths}]
-  (:body (data-raw/collect-stats user :paths paths)))
-
-(with-pre-hook! #'do-stat
-  (fn [params body]
-    (paths/log-call "do-stat" params body)
-    (validate-map params {:user string?})
-    (validate-map body {:paths vector?})
-    (validate-map body {:paths #(not (empty? %1))})
-    (validate-map body {:paths #(every? (comp not string/blank?) %1)})
-    (validators/validate-num-paths (:paths body))))
-
-(with-post-hook! #'do-stat (paths/log-func "do-stat"))
+  [{user :user} body]
+  (-> (data-raw/collect-stats user body)
+      :body
+      (json/decode true)))
