@@ -205,7 +205,7 @@ If this dataset accompanies a paper, please contact us with the DOI for that pap
 (defn- publish-data-item
   [user folder]
   (let [curators-group (config/permanent-id-curators-group)
-        publish-path   (move-folder curators-group
+        publish-path   (move-folder (config/irods-user)
                                     folder
                                     (config/permanent-id-publish-dir))]
     (data-info/share (config/irods-user) [curators-group] [publish-path] "own")
