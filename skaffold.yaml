@@ -1,0 +1,14 @@
+apiVersion: skaffold/v1
+kind: Config
+metadata:
+  name: terrain
+deploy:
+  kubectl:
+    manifests:
+    - k8s/terrain.yml
+build:
+  tagPolicy:
+    gitCommit: {}
+  artifacts:
+  - image: discoenv/terrain
+  local: {}
