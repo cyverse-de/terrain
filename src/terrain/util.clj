@@ -44,3 +44,11 @@
             (partial ctlr req true func)
             (partial ctlr req false func))]
     (apply p args)))
+
+(defn disable-redirects
+  ([]
+   (disable-redirects {}))
+  ([opts]
+   (assoc opts
+          :redirect-strategy    :none
+          :unexceptional-status (fn [status] (<= 200 status 299)))))
