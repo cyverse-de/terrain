@@ -30,9 +30,8 @@
   ([]
    (get-options {}))
   ([params]
-   {:query-params     (user-params params)
-    :as               :stream
-    :follow-redirects false})
+   {:query-params (user-params params)
+    :as           :stream})
   ([params param-keys]
    (get-options (user-params params param-keys))))
 
@@ -40,9 +39,8 @@
   ([]
    (json-get-options {}))
   ([params]
-   {:query-params     (user-params params)
-    :as               :json
-    :follow-redirects false}))
+   {:query-params (user-params params)
+    :as           :json}))
 
 (def delete-options get-options)
 
@@ -50,21 +48,19 @@
   ([body]
    (post-options body {}))
   ([body params]
-   {:query-params     (user-params params)
-    :body             body
-    :content-type     :json
-    :as               :stream
-    :follow-redirects false}))
+   {:query-params (user-params params)
+    :body         body
+    :content-type :json
+    :as           :stream}))
 
 (defn json-post-options
   ([body]
    (json-post-options body {}))
   ([body params]
-   {:query-params     (user-params params)
-    :form-params      body
-    :content-type     :json
-    :as               :json
-    :follow-redirects false}))
+   {:query-params (user-params params)
+    :form-params  body
+    :content-type :json
+    :as           :json}))
 
 (def put-options post-options)
 
@@ -259,8 +255,7 @@
               :multipart        [{:part-name "ontology-xml"
                                   :name      filename
                                   :mime-type content-type
-                                  :content   istream}]
-              :follow-redirects false}))
+                                  :content   istream}]}))
 
 (defn delete-app-category-hierarchy
   [ontology-version root-iri]
