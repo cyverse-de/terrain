@@ -21,7 +21,7 @@ RUN ln -s "/usr/bin/java" "/bin/terrain"
 
 COPY . /usr/src/app
 
-RUN lein uberjar && \
+RUN lein do clean, uberjar && \
     cp target/terrain-standalone.jar .
 
 # Add the Internet2 InCommon intermediate CA certificate.
