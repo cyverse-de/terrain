@@ -15,7 +15,8 @@
                 NewQuickLaunchGlobalDefault]]
         [ring.util.http-response :only [ok]]
         [terrain.util :only [optional-routes]])
-  (:require [common-swagger-api.schema.analyses :as schema]
+  (:require [common-swagger-api.routes]                         ;; for :description-file
+            [common-swagger-api.schema.analyses :as schema]
             [common-swagger-api.schema.analyses.listing :as listing-schema]
             [common-swagger-api.schema.apps.permission :as perms-schema]
             [schema.core :as s]
@@ -56,6 +57,12 @@
        :summary perms-schema/AnalysisPermissionListingSummary
        :description perms-schema/AnalysisPermissionListingDocs
        (ok (apps/list-job-permissions body params)))
+
+     (POST "/relauncher" []
+       :body [body schema/AnalysesRelauncherRequest]
+       :summary schema/AnalysesRelauncherSummary
+       :description-file "docs/analyses/relauncher.md"
+       (ok (apps/relaunch-jobs body)))
 
      (POST "/sharing" []
        :body [body perms-schema/AnalysisSharingRequest]

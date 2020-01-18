@@ -466,6 +466,16 @@
                   :content-type :json
                   :as           :json}))))
 
+(defn relaunch-jobs
+  [body]
+  (:body
+   (client/post (apps-url "analyses" "relauncher")
+                (disable-redirects
+                 {:query-params (secured-params)
+                  :form-params  body
+                  :content-type :json
+                  :as           :json}))))
+
 (defn share-jobs
   [body]
   (:body
@@ -704,7 +714,6 @@
                   :form-params  docs
                   :content-type :json
                   :as           :json}))))
-
 
 (defn get-oauth-access-token
   [api-name params]
