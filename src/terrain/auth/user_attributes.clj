@@ -114,7 +114,7 @@
 (defn- is-jwt?
   "Returns a truthy value if a token appears to be a JWT."
   [[_ token]]
-  (re-find #"(?:[\p{Alnum}/+]+=*[.]){1,2}(?:[\p{Alnum}/+]+=*)" token))
+  (re-find #"^(?:[\p{Alnum}_-]+=*[.]){1,2}(?:[\p{Alnum}_-]+=*)$" token))
 
 (defn- get-cas-oauth-token
   "Returns a non-nil value if we appear to have received a CAS OAuth token."
