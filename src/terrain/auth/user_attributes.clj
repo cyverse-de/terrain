@@ -5,7 +5,8 @@
             [clojure-commons.exception :as cx]
             [terrain.util.config :as cfg]
             [terrain.util.jwt :as jwt]
-            [terrain.util.oauth :as oauth-util]))
+            [terrain.util.oauth :as oauth-util]
+            [terrain.util.keycloak-oidc :as keycloak-oidc-util]))
 
 (def
   ^{:doc "The authenticated user or nil if the service is unsecured."
@@ -98,13 +99,36 @@
   (when-let [header-name (cfg/wso2-jwt-header)]
     (get (:headers request) (string/lower-case header-name))))
 
-(defn- get-oauth-token
-  "Returns a non-nil value if we're using OAuth for authentication."
+(defn- get-authorization-header
+  "Extracts the authorization header from the reqeust if present and splits it into its components."
   [request]
   (when-let [header (get (:headers request) "authorization")]
-    (let [[type token] (string/split header #"\s+" 2)]
-      (when (= (string/lower-case type) "bearer")
-        token))))
+    (string/split header #"\s+" 2)))
+
+(defn- is-bearer?
+  "Returns a truthy value if a token type indicates that the token is a bearer token. This function
+   exists only to reduce code duplication."
+  [[token-type _]]
+  (= (string/lower-case token-type) "bearer"))
+
+(defn- is-jwt?
+  "Returns a truthy value if a token appears to be a JWT."
+  [[_ token]]
+  (re-find #"^(?:[\p{Alnum}_-]+=*[.]){1,2}(?:[\p{Alnum}_-]+=*)$" token))
+
+(defn- get-cas-oauth-token
+  "Returns a non-nil value if we appear to have received a CAS OAuth token."
+  [request]
+  (when-let [header (get-authorization-header request)]
+    (when (and (is-bearer? header) (not (is-jwt? header)))
+      (second header))))
+
+(defn- get-keycloak-oidc-token
+  "Returns a non-nil value if we appear to have received a Keycloak bearer token."
+  [request]
+  (when-let [header (get-authorization-header request)]
+    (when (and (is-bearer? header) (is-jwt? header))
+      (second header))))
 
 (defn- wrap-fake-auth
   [handler]
@@ -120,28 +144,35 @@
   (-> (wrap-current-user handler user-from-wso2-jwt-claims)
       (jwt/validate-jwt-assertion get-wso2-jwt-assertion jwt/user-from-wso2-assertion)))
 
-(defn- wrap-oauth
+(defn- wrap-cas-oauth
   [handler]
   (-> (wrap-current-user handler oauth-util/user-from-oauth-profile)
-      (oauth-util/validate-oauth-token get-oauth-token)))
+      (oauth-util/validate-oauth-token get-cas-oauth-token)))
+
+(defn- wrap-keycloak-oidc
+  [handler]
+  (-> (wrap-current-user handler keycloak-oidc-util/user-from-token)
+      (keycloak-oidc-util/validate-token get-keycloak-oidc-token)))
 
 (defn authenticate-current-user
   "Authenticates the user and binds current-user to a map that is built from the user attributes retrieved
    during the authentication process."
   [handler]
-  (wrap-auth-selection [[get-fake-auth          (wrap-fake-auth handler)]
-                        [get-de-jwt-assertion   (wrap-de-jwt-auth handler)]
-                        [get-wso2-jwt-assertion (wrap-wso2-jwt-auth handler)]
-                        [get-oauth-token        (wrap-oauth handler)]]))
+  (wrap-auth-selection [[get-fake-auth           (wrap-fake-auth handler)]
+                        [get-de-jwt-assertion    (wrap-de-jwt-auth handler)]
+                        [get-wso2-jwt-assertion  (wrap-wso2-jwt-auth handler)]
+                        [get-cas-oauth-token     (wrap-cas-oauth handler)]
+                        [get-keycloak-oidc-token (wrap-keycloak-oidc handler)]]))
 
 (defn validate-current-user
   "Verifies that the user belongs to one of the groups that are permitted to access the resource."
   [handler]
   (wrap-auth-selection
-   [[get-fake-auth          handler]
-    [get-de-jwt-assertion   (jwt/validate-group-membership handler cfg/allowed-groups)]
-    [get-wso2-jwt-assertion (constantly (resp/forbidden "Admin not supported for WSO2."))]
-    [get-oauth-token        (oauth-util/validate-group-membership handler cfg/allowed-groups)]]))
+   [[get-fake-auth           handler]
+    [get-de-jwt-assertion    (jwt/validate-group-membership handler cfg/allowed-groups)]
+    [get-wso2-jwt-assertion  (constantly (resp/forbidden "Admin not supported for WSO2."))]
+    [get-cas-oauth-token     (oauth-util/validate-group-membership handler cfg/allowed-groups)]
+    [get-keycloak-oidc-token (keycloak-oidc-util/validate-group-membership handler cfg/allowed-groups)]]))
 
 (defn fake-store-current-user
   "Fake storage of a user"

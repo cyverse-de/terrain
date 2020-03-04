@@ -503,6 +503,16 @@
   [props config-valid configs]
   "terrain.app-exposer.base-uri" "http://app-exposer")
 
+(cc/defprop-optstr keycloak-base-uri
+  "The base URI for the Keycloak server."
+  [props config-valid configs]
+  "terrain.keycloak.base-uri" "https://kc.cyverse.org")
+
+(cc/defprop-optstr keycloak-realm
+  "The Keycloak realm to use."
+  [props config-valid configs]
+  "terrain.keycloak.realm" "CyVerse")
+
 (def metadata-client
   (memoize #(metadata-client/new-metadata-client (metadata-base-url))))
 
