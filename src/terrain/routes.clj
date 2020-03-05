@@ -159,6 +159,7 @@
 (def admin-handler
   (middleware
    [authenticate-current-user
+    require-authentication
     wrap-user-info
     validate-current-user
     wrap-logging]
@@ -167,6 +168,7 @@
 (def secured-routes-handler
   (middleware
    [authenticate-current-user
+    require-authentication
     wrap-user-info
     wrap-logging]
    (secured-routes)))
@@ -174,6 +176,7 @@
 (def secured-routes-no-context-handler
   (middleware
    [authenticate-current-user
+    require-authentication
     wrap-user-info
     wrap-logging]
    (secured-routes-no-context)))

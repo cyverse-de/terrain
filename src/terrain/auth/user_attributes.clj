@@ -156,13 +156,17 @@
 
 (defn authenticate-current-user
   "Authenticates the user and binds current-user to a map that is built from the user attributes retrieved
-   during the authentication process."
+   during the authentication process. This middleware does not require authentication information to be
+   present in the request. If authentication information is present then authentication must succeed for the
+   request to be processed. Requests without credentials will be passed to the handler without authentication
+   routes that require authentication can use the require-authentication middleware."
   [handler]
   (wrap-auth-selection [[get-fake-auth           (wrap-fake-auth handler)]
                         [get-de-jwt-assertion    (wrap-de-jwt-auth handler)]
                         [get-wso2-jwt-assertion  (wrap-wso2-jwt-auth handler)]
                         [get-cas-oauth-token     (wrap-cas-oauth handler)]
-                        [get-keycloak-oidc-token (wrap-keycloak-oidc handler)]]))
+                        [get-keycloak-oidc-token (wrap-keycloak-oidc handler)]
+                        [(constantly true)       handler]]))
 
 (defn validate-current-user
   "Verifies that the user belongs to one of the groups that are permitted to access the resource."
@@ -172,7 +176,17 @@
     [get-de-jwt-assertion    (jwt/validate-group-membership handler cfg/allowed-groups)]
     [get-wso2-jwt-assertion  (constantly (resp/forbidden "Admin not supported for WSO2."))]
     [get-cas-oauth-token     (oauth-util/validate-group-membership handler cfg/allowed-groups)]
-    [get-keycloak-oidc-token (keycloak-oidc-util/validate-group-membership handler cfg/allowed-groups)]]))
+    [get-keycloak-oidc-token (keycloak-oidc-util/validate-group-membership handler cfg/allowed-groups)]
+    [(constantly true)       (constantly (resp/unauthorized "Admin endpoints require authentication."))]]))
+
+(defn require-authentication
+  "Middleware that checks for user information in an incoming request and returns a 401 if it's not found.
+   Should be placed in the middleware chain after either authenticate-current-user or wrap-current-user."
+  [handler]
+  (fn [req]
+    (if (:user-info req)
+      (handler req)
+      (resp/unauthorized "No authentication information found in request."))))
 
 (defn fake-store-current-user
   "Fake storage of a user"
