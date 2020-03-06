@@ -24,19 +24,21 @@
   "Filters the list of given data IDs, returning those marked as favorites by the user according to
   the metadata filter-favorites service. If the filtered list of favorite IDs cannot be retrieved,
   an empty list is returned instead."
-  [data-ids]
-  (try+
-    (favorites/filter-favorites data-ids)
-    (catch Object e
-      (log/error e "Could not lookup favorites in directory listing")
-      [])))
+  [user data-ids]
+  (if user
+    (try+
+     (favorites/filter-favorites data-ids)
+     (catch Object e
+       (log/error e "Could not lookup favorites in directory listing")
+       []))
+    []))
 
 (defn- bad-paths
   "Returns a seq of full paths that should not be included in paged listing."
   [user]
-  [(cfg/fs-community-data)
-   (ft/path-join (cfg/irods-home) user)
-   (ft/path-join (cfg/irods-home) "public")])
+  (remove nil? [(cfg/fs-community-data)
+                (when user (ft/path-join (cfg/irods-home) user))
+                (ft/path-join (cfg/irods-home) "public")]))
 
 (defn- is-bad?
   "Returns true if the map is okay to include in a directory listing."
@@ -70,7 +72,7 @@
   (let [favorite-ids (->> folders
                           (map :id)
                           (concat [id])
-                          lookup-favorite-ids)]
+                          (lookup-favorite-ids user))]
     (assoc (fmt-folder user favorite-ids data-resp)
       :folders (map (partial fmt-folder user favorite-ids) folders))))
 
@@ -137,7 +139,7 @@
   [user {:keys [id files folders total totalBad] :as page}]
   (let [file-ids (map :id files)
         folder-ids (map :id folders)
-        favorite-ids (lookup-favorite-ids (concat file-ids folder-ids [id]))]
+        favorite-ids (lookup-favorite-ids user (concat file-ids folder-ids [id]))]
     (assoc (format-data-item user favorite-ids page)
       :hasSubDirs true
       :files      (map (partial format-data-item user favorite-ids) files)
@@ -164,7 +166,7 @@
   [user path entity-type limit offset sort-field sort-dir info-type]
   (log/info "paged-dir-listing - user:" user "path:" path "limit:" limit "offset:" offset)
   (let [url-path         (data/mk-data-path-url-path path)
-        params           {:user        user
+        params           {:user        (or user "anonymous")
                           :entity-type (name entity-type)
                           :limit       limit
                           :offset      offset
@@ -226,10 +228,3 @@
         resp        (paged-dir-listing
                       user path entity-type limit offset sort-field sort-dir info-type)]
     (format-page user (json/decode (:body resp) true))))
-
-(with-pre-hook! #'do-paged-listing
-  (fn [params]
-    (paths/log-call "do-paged-listing" params)
-    (validate-map params {:user string? :path string? :limit string? :offset string?})))
-
-(with-post-hook! #'do-paged-listing (paths/log-func "do-paged-listing"))

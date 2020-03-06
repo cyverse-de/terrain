@@ -1,5 +1,6 @@
 (ns terrain.routes.filesystem
   (:use [common-swagger-api.schema]
+        [terrain.auth.user-attributes :only [require-authentication]]
         [terrain.util :only [controller optional-routes]])
   (:require [terrain.clients.data-info :as data]
             [terrain.clients.metadata.raw :as meta-raw]
@@ -14,61 +15,81 @@
   "The routes for file IO endpoints."
   []
   (optional-routes
-    [config/filesystem-routes-enabled]
+   [config/filesystem-routes-enabled]
 
-    (GET "/filesystem/display-download" [:as req]
-      (controller req ud/do-special-download :params))
+   (context "/filesystem" []
+     :tags ["filesystem"]
 
-    (GET "/filesystem/paged-directory" [:as req]
-      (controller req dir/do-paged-listing :params))
+     (GET "/display-download" [:as req]
+       :middleware [require-authentication]
+       (controller req ud/do-special-download :params))
 
-    (POST "/filesystem/path-list-creator" [:as req]
-      (controller req data/path-list-creator :params :body))
+     (GET "/paged-directory" [:as req]
+       (controller req dir/do-paged-listing :params))
 
-    (POST "/filesystem/directories" [:as req]
-      (controller req data/create-dirs :params :body))
+     (POST "/path-list-creator" [:as req]
+       :middleware [require-authentication]
+       (controller req data/path-list-creator :params :body))
 
-    (POST "/filesystem/directory/create" [:as req]
-      (controller req data/create-dir :params :body))
+     (POST "/directories" [:as req]
+       :middleware [require-authentication]
+       (controller req data/create-dirs :params :body))
 
-    (POST "/filesystem/rename" [:as req]
-      (controller req data/rename :params :body))
+     (POST "/directory/create" [:as req]
+       :middleware [require-authentication]
+       (controller req data/create-dir :params :body))
 
-    (POST "/filesystem/delete" [:as req]
-      (controller req data/delete-paths :params :body))
+     (POST "/rename" [:as req]
+       :middleware [require-authentication]
+       (controller req data/rename :params :body))
 
-    (POST "/filesystem/delete-contents" [:as req]
-      (controller req data/delete-contents :params :body))
+     (POST "/delete" [:as req]
+       :middleware [require-authentication]
+       (controller req data/delete-paths :params :body))
 
-    (POST "/filesystem/move" [:as req]
-      (controller req data/move :params :body))
+     (POST "/delete-contents" [:as req]
+       :middleware [require-authentication]
+       (controller req data/delete-contents :params :body))
 
-    (POST "/filesystem/move-contents" [:as req]
-      (controller req data/move-contents :params :body))
+     (POST "/move" [:as req]
+       :middleware [require-authentication]
+       (controller req data/move :params :body))
 
-    (GET "/filesystem/file/manifest" [:as req]
-      (controller req data/manifest :params))
+     (POST "/move-contents" [:as req]
+       :middleware [require-authentication]
+       (controller req data/move-contents :params :body))
 
-    (POST "/filesystem/user-permissions" [:as req]
-      (controller req data/collect-permissions :params :body))
+     (GET "/file/manifest" [:as req]
+       :middleware [require-authentication]
+       (controller req data/manifest :params))
 
-    (POST "/filesystem/restore" [:as req]
-      (controller req data/restore-files :params :body))
+     (POST "/user-permissions" [:as req]
+       :middleware [require-authentication]
+       (controller req data/collect-permissions :params :body))
 
-    (POST "/filesystem/restore-all" [:as req]
-      (controller req data/restore-files :params))
+     (POST "/restore" [:as req]
+       :middleware [require-authentication]
+       (controller req data/restore-files :params :body))
 
-    (DELETE "/filesystem/trash" [:as req]
-      (controller req data/delete-trash :params))
+     (POST "/restore-all" [:as req]
+       :middleware [require-authentication]
+       (controller req data/restore-files :params))
 
-    (POST "/filesystem/read-chunk" [:as req]
-      (controller req data/read-chunk :params :body))
+     (DELETE "/trash" [:as req]
+       :middleware [require-authentication]
+       (controller req data/delete-trash :params))
 
-    (POST "/filesystem/read-csv-chunk" [:as req]
-      (controller req data/read-tabular-chunk :params :body))
+     (POST "/read-chunk" [:as req]
+       :middleware [require-authentication]
+       (controller req data/read-chunk :params :body))
 
-    (POST "/filesystem/anon-files" [:as req]
-      (controller req data/share-with-anonymous :params :body))))
+     (POST "/read-csv-chunk" [:as req]
+       :middleware [require-authentication]
+       (controller req data/read-tabular-chunk :params :body))
+
+     (POST "/anon-files" [:as req]
+       :middleware [require-authentication]
+       (controller req data/share-with-anonymous :params :body)))))
 
 (defn secured-filesystem-metadata-routes
   "The routes for file metadata endpoints."

@@ -68,7 +68,8 @@
   "Generates a label given a listing ID (read as absolute path)."
   [user id]
   (cond
-    (user-trash-dir? user id)             "Trash"
-    (sharing? id)                         "Shared With Me"
-    (community? id)                       "Community Data"
-    :else                                 (ft/basename id)))
+    (community? id)           "Community Data"
+    (nil? user)               (ft/basename id)
+    (user-trash-dir? user id) "Trash"
+    (sharing? id)             "Shared With Me"
+    :else                     (ft/basename id)))
