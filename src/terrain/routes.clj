@@ -20,6 +20,7 @@
         [terrain.routes.apps.reference-genomes]
         [terrain.routes.apps.tools]
         [terrain.routes.bootstrap]
+        [terrain.routes.dashboard-aggregator]
         [terrain.routes.data]
         [terrain.routes.fileio]
         [terrain.routes.filesystem]
@@ -113,6 +114,7 @@
    (secured-favorites-routes)
    (secured-tag-routes)
    (data-comment-routes)
+   (secured-dashboard-aggregator-routes)
    (route/not-found (service/unrecognized-path-response))))
 
 (defn admin-routes
@@ -228,6 +230,7 @@
                                      {:name "coge", :description "CoGe Endpoints"}
                                      {:name "collaborator-lists", :description "Collaborator List Endpoints"}
                                      {:name "communities", :description "Community Endpoints"}
+                                     {:name "dashboard", :description "Dashboard Aggregator Endpoints"}
                                      {:name "data", :description "Data Endpoints"}
                                      {:name "favorites", :description "Favorites Endpoints"}
                                      {:name "fileio", :description "File Input/Output Endpoints"}

@@ -3,7 +3,7 @@
         [ring.util.http-response :only [ok]]
         [terrain.routes.schemas.dashboard-aggregator]
         [terrain.services.dashboard-aggregator]
-        [terrain.util])
+        [terrain.util]))
 
 (defn secured-dashboard-aggregator-routes
   []
