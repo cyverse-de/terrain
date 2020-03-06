@@ -513,6 +513,11 @@
   [props config-valid configs]
   "terrain.keycloak.realm" "CyVerse")
 
+(cc/defprop-optstr dashboard-aggregator-url
+  "The URL to the dashboard-aggregator service."
+  [props config-valid configs]
+  "terrain.dashboard-aggregator.base-uri" "http://dashboard-aggregator")
+
 (def metadata-client
   (memoize #(metadata-client/new-metadata-client (metadata-base-url))))
 
