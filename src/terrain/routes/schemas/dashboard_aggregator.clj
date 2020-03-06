@@ -37,3 +37,6 @@
 (defschema DashboardAggregatorResponse
  {:apps                    (describe DashboardAggregatedApps "The app listings returned for the dashboard")
   (optional-key :analyses) (describe DashboardAggregatedAnalyses "The analysis listings returned for the dashboard")})
+
+(defschema DashboardRequestParams
+  {(optional-key :limit) (describe (maybe Integer) "The number of responses to include in each field.")})
