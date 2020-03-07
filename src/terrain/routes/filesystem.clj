@@ -1,9 +1,12 @@
 (ns terrain.routes.filesystem
   (:use [common-swagger-api.schema]
-        [terrain.auth.user-attributes :only [require-authentication]]
+        [common-swagger-api.schema.data :only [PagedFolderListing]]
+        [ring.util.http-response :only [ok]]
+        [terrain.auth.user-attributes :only [require-authentication current-user]]
         [terrain.util :only [controller optional-routes]])
   (:require [terrain.clients.data-info :as data]
             [terrain.clients.metadata.raw :as meta-raw]
+            [terrain.routes.schemas.filesystem :as fs-schema]
             [terrain.services.filesystem.directory :as dir]
             [terrain.services.filesystem.metadata :as meta]
             [terrain.services.filesystem.metadata-templates :as mt]
@@ -25,7 +28,11 @@
        (controller req ud/do-special-download :params))
 
      (GET "/paged-directory" [:as req]
-       (controller req dir/do-paged-listing :params))
+       :query [params fs-schema/FolderListingParams]
+       :summary "List Folder Contents"
+       :description (str "Provides a paged listing of the contents of a folder in the data store.")
+       :return PagedFolderListing
+       (ok (dir/do-paged-listing current-user params)))
 
      (POST "/path-list-creator" [:as req]
        :middleware [require-authentication]

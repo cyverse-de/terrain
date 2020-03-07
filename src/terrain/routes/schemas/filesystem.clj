@@ -3,7 +3,8 @@
         [common-swagger-api.schema.filetypes :only [ValidInfoTypesEnum]])
   (:require [common-swagger-api.schema.data :as data-schema]
             [common-swagger-api.schema.stats :as stats-schema]
-            [schema.core :as s])
+            [schema.core :as s]
+            [schema-tools.core :as st])
   (:import [java.util UUID]))
 
 (def DataIdPathParam data-schema/DataIdPathParam)
@@ -103,3 +104,7 @@
 
 (s/defschema FilteredUuids
   {:filesystem (describe [UUID] "The filtered list of UUIDs")})
+
+(s/defschema FolderListingParams
+  (merge (st/required-keys data-schema/FolderListingParams [:limit])
+         {:path (describe String "The path to the folder in the data store.")}))
