@@ -27,7 +27,7 @@
        :middleware [require-authentication]
        (controller req ud/do-special-download :params))
 
-     (GET "/paged-directory" [:as req]
+     (GET "/paged-directory" []
        :query [params fs-schema/FolderListingParams]
        :summary "List Folder Contents"
        :description (str "Provides a paged listing of the contents of a folder in the data store.")

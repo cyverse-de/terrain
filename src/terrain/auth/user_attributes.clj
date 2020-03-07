@@ -158,8 +158,8 @@
   "Authenticates the user and binds current-user to a map that is built from the user attributes retrieved
    during the authentication process. This middleware does not require authentication information to be
    present in the request. If authentication information is present then authentication must succeed for the
-   request to be processed. Requests without credentials will be passed to the handler without authentication
-   routes that require authentication can use the require-authentication middleware."
+   request to be processed. Requests without credentials will be passed to the handler without authentication.
+   Routes that require authentication can use the require-authentication middleware."
   [handler]
   (wrap-auth-selection [[get-fake-auth           (wrap-fake-auth handler)]
                         [get-de-jwt-assertion    (wrap-de-jwt-auth handler)]

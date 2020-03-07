@@ -540,10 +540,7 @@
 (defn list-folder-contents
   "Obtains a directory listing for a folder path."
   [path params]
-  (try+
-    (:body (http/get (data-path-url path)
-                     {:query-params (remove-nil-values params)
-                      :accept       :json
-                      :as           :json}))
-    (catch [:status 404] _
-      (throw+ {:error_code error/ERR_NOT_FOUND :path path}))))
+  (:body (http/get (data-path-url path)
+                   {:query-params (remove-nil-values params)
+                    :accept       :json
+                    :as           :json})))
