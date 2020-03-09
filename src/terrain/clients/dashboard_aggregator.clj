@@ -13,10 +13,4 @@
 
 (defn get-dashboard-data
   [username]
-  (let [resp (http/get (dashboard-aggregator-url username) {:throw-exceptions false})]
-    (cond
-      (not (<= 200 (:status resp) 299))
-      (throw+ {:error_code ERR_UNCHECKED_EXCEPTION :msg (:body resp)})
-      
-      :else
-      (json/parse-string (:body resp) true))))
+  (:body (http/get (dashboard-aggregator-url username) {:as :json})))
