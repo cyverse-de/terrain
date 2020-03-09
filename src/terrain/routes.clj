@@ -65,6 +65,9 @@
         (tc/with-logging-context {:user-info (cheshire/encode user-info)}
           (handler request))))))
 
+; Add new secured routes to this function, not to (secured-routes).
+; This function allows for secured routes without the /secured content/prefix,
+; which is what the -no-context refers to.
 (defn secured-routes-no-context
   []
   (util/flagged-routes
@@ -91,8 +94,12 @@
    (misc-metadata-routes)
    (oauth-routes)
    (quicklaunch-routes)
+   (secured-dashboard-aggregator-routes)
    (route/not-found (service/unrecognized-path-response))))
 
+; The old way of adding secured routes. Prepends /secured to the URL
+; path. Add new secured endpoints to (secured-routes-no-context), not
+; here.
 (defn secured-routes
   []
   (util/flagged-routes
@@ -114,7 +121,6 @@
    (secured-favorites-routes)
    (secured-tag-routes)
    (data-comment-routes)
-   (secured-dashboard-aggregator-routes)
    (route/not-found (service/unrecognized-path-response))))
 
 (defn admin-routes
