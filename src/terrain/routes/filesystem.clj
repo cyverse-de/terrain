@@ -1,6 +1,5 @@
 (ns terrain.routes.filesystem
   (:use [common-swagger-api.schema]
-        [common-swagger-api.schema.data :only [PagedFolderListing]]
         [ring.util.http-response :only [ok]]
         [terrain.auth.user-attributes :only [require-authentication current-user]]
         [terrain.util :only [controller optional-routes]])
@@ -31,7 +30,7 @@
        :query [params fs-schema/FolderListingParams]
        :summary "List Folder Contents"
        :description (str "Provides a paged listing of the contents of a folder in the data store.")
-       :return PagedFolderListing
+       :return fs-schema/PagedFolderListing
        (ok (dir/do-paged-listing current-user params)))
 
      (POST "/path-list-creator" [:as req]
