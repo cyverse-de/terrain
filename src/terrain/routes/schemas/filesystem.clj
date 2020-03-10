@@ -1,5 +1,5 @@
 (ns terrain.routes.schemas.filesystem
-  (:use [common-swagger-api.schema :only [describe NonBlankString]]
+  (:use [common-swagger-api.schema :only [describe NonBlankString transform-enum]]
         [common-swagger-api.schema.filetypes :only [ValidInfoTypesEnum]])
   (:require [common-swagger-api.schema.data :as data-schema]
             [common-swagger-api.schema.stats :as stats-schema]
@@ -106,7 +106,9 @@
   {:filesystem (describe [UUID] "The filtered list of UUIDs")})
 
 (s/defschema FolderListingParams
-  (merge (st/required-keys data-schema/FolderListingParams [:limit])
+  (merge (-> (st/required-keys data-schema/FolderListingParams [:limit])
+             (st/update :sort-field transform-enum name)
+             (st/update :entity-type transform-enum name))
          {:path (describe String "The path to the folder in the data store.")}))
 
 (s/defschema PagedItemListEntry
