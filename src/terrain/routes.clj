@@ -66,6 +66,9 @@
           (handler request))))))
 
 (defn optionally-authenticated-routes
+  "Returns a list of routes that may be called with or without authentication credentials. Note that this
+   set of routes shouldn't contain a call to `route/not-found` because we want the call to fall through to
+   the next set of routes (`secured-routes-no-context`) if nothing matches."
   []
   (util/flagged-routes
    (secured-filesystem-routes)))
