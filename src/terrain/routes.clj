@@ -65,6 +65,14 @@
         (tc/with-logging-context {:user-info (cheshire/encode user-info)}
           (handler request))))))
 
+(defn optionally-authenticated-routes
+  "Returns a list of routes that may be called with or without authentication credentials. Note that this
+   set of routes shouldn't contain a call to `route/not-found` because we want the call to fall through to
+   the next set of routes (`secured-routes-no-context`) if nothing matches."
+  []
+  (util/flagged-routes
+   (secured-filesystem-routes)))
+
 ; Add new secured routes to this function, not to (secured-routes).
 ; This function allows for secured routes without the /secured content/prefix,
 ; which is what the -no-context refers to.
@@ -159,6 +167,7 @@
 (def admin-handler
   (middleware
    [authenticate-current-user
+    require-authentication
     wrap-user-info
     validate-current-user
     wrap-logging]
@@ -167,13 +176,22 @@
 (def secured-routes-handler
   (middleware
    [authenticate-current-user
+    require-authentication
     wrap-user-info
     wrap-logging]
    (secured-routes)))
 
+(def optionally-authenticated-routes-handler
+  (middleware
+   [authenticate-current-user
+    wrap-user-info
+    wrap-logging]
+   (optionally-authenticated-routes)))
+
 (def secured-routes-no-context-handler
   (middleware
    [authenticate-current-user
+    require-authentication
     wrap-user-info
     wrap-logging]
    (secured-routes-no-context)))
@@ -189,6 +207,7 @@
    unsecured-routes-handler
    (context "/admin" [] admin-handler)
    (context "/secured" [] secured-routes-handler)
+   optionally-authenticated-routes-handler
    secured-routes-no-context-handler))
 
 (defn- site-handler

@@ -1,7 +1,9 @@
 (ns terrain.clients.data-info
-  (:use [terrain.auth.user-attributes :only [current-user]]
-        [slingshot.slingshot :only [throw+ try+]])
-  (:require [clojure.string :as string]
+  (:use [clojure-commons.core :only [remove-nil-values]]
+        [slingshot.slingshot :only [throw+ try+]]
+        [terrain.auth.user-attributes :only [current-user]])
+  (:require [clj-http.client :as http]
+            [clojure.string :as string]
             [clojure.tools.logging :as log]
             [clojure.walk :as walk]
             [cemerick.url :as url]
@@ -522,3 +524,23 @@
       (raw/request method [url-path] req-map)
       (catch #(not (nil? (:status %))) err
         (handle-error method url err error-handlers)))))
+
+
+(defn- data-path-url
+  "Returns the URL for the path to a data item in the data store."
+  [path]
+  (->> (ft/rm-last-slash path)
+       fs/split
+       (remove (partial = "/"))
+       (map url/url-encode)
+       (apply url/url (cfg/data-info-base-url) "data" "path")
+       str))
+
+
+(defn list-folder-contents
+  "Obtains a directory listing for a folder path."
+  [path params]
+  (:body (http/get (data-path-url path)
+                   {:query-params (remove-nil-values params)
+                    :accept       :json
+                    :as           :json})))

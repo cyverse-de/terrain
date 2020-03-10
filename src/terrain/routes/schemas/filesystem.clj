@@ -3,7 +3,8 @@
         [common-swagger-api.schema.filetypes :only [ValidInfoTypesEnum]])
   (:require [common-swagger-api.schema.data :as data-schema]
             [common-swagger-api.schema.stats :as stats-schema]
-            [schema.core :as s])
+            [schema.core :as s]
+            [schema-tools.core :as st])
   (:import [java.util UUID]))
 
 (def DataIdPathParam data-schema/DataIdPathParam)
@@ -103,3 +104,56 @@
 
 (s/defschema FilteredUuids
   {:filesystem (describe [UUID] "The filtered list of UUIDs")})
+
+(s/defschema FolderListingParams
+  (merge (st/required-keys data-schema/FolderListingParams [:limit])
+         {:path (describe String "The path to the folder in the data store.")}))
+
+(s/defschema PagedItemListEntry
+  {:infoType
+   (describe (s/maybe ValidInfoTypesEnum) "The info-type of the item being listed or null for folders")
+
+   :path
+   (describe String "The path to the item")
+
+   :date-created
+   (describe Long "The date and time that the item was created as a UNIX epoch")
+
+   :permission
+   (describe data-schema/PermissionEnum "The user's permission-level for the item")
+
+   :date-modified
+   (describe Long "The date and time that the item was most recently modified as a UNIX epoch")
+
+   :file-size
+   (describe Long "The size of the item in bytes or 0 for folders")
+
+   :badName
+   (describe Boolean "True if the item name may cuase problems in the DE")
+
+   :isFavorite
+   (describe Boolean "True if the user has marked the item as a favorite")
+
+   :label
+   (describe String "The base name of the item")
+
+   :id
+   (describe UUID "The ID assigned to the item")})
+
+(s/defschema PagedFolderListing
+  (merge PagedItemListEntry
+         {:folders
+          (describe [PagedItemListEntry] "The list of subfolders")
+
+          :hasSubDirs
+          (describe Boolean "True if the folder has subfolders")
+
+          :total
+          (describe Long "The total number of subfolders and files in the folder")
+
+          :totalBad
+          (describe Long (str "The total number of folder or file names in the listing that may cause problems "
+                              "in the DE"))
+
+          :files
+          (describe [PagedItemListEntry] "The list of files in the folder")}))

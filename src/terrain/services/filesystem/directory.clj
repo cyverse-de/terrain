@@ -24,19 +24,21 @@
   "Filters the list of given data IDs, returning those marked as favorites by the user according to
   the metadata filter-favorites service. If the filtered list of favorite IDs cannot be retrieved,
   an empty list is returned instead."
-  [data-ids]
-  (try+
-    (favorites/filter-favorites data-ids)
-    (catch Object e
-      (log/error e "Could not lookup favorites in directory listing")
-      [])))
+  [user data-ids]
+  (if user
+    (try+
+     (favorites/filter-favorites data-ids)
+     (catch Object e
+       (log/error e "Could not lookup favorites in directory listing")
+       []))
+    []))
 
 (defn- bad-paths
   "Returns a seq of full paths that should not be included in paged listing."
   [user]
-  [(cfg/fs-community-data)
-   (ft/path-join (cfg/irods-home) user)
-   (ft/path-join (cfg/irods-home) "public")])
+  (remove nil? [(cfg/fs-community-data)
+                (when user (ft/path-join (cfg/irods-home) user))
+                (ft/path-join (cfg/irods-home) "public")]))
 
 (defn- is-bad?
   "Returns true if the map is okay to include in a directory listing."
@@ -70,7 +72,7 @@
   (let [favorite-ids (->> folders
                           (map :id)
                           (concat [id])
-                          lookup-favorite-ids)]
+                          (lookup-favorite-ids user))]
     (assoc (fmt-folder user favorite-ids data-resp)
       :folders (map (partial fmt-folder user favorite-ids) folders))))
 
@@ -137,7 +139,7 @@
   [user {:keys [id files folders total totalBad] :as page}]
   (let [file-ids (map :id files)
         folder-ids (map :id folders)
-        favorite-ids (lookup-favorite-ids (concat file-ids folder-ids [id]))]
+        favorite-ids (lookup-favorite-ids user (concat file-ids folder-ids [id]))]
     (assoc (format-data-item user favorite-ids page)
       :hasSubDirs true
       :files      (map (partial format-data-item user favorite-ids) files)
@@ -146,90 +148,13 @@
       :totalBad   totalBad)))
 
 
-(defn- handle-not-processable
-  [method url err]
-  (let [body (json/decode (:body err) true)]
-    (if (and (= (:error_code body) error/ERR_BAD_QUERY_PARAMETER)
-             (= (:parameters body) ["info-type"]))
-      (throw+ body)
-      (data/respond-with-default-error 422 method url err))))
-
-(defn- handle-error-with-rethrow
-  [_ _ err]
-  (throw+ err))
-
-
-(defn- paged-dir-listing
-  "Provides paged directory listing as an alternative to (list-dir). Always contains files."
-  [user path entity-type limit offset sort-field sort-dir info-type]
-  (log/info "paged-dir-listing - user:" user "path:" path "limit:" limit "offset:" offset)
-  (let [url-path         (data/mk-data-path-url-path path)
-        params           {:user        user
-                          :entity-type (name entity-type)
-                          :limit       limit
-                          :offset      offset
-                          :bad-chars   (cfg/fs-bad-chars)
-                          :bad-name    (cfg/fs-bad-names)
-                          :bad-path    (bad-paths user)
-                          :sort-field  sort-field
-                          :sort-dir    sort-dir}
-        params           (if info-type
-                           (assoc params :info-type info-type)
-                           params)
-        handle-not-found (fn [_ _ _] (throw+ {:error_code error/ERR_NOT_FOUND :path path}))]
-    (data/trapped-request :get url-path {:query-params params}
-      :403 handle-not-found
-      :404 handle-not-found
-      :410 handle-not-found
-      :414 handle-not-found
-      :422 handle-not-processable
-      :503 handle-error-with-rethrow)))
-
-
-(defn- resolve-sort-field
-  [sort-col]
-  (if-not sort-col
-    "name"
-    (case (string/lower-case sort-col)
-      "datecreated"  "datecreated"
-      "id"           "path"
-      "lastmodified" "datemodified"
-      "name"         "name"
-      "path"         "path"
-      "size"         "size"
-                     (do
-                       (log/warn "invalid sort column" sort-col)
-                       (throw+ {:error_code "ERR_INVALID_SORT_COLUMN" :column sort-col})))))
-
-
-(defn- resolve-sort-dir
-  [sort-dir]
-  (if-not sort-dir
-    "ASC"
-    (let [sort-dir (string/upper-case sort-dir)]
-      (when-not (contains? #{"ASC" "DESC"} (string/upper-case sort-dir))
-        (log/warn "invalid sort order" sort-dir)
-        (throw+ {:error_code "ERR_INVALID_SORT_DIR" :sort-dir sort-dir}))
-      sort-dir)))
-
-
-; TODO validate limit >= 0, offset >= 0
 (defn do-paged-listing
   "Entrypoint for the API that calls (paged-dir-listing)."
-  [{:keys [user path entity-type info-type limit offset sort-col sort-dir]}]
-  (Integer/parseInt limit)
-  (Integer/parseInt offset)
-  (let [path        (ft/rm-last-slash path)
-        entity-type (duv/resolve-entity-type entity-type)
-        sort-field  (resolve-sort-field sort-col)
-        sort-dir    (resolve-sort-dir sort-dir)
-        resp        (paged-dir-listing
-                      user path entity-type limit offset sort-field sort-dir info-type)]
-    (format-page user (json/decode (:body resp) true))))
-
-(with-pre-hook! #'do-paged-listing
-  (fn [params]
-    (paths/log-call "do-paged-listing" params)
-    (validate-map params {:user string? :path string? :limit string? :offset string?})))
-
-(with-post-hook! #'do-paged-listing (paths/log-func "do-paged-listing"))
+  [{user :shortUsername} {:keys [path] :as params}]
+  (let [params (dissoc params :path)]
+    (->> (merge params {:user      (or user "anonymous")
+                        :bad-chars (cfg/fs-bad-chars)
+                        :bad-name  (cfg/fs-bad-names)
+                        :bad-path  (bad-paths user)})
+         (data/list-folder-contents path)
+         (format-page user))))
