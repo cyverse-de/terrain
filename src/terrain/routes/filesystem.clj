@@ -15,11 +15,14 @@
             [terrain.services.filesystem.updown :as ud]
             [terrain.util.config :as config]))
 
-(defn- wrap-upper-case-sort-dir-param [handler]
-  (fn [req]
-    (-> (update-existing-in req [:params :sort-dir] string/upper-case)
-        (update-existing-in [:query-params "sort-dir"] string/upper-case)
-        handler)))
+(defn- wrap-fix-param [handler param f]
+  (if-let [param (keyword param)]
+    (fn [req]
+      (as-> req req
+        (update-existing-in req [:params param] f)
+        (update-existing-in req [:query-params (name param)] f)
+        (handler req)))
+    (throw (Exception. (str "Invalid parameter: " param)))))
 
 (defn secured-filesystem-routes
   "The routes for file IO endpoints."
@@ -35,7 +38,8 @@
        (controller req ud/do-special-download :params))
 
      (GET "/paged-directory" []
-       :middleware [wrap-upper-case-sort-dir-param]
+       :middleware [[wrap-fix-param :sort-dir string/upper-case]
+                    [wrap-fix-param :sort-col string/lower-case]]
        :query [params fs-schema/FolderListingParams]
        :summary "List Folder Contents"
        :description (str "Provides a paged listing of the contents of a folder in the data store.")
