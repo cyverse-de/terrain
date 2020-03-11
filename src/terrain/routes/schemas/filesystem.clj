@@ -106,11 +106,12 @@
   {:filesystem (describe [UUID] "The filtered list of UUIDs")})
 
 (s/defschema FolderListingParams
-  (-> (st/required-keys data-schema/FolderListingParams [:limit])
-      (st/update :sort-field transform-enum name)
-      (st/update :entity-type transform-enum name)
-      (st/assoc :path (describe String "The path to the folder in the data store."))
-      ((fn [m] (st/assoc m (s/optional-key :sort-col) (st/get-in m [:sort-field]))))))
+  (as-> data-schema/FolderListingParams schema
+    (st/required-keys schema [:limit])
+    (st/update schema :sort-field transform-enum name)
+    (st/update schema :entity-type transform-enum name)
+    (st/assoc schema :path (describe String "The path to the folder in the data store."))
+    (st/assoc schema (s/optional-key :sort-col) (st/get-in schema [:sort-field]))))
 
 (s/defschema PagedItemListEntry
   {:infoType
