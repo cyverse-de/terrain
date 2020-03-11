@@ -25,7 +25,7 @@
                  [compojure "1.6.1"]
                  [dire "0.5.4"]
                  [me.raynes/fs "1.4.6"]
-                 [medley "1.2.0"]
+                 [medley "1.3.0"]
                  [metosin/ring-http-response "0.9.1"]
                  [proto-repl "0.3.1"]
                  [org.apache.tika/tika-core "1.23"]

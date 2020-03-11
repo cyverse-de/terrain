@@ -1,9 +1,11 @@
 (ns terrain.routes.filesystem
   (:use [common-swagger-api.schema]
+        [medley.core :only [update-existing-in]]
         [ring.util.http-response :only [ok]]
         [terrain.auth.user-attributes :only [require-authentication current-user]]
         [terrain.util :only [controller optional-routes]])
-  (:require [terrain.clients.data-info :as data]
+  (:require [clojure.string :as string]
+            [terrain.clients.data-info :as data]
             [terrain.clients.metadata.raw :as meta-raw]
             [terrain.routes.schemas.filesystem :as fs-schema]
             [terrain.services.filesystem.directory :as dir]
@@ -12,6 +14,12 @@
             [terrain.services.filesystem.stat :as stat]
             [terrain.services.filesystem.updown :as ud]
             [terrain.util.config :as config]))
+
+(defn- wrap-upper-case-sort-dir-param [handler]
+  (fn [req]
+    (-> (update-existing-in req [:params :sort-dir] string/upper-case)
+        (update-existing-in [:query-params "sort-dir"] string/upper-case)
+        handler)))
 
 (defn secured-filesystem-routes
   "The routes for file IO endpoints."
@@ -27,6 +35,7 @@
        (controller req ud/do-special-download :params))
 
      (GET "/paged-directory" []
+       :middleware [wrap-upper-case-sort-dir-param]
        :query [params fs-schema/FolderListingParams]
        :summary "List Folder Contents"
        :description (str "Provides a paged listing of the contents of a folder in the data store.")
