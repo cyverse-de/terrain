@@ -1,5 +1,6 @@
 (ns terrain.services.filesystem.directory
-  (:use [clojure-commons.validators]
+  (:use [clojure-commons.core :only [remove-nil-values]]
+        [clojure-commons.validators]
         [kameleon.uuids :only [uuidify]]
         [slingshot.slingshot :only [try+ throw+]])
   (:require [clojure.tools.logging :as log]
@@ -148,13 +149,20 @@
       :totalBad   totalBad)))
 
 
+(defn- fix-paged-listing-params
+  [user params]
+  (remove-nil-values
+   (merge (dissoc params :sort-col)
+          {:user       (or user "anonymous")
+           :bad-chars  (cfg/fs-bad-chars)
+           :bad-name   (cfg/fs-bad-names)
+           :bad-path   (bad-paths user)
+           :sort-field ((some-fn :sort-field :sort-col) params)})))
+
 (defn do-paged-listing
   "Entrypoint for the API that calls (paged-dir-listing)."
   [{user :shortUsername} {:keys [path] :as params}]
   (let [params (dissoc params :path)]
-    (->> (merge params {:user      (or user "anonymous")
-                        :bad-chars (cfg/fs-bad-chars)
-                        :bad-name  (cfg/fs-bad-names)
-                        :bad-path  (bad-paths user)})
+    (->> (fix-paged-listing-params user params)
          (data/list-folder-contents path)
          (format-page user))))
