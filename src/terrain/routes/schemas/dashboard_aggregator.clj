@@ -26,6 +26,17 @@
    (optional-key :subdomain)          (describe (maybe String) "The subdomain assigned to the analysis. VICE only")
    (optional-key :parent_id)          (describe (maybe UUID) "The UUID of the parent analysis. Only for batch analyses")})
 
+(defschema DashboardFeedItem
+  {:id          (describe String "The unique identifier for a feed. Probably not a UUID")
+   :name        (describe String "The name of the item in the feed. Not the name of the feed itself")
+   :description (describe String "Corresponds to the content snippet provided by the feed. Named description to match the other types")
+   :link        (describe String "Link to the source of the feed item. Probably leads to the website")
+   :date_added  (describe String "The date the item was published")})
+
+(defschema DashboardFeeds
+  {(optional-key :news)   (describe (maybe [DashboardFeedItem]) "The news feed")
+   (optional-key :events) (describe (maybe [DashboardFeedItem]) "The events feed")})
+
 (defschema DashboardAggregatedApps
   {(optional-key :recentlyAdded) (describe (maybe [DashboardApp]) "Apps recently added by the user")
    :public                       (describe [DashboardApp] "Apps recently made public")})
@@ -36,7 +47,8 @@
 
 (defschema DashboardAggregatorResponse
  {:apps                    (describe DashboardAggregatedApps "The app listings returned for the dashboard")
-  (optional-key :analyses) (describe DashboardAggregatedAnalyses "The analysis listings returned for the dashboard")})
+  (optional-key :analyses) (describe DashboardAggregatedAnalyses "The analysis listings returned for the dashboard")
+  (optional-key :feeds)    (describe DashboardFeeds "Information from RSS feeds on the website")})
 
 (defschema DashboardRequestParams
   {(optional-key :limit) (describe (maybe Integer) "The number of responses to include in each field.")})
