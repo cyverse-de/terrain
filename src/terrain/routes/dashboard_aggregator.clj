@@ -7,7 +7,7 @@
   (:require [clojure.tools.logging :as log]
             [terrain.clients.dashboard-aggregator :as dcl]))
 
-(defn secured-dashboard-aggregator-routes
+(defn dashboard-aggregator-routes
   []
   (context "/dashboard" []
     :tags ["dashboard"]
@@ -17,4 +17,6 @@
       :return DashboardAggregatorResponse
       :summary "Get data for the dashboard"
       :description "Returns data for populating the dashboard view."
-      (ok (dcl/get-dashboard-data (:username current-user))))))
+      (ok (if current-user
+        (dcl/get-dashboard-data (:username current-user))
+        (dcl/get-dashboard-data))))))

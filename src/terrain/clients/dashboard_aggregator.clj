@@ -8,9 +8,11 @@
               [terrain.util.config :as config]))
 
 (defn- dashboard-aggregator-url
-  [user]
-  (str (url (config/dashboard-aggregator-url) "users" user)))
+  [& parts]
+  (str (apply url (config/dashboard-aggregator-url) parts)))
 
 (defn get-dashboard-data
-  [username]
-  (:body (http/get (dashboard-aggregator-url username) {:as :json})))
+  ([username]
+    (:body (http/get (dashboard-aggregator-url "users" username) {:as :json})))
+  ([]
+    (:body (http/get (dashboard-aggregator-url) {:as :json}))))
