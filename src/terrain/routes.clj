@@ -71,7 +71,8 @@
    the next set of routes (`secured-routes-no-context`) if nothing matches."
   []
   (util/flagged-routes
-   (secured-filesystem-routes)))
+    (dashboard-aggregator-routes)
+    (secured-filesystem-routes)))
 
 ; Add new secured routes to this function, not to (secured-routes).
 ; This function allows for secured routes without the /secured content/prefix,
@@ -102,7 +103,6 @@
    (misc-metadata-routes)
    (oauth-routes)
    (quicklaunch-routes)
-   (secured-dashboard-aggregator-routes)
    (route/not-found (service/unrecognized-path-response))))
 
 ; The old way of adding secured routes. Prepends /secured to the URL
