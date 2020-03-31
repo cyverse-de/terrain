@@ -27,7 +27,10 @@
 (defn- fix-sort-col-param [param-value]
   (as-> param-value v
     (string/lower-case v)
-    (if (= v "lastmodified") "datemodified" v)))
+    (cond
+      (= v "id")           "path"
+      (= v "lastmodified") "datemodified"
+      :else                v)))
 
 (defn secured-filesystem-routes
   "The routes for file IO endpoints."
@@ -44,7 +47,8 @@
 
      (GET "/paged-directory" []
        :middleware [[wrap-fix-param :sort-dir string/upper-case]
-                    [wrap-fix-param :sort-col fix-sort-col-param]]
+                    [wrap-fix-param :sort-col fix-sort-col-param]
+                    [wrap-fix-param :entity-type string/lower-case]]
        :query [params fs-schema/FolderListingParams]
        :summary "List Folder Contents"
        :description (str "Provides a paged listing of the contents of a folder in the data store.")
