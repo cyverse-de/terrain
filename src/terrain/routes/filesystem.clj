@@ -5,6 +5,7 @@
         [terrain.auth.user-attributes :only [require-authentication current-user]]
         [terrain.util :only [controller optional-routes]])
   (:require [clojure.string :as string]
+            [compojure.api.middleware :as mw]
             [terrain.clients.data-info :as data]
             [terrain.clients.metadata.raw :as meta-raw]
             [terrain.routes.schemas.filesystem :as fs-schema]
@@ -53,6 +54,7 @@
        :summary "List Folder Contents"
        :description (str "Provides a paged listing of the contents of a folder in the data store.")
        :return fs-schema/PagedFolderListing
+       :coercion mw/no-response-coercion
        (ok (dir/do-paged-listing current-user params)))
 
      (POST "/path-list-creator" [:as req]
