@@ -105,6 +105,11 @@
   [props config-valid configs]
   "terrain.routes.search" false)
 
+(cc/defprop-optboolean request-routes-enabled
+  "Enables or disabled routes related to administrative requests."
+  [props config-valid configs]
+  "terrain.routes.requests" true)
+
 (cc/defprop-optboolean coge-enabled
   "Enables or disables COGE endpoints."
   [props config-valid configs]
@@ -113,7 +118,7 @@
 (cc/defprop-optstr iplant-email-base-url
   "The base URL to use when connnecting to the iPlant email service."
   [props config-valid configs app-routes-enabled]
-  "terrain.email.base-url" "http://iplant-email:60000")
+  "terrain.email.base-url" "http://iplant-email")
 
 (cc/defprop-str tool-request-dest-addr
   "The destination email address for tool request messages."
@@ -143,22 +148,22 @@
 (cc/defprop-optstr apps-base-url
   "The base URL to use when connecting to secured Apps services."
   [props config-valid configs app-routes-enabled]
-  "terrain.apps.base-url" "http://apps:60000")
+  "terrain.apps.base-url" "http://apps")
 
 (cc/defprop-optstr metadata-base-url
   "The base URL to use when connecting to the metadata services."
   [props config-valid configs metadata-routes-enabled]
-  "terrain.metadata.base-url" "http://metadata:60000")
+  "terrain.metadata.base-url" "http://metadata")
 
 (cc/defprop-optstr notificationagent-base-url
   "The base URL to use when connecting to the notification agent."
   [props config-valid configs notification-routes-enabled]
-  "terrain.notificationagent.base-url" "http://notification-agent:60000")
+  "terrain.notificationagent.base-url" "http://notification-agent")
 
 (cc/defprop-optstr ipg-base
   "The base URL for the iplant-groups service."
   [props config-valid configs]
-  "terrain.iplant-groups.base-url" "http://iplant-groups:60000")
+  "terrain.iplant-groups.base-url" "http://iplant-groups")
 
 (cc/defprop-optstr grouper-user
   "The administrative user to use for Grouper."
@@ -173,12 +178,17 @@
 (cc/defprop-optstr permissions-base
   "The base URL for the permissions service."
   [props config-valid configs]
-  "terrain.permissions.base-url" "http://permissions:60000")
+  "terrain.permissions.base-url" "http://permissions")
+
+(cc/defprop-optstr requests-base
+  "The base URL for the requests service."
+  [props config-valid configs]
+  "terrain.requests.base-url" "http://requests")
 
 (cc/defprop-optstr jex-base-url
   "The base URL for the JEX."
   [props config-valid configs app-routes-enabled]
-  "terrain.jex.base-url" "http://jex-adapter:60000")
+  "terrain.jex.base-url" "http://jex-adapter")
 
 
 ;;;iRODS connection information
@@ -316,7 +326,7 @@
 (cc/defprop-optstr data-info-base-url
   "The base URL for the data info service."
   [props config-valid configs filesystem-routes-enabled]
-  "terrain.data-info.base-url" "http://data-info:60000")
+  "terrain.data-info.base-url" "http://data-info")
 
 (cc/defprop-optstr es-url
   "The URL for Elastic Search"
@@ -461,22 +471,22 @@
 (cc/defprop-optstr prefs-base-url
   "The hostname of the user-preferences service"
   [props config-valid configs]
-  "terrain.preferences.host" "http://user-preferences:60000")
+  "terrain.preferences.host" "http://user-preferences")
 
 (cc/defprop-optstr search-base-url
   "The hostname of the search service"
   [props config-valid configs]
-  "terrain.search.base-url" "http://search:60000")
+  "terrain.search.base-url" "http://search")
 
 (cc/defprop-optstr sessions-base-url
   "The hostname of the user-sessions service"
   [props config-valid configs]
-  "terrain.sessions.host" "http://user-sessions:60000")
+  "terrain.sessions.host" "http://user-sessions")
 
 (cc/defprop-optstr saved-searches-base-url
   "The base URL of the saved-searches service"
   [props config-valid configs]
-  "terrain.saved-searches.host" "http://saved-searches:60000")
+  "terrain.saved-searches.host" "http://saved-searches")
 
 (cc/defprop-optstr oauth-base-uri
   "The base URI for the OAuth API endpoints."
