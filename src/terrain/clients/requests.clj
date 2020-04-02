@@ -32,3 +32,9 @@
                                     :details      details}
                      :content-type :json
                      :as           :json})))
+
+(defn get-request
+  "Obtains information about the request with the given ID."
+  [request-id]
+  (:body (http/get (requests-url "requests" request-id)
+                   {:as :json})))
