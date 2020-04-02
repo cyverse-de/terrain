@@ -13,19 +13,19 @@
    (optional-key :email)
    (describe NonBlankString "The user's email address")
 
-   :intended-use
+   :intended_use
    (describe NonBlankString "The reason for requesting VICE access")
 
-   :funding-award-number
+   :funding_award_number
    (describe NonBlankString "The award number from any relevant funding agency")
 
-   (optional-key :references)
+   :references
    (describe [NonBlankString] "The names of other CyVerse users who can vouch for the user")
 
-   (optional-key :orcid)
+   :orcid
    (describe NonBlankString "The user's ORCID identifier")
 
-   (optional-key :concurrent-jobs)
+   :concurrent_jobs
    (describe Integer "The requested number of concurrently running VICE jobs")})
 
 (defschema ViceRequest
