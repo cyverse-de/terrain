@@ -45,6 +45,7 @@
         [terrain.routes.token]
         [terrain.routes.webhooks]
         [terrain.routes.comments]
+        [terrain.routes.requests]
         [terrain.util :as util]
         [terrain.util.transformers :as transform])
   (:require [clojure.tools.logging :as log]
@@ -103,6 +104,7 @@
    (misc-metadata-routes)
    (oauth-routes)
    (quicklaunch-routes)
+   (request-routes)
    (route/not-found (service/unrecognized-path-response))))
 
 ; The old way of adding secured routes. Prepends /secured to the URL
@@ -261,6 +263,7 @@
                                      {:name "fileio", :description "File Input/Output Endpoints"}
                                      {:name "filesystem", :description "Filesystem Endpoints"}
                                      {:name "reference-genomes", :description "Reference Genome Endpoints"}
+                                     {:name "requests", :description "Request Endpoints"}
                                      {:name "subjects", :description "Subject Endpoints"}
                                      {:name "teams", :description "Team Endpoints"}
                                      {:name "tools", :description "Tool Endpoints"}
