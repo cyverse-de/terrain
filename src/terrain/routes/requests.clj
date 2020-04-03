@@ -65,4 +65,27 @@
        :query [params schema/RequestListingQueryParams]
        :return schema/RequestListing
        :description "Lists administrative requests, optionally filtered by request type or requesting user."
-       (ok (requests/list-requests params))))))
+       (ok (requests/list-requests params)))
+
+     (context "/:request-id" []
+       :path-params [request-id :- schema/RequestId]
+
+       (GET "/" []
+         :summary "Get Request Information"
+         :return schema/Request
+         :description "Returns information about an existing request."
+         (ok (requests/get-request request-id)))
+
+       (POST "/in-progress" []
+         :summary "Mark Request as in Progress"
+         :body [body schema/RequestUpdateMessage]
+         :return schema/RequestUpdate
+         :description "Marks a request as being in progress."
+         (ok (requests/request-in-progress current-user request-id body)))
+
+       (POST "/rejected" []
+         :summary "Mark Request as Rejected"
+         :body [body schema/RequestUpdateMessage]
+         :return schema/RequestUpdate
+         :description "Marks a request as having been rejected."
+         (ok (requests/request-rejected current-user request-id body)))))))

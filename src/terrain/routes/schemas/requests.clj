@@ -33,6 +33,10 @@
 (defschema RequestListing
   {:requests (describe [(st/dissoc Request :updates)] "A listing of administrative requests")})
 
+(defschema RequestUpdateMessage
+  {(optional-key :message)
+   (describe NonBlankString "The message to store with the request.")})
+
 (defschema ViceRequestDetails
   {(optional-key :name)
    (describe NonBlankString "The user's name")

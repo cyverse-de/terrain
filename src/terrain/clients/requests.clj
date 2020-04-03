@@ -38,3 +38,13 @@
   [request-id]
   (:body (http/get (requests-url "requests" request-id)
                    {:as :json})))
+
+(defn update-request
+  "Updates a request."
+  [username request-id message request-status-code]
+  (:body (http/post (requests-url "requests" request-id "status")
+                    {:query-params {:user username}
+                     :form-params  {:message message
+                                    :status  request-status-code}
+                     :content-type :json
+                     :as           :json})))

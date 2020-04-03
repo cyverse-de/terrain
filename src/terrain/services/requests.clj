@@ -27,19 +27,23 @@
   [{username :shortUsername :as user} details]
   (rc/submit-request vice-request-type username (add-user-to-request-details user details)))
 
-(defn- get-request
+(def get-request
   "Gets information about a request and verifies that the request type is correct. If the request exists but is of
    a different type then an exception will be thrown to cause the service endpoint to return a 404."
-  [request-type request-id]
-  (let [request (rc/get-request request-id)]
-    (when-not (= request-type (:request_type request))
-      (cxu/not-found (str request-type " request " request-id " not found")))
-    request))
+  rc/get-request)
+
+(defn- validate-request-type
+  "Verifies that a request has the expected type. This is useful for endpoints where the request type is included
+   in the URL path."
+  [request-type {request-id :id :as request}]
+  (when-not (= request-type (:request_type request))
+    (cxu/not-found (str request-type " request " request-id " not found")))
+  request)
 
 (def get-vice-request
   "Gets information about a VICE request. If the request exists but is not a VICE request then an exception will be
    thrown to cause the service endpoint to return a 404."
-  (partial get-request vice-request-type))
+  (comp (partial validate-request-type vice-request-type) get-request))
 
 (defn validate-request-user
   "Verifies that the current user is the person who submitted the request. If the user did not submit the request
@@ -50,3 +54,18 @@
   (when-not (= username requesting-user)
     (cxu/not-found (str "request " request-id " not found")))
   request)
+
+(defn- request-update-fn
+  "Returns a function that can be used to update a request with a default update message and a given request
+   status code."
+  [default-message request-status-code]
+  (fn [{username :shortUsername} request-id {:keys [message] :or {message default-message}}]
+    (rc/update-request username request-id message request-status-code)))
+
+(def request-in-progress
+  "Marks a request as being in progress."
+  (request-update-fn "Your request is in progress." "in-progress"))
+
+(def request-rejected
+  "Marks a request as having been rejected."
+  (request-update-fn "No deinal reason given." "rejected"))
