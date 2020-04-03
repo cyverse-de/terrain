@@ -5,6 +5,11 @@
 ;; Request type constants
 (def vice-request-type "vice")
 
+(defn list-requests
+  "Lists requests for administrative endpoints."
+  [params]
+  (rc/list-requests params))
+
 (defn list-vice-requests
   "Lists VICE requests. for the currently authenticated user."
   [{username :shortUsername}]

@@ -1,10 +1,20 @@
 (ns terrain.routes.schemas.requests
   (:use [common-swagger-api.schema :only [describe NonBlankString]]
-        [schema.core :only [defschema enum optional-key]])
+        [schema.core :only [Any defschema enum optional-key]])
   (:require [schema-tools.core :as st])
   (:import [java.util UUID]))
 
 (def RequestId (describe UUID "The request ID"))
+
+(defschema RequestListingQueryParams
+  {(optional-key :include-completed)
+   (describe Boolean "If set to true, completed requests will be included in the listing")
+
+   (optional-key :request-type)
+   (describe String "If specified, only requests of the selected type will be included in the listing")
+
+   (optional-key :requesting-user)
+   (describe String "If specified, only requests submitted by the selected user will be included in the listing")})
 
 (defschema RequestUpdate
   {:created_date  (describe NonBlankString "The date and time the update occurred")
@@ -12,6 +22,16 @@
    :message       (describe String "The message entered by the person who updated the requst")
    :status        (describe String "The request status code")
    :updating_user (describe String "The username of the person who updated the request")})
+
+(defschema Request
+  {:id              RequestId
+   :request_type    (describe NonBlankString "The name of the request type")
+   :requesting_user (describe NonBlankString "The username of the requesting user")
+   :details         (describe Any "The request details")
+   :updates         (describe [RequestUpdate] "Updates that were made to the request")})
+
+(defschema RequestListing
+  {:requests (describe [(st/dissoc Request :updates)] "A listing of administrative requests")})
 
 (defschema ViceRequestDetails
   {(optional-key :name)
@@ -39,11 +59,8 @@
    (describe Integer "The requested number of concurrently running VICE jobs")})
 
 (defschema ViceRequest
-  {:id              RequestId
-   :request_type    (describe NonBlankString "The name of the request type")
-   :requesting_user (describe NonBlankString "The username of the requesting user")
-   :details         (describe ViceRequestDetails "The request details")
-   :updates         (describe [RequestUpdate] "Updates that were made to the request")})
+  (st/assoc Request
+            :details (describe ViceRequestDetails "The request details")))
 
 (defschema ViceRequestListing
   {:requests (describe [(st/dissoc ViceRequest :updates)] "A listing of VICE access requests")})

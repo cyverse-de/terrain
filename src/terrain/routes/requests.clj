@@ -10,7 +10,10 @@
             [terrain.services.requests :as requests]))
 
 (defn request-routes
-  "Routes for submitting administrative requests."
+  "Routes for submitting administrative requests. The non-administrative routes have the request type in the path with
+   the endpoints for each type of request documented separately. The reason for this is that the request details may
+   vary by request type, and defining the endpoints this way is the easiest way to ensure that we can use a slightly
+   different schema for each type of request."
   []
   (optional-routes
    [config/request-routes-enabled]
@@ -43,3 +46,23 @@
            (->> (requests/get-vice-request request-id)
                 (requests/validate-request-user current-user)
                 ok)))))))
+
+(defn admin-request-routes
+  "Routes for administering requests. The administrative routes are defined in a more consolidated fashion than their
+   non-administrative counterparts. The reason for doing this is that the request details don't need to be documented
+   in the administrative routes (because request details are never changed after the request is submitted.)
+   Consolidating the routes also makes it easier to have one administrative request processing page to handle multiple
+   different types of requests if we want to."
+  []
+  (optional-routes
+   [#(and (config/admin-routes-enabled) (config/request-routes-enabled))]
+
+   (context "/requests" []
+     :tags ["admin-requests"]
+
+     (GET "/" []
+       :summary "List Administrative Requests"
+       :query [params schema/RequestListingQueryParams]
+       :return schema/RequestListing
+       :description "Lists administrative requests, optionally filtered by request type or requesting user."
+       (ok (requests/list-requests params))))))
