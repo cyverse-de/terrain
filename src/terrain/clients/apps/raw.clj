@@ -245,6 +245,14 @@
                  {:query-params (secured-params)
                   :as           :json}))))
 
+(defn list-single-app
+  [system-id app-id]
+  (:body
+   (client/get (apps-url "apps" system-id app-id "listing")
+               (disable-redirects
+                {:query-params (secured-params)
+                 :as           :json}))))
+
 (defn get-admin-app-details
   [system-id app-id]
   (:body

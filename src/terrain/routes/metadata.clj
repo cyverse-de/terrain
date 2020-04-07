@@ -188,6 +188,12 @@
                 :description schema/AppCopyDocs
                 (ok (apps/copy-app system-id app-id)))
 
+          (GET "/listing" []
+                :summary schema/SingleAppListingSummary
+                :return schema/AppListing
+                :description schema/SingleAppListingDocs
+                (ok (apps/list-single-app system-id app-id)))
+
           (GET "/details" []
                :return schema/AppDetails
                :summary schema/AppDetailsSummary
