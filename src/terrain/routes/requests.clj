@@ -88,4 +88,11 @@
          :body [body schema/RequestUpdateMessage]
          :return schema/RequestUpdate
          :description "Marks a request as having been rejected."
-         (ok (requests/request-rejected current-user request-id body)))))))
+         (ok (requests/request-rejected current-user request-id body)))
+
+       (POST "/approved" []
+         :summary "Approve a Request"
+         :body [body schema/RequestUpdateMessage]
+         :return schema/RequestUpdate
+         :description "Marks a request as approved and performs any actions required to fulfill the request."
+         (ok (requests/request-approved current-user request-id body)))))))

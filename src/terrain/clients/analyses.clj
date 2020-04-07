@@ -118,3 +118,10 @@
                     {:content-type :json
                      :as           :json
                      :form-params  ql})))
+
+(defn set-concurrent-job-limit
+  [username concurrent-jobs]
+  (:body (http/put (analyses-url ["settings" "concurrent-job-limits" username])
+                   {:content-type :json
+                    :as           :json
+                    :form-params  {:concurrent_jobs concurrent-jobs}})))

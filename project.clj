@@ -27,6 +27,7 @@
                  [me.raynes/fs "1.4.6"]
                  [medley "1.3.0"]
                  [metosin/ring-http-response "0.9.1"]
+                 [potemkin "0.4.5"]
                  [proto-repl "0.3.1"]
                  [org.apache.tika/tika-core "1.23"]
                  [ring/ring-jetty-adapter "1.8.0"]
