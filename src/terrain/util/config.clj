@@ -106,9 +106,14 @@
   "terrain.routes.search" false)
 
 (cc/defprop-optboolean request-routes-enabled
-  "Enables or disabled routes related to administrative requests."
+  "Enables or disables routes related to administrative requests."
   [props config-valid configs]
   "terrain.routes.requests" true)
+
+(cc/defprop-optboolean setting-routes-enabled
+  "Enables or disables routes related to user settings."
+  [props config-valid configs]
+  "terrain.routes.settings" true)
 
 (cc/defprop-optboolean coge-enabled
   "Enables or disables COGE endpoints."

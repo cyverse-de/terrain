@@ -46,6 +46,7 @@
         [terrain.routes.webhooks]
         [terrain.routes.comments]
         [terrain.routes.requests]
+        [terrain.routes.settings]
         [terrain.util :as util]
         [terrain.util.transformers :as transform])
   (:require [clojure.tools.logging :as log]
@@ -158,6 +159,7 @@
    (admin-workspace-routes)
    (admin-user-info-routes)
    (admin-request-routes)
+   (admin-setting-routes)
    (route/not-found (service/unrecognized-path-response))))
 
 (defn unsecured-routes
@@ -241,7 +243,8 @@
                                      {:name "admin-communities", :description "Community Administration Endpoints"}
                                      {:name "admin-filesystem", :description "File System Administration Endpoints"}
                                      {:name "admin-reference-genomes", :description "Admin Reference Genome Endpoints"}
-                                     {:name "admin-requests", :description "Admin Requst Endpoints"}
+                                     {:name "admin-requests", :description "Admin Request Endpoints"}
+                                     {:name "admin-settings", :description "Admin Setting Endpoints"}
                                      {:name "admin-tools", :description "Admin Tool Endpoints"}
                                      {:name "admin-tool-requests", :description "Admin Tool Request Endpoints"}
                                      {:name "admin-user-info", :description "User Info Administration Endpoints"}
