@@ -53,4 +53,4 @@
   (optional-key :feeds)    (describe DashboardFeeds "Information from RSS feeds on the website")})
 
 (defschema DashboardRequestParams
-  {(optional-key :limit) (describe (maybe Integer) "The number of responses to include in each field.")})
+  {(optional-key :limit) (describe (maybe Long) "The number of responses to include in each field.")})
