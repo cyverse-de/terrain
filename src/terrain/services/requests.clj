@@ -1,0 +1,101 @@
+(ns terrain.services.requests
+  (:use [potemkin :only [import-vars]])
+  (:require [clojure-commons.exception-util :as cxu]
+            [terrain.clients.analyses :as ac]
+            [terrain.clients.requests :as rc]))
+
+(import-vars
+ [terrain.clients.requests
+  get-request])
+
+;; Request type constants
+(def vice-request-type "vice")
+
+(defn list-requests
+  "Lists requests for administrative endpoints."
+  [params]
+  (rc/list-requests params))
+
+(defn list-vice-requests
+  "Lists VICE requests. for the currently authenticated user."
+  [{username :shortUsername}]
+  (rc/list-requests {:request-type    vice-request-type
+                     :requesting-user username}))
+
+(defn- add-user-to-request-details
+  [{name :commonName :keys [email]} details]
+  (assoc details
+         :name name
+         :email email))
+
+(defn submit-vice-request
+  "Submits a VICE request. Details about the currently authenticated user are automatically added to the request."
+  [{username :shortUsername :as user} details]
+  (rc/submit-request vice-request-type username (add-user-to-request-details user details)))
+
+(defn- validate-request-type
+  "Verifies that a request has the expected type. This is useful for endpoints where the request type is included
+   in the URL path."
+  [request-type {request-id :id :as request}]
+  (when-not (= request-type (:request_type request))
+    (cxu/not-found (str request-type " request " request-id " not found")))
+  request)
+
+(def get-vice-request
+  "Gets information about a VICE request. If the request exists but is not a VICE request then an exception will be
+   thrown to cause the service endpoint to return a 404."
+  (comp (partial validate-request-type vice-request-type) get-request))
+
+(defn validate-request-user
+  "Verifies that the current user is the person who submitted the request. If the user did not submit the request
+   then an exception will be thrown to cause the service endpoint to return a 404. This is useful in cases where
+   the user is getting information about a request, and we don't want them to be able to obtain information about
+   requests submitted by other users."
+  [{username :shortUsername} {requesting-user :requesting_user request-id :id :as request}]
+  (when-not (= username requesting-user)
+    (cxu/not-found (str "request " request-id " not found")))
+  request)
+
+(defn- request-update-fn
+  "Returns a function that can be used to update a request with a default update message and a given request
+   status code."
+  [default-message request-status-code]
+  (fn [{username :shortUsername} request-id {:keys [message] :or {message default-message}}]
+    (rc/update-request username request-id message request-status-code)))
+
+(def request-in-progress
+  "Marks a request as being in progress."
+  (request-update-fn "Your request is in progress." "in-progress"))
+
+(def request-rejected
+  "Marks a request as having been rejected."
+  (request-update-fn "No deinal reason given." "rejected"))
+
+(def mark-request-approved
+  "Marks a request as having been approved."
+  (request-update-fn "Your request has been approved." "complete"))
+
+(defn fulfill-vice-request
+  "Fulfills a request for VICE access by changing the user's limit for the number of cuncurrently running VICE
+   analyses to the requested number."
+  [{username :requesting_user {concurrent-jobs :concurrent_jobs} :details}]
+  (ac/set-concurrent-job-limit username concurrent-jobs))
+
+(def fulfillment-fns
+  "The functions required to fulfill different types of requests."
+  {vice-request-type fulfill-vice-request})
+
+(defn fulfill-request
+  "Performs actions required to fulfill a request. The specific action taken varies depending on the type of
+   request being fulfilled."
+  [{request-type :request_type :as request}]
+  (if-let [fulfillment-fn (fulfillment-fns request-type)]
+    (fulfillment-fn request)
+    (cxu/internal-system-error (str "request type " request-type " is not supported yet"))))
+
+(defn request-approved
+  "Performs actions required to fulfill a request and marks the request as approved."
+  [user request-id message-body]
+  (let [request (get-request request-id)]
+    (fulfill-request request)
+    (mark-request-approved user request-id message-body)))

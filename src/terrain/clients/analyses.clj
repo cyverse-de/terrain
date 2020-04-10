@@ -118,3 +118,25 @@
                     {:content-type :json
                      :as           :json
                      :form-params  ql})))
+
+(defn list-concurrent-job-limits
+  []
+  (:body (http/get (analyses-url ["settings" "concurrent-job-limits"])
+                   {:as :json})))
+
+(defn get-concurrent-job-limit
+  [username]
+  (:body (http/get (analyses-url ["settings" "concurrent-job-limits" username])
+                   {:as :json})))
+
+(defn set-concurrent-job-limit
+  [username concurrent-jobs]
+  (:body (http/put (analyses-url ["settings" "concurrent-job-limits" username])
+                   {:content-type :json
+                    :as           :json
+                    :form-params  {:concurrent_jobs concurrent-jobs}})))
+
+(defn remove-concurrent-job-limit
+  [username]
+  (:body (http/delete (analyses-url ["settings" "concurrent-job-limits" username])
+                      {:as :json})))
