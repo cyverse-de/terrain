@@ -32,3 +32,8 @@
   "Calls the endpoint that adds two days to the time limit for a VICE analysis"
   [analysis-id]
   (:body (client/post (app-exposer-url ["vice" analysis-id "time-limit"]) {:as :json})))
+
+(defn get-resources
+  "Calls app-exposer's GET /vice/listing endpoint, with filter as the query filter map."
+  [filter]
+  (:body (client/get (app-exposer-url ["vice" "listing"] filter))))

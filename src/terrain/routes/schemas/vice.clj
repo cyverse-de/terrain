@@ -43,9 +43,9 @@
 (defschema ContainerState
   {(optional-key :waiting)    (describe (maybe ContainerStateWaiting) "The waiting container state")
    (optional-key :running)    (describe (maybe ContainerStateRunning) "The running container state")
-   (optional-key :terminated) (describe (maybe ContainerTerminated) "The terminated container state")})
+   (optional-key :terminated) (describe (maybe ContainerStateTerminated) "The terminated container state")})
 
-(defschem ContainerStatus
+(defschema ContainerStatus
   {:name         (describe String "The name of the container")
    :ready        (describe Boolean "Whether or not the container is ready")
    :restartCount (describe Long "The number of times the container has restarted")
@@ -71,14 +71,38 @@
     {:data (describe Any "The data of the config map")}))
 
 (defschema ServicePort
-  {:name                         (describe String "The name of the port")
-   (optional-key :nodePort)      (describe (maybe Long) "The exposed port on the k8s nodes")
-   (optional-key :targetPort)    (describe (maybe Long) "The target port in the selected pods. Will not be present if targetPortName is set")
-   (optional-key :targetPortName (describe (maybe String) "The name of the target port on the selected pods. Will not be present if targetPort is set"))
-   :port                         (describe Long "The service port")
-   :protocol                     (describe String "The protocol the primary service port supports")})
+  {:name                          (describe String "The name of the port")
+   (optional-key :nodePort)       (describe (maybe Long) "The exposed port on the k8s nodes")
+   (optional-key :targetPort)     (describe (maybe Long) "The target port in the selected pods. Will not be present if targetPortName is set")
+   (optional-key :targetPortName) (describe (maybe String) "The name of the target port on the selected pods. Will not be present if targetPort is set")
+   :port                          (describe Long "The service port")
+   :protocol                      (describe String "The protocol the primary service port supports")})
 
 (defschema Service
    (merge
      BaseListing
      {:ports (describe [ServicePort] "The list of ports open in the service")}))
+
+(defschema IngressRule
+  {:host (describe String "The host the rule applies to")
+   :http (describe Any "The content of the rule")}) ; Yes, I got lazy and didn't want to model the entire thing.
+
+(defschema Ingress
+  (merge
+    BaseListing
+    {:rules (describe [IngressRule] "The list of rules making up the Ingress")}))
+
+(defschema FullResourceListing
+  {:deployments (describe [Deployment] "The list of deployments")
+   :pods        (describe [Pod] "The list of pods")
+   :configMaps  (describe [ConfigMap] "The list of config maps")
+   :services    (describe [Service] "The list of services")
+   :ingresses   (describe [Ingress] "The list of ingresses")})
+
+(defschema FilterParams
+  {:analysis-name (describe String "The name of the analysis")
+   :app-id        (describe UUID "The UUID of the running app for the analysis")
+   :app-name      (describe String "The name of the running app for the analysis")
+   :external-id   (describe UUID "The value of the external_id field in the job_steps table. Used widely in the API")
+   :user-id       (describe UUID "The UUID assigned to the user that launched the analysis")
+   :username      (describe String "The user of the user that launched the analysis")})
