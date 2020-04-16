@@ -8,13 +8,13 @@
             [terrain.routes.schemas.vice :as vice-schema]
             [terrain.util.config :as config]))
 
-(defn admin-vice
+(defn admin-vice-routes
   []
   (optional-routes
     [config/app-routes-enabled]
     
     (context "/vice" []
-      :tags ["vice"]
+      :tags ["admin-vice"]
       
       (GET "/resources" []
         :query [filter vice-schema/FilterParams]

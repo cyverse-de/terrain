@@ -33,9 +33,9 @@
 
 (defschema ContainerStateTerminated
   {:exitCode    (describe Long "The exit code for the container")
-   :signal      (describe Long "The numerical signal sent to the container process")
+   (optional-key :signal)      (describe Long "The numerical signal sent to the container process")
    :reason      (describe (maybe String) "The reason the container terminated")
-   :message     (describe (maybe String) "The message associated with the container termination")
+   (optional-key :message)     (describe (maybe String) "The message associated with the container termination")
    :startedAt   (describe String "The time the container started")
    :finishedAt  (describe String "The time the container finished")
    :containerID (describe String "The ID of the container")})
@@ -54,16 +54,16 @@
    :image        (describe String "The image name used for the container")
    :imageID      (describe String "The image ID assocaited with the container")
    :containerID  (describe String "The ID associated with the container")
-   :started      (describe Boolean "Whether or not the container has started")})
+   (optional-key :started)      (describe Boolean "Whether or not the container has started")})
 
 (defschema Pod
   (merge
     BaseListing
-    {:phase               (describe String "The pod phase")
-     :message             (describe (maybe String) "The message associated with the current state/phase of the pod")
-     :reason              (describe (maybe String) "The reason the pod is in the phase")
-     :containerStatuses   (describe [ContainerStatus] "The list of container statuses for the pod")
-     :initContainerStatus (describe [ContainerStatus] "The list of container status for the init containers in the pod")}))
+    {:phase                 (describe String "The pod phase")
+     :message               (describe (maybe String) "The message associated with the current state/phase of the pod")
+     :reason                (describe (maybe String) "The reason the pod is in the phase")
+     :containerStatuses     (describe [ContainerStatus] "The list of container statuses for the pod")
+     :initContainerStatuses (describe [ContainerStatus] "The list of container status for the init containers in the pod")}))
 
 (defschema ConfigMap
   (merge
@@ -90,7 +90,8 @@
 (defschema Ingress
   (merge
     BaseListing
-    {:rules (describe [IngressRule] "The list of rules making up the Ingress")}))
+    {:rules (describe [IngressRule] "The list of rules making up the Ingress")
+     :defaultBackend (describe String "The default service that accepts ingress requests that match no rules")}))
 
 (defschema FullResourceListing
   {:deployments (describe [Deployment] "The list of deployments")
@@ -100,9 +101,9 @@
    :ingresses   (describe [Ingress] "The list of ingresses")})
 
 (defschema FilterParams
-  {:analysis-name (describe String "The name of the analysis")
-   :app-id        (describe UUID "The UUID of the running app for the analysis")
-   :app-name      (describe String "The name of the running app for the analysis")
-   :external-id   (describe UUID "The value of the external_id field in the job_steps table. Used widely in the API")
-   :user-id       (describe UUID "The UUID assigned to the user that launched the analysis")
-   :username      (describe String "The user of the user that launched the analysis")})
+  {(optional-key :analysis-name) (describe (maybe String) "The name of the analysis")
+   (optional-key :app-id)        (describe (maybe UUID) "The UUID of the running app for the analysis")
+   (optional-key :app-name)      (describe (maybe String) "The name of the running app for the analysis")
+   (optional-key :external-id)   (describe (maybe UUID) "The value of the external_id field in the job_steps table. Used widely in the API")
+   (optional-key :user-id)       (describe (maybe UUID) "The UUID assigned to the user that launched the analysis")
+   (optional-key :username)      (describe (maybe String) "The user of the user that launched the analysis")})

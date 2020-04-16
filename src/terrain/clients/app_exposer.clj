@@ -16,7 +16,11 @@
   ([components query]
    (-> (apply curl/url (config/app-exposer-base-uri) components)
        (assoc :query (assoc query :user (:shortUsername current-user)))
-       str)))
+       str))
+  ([components query no-user]
+    (-> (apply curl/url (config/app-exposer-base-uri) components)
+        (assoc :query query)
+        str)))
 
 (defn get-pod-logs
   "Returns the logs for a pod"
@@ -36,4 +40,4 @@
 (defn get-resources
   "Calls app-exposer's GET /vice/listing endpoint, with filter as the query filter map."
   [filter]
-  (:body (client/get (app-exposer-url ["vice" "listing"] filter))))
+  (:body (client/get (app-exposer-url ["vice" "listing"] filter true) {:as :json})))
