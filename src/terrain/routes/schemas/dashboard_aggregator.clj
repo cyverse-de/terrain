@@ -5,8 +5,8 @@
 
 (defschema DashboardApp
   {:id                              (describe String "The app ID")
-   :name                            (describe String "The name of the app")
-   :description                     (describe (maybe String) "The description of the app")
+   (optional-key :name)             (describe (maybe String) "The name of the app")
+   (optional-key :description)      (describe (maybe String) "The description of the app")
    :username                        (describe String "The name of the user that created the app")
    (optional-key :wiki_url)         (describe (maybe String) "The URL to the wiki entry for the app")
    (optional-key :integration_date) (describe (maybe String) "The date the app was integrated. Milliseconds since epoch")
@@ -15,11 +15,11 @@
 (defschema DashboardAnalysis
   {:id                                (describe UUID "The analysis/job ID")
    :name                              (describe String "The name of the analysis")
-   :description                       (describe (maybe String) "The description of the analysis")
+   (optional-key :description)        (describe (maybe String) "The description of the analysis")
    :username                          (describe String "The name of the user that created the app")
    :app_id                            (describe String "The ID of the app used for the analysis")
-   :app_name                          (describe String "The name of the app used for the analysis")
-   :app_description                   (describe (maybe String) "The description of the app used for the analysis")
+   (optional-key :app_name)           (describe (maybe String) "The name of the app used for the analysis")
+   (optional-key :app_description)    (describe (maybe String) "The description of the app used for the analysis")
    (optional-key :result_folder_path) (describe (maybe String) "The path to the analysis outputs")
    :start_date                        (describe (maybe String) "The date the analysis was started. Milliseconds since the epoch")
    (optional-key :end_date)           (describe (maybe String) "The date the analysis ended. Milliseconds since the epoch")
