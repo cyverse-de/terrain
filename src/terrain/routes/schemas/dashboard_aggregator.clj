@@ -4,7 +4,7 @@
   (:import [java.util UUID]))
 
 (defschema DashboardApp
-  {:id                              (describe UUID "The app ID")
+  {:id                              (describe String "The app ID")
    :name                            (describe String "The name of the app")
    :description                     (describe (maybe String) "The description of the app")
    :username                        (describe String "The name of the user that created the app")
@@ -17,7 +17,7 @@
    :name                              (describe String "The name of the analysis")
    :description                       (describe (maybe String) "The description of the analysis")
    :username                          (describe String "The name of the user that created the app")
-   :app_id                            (describe UUID "The ID of the app used for the analysis")
+   :app_id                            (describe String "The ID of the app used for the analysis")
    :app_name                          (describe String "The name of the app used for the analysis")
    :app_description                   (describe (maybe String) "The description of the app used for the analysis")
    (optional-key :result_folder_path) (describe (maybe String) "The path to the analysis outputs")
