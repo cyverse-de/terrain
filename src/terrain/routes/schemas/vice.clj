@@ -32,13 +32,13 @@
   {:startedAt (describe String "The time the container started running")})
 
 (defschema ContainerStateTerminated
-  {:exitCode    (describe Long "The exit code for the container")
-   (optional-key :signal)      (describe Long "The numerical signal sent to the container process")
-   :reason      (describe (maybe String) "The reason the container terminated")
-   (optional-key :message)     (describe (maybe String) "The message associated with the container termination")
-   :startedAt   (describe String "The time the container started")
-   :finishedAt  (describe String "The time the container finished")
-   :containerID (describe String "The ID of the container")})
+  {:exitCode               (describe Long "The exit code for the container")
+   (optional-key :signal)  (describe Long "The numerical signal sent to the container process")
+   :reason                 (describe (maybe String) "The reason the container terminated")
+   (optional-key :message) (describe (maybe String) "The message associated with the container termination")
+   :startedAt              (describe String "The time the container started")
+   :finishedAt             (describe String "The time the container finished")
+   :containerID            (describe String "The ID of the container")})
 
 (defschema ContainerState
   {(optional-key :waiting)    (describe (maybe ContainerStateWaiting) "The waiting container state")
