@@ -10,16 +10,17 @@
             [terrain.auth.user-attributes :refer [current-user]]))
 
 
+(defn- augment-query
+  [query {:keys [no-user]}]
+  (as-> query q
+    (if no-user q (assoc q :user (:shortUsername current-user)))))
+
 (defn- app-exposer-url
   ([components]
-   (app-exposer-url components {}))
-  ([components query]
-   (-> (apply curl/url (config/app-exposer-base-uri) components)
-       (assoc :query (assoc query :user (:shortUsername current-user)))
-       str))
-  ([components query no-user]
+    (app-exposer-url components {}))
+  ([components query & {:as opts}]
     (-> (apply curl/url (config/app-exposer-base-uri) components)
-        (assoc :query query)
+        (assoc :query (augment-query query opts))
         str)))
 
 (defn get-pod-logs
@@ -40,4 +41,4 @@
 (defn get-resources
   "Calls app-exposer's GET /vice/listing endpoint, with filter as the query filter map."
   [filter]
-  (:body (client/get (app-exposer-url ["vice" "listing"] filter true) {:as :json})))
+  (:body (client/get (app-exposer-url ["vice" "listing"] filter :no-user true) {:as :json})))
