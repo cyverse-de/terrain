@@ -47,6 +47,7 @@
         [terrain.routes.comments]
         [terrain.routes.requests]
         [terrain.routes.settings]
+        [terrain.routes.vice]
         [terrain.util :as util]
         [terrain.util.transformers :as transform])
   (:require [clojure.tools.logging :as log]
@@ -160,6 +161,7 @@
    (admin-user-info-routes)
    (admin-request-routes)
    (admin-setting-routes)
+   (admin-vice-routes)
    (route/not-found (service/unrecognized-path-response))))
 
 (defn unsecured-routes
@@ -248,6 +250,7 @@
                                      {:name "admin-tools", :description "Admin Tool Endpoints"}
                                      {:name "admin-tool-requests", :description "Admin Tool Request Endpoints"}
                                      {:name "admin-user-info", :description "User Info Administration Endpoints"}
+                                     {:name "admin-vice", :description "VICE Administration Endpoints"}
                                      {:name "analyses", :description "Analysis Endpoints"}
                                      {:name "analyses-quicklaunches", :description "Quick Launch Endpoints"}
                                      {:name "apps", :description, "Apps Endpoints"}
