@@ -21,4 +21,23 @@
         :return vice-schema/FullResourceListing
         :summary "List Kubernetes resources deployed in the cluster"
         :description "Lists all Kubernetes resources associated with an analysis running in the cluster."
-        (ok (vice/get-resources filter))))))
+        (ok (vice/get-resources filter)))
+      
+      (DELETE "/analyses/:analysis-id" []
+        :path-params [analysis-id :- vice-schema/AnalysisID]
+        :summary "Cancel VICE analysis, send outputs to data store"
+        :description "Cancels the VICE analysis after triggering the transfers of the output to the data store and waiting for them to complete"
+        (ok (vice/cancel-analysis analysis-id)))
+      
+      (GET "/analyses/:analysis-id/time-limit" []
+        :path-params [analysis-id :- vice-schema/AnalysisID]
+        :summary "Get current time limit"
+        :description "Gets the current time limit set for the analysis"
+        (ok (vice/get-time-limit analysis-id)))
+        
+      (POST "/analyses/:analysis-id/time-limit" []
+        :path-params [analysis-id :- vice-schema/AnalysisID]
+        :summary "Extend the time limit"
+        :description "Extends the time limit for the analysis by 3 days"
+        (ok (vice/set-time-limit analysis-id))))))
+

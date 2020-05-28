@@ -42,3 +42,13 @@
   "Calls app-exposer's GET /vice/listing endpoint, with filter as the query filter map."
   [filter]
   (:body (client/get (app-exposer-url ["vice" "listing"] filter :no-user true) {:as :json})))
+
+(defn cancel-analysis
+  "Calls app-exposer's POST /vice/{id}/save-and-exit endpoint"
+  [analysis-id]
+  (:body (client/post (app-exposer-url ["vice", analysis-id, "save-and-exit"]) {:as :json})))
+
+(defn readiness
+  "Calls app-exposer's GET /vice/{subdomain}/url-ready endpoint"
+  [subdomain]
+  (:body (client/get (app-exposer-url ["vice", subdomain, "url-ready"]) {:as :json})))

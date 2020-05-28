@@ -1,7 +1,10 @@
 (ns terrain.routes.schemas.vice
-  (:use [common-swagger-api.schema :only [describe]]
+  (:use [common-swagger-api.schema :only [describe NonBlankString]]
         [schema.core :only [defschema Any maybe optional-key]])
   (:import [java.util UUID]))
+
+(def AnalysisID (describe UUID "The UUID assigned to the analysis"))
+(def Subdomain (describe NonBlankString "The subdomain assigned to the analysis"))
 
 (defschema BaseListing
   {:name                      (describe String "The name of the resource")
