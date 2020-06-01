@@ -52,3 +52,9 @@
   "Calls app-exposer's GET /vice/{subdomain}/url-ready endpoint"
   [subdomain]
   (:body (client/get (app-exposer-url ["vice", subdomain, "url-ready"]) {:as :json})))
+
+(defn async-data
+  "Calls app-exposer's GET /vice/async-data endpoint"
+  [external-id]
+  (:body (client/get (app-exposer-url ["vice" "async-data"] {:external-id external-id}) {:as :json})))
+

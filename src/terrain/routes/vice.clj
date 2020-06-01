@@ -22,6 +22,13 @@
         :summary "List Kubernetes resources deployed in the cluster"
         :description "Lists all Kubernetes resources associated with an analysis running in the cluster."
         (ok (vice/get-resources filter)))
+
+      (GET "/async-data" []
+        :query [external-id :- vice-schema/ExternalID]
+        :return vice-schema/AsyncData
+        :summary "Get data that is generated asynchronously"
+        :description "Get data for a VICE analysis that is generated asynchronously. The call itself is synchronous"
+        (ok (vice/async-data external-id)))
       
       (DELETE "/analyses/:analysis-id" []
         :path-params [analysis-id :- vice-schema/AnalysisID]
