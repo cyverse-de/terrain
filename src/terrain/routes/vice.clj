@@ -24,11 +24,11 @@
         (ok (vice/get-resources filter)))
 
       (GET "/async-data" []
-        :query [external-id :- vice-schema/ExternalID]
+        :query [params vice-schema/AsyncDataParams]
         :return vice-schema/AsyncData
         :summary "Get data that is generated asynchronously"
-        :description "Get data for a VICE analysis that is generated asynchronously. The call itself is synchronous"
-        (ok (vice/async-data external-id)))
+        :description "Get data for the VICE analysis that is generated asynchronously"
+        (ok (vice/async-data (:external-id params))))
       
       (DELETE "/analyses/:analysis-id" []
         :path-params [analysis-id :- vice-schema/AnalysisID]

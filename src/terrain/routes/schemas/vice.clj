@@ -7,6 +7,9 @@
 (def Subdomain (describe NonBlankString "The subdomain assigned to the analysis"))
 (def ExternalID (describe NonBlankString "The external ID assigned to the analysis step"))
 
+(defschema AsyncDataParams
+  {:external-id (describe ExternalID "The external ID assigned to the analysis step")})
+
 (defschema AsyncData
   {:analysisID (describe (maybe AnalysisID) "The UUID assigned to the analysis")
    :ipAddr     (describe (maybe String) "The IP address of the user that launched the analysis")
