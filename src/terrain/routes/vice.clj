@@ -28,7 +28,7 @@
         :return vice-schema/AsyncData
         :summary "Get data that is generated asynchronously"
         :description "Get data for the VICE analysis that is generated asynchronously"
-        (ok (vice/async-data (:external-id params))))
+        (ok (vice/async-data params)))
       
       (DELETE "/analyses/:analysis-id" []
         :path-params [analysis-id :- vice-schema/AnalysisID]
@@ -38,13 +38,17 @@
       
       (GET "/analyses/:analysis-id/time-limit" []
         :path-params [analysis-id :- vice-schema/AnalysisID]
+        :query [params vice-schema/TimeLimitQueryParams]
+        :return vice-schema/TimeLimit
         :summary "Get current time limit"
         :description "Gets the current time limit set for the analysis"
-        (ok (vice/get-time-limit analysis-id)))
+        (ok (vice/get-time-limit analysis-id (:user params))))
         
       (POST "/analyses/:analysis-id/time-limit" []
         :path-params [analysis-id :- vice-schema/AnalysisID]
+        :query [params vice-schema/TimeLimitQueryParams]
+        :return vice-schema/TimeLimit
         :summary "Extend the time limit"
         :description "Extends the time limit for the analysis by 3 days"
-        (ok (vice/set-time-limit analysis-id))))))
+        (ok (vice/set-time-limit analysis-id (:user params)))))))
 
