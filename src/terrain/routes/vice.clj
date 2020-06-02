@@ -31,10 +31,10 @@
         (ok (vice/async-data params)))
       
       (DELETE "/analyses/:analysis-id" []
-        :path-params [analysis-id :- vice-schema/AnalysisID]
+        :path-params [external-id :- vice-schema/ExternalID]
         :summary "Cancel VICE analysis, send outputs to data store"
         :description "Cancels the VICE analysis after triggering the transfers of the output to the data store and waiting for them to complete"
-        (ok (vice/cancel-analysis analysis-id)))
+        (ok (vice/cancel-analysis external-id)))
       
       (GET "/analyses/:analysis-id/time-limit" []
         :path-params [analysis-id :- vice-schema/AnalysisID]

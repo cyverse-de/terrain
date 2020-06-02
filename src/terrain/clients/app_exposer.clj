@@ -45,8 +45,8 @@
 
 (defn cancel-analysis
   "Calls app-exposer's POST /vice/{id}/save-and-exit endpoint"
-  [analysis-id]
-  (:body (client/post (app-exposer-url ["vice", analysis-id, "save-and-exit"]) {:as :json})))
+  [external-id]
+  (:body (client/post (app-exposer-url ["vice", external-id, "save-and-exit"]) {:as :json})))
 
 (defn readiness
   "Calls app-exposer's GET /vice/{subdomain}/url-ready endpoint"
