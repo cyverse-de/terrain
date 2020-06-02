@@ -162,7 +162,7 @@
 
 (defn list-all-attached-tags
   []
-  (http/get (metadata-url "filesystem" "data" "tags") (get-options)))
+  (:body (http/get (metadata-url "filesystem" "data" "tags") (json-get-options))))
 
 (defn remove-all-attached-tags
   []

@@ -1,6 +1,8 @@
 (ns terrain.routes.tags
-  (:use [common-swagger-api.schema :only [DELETE GET PATCH POST]])
-  (:require [terrain.services.metadata.tags :as tags]
+  (:use [common-swagger-api.schema]
+        [ring.util.http-response :only [ok]])
+  (:require [common-swagger-api.schema.metadata.tags :as schema]
+            [terrain.services.metadata.tags :as tags]
             [terrain.util :as util]
             [terrain.util.config :as config]))
 
@@ -10,17 +12,24 @@
   (util/optional-routes
    [#(and (config/filesystem-routes-enabled) (config/metadata-routes-enabled))]
 
-   (GET "/filesystem/entry/tags" []
-     (tags/list-all-attached-tags))
+   (context "/filesystem/entry" []
+            :tags ["tags"]
 
-   (DELETE "/filesystem/entry/tags" []
-     (tags/remove-all-attached-tags))
+      (GET "/tags" []
+        :summary schema/GetTagsSummary
+        :description schema/GetTagsDescription
+        :return schema/AttachedTagsListing
+        (ok (tags/list-all-attached-tags)))
 
-   (GET "/filesystem/entry/:entry-id/tags" [entry-id]
-     (tags/list-attached-tags entry-id))
+      (DELETE "/tags" []
+        (tags/remove-all-attached-tags))
 
-   (PATCH "/filesystem/entry/:entry-id/tags" [entry-id type :as {body :body}]
-     (tags/handle-patch-file-tags entry-id type body))
+      (GET "/:entry-id/tags" [entry-id]
+        (tags/list-attached-tags entry-id))
+
+      (PATCH "/:entry-id/tags" [entry-id type :as {body :body}]
+        (tags/handle-patch-file-tags entry-id type body))
+      )
 
    (GET "/tags/suggestions" [contains limit]
      (tags/suggest-tags contains limit))
