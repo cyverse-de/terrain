@@ -273,6 +273,7 @@
                                      {:name "reference-genomes", :description "Reference Genome Endpoints"}
                                      {:name "requests", :description "Request Endpoints"}
                                      {:name "subjects", :description "Subject Endpoints"}
+                                     {:name "tags", :description "Tag Endpoints"}
                                      {:name "teams", :description "Team Endpoints"}
                                      {:name "tools", :description "Tool Endpoints"}
                                      {:name "tool-requests", :description "Tool Request Endpoints"}
