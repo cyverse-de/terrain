@@ -22,7 +22,10 @@
         (ok (tags/list-all-attached-tags)))
 
       (DELETE "/tags" []
-        (tags/remove-all-attached-tags))
+        :summary schema/DeleteTagsSummary
+        :description schema/DeleteTagsDescription
+        :return nil
+        (ok (tags/remove-all-attached-tags)))
 
       (GET "/:entry-id/tags" [entry-id]
         (tags/list-attached-tags entry-id))

@@ -166,7 +166,7 @@
 
 (defn remove-all-attached-tags
   []
-  (http/delete (metadata-url "filesystem" "data" "tags") (delete-options)))
+  (:body (http/delete (metadata-url "filesystem" "data" "tags") (json-get-options))))
 
 (defn list-attached-tags
   [target-id]
