@@ -1,5 +1,6 @@
 (ns terrain.routes.tags
   (:use [common-swagger-api.schema]
+        [common-swagger-api.schema.metadata :only [TargetIdParam]]
         [ring.util.http-response :only [ok]])
   (:require [common-swagger-api.schema.metadata.tags :as schema]
             [terrain.services.metadata.tags :as tags]
@@ -27,8 +28,12 @@
         :return nil
         (ok (tags/remove-all-attached-tags)))
 
-      (GET "/:entry-id/tags" [entry-id]
-        (tags/list-attached-tags entry-id))
+      (GET "/:entry-id/tags" []
+        :path-params [entry-id :- TargetIdParam]
+        :summary schema/GetAttachedTagSummary
+        :description schema/GetAttachedTagDescription
+        :return schema/TagList
+        (ok (tags/list-attached-tags entry-id)))
 
       (PATCH "/:entry-id/tags" [entry-id type :as {body :body}]
         (tags/handle-patch-file-tags entry-id type body))

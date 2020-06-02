@@ -170,7 +170,7 @@
 
 (defn list-attached-tags
   [target-id]
-  (http/get (metadata-url "filesystem" "data" target-id "tags") (get-options)))
+  (:body (http/get (metadata-url "filesystem" "data" target-id "tags") (json-get-options))))
 
 (defn update-attached-tags
   [target-id data-type type body]
