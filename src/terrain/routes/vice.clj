@@ -30,7 +30,7 @@
         :description "Get data for the VICE analysis that is generated asynchronously"
         (ok (vice/async-data params)))
       
-      (DELETE "/analyses/:analysis-id" []
+      (DELETE "/analyses/:external-id" []
         :path-params [external-id :- vice-schema/ExternalID]
         :summary "Cancel VICE analysis, send outputs to data store"
         :description "Cancels the VICE analysis after triggering the transfers of the output to the data store and waiting for them to complete"
