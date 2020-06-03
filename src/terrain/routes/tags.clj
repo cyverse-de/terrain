@@ -44,20 +44,23 @@
         :return nil
         (ok (tags/handle-patch-file-tags entry-id params body))))
 
-   (GET "/tags/suggestions" [contains limit]
-     (tags/suggest-tags contains limit))
+   (context "/tags" []
+            :tags ["tags"]
 
-   (GET "/tags/user" []
-     (tags/list-user-tags))
+     (GET "/suggestions" [contains limit]
+       (tags/suggest-tags contains limit))
 
-   (DELETE "/tags/user" []
-     (tags/delete-all-user-tags))
+     (GET "/user" []
+       (tags/list-user-tags))
 
-   (POST "/tags/user" [:as {body :body}]
-     (tags/create-user-tag body))
+     (DELETE "/user" []
+       (tags/delete-all-user-tags))
 
-   (PATCH "/tags/user/:tag-id" [tag-id :as {body :body}]
-     (tags/update-user-tag tag-id body))
+     (POST "/user" [:as {body :body}]
+       (tags/create-user-tag body))
 
-   (DELETE "/tags/user/:tag-id" [tag-id]
-     (tags/delete-user-tag tag-id))))
+     (PATCH "/user/:tag-id" [tag-id :as {body :body}]
+       (tags/update-user-tag tag-id body))
+
+     (DELETE "/user/:tag-id" [tag-id]
+       (tags/delete-user-tag tag-id)))))
