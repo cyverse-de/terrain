@@ -42,9 +42,9 @@
    Returns:
      It returns the response."
   [^String body]
-  (let [tag (-> body slurp meta/create-user-tag :body slurp (json/parse-string true))]
+  (let [tag (-> body meta/create-user-tag)]
     (search/index-tag (format-new-tag-doc tag))
-    (svc/success-response (select-keys tag [:id]))))
+    (select-keys tag [:id])))
 
 
 (defn ^IPersistentMap delete-user-tag

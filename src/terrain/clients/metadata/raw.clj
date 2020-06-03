@@ -194,7 +194,7 @@
 
 (defn create-user-tag
   [body]
-  (http/post (metadata-url "tags" "user") (post-options body)))
+  (:body (http/post (metadata-url "tags" "user") (json-post-options body))))
 
 (defn update-user-tag
   [tag-id body]

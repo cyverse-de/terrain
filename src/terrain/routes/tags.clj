@@ -65,8 +65,12 @@
         :return nil
         (ok (tags/delete-all-user-tags)))
 
-     (POST "/user" [:as {body :body}]
-       (tags/create-user-tag body))
+     (POST "/user" []
+        :body [body schema/TagRequest]
+        :summary schema/PostTagSummary
+        :description schema/PostTagDescription
+        :return schema/TagId
+        (ok (tags/create-user-tag body)))
 
      (PATCH "/user/:tag-id" [tag-id :as {body :body}]
        (tags/update-user-tag tag-id body))
