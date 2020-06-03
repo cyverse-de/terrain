@@ -54,7 +54,10 @@
         (ok (tags/suggest-tags (:contains params) (:limit params))))
 
      (GET "/user" []
-       (tags/list-user-tags))
+        :summary schema/GetUserTagsSummary
+        :description schema/GetUserTagsDescription
+        :return schema/TagList
+        (ok (tags/list-user-tags)))
 
      (DELETE "/user" []
        (tags/delete-all-user-tags))

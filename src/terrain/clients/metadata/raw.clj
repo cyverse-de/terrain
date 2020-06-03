@@ -186,7 +186,7 @@
 
 (defn list-user-tags
   []
-  (http/get (metadata-url "tags" "user") (get-options)))
+  (:body (http/get (metadata-url "tags" "user") (json-get-options))))
 
 (defn delete-all-user-tags
   []
