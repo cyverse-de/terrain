@@ -30,15 +30,31 @@
 
 (defn get-time-limit
   "Returns the time limit for a VICE analysis"
-  [analysis-id]
-  (:body (client/get (app-exposer-url ["vice" analysis-id "time-limit"]) {:as :json})))
+  [analysis-id user]
+  (:body (client/get (app-exposer-url ["vice" analysis-id "time-limit"] {:user user} :no-user true) {:as :json})))
 
 (defn set-time-limit
   "Calls the endpoint that adds two days to the time limit for a VICE analysis"
-  [analysis-id]
-  (:body (client/post (app-exposer-url ["vice" analysis-id "time-limit"]) {:as :json})))
+  [analysis-id user]
+  (:body (client/post (app-exposer-url ["vice" analysis-id "time-limit"] {:user user} :no-user true) {:as :json})))
 
 (defn get-resources
   "Calls app-exposer's GET /vice/listing endpoint, with filter as the query filter map."
   [filter]
   (:body (client/get (app-exposer-url ["vice" "listing"] filter :no-user true) {:as :json})))
+
+(defn cancel-analysis
+  "Calls app-exposer's POST /vice/{id}/save-and-exit endpoint"
+  [external-id]
+  (:body (client/post (app-exposer-url ["vice", external-id, "save-and-exit"]) {:as :json})))
+
+(defn readiness
+  "Calls app-exposer's GET /vice/{subdomain}/url-ready endpoint"
+  [subdomain]
+  (:body (client/get (app-exposer-url ["vice", subdomain, "url-ready"]) {:as :json})))
+
+(defn async-data
+  "Calls app-exposer's GET /vice/async-data endpoint"
+  [query]
+  (:body (client/get (app-exposer-url ["vice" "async-data"] query) {:as :json})))
+

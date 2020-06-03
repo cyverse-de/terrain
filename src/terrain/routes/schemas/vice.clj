@@ -1,7 +1,25 @@
 (ns terrain.routes.schemas.vice
-  (:use [common-swagger-api.schema :only [describe]]
+  (:use [common-swagger-api.schema :only [describe NonBlankString]]
         [schema.core :only [defschema Any maybe optional-key]])
   (:import [java.util UUID]))
+
+(def AnalysisID (describe UUID "The UUID assigned to the analysis"))
+(def Subdomain (describe NonBlankString "The subdomain assigned to the analysis"))
+(def ExternalID (describe NonBlankString "The external ID assigned to the analysis step"))
+
+(defschema AsyncDataParams
+  {:external-id (describe ExternalID "The external ID assigned to the analysis step")})
+
+(defschema TimeLimitQueryParams
+  {:user (describe NonBlankString "The username for the user that started the analysis, not the logged in user")})
+
+(defschema TimeLimit
+  {:time_limit (describe (maybe String) "The scheduled end date as seconds since the epoch")})
+
+(defschema AsyncData
+  {:analysisID (describe (maybe AnalysisID) "The UUID assigned to the analysis")
+   :ipAddr     (describe (maybe String) "The IP address of the user that launched the analysis")
+   :subdomain  (describe (maybe Subdomain) "The subdomain assigned to the VICE analysis")})
 
 (defschema BaseListing
   {:name                      (describe String "The name of the resource")
