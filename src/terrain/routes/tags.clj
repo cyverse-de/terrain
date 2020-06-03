@@ -46,9 +46,12 @@
 
    (context "/tags" []
             :tags ["tags"]
-
-     (GET "/suggestions" [contains limit]
-       (tags/suggest-tags contains limit))
+     (GET "/suggestions" []
+        :query [params (dissoc schema/TagSuggestQueryParams :user)]
+        :summary schema/GetTagSuggestionsSummary
+        :description schema/GetTagSuggestionsDescription
+        :return schema/TagList
+        (ok (tags/suggest-tags (:contains params) (:limit params))))
 
      (GET "/user" []
        (tags/list-user-tags))
