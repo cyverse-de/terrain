@@ -190,7 +190,7 @@
 
 (defn delete-all-user-tags
   []
-  (http/delete (metadata-url "tags" "user") (delete-options)))
+  (:body (http/delete (metadata-url "tags" "user") (json-get-options))))
 
 (defn create-user-tag
   [body]

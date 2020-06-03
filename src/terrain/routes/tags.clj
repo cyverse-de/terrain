@@ -60,7 +60,10 @@
         (ok (tags/list-user-tags)))
 
      (DELETE "/user" []
-       (tags/delete-all-user-tags))
+        :summary schema/DeleteUserTagsSummary
+        :description schema/DeleteUserTagsDescription
+        :return nil
+        (ok (tags/delete-all-user-tags)))
 
      (POST "/user" [:as {body :body}]
        (tags/create-user-tag body))
