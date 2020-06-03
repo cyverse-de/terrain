@@ -80,5 +80,9 @@
         :return nil
         (ok (tags/update-user-tag tag-id body)))
 
-     (DELETE "/user/:tag-id" [tag-id]
-       (tags/delete-user-tag tag-id)))))
+     (DELETE "/user/:tag-id" []
+        :path-params [tag-id :- schema/TagIdPathParam]
+        :summary schema/DeleteTagSummary
+        :description schema/DeleteTagDescription
+        :return nil
+        (ok (tags/delete-user-tag tag-id))))))

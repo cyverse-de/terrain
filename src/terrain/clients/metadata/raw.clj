@@ -202,7 +202,7 @@
 
 (defn delete-user-tag
   [tag-id]
-  (http/delete (metadata-url "tags" "user" tag-id) (delete-options)))
+  (:body (http/delete (metadata-url "tags" "user" tag-id) (json-get-options))))
 
 (defn list-templates
   []

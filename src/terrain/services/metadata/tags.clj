@@ -61,8 +61,7 @@
   [^UUID tag-id]
   (let [tag-id (valid/extract-uri-uuid tag-id)]
     (meta/delete-user-tag tag-id)
-    (search/remove-tag tag-id)
-    (svc/success-response)))
+    (search/remove-tag tag-id)))
 
 
 (defn handle-patch-file-tags
