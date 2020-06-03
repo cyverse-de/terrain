@@ -35,9 +35,14 @@
         :return schema/TagList
         (ok (tags/list-attached-tags entry-id)))
 
-      (PATCH "/:entry-id/tags" [entry-id type :as {body :body}]
-        (tags/handle-patch-file-tags entry-id type body))
-      )
+      (PATCH "/:entry-id/tags" []
+        :path-params [entry-id :- TargetIdParam]
+        :query [params schema/TagTypeEnum]
+        :body [body schema/TagIdList]
+        :summary schema/PatchTagsSummary
+        :description schema/PatchTagsDescription
+        :return nil
+        (ok (tags/handle-patch-file-tags entry-id params body))))
 
    (GET "/tags/suggestions" [contains limit]
      (tags/suggest-tags contains limit))

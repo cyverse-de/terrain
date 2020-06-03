@@ -173,10 +173,11 @@
   (:body (http/get (metadata-url "filesystem" "data" target-id "tags") (json-get-options))))
 
 (defn update-attached-tags
-  [target-id data-type type body]
-  (http/patch (metadata-url "filesystem" "data" target-id "tags")
-              (post-options body {:data-type data-type
-                                  :type type})))
+  [target-id data-type params body]
+  (:body (http/patch (metadata-url "filesystem" "data" target-id "tags")
+              (json-post-options body
+                                 {:data-type data-type
+                                  :type (:type params)}))))
 
 (defn get-tags-by-value
   [contains limit]

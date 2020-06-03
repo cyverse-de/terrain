@@ -16,7 +16,7 @@
 (defn- update-tags-targets
   [response]
   (letfn [(fmt-tgt ([tgt] (update tgt :id uuidify)))
-          (parse-resp ([response] (-> response :body slurp (json/parse-string true) :tags)))]
+          (parse-resp ([response] (-> response :body (json/parse-string true) :tags)))]
     (doseq [{:keys [id targets]} (parse-resp response)]
       (search/update-tag-targets (uuidify id) (map fmt-tgt targets)))))
 
@@ -73,14 +73,12 @@
      type - The `type` query parameter. It should be either `attach` or `detach`.
      body - This is the request body. It should be a JSON document containing a `tags` field. This
             field should hold an array of tag UUIDs."
-  [entry-id type body]
+  [entry-id params body]
   (let [entry-id (uuidify entry-id)
-        req      (slurp body)
         user     (:shortUsername user/current-user)]
     (data/validate-uuid-accessible user entry-id)
     (update-tags-targets
-      (meta/update-attached-tags entry-id (data/resolve-data-type entry-id) type req))
-    (svc/success-response)))
+      (meta/update-attached-tags entry-id (data/resolve-data-type entry-id) params body))))
 
 
 (defn list-all-attached-tags
