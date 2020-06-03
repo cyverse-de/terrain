@@ -136,10 +136,9 @@
       It returns the response."
   [^String tag-str ^Reader body]
   (let [tag-id  (uuidify tag-str)
-        update  (meta/update-user-tag tag-id (slurp body))
-        tag-rec (-> update :body slurp (json/parse-string true))]
-    (do-update-tag tag-id tag-rec)
-    (svc/success-response {})))
+        update  (meta/update-user-tag tag-id body)
+        tag-rec (-> update :body (json/parse-string true))]
+    (do-update-tag tag-id tag-rec)))
 
 
 (defn list-user-tags

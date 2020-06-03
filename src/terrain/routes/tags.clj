@@ -72,8 +72,13 @@
         :return schema/TagId
         (ok (tags/create-user-tag body)))
 
-     (PATCH "/user/:tag-id" [tag-id :as {body :body}]
-       (tags/update-user-tag tag-id body))
+     (PATCH "/user/:tag-id" []
+        :path-params [tag-id :- schema/TagIdPathParam]
+        :body [body schema/TagUpdateRequest]
+        :summary schema/PatchTagSummary
+        :description schema/PatchTagDescription
+        :return nil
+        (ok (tags/update-user-tag tag-id body)))
 
      (DELETE "/user/:tag-id" [tag-id]
        (tags/delete-user-tag tag-id)))))

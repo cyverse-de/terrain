@@ -198,7 +198,7 @@
 
 (defn update-user-tag
   [tag-id body]
-  (http/patch (metadata-url "tags" "user" tag-id) (post-options body)))
+  (:body (http/patch (metadata-url "tags" "user" tag-id) (json-post-options body))))
 
 (defn delete-user-tag
   [tag-id]
