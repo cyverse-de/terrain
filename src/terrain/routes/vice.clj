@@ -42,7 +42,7 @@
         :return vice-schema/TimeLimit
         :summary "Get current time limit"
         :description "Gets the current time limit set for the analysis"
-        (ok (vice/get-time-limit analysis-id (:user params))))
+        (ok (vice/get-time-limit analysis-id)))
         
       (POST "/analyses/:analysis-id/time-limit" []
         :path-params [analysis-id :- vice-schema/AnalysisID]
@@ -50,5 +50,5 @@
         :return vice-schema/TimeLimit
         :summary "Extend the time limit"
         :description "Extends the time limit for the analysis by 3 days"
-        (ok (vice/set-time-limit analysis-id (:user params)))))))
+        (ok (vice/set-time-limit analysis-id))))))
 
