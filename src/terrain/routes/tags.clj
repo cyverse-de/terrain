@@ -25,8 +25,8 @@
       (DELETE "/tags" []
         :summary schema/DeleteTagsSummary
         :description schema/DeleteTagsDescription
-        :return nil
-        (ok (tags/remove-all-attached-tags)))
+        (tags/remove-all-attached-tags)
+        (ok))
 
       (GET "/:entry-id/tags" []
         :path-params [entry-id :- TargetIdParam]
@@ -41,8 +41,8 @@
         :body [body schema/TagIdList]
         :summary schema/PatchTagsSummary
         :description schema/PatchTagsDescription
-        :return nil
-        (ok (tags/handle-patch-file-tags entry-id params body))))
+        (tags/handle-patch-file-tags entry-id params body)
+        (ok)))
 
    (context "/tags" []
             :tags ["tags"]
@@ -62,8 +62,8 @@
      (DELETE "/user" []
         :summary schema/DeleteUserTagsSummary
         :description schema/DeleteUserTagsDescription
-        :return nil
-        (ok (tags/delete-all-user-tags)))
+        (tags/delete-all-user-tags)
+        (ok))
 
      (POST "/user" []
         :body [body schema/TagRequest]
@@ -77,12 +77,12 @@
         :body [body schema/TagUpdateRequest]
         :summary schema/PatchTagSummary
         :description schema/PatchTagDescription
-        :return nil
-        (ok (tags/update-user-tag tag-id body)))
+        (tags/update-user-tag tag-id body)
+        (ok))
 
      (DELETE "/user/:tag-id" []
         :path-params [tag-id :- schema/TagIdPathParam]
         :summary schema/DeleteTagSummary
         :description schema/DeleteTagDescription
-        :return nil
-        (ok (tags/delete-user-tag tag-id))))))
+        (tags/delete-user-tag tag-id)
+        (ok)))))
