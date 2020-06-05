@@ -30,25 +30,48 @@
         :description "Get data for the VICE analysis that is generated asynchronously"
         (ok (vice/async-data params)))
       
-      (DELETE "/analyses/:external-id" []
-        :path-params [external-id :- vice-schema/ExternalID]
-        :summary "Cancel VICE analysis, send outputs to data store"
-        :description "Cancels the VICE analysis after triggering the transfers of the output to the data store and waiting for them to complete"
-        (ok (vice/cancel-analysis external-id)))
-      
       (GET "/analyses/:analysis-id/time-limit" []
         :path-params [analysis-id :- vice-schema/AnalysisID]
-        :query [params vice-schema/TimeLimitQueryParams]
         :return vice-schema/TimeLimit
         :summary "Get current time limit"
         :description "Gets the current time limit set for the analysis"
-        (ok (vice/get-time-limit analysis-id)))
+        (ok (vice/admin-get-time-limit analysis-id)))
         
       (POST "/analyses/:analysis-id/time-limit" []
         :path-params [analysis-id :- vice-schema/AnalysisID]
-        :query [params vice-schema/TimeLimitQueryParams]
         :return vice-schema/TimeLimit
         :summary "Extend the time limit"
         :description "Extends the time limit for the analysis by 3 days"
-        (ok (vice/set-time-limit analysis-id))))))
+        (ok (vice/admin-set-time-limit analysis-id)))
+        
+      (POST "/analyses/:analysis-id/save-and-exit" []
+        :path-params [analysis-id :- vice-schema/AnalysisID]
+        :summary "Upload outputs and exit"
+        :description "Terminates the analysis after uploading the output files to the data store"
+        (ok (vice/admin-cancel-analysis analysis-id)))
+      
+      (POST "/analyses/:analysis-id/exit" []
+        :path-params [analysis-id :- vice-schema/AnalysisID]
+        :summary "Exit without saving"
+        :description "Terminates the analysis without uploading files to the data store"
+        (ok (vice/admin-exit analysis-id)))
+      
+      (POST "/analyses/:analysis-id/save-output-files" []
+        :path-params [analysis-id :- vice-schema/AnalysisID]
+        :summary "Upload files without exiting"
+        :description "Uploads output files for the analysis to the data store without terminating the analysis"
+        (ok (vice/admin-save-output-files analysis-id)))
+      
+      (POST "/analyses/:analysis-id/download-input-files" []
+        :path-params [analysis-id :- vice-schema/AnalysisID]
+        :summary "Download input files"
+        :description "Downloads input files to the analysis container without changing the status of the analysis"
+        (ok (vice/admin-download-input-files analysis-id)))
+        
+      (GET "/analyses/:analysis-id/external-id" []
+        :path-params [analysis-id :- vice-schema/AnalysisID]
+        :return vice-schema/ExternalIDResponse
+        :summary "Get external UUID"
+        :description "Returns the external UUID associated with the analysis. VICE analyses only have a single external UUID"
+        (ok (vice/admin-external-id analysis-id))))))
 

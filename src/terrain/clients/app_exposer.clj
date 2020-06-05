@@ -33,10 +33,20 @@
   [analysis-id]
   (:body (client/get (app-exposer-url ["vice" analysis-id "time-limit"]) {:as :json})))
 
+(defn admin-get-time-limit
+  "Same as (get-time-limit), just with no user info and a different path"
+  [analysis-id]
+  (:body (client/get (app-exposer-url ["vice" "admin" "analyses" analysis-id "time-limit"] {} :no-user true) {:as :json})))
+
 (defn set-time-limit
   "Calls the endpoint that adds two days to the time limit for a VICE analysis"
   [analysis-id]
   (:body (client/post (app-exposer-url ["vice" analysis-id "time-limit"]) {:as :json})))
+
+(defn admin-set-time-limit
+  "Same as (set-time-limit), just with no user info and a different path"
+  [analysis-id]
+  (:body (client/post (app-exposer-url ["vice" "admin" "analyses" analysis-id "time-limit"] {} :no-user true) {:as :json})))
 
 (defn get-resources
   "Calls app-exposer's GET /vice/listing endpoint, with filter as the query filter map."
@@ -48,6 +58,11 @@
   [external-id]
   (:body (client/post (app-exposer-url ["vice", external-id, "save-and-exit"]) {:as :json})))
 
+(defn admin-cancel-analysis
+  "Same as (cancel-analysis), just with no user info and a different path and accepts the analysis-id"
+  [analysis-id]
+  (:body (client/post (app-exposer-url ["vice" "admin" "analyses" analysis-id "save-and-exit"] {} :no-user true) {:as :json})))
+
 (defn readiness
   "Calls app-exposer's GET /vice/{subdomain}/url-ready endpoint"
   [subdomain]
@@ -58,3 +73,22 @@
   [query]
   (:body (client/get (app-exposer-url ["vice" "async-data"] query) {:as :json})))
 
+(defn admin-external-id
+  "Gets the external-id for the provided analysis-id. VICE analyses only have a single external-id"
+  [analysis-id]
+  (:body (client/get (app-exposer-url ["vice" "admin" "analyses" analysis-id "external-id"] {} :no-user true) {:as :json})))
+
+(defn admin-exit
+  "Forces the analysis to exit without transferring output files"
+  [analysis-id]
+  (:body (client/post (app-exposer-url ["vice" "admin" "analyses" analysis-id "exit"] {} :no-user true) {:as :json})))
+
+(defn admin-save-output-files
+  "Tells the vice-transfer-files tool to transfer outputs without terminating the analysis"
+  [analysis-id]
+  (:body (client/post (app-exposer-url ["vice" "admin" "analyses" analysis-id "save-output-files"] {} :no-user true) {:as :json})))
+
+(defn admin-download-input-files
+  "Tells the vice-transfer-files tool to download inputs without affecting the analysis status"
+  [analysis-id]
+  (:body (client/post (app-exposer-url ["vice" "admin" "analyses" analysis-id "download-input-files"] {} :no-user true) {:as :json})))
