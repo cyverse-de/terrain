@@ -42,6 +42,8 @@
    {:query-params (user-params params)
     :as           :json}))
 
+(def json-delete-options json-get-options)
+
 (def delete-options get-options)
 
 (defn post-options
@@ -166,7 +168,7 @@
 
 (defn remove-all-attached-tags
   []
-  (:body (http/delete (metadata-url "filesystem" "data" "tags") (json-get-options))))
+  (:body (http/delete (metadata-url "filesystem" "data" "tags") (json-delete-options))))
 
 (defn list-attached-tags
   [target-id]
@@ -190,7 +192,7 @@
 
 (defn delete-all-user-tags
   []
-  (:body (http/delete (metadata-url "tags" "user") (json-get-options))))
+  (:body (http/delete (metadata-url "tags" "user") (json-delete-options))))
 
 (defn create-user-tag
   [body]
@@ -202,7 +204,7 @@
 
 (defn delete-user-tag
   [tag-id]
-  (:body (http/delete (metadata-url "tags" "user" tag-id) (json-get-options))))
+  (:body (http/delete (metadata-url "tags" "user" tag-id) (json-delete-options))))
 
 (defn list-templates
   []
