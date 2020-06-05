@@ -16,6 +16,9 @@
 (defschema TimeLimit
   {:time_limit (describe (maybe String) "The scheduled end date as seconds since the epoch")})
 
+(defschema ExternalIDResponse
+  {:externalID (describe ExternalID "The single external ID associated with the VICE analysis")})
+
 (defschema AsyncData
   {:analysisID (describe (maybe AnalysisID) "The UUID assigned to the analysis")
    :ipAddr     (describe (maybe String) "The IP address of the user that launched the analysis")

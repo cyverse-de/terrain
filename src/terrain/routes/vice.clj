@@ -66,5 +66,12 @@
         :path-params [analysis-id :- vice-schema/AnalysisID]
         :summary "Download input files"
         :description "Downloads input files to the analysis container without changing the status of the analysis"
-        (ok (vice/admin-download-input-files analysis-id))))))
+        (ok (vice/admin-download-input-files analysis-id)))
+        
+      (GET "/analyses/:analysis-id/external-id" []
+        :path-params [analysis-id :- vice-schema/AnalysisID]
+        :return vice-schema/ExternalIDResponse
+        :summary "Get external UUID"
+        :description "Returns the external UUID associated with the analysis. VICE analyses only have a single external UUID"
+        (ok (vice/admin-external-id analysis-id))))))
 
