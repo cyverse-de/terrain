@@ -28,21 +28,22 @@
         (tags/remove-all-attached-tags)
         (ok))
 
-      (GET "/:entry-id/tags" []
+     (context "/:entry-id/tags" []
         :path-params [entry-id :- TargetIdParam]
-        :summary schema/GetAttachedTagSummary
-        :description schema/GetAttachedTagDescription
-        :return schema/TagList
-        (ok (tags/list-attached-tags entry-id)))
 
-      (PATCH "/:entry-id/tags" []
-        :path-params [entry-id :- TargetIdParam]
-        :query [params schema/TagTypeEnum]
-        :body [body schema/TagIdList]
-        :summary schema/PatchTagsSummary
-        :description schema/PatchTagsDescription
-        (tags/handle-patch-file-tags entry-id params body)
-        (ok)))
+        (GET "/" []
+          :summary schema/GetAttachedTagSummary
+          :description schema/GetAttachedTagDescription
+          :return schema/TagList
+          (ok (tags/list-attached-tags entry-id)))
+
+        (PATCH "/" []
+          :query [params schema/TagTypeEnum]
+          :body [body schema/TagIdList]
+          :summary schema/PatchTagsSummary
+          :description schema/PatchTagsDescription
+          (tags/handle-patch-file-tags entry-id params body)
+        (ok))))
 
    (context "/tags" []
             :tags ["tags"]
@@ -53,36 +54,38 @@
         :return schema/TagList
         (ok (tags/suggest-tags (:contains params) (:limit params))))
 
-     (GET "/user" []
-        :summary schema/GetUserTagsSummary
-        :description schema/GetUserTagsDescription
-        :return schema/TagList
-        (ok (tags/list-user-tags)))
+     (context "/user" []
+        (GET "/" []
+          :summary schema/GetUserTagsSummary
+          :description schema/GetUserTagsDescription
+          :return schema/TagList
+          (ok (tags/list-user-tags)))
 
-     (DELETE "/user" []
-        :summary schema/DeleteUserTagsSummary
-        :description schema/DeleteUserTagsDescription
-        (tags/delete-all-user-tags)
-        (ok))
+        (DELETE "/" []
+          :summary schema/DeleteUserTagsSummary
+          :description schema/DeleteUserTagsDescription
+          (tags/delete-all-user-tags)
+          (ok))
 
-     (POST "/user" []
-        :body [body schema/TagRequest]
-        :summary schema/PostTagSummary
-        :description schema/PostTagDescription
-        :return schema/TagId
-        (ok (tags/create-user-tag body)))
+        (POST "/" []
+          :body [body schema/TagRequest]
+          :summary schema/PostTagSummary
+          :description schema/PostTagDescription
+          :return schema/TagId
+          (ok (tags/create-user-tag body)))
 
-     (PATCH "/user/:tag-id" []
-        :path-params [tag-id :- schema/TagIdPathParam]
-        :body [body schema/TagUpdateRequest]
-        :summary schema/PatchTagSummary
-        :description schema/PatchTagDescription
-        (tags/update-user-tag tag-id body)
-        (ok))
+        (context "/:tag-id" []
+          :path-params [tag-id :- schema/TagIdPathParam]
 
-     (DELETE "/user/:tag-id" []
-        :path-params [tag-id :- schema/TagIdPathParam]
-        :summary schema/DeleteTagSummary
-        :description schema/DeleteTagDescription
-        (tags/delete-user-tag tag-id)
-        (ok)))))
+          (PATCH "/" []
+            :body [body schema/TagUpdateRequest]
+            :summary schema/PatchTagSummary
+            :description schema/PatchTagDescription
+            (tags/update-user-tag tag-id body)
+            (ok))
+
+          (DELETE "/" []
+            :summary schema/DeleteTagSummary
+            :description schema/DeleteTagDescription
+            (tags/delete-user-tag tag-id)
+            (ok)))))))
