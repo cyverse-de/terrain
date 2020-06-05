@@ -182,7 +182,7 @@
 (defn get-tags-by-value
   [contains limit]
   (:body (http/get (metadata-url "tags" "suggestions") (json-get-options (remove-nil-values {:contains contains
-                                                                                 :limit limit})))))
+                                                                                             :limit    limit})))))
 
 (defn list-user-tags
   []
