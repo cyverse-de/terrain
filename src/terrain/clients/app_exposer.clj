@@ -81,7 +81,7 @@
 (defn admin-exit
   "Forces the analysis to exit without transferring output files"
   [analysis-id]
-  (:body (client/get (app-exposer-url ["vice" "admin" "analyses" analysis-id "exit"] {} :no-user true) {:as :json})))
+  (:body (client/post (app-exposer-url ["vice" "admin" "analyses" analysis-id "exit"] {} :no-user true) {:as :json})))
 
 (defn admin-save-output-files
   "Tells the vice-transfer-files tool to transfer outputs without terminating the analysis"
