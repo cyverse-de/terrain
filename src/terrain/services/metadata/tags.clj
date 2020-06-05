@@ -15,9 +15,8 @@
 
 (defn- update-tags-targets
   [response]
-  (letfn [(fmt-tgt ([tgt] (update tgt :id uuidify)))
-          (parse-resp ([response] (-> response :body (json/parse-string true) :tags)))]
-    (doseq [{:keys [id targets]} (parse-resp response)]
+  (letfn [(fmt-tgt ([tgt] (update tgt :id uuidify)))]
+    (doseq [{:keys [id targets]} (:tags response)]
       (search/update-tag-targets (uuidify id) (map fmt-tgt targets)))))
 
 
@@ -135,9 +134,8 @@
       It returns the response."
   [^String tag-str ^Reader body]
   (let [tag-id  (uuidify tag-str)
-        update  (meta/update-user-tag tag-id body)
-        tag-rec (-> update :body (json/parse-string true))]
-    (do-update-tag tag-id tag-rec)))
+        update  (meta/update-user-tag tag-id body)]
+    (do-update-tag tag-id update)))
 
 
 (defn list-user-tags
@@ -149,7 +147,7 @@
 (defn delete-all-user-tags
   "Deletes all tags that were created by the authenticated user."
   []
-  (let [tag-ids (map :id (:tags (:body (meta/list-user-tags))))
+  (let [tag-ids (map :id (:tags meta/list-user-tags))
         result  (meta/delete-all-user-tags)]
     (doseq [tag-id tag-ids]
       (search/remove-tag tag-id))
