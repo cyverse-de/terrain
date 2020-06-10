@@ -42,6 +42,8 @@
    {:query-params (user-params params)
     :as           :json}))
 
+(def json-delete-options json-get-options)
+
 (def delete-options get-options)
 
 (defn post-options
@@ -162,46 +164,47 @@
 
 (defn list-all-attached-tags
   []
-  (http/get (metadata-url "filesystem" "data" "tags") (get-options)))
+  (:body (http/get (metadata-url "filesystem" "data" "tags") (json-get-options))))
 
 (defn remove-all-attached-tags
   []
-  (http/delete (metadata-url "filesystem" "data" "tags") (delete-options)))
+  (:body (http/delete (metadata-url "filesystem" "data" "tags") (json-delete-options))))
 
 (defn list-attached-tags
   [target-id]
-  (http/get (metadata-url "filesystem" "data" target-id "tags") (get-options)))
+  (:body (http/get (metadata-url "filesystem" "data" target-id "tags") (json-get-options))))
 
 (defn update-attached-tags
-  [target-id data-type type body]
-  (http/patch (metadata-url "filesystem" "data" target-id "tags")
-              (post-options body {:data-type data-type
-                                  :type type})))
+  [target-id data-type params body]
+  (:body (http/patch (metadata-url "filesystem" "data" target-id "tags")
+              (json-post-options body
+                                 {:data-type data-type
+                                  :type (:type params)}))))
 
 (defn get-tags-by-value
   [contains limit]
-  (http/get (metadata-url "tags" "suggestions") (get-options (remove-nil-values {:contains contains
-                                                                                 :limit limit}))))
+  (:body (http/get (metadata-url "tags" "suggestions") (json-get-options (remove-nil-values {:contains contains
+                                                                                             :limit    limit})))))
 
 (defn list-user-tags
   []
-  (http/get (metadata-url "tags" "user") (get-options)))
+  (:body (http/get (metadata-url "tags" "user") (json-get-options))))
 
 (defn delete-all-user-tags
   []
-  (http/delete (metadata-url "tags" "user") (delete-options)))
+  (:body (http/delete (metadata-url "tags" "user") (json-delete-options))))
 
 (defn create-user-tag
   [body]
-  (http/post (metadata-url "tags" "user") (post-options body)))
+  (:body (http/post (metadata-url "tags" "user") (json-post-options body))))
 
 (defn update-user-tag
   [tag-id body]
-  (http/patch (metadata-url "tags" "user" tag-id) (post-options body)))
+  (:body (http/patch (metadata-url "tags" "user" tag-id) (json-post-options body))))
 
 (defn delete-user-tag
   [tag-id]
-  (http/delete (metadata-url "tags" "user" tag-id) (delete-options)))
+  (:body (http/delete (metadata-url "tags" "user" tag-id) (json-delete-options))))
 
 (defn list-templates
   []

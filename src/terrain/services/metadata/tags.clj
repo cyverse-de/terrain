@@ -15,9 +15,8 @@
 
 (defn- update-tags-targets
   [response]
-  (letfn [(fmt-tgt ([tgt] (update tgt :id uuidify)))
-          (parse-resp ([response] (-> response :body slurp (json/parse-string true) :tags)))]
-    (doseq [{:keys [id targets]} (parse-resp response)]
+  (letfn [(fmt-tgt ([tgt] (update tgt :id uuidify)))]
+    (doseq [{:keys [id targets]} (:tags response)]
       (search/update-tag-targets (uuidify id) (map fmt-tgt targets)))))
 
 
@@ -42,9 +41,9 @@
    Returns:
      It returns the response."
   [^String body]
-  (let [tag (-> body slurp meta/create-user-tag :body slurp (json/parse-string true))]
+  (let [tag (-> body meta/create-user-tag)]
     (search/index-tag (format-new-tag-doc tag))
-    (svc/success-response (select-keys tag [:id]))))
+    (select-keys tag [:id])))
 
 
 (defn ^IPersistentMap delete-user-tag
@@ -61,8 +60,7 @@
   [^UUID tag-id]
   (let [tag-id (valid/extract-uri-uuid tag-id)]
     (meta/delete-user-tag tag-id)
-    (search/remove-tag tag-id)
-    (svc/success-response)))
+    (search/remove-tag tag-id)))
 
 
 (defn handle-patch-file-tags
@@ -73,14 +71,12 @@
      type - The `type` query parameter. It should be either `attach` or `detach`.
      body - This is the request body. It should be a JSON document containing a `tags` field. This
             field should hold an array of tag UUIDs."
-  [entry-id type body]
+  [entry-id params body]
   (let [entry-id (uuidify entry-id)
-        req      (slurp body)
         user     (:shortUsername user/current-user)]
     (data/validate-uuid-accessible user entry-id)
     (update-tags-targets
-      (meta/update-attached-tags entry-id (data/resolve-data-type entry-id) type req))
-    (svc/success-response)))
+      (meta/update-attached-tags entry-id (data/resolve-data-type entry-id) params body))))
 
 
 (defn list-all-attached-tags
@@ -138,10 +134,8 @@
       It returns the response."
   [^String tag-str ^Reader body]
   (let [tag-id  (uuidify tag-str)
-        update  (meta/update-user-tag tag-id (slurp body))
-        tag-rec (-> update :body slurp (json/parse-string true))]
-    (do-update-tag tag-id tag-rec)
-    (svc/success-response {})))
+        update  (meta/update-user-tag tag-id body)]
+    (do-update-tag tag-id update)))
 
 
 (defn list-user-tags
@@ -153,7 +147,7 @@
 (defn delete-all-user-tags
   "Deletes all tags that were created by the authenticated user."
   []
-  (let [tag-ids (map :id (:tags (svc/decode-json (:body (meta/list-user-tags)))))
+  (let [tag-ids (map :id (:tags meta/list-user-tags))
         result  (meta/delete-all-user-tags)]
     (doseq [tag-id tag-ids]
       (search/remove-tag tag-id))

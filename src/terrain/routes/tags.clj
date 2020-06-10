@@ -1,41 +1,102 @@
 (ns terrain.routes.tags
-  (:use [common-swagger-api.schema :only [DELETE GET PATCH POST]])
-  (:require [terrain.services.metadata.tags :as tags]
+  (:use [common-swagger-api.schema]
+        [common-swagger-api.schema.metadata :only [TargetIdParam]]
+        [ring.util.http-response :only [ok]])
+  (:require [common-swagger-api.schema.metadata.tags :as schema]
+            [compojure.api.middleware :as middleware]
+            [terrain.routes.schemas.tags :as ts]
+            [terrain.services.metadata.tags :as tags]
             [terrain.util :as util]
             [terrain.util.config :as config]))
-
 
 (defn secured-tag-routes
   []
   (util/optional-routes
    [#(and (config/filesystem-routes-enabled) (config/metadata-routes-enabled))]
 
-   (GET "/filesystem/entry/tags" []
-     (tags/list-all-attached-tags))
+   (context "/filesystem/entry" []
+            :tags ["tags"]
 
-   (DELETE "/filesystem/entry/tags" []
-     (tags/remove-all-attached-tags))
+      (GET "/tags" []
+        :summary schema/GetTagsSummary
+        :description schema/GetTagsDescription
+        :responses schema/GetTagsResponses
+        (ok (tags/list-all-attached-tags)))
 
-   (GET "/filesystem/entry/:entry-id/tags" [entry-id]
-     (tags/list-attached-tags entry-id))
+      (DELETE "/tags" []
+        :summary schema/DeleteTagsSummary
+        :description schema/DeleteTagsDescription
+        :coercion middleware/no-response-coercion
+        :responses schema/DeleteTagsResponses
+        (tags/remove-all-attached-tags)
+        (ok))
 
-   (PATCH "/filesystem/entry/:entry-id/tags" [entry-id type :as {body :body}]
-     (tags/handle-patch-file-tags entry-id type body))
+     (context "/:entry-id/tags" []
+        :path-params [entry-id :- TargetIdParam]
 
-   (GET "/tags/suggestions" [contains limit]
-     (tags/suggest-tags contains limit))
+        (GET "/" []
+          :summary schema/GetAttachedTagSummary
+          :description schema/GetAttachedTagDescription
+          :responses schema/GetAttachedTagResponses
+          (ok (tags/list-attached-tags entry-id)))
 
-   (GET "/tags/user" []
-     (tags/list-user-tags))
+        (PATCH "/" []
+          :query [params schema/TagTypeEnum]
+          :body [body schema/TagIdList]
+          :summary schema/PatchTagsSummary
+          :description schema/PatchTagsDescription
+          :coercion middleware/no-response-coercion
+          :responses ts/PatchTagsResponses
+          (tags/handle-patch-file-tags entry-id params body)
+          (ok))))
 
-   (DELETE "/tags/user" []
-     (tags/delete-all-user-tags))
+   (context "/tags" []
+            :tags ["tags"]
+     (GET "/suggestions" []
+        :query [params (dissoc schema/TagSuggestQueryParams :user)]
+        :summary schema/GetTagSuggestionsSummary
+        :description schema/GetTagSuggestionsDescription
+        :responses schema/GetTagSuggestionsResponses
+        (ok (tags/suggest-tags (:contains params) (:limit params))))
 
-   (POST "/tags/user" [:as {body :body}]
-     (tags/create-user-tag body))
+     (context "/user" []
+        (GET "/" []
+          :summary schema/GetUserTagsSummary
+          :description schema/GetUserTagsDescription
+          :responses schema/GetUserTagsResponses
+          (ok (tags/list-user-tags)))
 
-   (PATCH "/tags/user/:tag-id" [tag-id :as {body :body}]
-     (tags/update-user-tag tag-id body))
+        (DELETE "/" []
+          :summary schema/DeleteUserTagsSummary
+          :description schema/DeleteUserTagsDescription
+          :coercion middleware/no-response-coercion
+          :responses schema/DeleteUserTagsResponses
+          (tags/delete-all-user-tags)
+          (ok))
 
-   (DELETE "/tags/user/:tag-id" [tag-id]
-     (tags/delete-user-tag tag-id))))
+        (POST "/" []
+          :body [body schema/TagRequest]
+          :summary schema/PostTagSummary
+          :description schema/PostTagDescription
+          :responses ts/PostTagResponses
+          (ok (tags/create-user-tag body)))
+
+        (context "/:tag-id" []
+          :path-params [tag-id :- schema/TagIdPathParam]
+
+          (PATCH "/" []
+            :body [body schema/TagUpdateRequest]
+            :summary schema/PatchTagSummary
+            :description schema/PatchTagDescription
+            :coercion middleware/no-response-coercion
+            :responses ts/PatchTagResponses
+            (tags/update-user-tag tag-id body)
+            (ok))
+
+          (DELETE "/" []
+            :summary schema/DeleteTagSummary
+            :description schema/DeleteTagDescription
+            :coercion middleware/no-response-coercion
+            :responses schema/DeleteTagResponses
+            (tags/delete-user-tag tag-id)
+            (ok)))))))
