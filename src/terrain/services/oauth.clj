@@ -25,5 +25,15 @@
     (http-response/ok (keycloak/get-token username password))
     (http-response/unauthorized)))
 
-;; Make CAS the default identity provider for now.
+;; Make CAS the default identity provider for standard tokens for now.
 (def get-token get-cas-token)
+
+(defn get-keycloak-admin-token [authorization username]
+  (if-let [[username password] (get-basic-auth-credentials authorization)]
+    (http-response/ok (-> (keycloak/get-token username password)
+                          :access_token
+                          (keycloak/get-impersonation-token username)))
+    (http-response/unauthorized)))
+
+;; Make Keycloak the default identity provider for impersonation tokens.
+(def get-admin-token get-keycloak-admin-token)

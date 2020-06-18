@@ -26,3 +26,6 @@
 
    (optional-key :scope)
    (describe String "The scopes granted to the access token")})
+
+(defschema AdminKeycloakTokenParams
+  {:username (describe String "The username of the person to impersonate")})

@@ -27,3 +27,23 @@
        :return AccessTokenResponse
        :description-file "docs/get-token.md"
        (oauth/get-keycloak-token authorization)))))
+
+(defn admin-token-routes
+  []
+  (routes
+   (context "/admin/token" []
+     :tags ["admin-token"]
+
+     (GET "/" [:as {{:strs [authorization]} :headers}]
+       :query [{:keys [username]} AdminKeycloakTokenParams]
+       :summary "Obtain Impersonation Tokens"
+       :return AccessTokenResponse
+       :description-file "docs/get-admin-token.md"
+       (oauth/get-admin-token authorization username))
+
+     (GET "/keycloak" [:as {{:strs [authorization]} :headers}]
+       :query [{:keys [username]} AdminKeycloakTokenParams]
+       :summary "Obtain Keycloak OIDC Impersonation Tokens"
+       :return AccessTokenResponse
+       :description-file "docs/get-admin-token.md"
+       (oauth/get-keycloak-admin-token authorization username)))))

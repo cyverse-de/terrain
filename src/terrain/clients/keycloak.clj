@@ -26,3 +26,15 @@
                                    :username      username
                                    :password      password}
                      :as          :json})))
+
+(defn get-impersonation-token
+  "Obtains an impersonation token for troubleshooting purposes."
+  [subject-token username]
+  (:body (http/post (keycloak-url "protocol" "openid-connect" "token")
+                    {:form-params {:grant_type           "urn:ietf:params:oauth:grant-type:token-exchange"
+                                   :client_id            (config/keycloak-client-id)
+                                   :client_secret        (config/keycloak-client-secret)
+                                   :subject_token        subject-token
+                                   :requested_token_type "urn:ietf:params:oauth:token-type:access_token"
+                                   :requested_subject    username}
+                     :as          :json})))

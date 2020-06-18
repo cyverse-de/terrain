@@ -167,6 +167,7 @@
 (defn unsecured-routes
   []
   (util/flagged-routes
+   (admin-token-routes)
    (token-routes)
    (unsecured-misc-routes)
    (unsecured-notification-routes)))
@@ -247,6 +248,7 @@
                                      {:name "admin-reference-genomes", :description "Admin Reference Genome Endpoints"}
                                      {:name "admin-requests", :description "Admin Request Endpoints"}
                                      {:name "admin-settings", :description "Admin Setting Endpoints"}
+                                     {:name "admin-token", :description "Admin OAuth Tokens"}
                                      {:name "admin-tools", :description "Admin Tool Endpoints"}
                                      {:name "admin-tool-requests", :description "Admin Tool Request Endpoints"}
                                      {:name "admin-user-info", :description "User Info Administration Endpoints"}
