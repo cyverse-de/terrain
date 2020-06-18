@@ -521,12 +521,22 @@
 (cc/defprop-optstr keycloak-base-uri
   "The base URI for the Keycloak server."
   [props config-valid configs]
-  "terrain.keycloak.base-uri" "https://kc.cyverse.org")
+  "terrain.keycloak.base-uri" "https://kc.cyverse.org/auth")
 
 (cc/defprop-optstr keycloak-realm
   "The Keycloak realm to use."
   [props config-valid configs]
   "terrain.keycloak.realm" "CyVerse")
+
+(cc/defprop-str keycloak-client-id
+  "The Keycloak client ID to use."
+  [props config-valid configs]
+  "terrain.keycloak.client-id")
+
+(cc/defprop-str keycloak-client-secret
+  "The keycloak client secret to use."
+  [props config-valid configs]
+  "terrain.keycloak.client-secret")
 
 (cc/defprop-optstr dashboard-aggregator-url
   "The URL to the dashboard-aggregator service."

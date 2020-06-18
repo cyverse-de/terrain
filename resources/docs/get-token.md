@@ -1,7 +1,7 @@
-This service allows users to obtain OAuth tokens for accessing other API endpoints. You must be logged in using HTTP
-basic authorization to use this endpoint. This is the only endpoint that uses basic authorization. To log in, click the
-Authorize button above, enter your username and password under `Basic authentication`, and click the Authorize button
-underneath the password text box.
+This service allows users to obtain OAuth or OIDC tokens for accessing other API endpoints. You must be logged in using
+HTTP basic authorization to use this endpoint. The token endpoints are the only endpoints that use basic
+authorization. To log in, click the Authorize button above, enter your username and password under `Basic
+authentication`, and click the Authorize button underneath the password text box.
 
 Once you have the access token, you can use it to authorize calls to other endpoints in the Swagger UI.  First, remove
 the basic authentication credentials by clicking the Authorize button above and clicking the Logout button in the `Basic
