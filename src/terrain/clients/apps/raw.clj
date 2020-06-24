@@ -464,6 +464,14 @@
                 {:query-params (secured-params params)
                  :as           :json}))))
 
+(defn list-job-stats
+  [params]
+  (:body
+    (client/get (apps-url "analyses" "stats")
+                (disable-redirects
+                  {:query-params (secured-params params)
+                   :as           :json}))))
+
 (defn list-job-permissions
   [body params]
   (:body

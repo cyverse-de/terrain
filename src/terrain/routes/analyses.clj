@@ -42,6 +42,13 @@
        :description listing-schema/AnalysesListingDocs
        (ok (apps/list-jobs params)))
 
+     (GET "/stats" []
+       :query [params schema/AnalysisStatParams]
+       :return schema/AnalysisStats
+       :summary schema/AnalysisStatSummary
+       :description schema/AnalysisStatDescription
+       (ok (apps/list-job-stats params)))
+
      (POST "/" []
        :middleware [schema/coerce-analysis-submission-requirements]
        :body [body schema/AnalysisSubmission]
