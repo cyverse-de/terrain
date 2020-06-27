@@ -112,17 +112,17 @@ If this dataset accompanies a paper, please contact us with the DOI for that pap
   folder)
 
 (defn- validate-staging-dest-available
-  [{:keys [paths]} staging-dest]
+  [{:keys [paths]} staging-dest src-folder]
   (let [path-exists? (get paths (keyword staging-dest))]
-    (when path-exists?
+    (when (and path-exists? (not= staging-dest src-folder))
     (throw+ {:type :clojure-commons.exception/exists
              :error "A folder with this name has already been submitted for a Permanent ID request."
              :path staging-dest}))))
 
 (defn- validate-publish-dest-available
-  [{:keys [paths]} publish-dest]
+  [{:keys [paths]} publish-dest src-folder]
   (let [path-exists? (get paths (keyword publish-dest))]
-    (when path-exists?
+    (when (and path-exists? (not= publish-dest src-folder))
       (throw+ {:type :clojure-commons.exception/exists
                :error "A folder with this name has already been published."
                :path publish-dest}))))
@@ -132,7 +132,7 @@ If this dataset accompanies a paper, please contact us with the DOI for that pap
   (let [publish-dest (format-publish-path path)
         paths-exist (data-info/check-existence (config/permanent-id-curators-group)
                                                [publish-dest])]
-    (validate-publish-dest-available paths-exist publish-dest))
+    (validate-publish-dest-available paths-exist publish-dest path))
   data-item)
 
 (defn- validate-data-item
@@ -146,8 +146,8 @@ If this dataset accompanies a paper, please contact us with the DOI for that pap
         paths-exist  (data-info/check-existence (config/permanent-id-curators-group)
                                                 [staging-dest
                                                  publish-dest])]
-    (validate-staging-dest-available paths-exist staging-dest)
-    (validate-publish-dest-available paths-exist publish-dest))
+    (validate-staging-dest-available paths-exist staging-dest path)
+    (validate-publish-dest-available paths-exist publish-dest path))
   data-item)
 
 (defn- submit-permanent-id-request
@@ -192,7 +192,7 @@ If this dataset accompanies a paper, please contact us with the DOI for that pap
      (email/send-permanent-id-request-data-move-error path dest-path current-user (:body e (str e)))
      path)))
 
-(defn- stage-data-item
+(defn- move-data-item-to-staging
   [user folder]
   (let [curators-group (config/permanent-id-curators-group)
         staged-path    (move-folder (config/irods-user)
@@ -202,7 +202,14 @@ If this dataset accompanies a paper, please contact us with the DOI for that pap
     (data-info/share (config/irods-user) [user] [staged-path] "write")
     staged-path))
 
-(defn- publish-data-item
+(defn- stage-data-item
+  [user {:keys [path] :as folder}]
+  (let [staged-path (format-staging-path path)]
+    (if (not= path staged-path)
+      (move-data-item-to-staging user folder)
+      staged-path)))
+
+(defn- move-data-item-to-published
   [user folder]
   (let [curators-group (config/permanent-id-curators-group)
         publish-path   (move-folder (config/irods-user)
@@ -210,6 +217,13 @@ If this dataset accompanies a paper, please contact us with the DOI for that pap
                                     (config/permanent-id-publish-dir))]
     (data-info/share (config/irods-user) [curators-group] [publish-path] "own")
     publish-path))
+
+(defn- publish-data-item
+  [user {:keys [path] :as folder}]
+  (let [publish-path (format-publish-path path)]
+    (if (not= path publish-path)
+      (move-data-item-to-published user folder)
+      publish-path)))
 
 (defn- publish-metadata
   [{:keys [id type]} publish-avus]
