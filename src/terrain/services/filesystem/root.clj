@@ -2,8 +2,7 @@
   (:use [clojure-commons.validators])
   (:require [clojure-commons.json :as json]
             [dire.core :refer [with-pre-hook! with-post-hook!]]
-            [terrain.clients.data-info.raw :as data-raw]
-            [terrain.services.filesystem.common-paths :as paths]))
+            [terrain.clients.data-info.raw :as data-raw]))
 
 (defn- format-roots
   [roots]
@@ -13,14 +12,7 @@
 
 (defn do-root-listing
   [{user :user}]
-  (-> (data-raw/list-roots user)
+  (-> (data-raw/list-roots (or user "anonymous"))
       :body
       (json/string->json true)
       format-roots))
-
-(with-pre-hook! #'do-root-listing
-  (fn [params]
-    (paths/log-call "do-root-listing" params)
-    (validate-map params {:user string?})))
-
-(with-post-hook! #'do-root-listing (paths/log-func "do-root-listing"))
