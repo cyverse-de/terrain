@@ -1,5 +1,6 @@
 (ns terrain.clients.apps.raw
-  (:use [terrain.util :only [disable-redirects]]
+  (:use [clojure-commons.core :only [remove-nil-values]]
+        [terrain.util :only [disable-redirects]]
         [terrain.util.transformers :only [secured-params]])
   (:require [cemerick.url :as curl]
             [clj-http.client :as client]
@@ -1041,7 +1042,7 @@
 
 (defn record-login
   [ip-address user-agent]
-  (let [params {:ip-address ip-address :user-agent user-agent}]
+  (let [params (remove-nil-values {:ip-address ip-address :user-agent user-agent})]
     (:body
      (client/post (apps-url "users" "login")
                   (disable-redirects
