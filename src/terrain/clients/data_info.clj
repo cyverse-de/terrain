@@ -26,7 +26,6 @@
   (:import [clojure.lang IPersistentMap ISeq Keyword]
            [java.util UUID]))
 
-
 (defn ^Boolean irods-running?
   "Determines whether or not iRODS is running."
   []
@@ -157,17 +156,17 @@
   (log/debug "getting or creating dir: path =" path)
   (let [user (:shortUsername current-user)]
     (cond
-     (not (path-exists? user path))
+      (not (path-exists? user path))
       (create-dir {:user user} {:path path})
 
-     (and (path-exists? user path) (st/path-is-dir? path))
-     path
+      (and (path-exists? user path) (st/path-is-dir? path))
+      path
 
-     (and (path-exists? user path) (not (st/path-is-dir? path)))
-     nil
+      (and (path-exists? user path) (not (st/path-is-dir? path)))
+      nil
 
-     :else
-     nil)))
+      :else
+      nil)))
 
 (defn can-create-dir?
   "Determines if a directory exists or can be created."
@@ -186,7 +185,7 @@
   [{:keys [user]} {:keys [source dest]}]
   (validators/not-superuser user)
   (assertions/assert-valid (= (ft/dirname dest) (ft/dirname source))
-      "The directory names of the source and destination must match for this endpoint.")
+                           "The directory names of the source and destination must match for this endpoint.")
   (let [path-uuid (uuid-for-path user source)]
     (raw/rename user path-uuid (ft/basename dest))))
 
@@ -211,34 +210,34 @@
     (raw/move-contents user path-uuid dest)))
 
 (defn delete-paths
-    "Uses the data-info deleter endpoint to delete many paths."
-    [{:keys [user]} {:keys [paths]}]
-    (validators/not-superuser user)
-    (raw/delete-paths user paths))
+  "Uses the data-info deleter endpoint to delete many paths."
+  [{:keys [user]} {:keys [paths]}]
+  (validators/not-superuser user)
+  (raw/delete-paths user paths))
 
 (defn delete-contents
-    "Uses the data-info delete-children endpoint to delete the contents of a directory."
-    [{:keys [user]} {:keys [path]}]
-    (validators/not-superuser user)
-    (let [path-uuid (uuid-for-path user path)]
-      (raw/delete-contents user path-uuid)))
+  "Uses the data-info delete-children endpoint to delete the contents of a directory."
+  [{:keys [user]} {:keys [path]}]
+  (validators/not-superuser user)
+  (let [path-uuid (uuid-for-path user path)]
+    (raw/delete-contents user path-uuid)))
 
 (defn delete-trash
-    "Uses the data-info trash endpoint to empty the trash of a user."
-    [params]
-    (raw/delete-trash (:user params)))
+  "Uses the data-info trash endpoint to empty the trash of a user."
+  [params]
+  (raw/delete-trash (:user params)))
 
 (defn restore-files
-    "Uses the data-info restorer endpoint to restore many or all paths."
-    ([params]
-     (raw/restore-files (:user params)))
-    ([params body]
-     (raw/restore-files (:user params) (:paths body))))
+  "Uses the data-info restorer endpoint to restore many or all paths."
+  ([params]
+   (raw/restore-files (:user params)))
+  ([params body]
+   (raw/restore-files (:user params) (:paths body))))
 
 (defn collect-permissions
-    "Uses the data-info permissions-gatherer endpoint to query user permissions for a set of files/folders."
-    [params body]
-    (raw/collect-permissions (:user params) (:paths body)))
+  "Uses the data-info permissions-gatherer endpoint to query user permissions for a set of files/folders."
+  [params body]
+  (raw/collect-permissions (:user params) (:paths body)))
 
 (defn path-list-creator
   "Uses the data-info path-list-creator endpoint to create an HT Path List files for a set of file/folder paths."
@@ -248,15 +247,15 @@
 (def get-type-list raw/get-type-list)
 
 (defn set-file-type
-    "Uses the data-info set-type endpoint to change the type of a file."
-    [params body]
-    (let [path-uuid (uuid-for-path (:user params) (:path body))]
-      (raw/set-file-type (:user params) path-uuid (:type body))))
+  "Uses the data-info set-type endpoint to change the type of a file."
+  [params body]
+  (let [path-uuid (uuid-for-path (:user params) (:path body))]
+    (raw/set-file-type (:user params) path-uuid (:type body))))
 
 (defn share-with-anonymous
-    "Uses the data-info anonymizer endpoint to share paths with the anonymous user."
-    [params body]
-    (raw/share-with-anonymous (:user params) (:paths body)))
+  "Uses the data-info anonymizer endpoint to share paths with the anonymous user."
+  [params body]
+  (raw/share-with-anonymous (:user params) (:paths body)))
 
 (defn gen-output-dir
   "Either obtains or creates a default output directory using a specified base name."
@@ -306,6 +305,32 @@
       (get-in ["ids" (str uuid)])
       walk/keywordize-keys))
 
+(defn ^ISeq stats-by-uuids
+  "Resolves the stat info for the entities with the given UUIDs. The results are not paged.
+
+   Params:
+     user   - the user requesting the info.
+     uuids  - the UUIDs for the items.
+     params - additional query parameters.
+
+  Query Parameters:
+     :ignore-missing      - Ignore non-existent UUIDs.
+     :ignore-inaccessible - Ignore UUIDs referring to items the user lacks permission to view.
+     :filter-include      - Fields to explicitly include in the response.
+     :filter-exclude      - Fields to exclude from the response.
+
+   Returns:
+     It returns a path-stat map containing an additional UUID field."
+  [user uuids params]
+  (let [params (select-keys params [:ignore-missing :ignore-inaccessible :filter-include :filter-exclude])]
+    (-> (http/post (raw/data-info-url "/path-info")
+                   {:query-params (assoc params :user user)
+                    :form-params  {:ids uuids}
+                    :content-type :json
+                    :as           :json})
+        :body
+        :ids)))
+
 (defn ^ISeq stats-by-uuids-paged
   "Resolves the stat info for the entities with the given UUIDs. The results are paged.
 
@@ -328,7 +353,7 @@
    ^Integer limit
    ^Integer offset
    ^ISeq    uuids
-            info-types]
+   info-types]
   (let [info-types (if (string? info-types) [info-types] info-types)
         page       (uuids/paths-for-uuids-paged user
                                                 sort-field
@@ -471,22 +496,22 @@
   (let [method (fmt-method method)
         url    (str url)]
     (case status
-       400 (handle-client-error method url err "bad request")
-       403 (handle-client-error method url err "user not allowed")
-       404 (handle-client-error method url err "URL not found")
-       405 (handle-client-error method url err "method not supported")
-       406 (handle-client-error method url err "doesn't support requested content type")
-       409 (handle-client-error method url err "request would conflict")
-       410 (handle-client-error method url err "no longer exists")
-       412 (handle-client-error method url err "provided precondition failed")
-       413 (handle-client-error method url err "request body too large")
-       414 (handle-client-error method url err "URL too long")
-       415 (handle-client-error method url err "doesn't support request body's content type")
-       422 (handle-client-error method url err "the request was not processable")
-       500 (handle-service-error method url "internal error")
-       501 (handle-service-error method url "not implemented")
-       503 (handle-service-error method url "temporarily unavailable")
-           (handle-client-error method url err "unexpected response code"))))
+      400 (handle-client-error method url err "bad request")
+      403 (handle-client-error method url err "user not allowed")
+      404 (handle-client-error method url err "URL not found")
+      405 (handle-client-error method url err "method not supported")
+      406 (handle-client-error method url err "doesn't support requested content type")
+      409 (handle-client-error method url err "request would conflict")
+      410 (handle-client-error method url err "no longer exists")
+      412 (handle-client-error method url err "provided precondition failed")
+      413 (handle-client-error method url err "request body too large")
+      414 (handle-client-error method url err "URL too long")
+      415 (handle-client-error method url err "doesn't support request body's content type")
+      422 (handle-client-error method url err "the request was not processable")
+      500 (handle-service-error method url "internal error")
+      501 (handle-service-error method url "not implemented")
+      503 (handle-service-error method url "temporarily unavailable")
+      (handle-client-error method url err "unexpected response code"))))
 
 
 (defn- handle-error
@@ -521,9 +546,9 @@
   [^Keyword method ^String url-path ^IPersistentMap req-map & {:as error-handlers}]
   (let [url (url/url (cfg/data-info-base-url) url-path)]
     (try+
-      (raw/request method [url-path] req-map)
-      (catch #(not (nil? (:status %))) err
-        (handle-error method url err error-handlers)))))
+     (raw/request method [url-path] req-map)
+     (catch #(not (nil? (:status %))) err
+       (handle-error method url err error-handlers)))))
 
 
 (defn- data-path-url

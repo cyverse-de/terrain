@@ -21,7 +21,7 @@
     :post     http/post
     :put      http/put))
 
-(defn- data-info-url
+(defn data-info-url
   [& url-path]
   (str (apply url/url (cfg/data-info-base-url) url-path)))
 

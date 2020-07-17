@@ -316,19 +316,11 @@ If this dataset accompanies a paper, please contact us with the DOI for that pap
        :value publish-date
        :unit  ""}]}))
 
-(defn- format-folder-details
-  [user folder-id]
-  (try+
-    (data-info/stat-by-uuid user folder-id)
-    (catch Object e
-      (log/warn e "Could not lookup folder details.")
-      nil)))
-
 (defn- format-perm-id-req-response
-  [user {:keys [target_id] :as response}]
+  [user path-info-for {:keys [target_id] :as response}]
   (-> response
       (dissoc :target_id :target_type)
-      (assoc :folder (format-folder-details user (uuidify target_id)))))
+      (assoc :folder (path-info-for (keyword target_id)))))
 
 (defn- format-requested-by
   [user {:keys [requested_by target_id] :as permanent-id-request}]
@@ -338,15 +330,20 @@ If this dataset accompanies a paper, please contact us with the DOI for that pap
 
 (defn- format-permanent-id-request-details
   [user permanent-id-request]
-  (->> permanent-id-request
-       (format-perm-id-req-response user)
-       (format-requested-by user)))
+  (let [uuid          (:target_id permanent-id-request)
+        path-info-for (data-info/stats-by-uuids user [uuid] {:ignore-missing true :ignore-inaccessible true})]
+    (->> permanent-id-request
+         (format-perm-id-req-response user path-info-for)
+         (format-requested-by user))))
 
 (defn- format-perm-id-req-list
   [requests]
-  (map
-    (partial format-perm-id-req-response (:shortUsername current-user))
-    requests))
+  (let [user          (:shortUsername current-user)
+        uuids         (map :target_id requests)
+        path-info-for (data-info/stats-by-uuids user uuids {:ignore-missing true :ignore-inaccessible true})]
+    (map
+     (partial format-perm-id-req-response user path-info-for)
+     requests)))
 
 (defn list-permanent-id-requests
   [params]
