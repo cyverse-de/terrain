@@ -29,8 +29,8 @@
 (def get-token get-cas-token)
 
 (defn get-keycloak-admin-token [authorization username]
-  (if-let [[username password] (get-basic-auth-credentials authorization)]
-    (http-response/ok (-> (keycloak/get-token username password)
+  (if-let [[admin-username password] (get-basic-auth-credentials authorization)]
+    (http-response/ok (-> (keycloak/get-token admin-username password)
                           :access_token
                           (keycloak/get-impersonation-token username)))
     (http-response/unauthorized)))
