@@ -26,6 +26,8 @@
   (:import [clojure.lang IPersistentMap ISeq Keyword]
            [java.util UUID]))
 
+(defn- data-info-url [& path-elements]
+  (str (apply url/url (cfg/data-info-base-url) path-elements)))
 
 (defn ^Boolean irods-running?
   "Determines whether or not iRODS is running."
@@ -305,6 +307,32 @@
       json/decode
       (get-in ["ids" (str uuid)])
       walk/keywordize-keys))
+
+(defn ^ISeq stats-by-uuids
+  "Resovles the stat info for the entities with the given UUIDs. The results are not paged.
+
+   Params:
+     user   - the user requesting the info.
+     uuids  - the UUIDs for the items.
+     params - additional query parameters.
+
+  Query Parameters:
+     :ignore-missing      - Ignore non-existent UUIDs.
+     :ignore-inaccessible - Ignore UUIDs referring to items the user lacks permission to view.
+     :filter-include      - Fields to explicitly include in the response.
+     :filter-exclude      - Fields to exclude from the response.
+
+   Returns:
+     It returns a path-stat map containing an additional UUID field."
+  [user uuids params]
+  (let [params (select-keys params [:ignore-missing :ignore-inaccessible :filter-include :filter-exclude])]
+    (-> (http/post (data-info-url "path-info")
+                   {:query-params (assoc params :user user)
+                    :form-params  {:ids uuids}
+                    :content-type :json
+                    :as           :json})
+        :body
+        :ids)))
 
 (defn ^ISeq stats-by-uuids-paged
   "Resolves the stat info for the entities with the given UUIDs. The results are paged.
