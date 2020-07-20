@@ -1,7 +1,6 @@
 (ns terrain.routes.filesystem
   (:use [common-swagger-api.schema]
         [medley.core :only [update-existing-in]]
-        [ring.util.http-response :only [ok]]
         [terrain.auth.user-attributes :only [require-authentication current-user]]
         [terrain.util :only [controller optional-routes]])
   (:require [clojure.string :as string]
@@ -55,7 +54,7 @@
        :description (str "Provides a paged listing of the contents of a folder in the data store.")
        :return fs-schema/PagedFolderListing
        :coercion mw/no-response-coercion
-       (ok (dir/do-paged-listing current-user params)))
+       (dir/do-paged-listing current-user params))
 
      (POST "/path-list-creator" [:as req]
        :middleware [require-authentication]

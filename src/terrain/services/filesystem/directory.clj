@@ -2,6 +2,7 @@
   (:use [clojure-commons.core :only [remove-nil-values]]
         [clojure-commons.validators]
         [kameleon.uuids :only [uuidify]]
+        [ring.util.http-response :only [ok]]
         [slingshot.slingshot :only [try+ throw+]])
   (:require [clojure.tools.logging :as log]
             [clojure.string :as string]
@@ -15,7 +16,8 @@
             [terrain.services.metadata.favorites :as favorites]
             [terrain.util.config :as cfg]
             [terrain.util.validators :as duv]
-            [terrain.services.filesystem.common-paths :as paths]))
+            [terrain.services.filesystem.common-paths :as paths]
+            [ring.util.http-response :as response]))
 
 (defn- is-favorite?
   [favorite-ids id]
@@ -162,7 +164,12 @@
 (defn do-paged-listing
   "Entrypoint for the API that calls (paged-dir-listing)."
   [{user :shortUsername} {:keys [path] :as params}]
-  (let [params (dissoc params :path)]
-    (->> (fix-paged-listing-params user params)
-         (data/list-folder-contents path)
-         (format-page user))))
+  (if-let [listing-user (if (= path (cfg/fs-community-data))
+                          (or user "anonymous")
+                          user)]
+    (let [params (dissoc params :path)]
+      (->> (fix-paged-listing-params listing-user params)
+           (data/list-folder-contents path)
+           (format-page user)
+           (ok)))
+    (response/unauthorized "No authentication information found in the request")))
