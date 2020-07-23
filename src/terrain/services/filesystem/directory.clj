@@ -2,7 +2,6 @@
   (:use [clojure-commons.core :only [remove-nil-values]]
         [clojure-commons.validators]
         [kameleon.uuids :only [uuidify]]
-        [ring.util.http-response :only [ok]]
         [slingshot.slingshot :only [try+ throw+]])
   (:require [clojure.tools.logging :as log]
             [clojure.string :as string]
@@ -170,6 +169,6 @@
     (let [params (dissoc params :path)]
       (->> (fix-paged-listing-params listing-user params)
            (data/list-folder-contents path)
-           (format-page user)
-           (ok)))
-    (response/unauthorized "No authentication information found in the request")))
+           (format-page user)))
+    (throw+ {:type :clojure-commons.exception/not-authorized
+             :user user})))
