@@ -1,7 +1,9 @@
 (ns terrain.core
   (:gen-class)
-  (:use [clojure.java.io :only [file resource]])
-  (:require [terrain.util.config :as config]
+  (:use [clojure.java.io :only [file resource]]
+        [terrain.middleware :only [wrap-fake-user]])
+  (:require [terrain.routes :as routes]
+            [terrain.util.config :as config]
             [clojure.tools.nrepl.server :as nrepl]
             [me.raynes.fs :as fs]
             [clj-http.client :as http]
@@ -59,10 +61,9 @@
 
 (defn cli-options
   []
-  [["-c" "--config PATH" "Path to the config file"
-    :default "/etc/iplant/de/terrain.properties"]
-   ["-v" "--version" "Print out the version number."]
-   ["-h" "--help"]])
+  (concat
+   (ccli/cli-options)
+   [["-u" "--fake-user USERNAME" "The username to use for fake authentication"]]))
 
 (def svc-info
   {:desc "DE service for business logic"
@@ -78,20 +79,31 @@
     ((eval 'terrain.routes/app-wrapper) req)))
 
 (defn run-jetty
-  []
+  [port fake-user]
   (require 'terrain.routes 'ring.adapter.jetty)
-  (log/warn "Started listening on" (config/listen-port))
-  ((eval 'ring.adapter.jetty/run-jetty) (eval 'terrain.routes/app-wrapper) {:port (config/listen-port)}))
+  (log/warn "Started listening on" port)
+  ((eval 'ring.adapter.jetty/run-jetty)
+   (wrap-fake-user routes/app-wrapper fake-user)
+   {:port port}))
+
+(defn- load-config
+  [config-path]
+  (let [config-path (or config-path "/etc/iplant/de/terrain.properties")]
+    (when-not (fs/exists? config-path)
+     (ccli/exit 1 (str "The config file does not exist.")))
+   (when-not (fs/readable? config-path)
+     (ccli/exit 1 "The config file is not readable."))
+   (config/load-config-from-file config-path)))
+
+(defn- get-port
+  [{:keys [port]}]
+  (or port (config/listen-port)))
 
 (defn -main
   [& args]
   (tc/with-logging-context svc-info
     (let [{:keys [options]} (ccli/handle-args svc-info args cli-options)]
-      (when-not (fs/exists? (:config options))
-        (ccli/exit 1 (str "The config file does not exist.")))
-      (when-not (fs/readable? (:config options))
-        (ccli/exit 1 "The config file is not readable."))
-      (config/load-config-from-file (:config options))
+      (load-config (:config options))
       (http/with-connection-pool {:timeout 5 :threads 10 :insecure? false :default-per-route 10}
         (icat/configure-icat)
-        (run-jetty)))))
+        (run-jetty (get-port options) (:fake-user options))))))

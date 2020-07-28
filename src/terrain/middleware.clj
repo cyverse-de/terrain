@@ -1,5 +1,6 @@
 (ns terrain.middleware
-  (:require [clojure.string :as string]))
+  (:require [clojure.string :as string]
+            [terrain.auth.user-attributes :as user-attributes]))
 
 (defn- add-context-path
   "Adds a context path to the start of a URI path if it's not present."
@@ -25,3 +26,13 @@
             (update-in [:params] dissoc query-param (keyword query-param))
             (update-in [:query-params] dissoc query-param (keyword query-param))
             handler)))))
+
+(defn wrap-fake-user
+  "Middleware that configures fake authentication for development testing. If the fake user is falsey,
+   the handler function is not wrapped at all."
+  [handler fake-user]
+  (if fake-user
+    (fn [request]
+      (binding [user-attributes/fake-user fake-user]
+        (handler request)))
+    handler))

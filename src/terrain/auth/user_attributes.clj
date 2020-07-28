@@ -1,12 +1,20 @@
 (ns terrain.auth.user-attributes
+  (:use [slingshot.slingshot :only [try+]])
   (:require [clojure.string :as string]
             [clojure.tools.logging :as log]
             [clojure-commons.response :as resp]
             [clojure-commons.exception :as cx]
+            [clojure-commons.exception-util :as cxu]
+            [terrain.clients.iplant-groups.subjects :as subjects]
             [terrain.util.config :as cfg]
             [terrain.util.jwt :as jwt]
             [terrain.util.oauth :as oauth-util]
             [terrain.util.keycloak-oidc :as keycloak-oidc-util]))
+
+(def
+  ^{:doc "The username to use when we're using fake authentication."
+    :dynamic true}
+  fake-user nil)
 
 (def
   ^{:doc "The authenticated user or nil if the service is unsecured."
@@ -40,15 +48,26 @@
   (jwt/terrain-user-from-jwt-claims jwt-claims jwt/user-from-wso2-assertion))
 
 (defn fake-user-from-attributes
-  "Creates a real map of fake values for a user base on environment variables."
+  "Uses the username bound to `fake-user` to obtain user attributes. The subject lookup happens with every request
+   so that terrain doesn't have to be restarted if the subject lookup fails when terrain is starting up. This adds
+   a little bit of overhead to each request when fake authentication is enabled, but it can avoid problems if, for
+   example, iplant-groups isn't available when terrain is started."
   [& _]
-  {:username      (System/getenv "IPLANT_CAS_USER")
-   :password      (System/getenv "IPLANT_CAS_PASS")
-   :email         (System/getenv "IPLANT_CAS_EMAIL")
-   :shortUsername (System/getenv "IPLANT_CAS_SHORT")
-   :firstName     (System/getenv "IPLANT_CAS_FIRST")
-   :lastName      (System/getenv "IPLANT_CAS_LAST")
-   :commonName    (System/getenv "IPLANT_CAS_COMMON")})
+  (if fake-user
+    (try+
+     (let [subject (subjects/lookup-subject (cfg/grouper-user) fake-user)]
+       {:username      (str (:id subject) "@" (cfg/uid-domain))
+        :password      nil
+        :email         (:email subject)
+        :shortUsername (:id subject)
+        :firstName     (:first_name subject)
+        :lastName      (:last_name subject)
+        :commonName    (:description subject)})
+     (catch [:status 404] _
+       (cxu/internal-system-error (str "fake user " fake-user " not found")))
+     (catch Object _
+       (cxu/internal-system-error (str "fake user lookup for username " fake-user " failed"))))
+    (cxu/internal-system-error (str "no fake user specified on command line"))))
 
 (defn- user-info-from-current-user
   "Converts the current-user to the user info structure expected in the request."
@@ -84,7 +103,7 @@
 (defn- get-fake-auth
   "Returns a non-nil value if we're using fake authentication."
   [_]
-  (System/getenv "IPLANT_CAS_FAKE"))
+  fake-user)
 
 (defn- get-de-jwt-assertion
   "Extracts a JWT assertion from the request header used by the DE, returning nil if none is
@@ -187,14 +206,6 @@
     (if (:user-info req)
       (handler req)
       (resp/unauthorized "No authentication information found in request."))))
-
-(defn fake-store-current-user
-  "Fake storage of a user"
-  [handler & _]
-  (fn [req]
-    (log/info "Storing current user from IPLANT_CAS_* env vars.")
-    (binding [current-user (fake-user-from-attributes req)]
-      (handler req))))
 
 (defmacro with-user
   "Performs a task with the given user information bound to current-user. This macro is used

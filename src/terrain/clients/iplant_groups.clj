@@ -8,6 +8,7 @@
             [clojure-commons.exception-util :as cxu]
             [cyverse-groups-client.core :as c]
             [terrain.clients.apps.raw :as apps-client]
+            [terrain.clients.iplant-groups.subjects :as subjects]
             [terrain.clients.metadata.raw :as metadata-client]
             [terrain.util.config :as config]))
 
@@ -57,25 +58,21 @@
    :institution ""
    :source_id ""})
 
-(defn- lookup-subject-url
-  [short-username]
-  (str (curl/url (config/ipg-base) "subjects" short-username)))
-
 (defn lookup-subject
   "Uses iplant-groups's subject lookup by ID endpoint to retrieve user details."
   [user short-username]
-  (try
-    (if-let [user-info (-> (http/get (lookup-subject-url short-username) {:query-params {:user user} :as :json})
-                           (:body))]
-      user-info
-      (do (log/warn (str "no user info found for username '" short-username "'"))
-          nil))
-    (catch Exception e
-      (log/error e (str "username lookup for '" short-username "' failed"))
+  (try+
+    (subjects/lookup-subject user short-username)
+    (catch [:status 404] _
+      (log/warn (str "no user info found for username '" short-username "'"))
+      nil)
+    (catch Object _
+      (log/error (:throwable &throw-context) "user lookup for '" short-username "' failed")
       nil)))
 
 (defn lookup-subject-add-empty
-  "Uses iplant-groups's subject lookup by ID endpoint to retrieve user details, returning an empty user info block if nothing is found."
+  "Uses iplant-groups's subject lookup by ID endpoint to retrieve user details, returning an empty user info block if
+   nothing is found."
   [user short-username]
   (if-let [user-info (lookup-subject user short-username)]
     user-info
