@@ -1,6 +1,7 @@
 (ns terrain.routes.filesystem.navigation
   (:use [common-swagger-api.schema]
         [ring.util.http-response :only [ok]]
+        [terrain.auth.user-attributes :only [require-authentication]]
         [terrain.util :only [optional-routes]]
         [terrain.util.transformers :only [add-current-user-to-map]])
   (:require [common-swagger-api.schema.data.navigation :as schema]
@@ -26,6 +27,7 @@
            (ok (root/do-root-listing (add-current-user-to-map {}))))
 
       (GET "/directory" [:as {:keys [params]}]
+           :middleware [require-authentication]
            :query [params terrain-nav-schema/DirectoryQueryParams]
            :responses terrain-nav-schema/DirectoryResponses
            :summary schema/NavigationSummary
