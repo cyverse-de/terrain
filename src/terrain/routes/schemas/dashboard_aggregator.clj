@@ -40,7 +40,8 @@
 
 (defschema DashboardFeeds
   {(optional-key :news)   (describe (maybe [DashboardFeedItem]) "The news feed")
-   (optional-key :events) (describe (maybe [DashboardFeedItem]) "The events feed")})
+   (optional-key :events) (describe (maybe [DashboardFeedItem]) "The events feed")
+   (optional-key :videos) (describe (maybe [DashboardFeedItem]) "The videos feed")})
 
 (defschema DashboardAggregatedApps
   {(optional-key :recentlyAdded) (describe (maybe [DashboardApp]) "Apps recently added by the user")
