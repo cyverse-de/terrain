@@ -29,11 +29,14 @@
    (optional-key :parent_id)          (describe (maybe UUID) "The UUID of the parent analysis. Only for batch analyses")})
 
 (defschema DashboardFeedItem
-  {:id          (describe String "The unique identifier for a feed. Probably not a UUID")
-   :name        (describe String "The name of the item in the feed. Not the name of the feed itself")
-   :description (describe String "Corresponds to the content snippet provided by the feed. Named description to match the other types")
-   :link        (describe String "Link to the source of the feed item. Probably leads to the website")
-   :date_added  (describe String "The date the item was published")})
+  {:id                     (describe String "The unique identifier for a feed. Probably not a UUID")
+   :name                   (describe String "The name of the item in the feed. Not the name of the feed itself")
+   :description            (describe String "Corresponds to the content snippet provided by the feed. Named description to match the other types")
+   :link                   (describe String "Link to the source of the feed item. Probably leads to the website")
+   :date_added             (describe String "The date the item was added to the feed")
+   :publication_date       (describe String "The date the item was originally published")
+   :author                 (describe String "The author of the item")
+   (optional-key :content) (describe (maybe String) "The content of the item")})
 
 (defschema DashboardFeeds
   {(optional-key :news)   (describe (maybe [DashboardFeedItem]) "The news feed")
@@ -48,9 +51,9 @@
    (optional-key :running) (describe (maybe [DashboardAnalysis]) "Analyses currently running for the user")})
 
 (defschema DashboardAggregatorResponse
- {:apps                    (describe DashboardAggregatedApps "The app listings returned for the dashboard")
-  (optional-key :analyses) (describe DashboardAggregatedAnalyses "The analysis listings returned for the dashboard")
-  (optional-key :feeds)    (describe DashboardFeeds "Information from RSS feeds on the website")})
+  {:apps                    (describe DashboardAggregatedApps "The app listings returned for the dashboard")
+   (optional-key :analyses) (describe DashboardAggregatedAnalyses "The analysis listings returned for the dashboard")
+   (optional-key :feeds)    (describe DashboardFeeds "Information from RSS feeds on the website")})
 
 (defschema DashboardRequestParams
   {(optional-key :limit) (describe (maybe Long) "The number of responses to include in each field.")})
