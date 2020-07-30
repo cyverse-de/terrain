@@ -32,6 +32,7 @@
                  [org.apache.tika/tika-core "1.23"]
                  [ring/ring-jetty-adapter "1.8.0"]
                  [slingshot "0.12.2"]
+                 [org.cyverse/async-tasks-client "0.0.3"]
                  [org.cyverse/clj-icat-direct "2.8.6"]
                  [org.cyverse/clj-jargon "2.8.9"]
                  [org.cyverse/clojure-commons "3.0.5"]

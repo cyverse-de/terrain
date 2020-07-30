@@ -9,6 +9,7 @@
             [clojure.tools.logging :as log]
             [clojure-commons.file-utils :as ft]
             [org.cyverse.metadata-files.datacite-4-1 :as datacite]
+            [terrain.clients.async-tasks :as async-tasks-client]
             [terrain.clients.data-info :as data-info]
             [terrain.clients.data-info.raw :as data-info-client]
             [terrain.clients.ezid :as ezid]
@@ -184,46 +185,102 @@ If this dataset accompanies a paper, please contact us with the DOI for that pap
 (defn- move-folder
   [user {:keys [id path]} dest-path]
   (try+
-   (data-info-client/move-single user id dest-path)
-   (ft/path-join dest-path (ft/basename path))
-
+   (-> (data-info-client/move-single user id dest-path)
+       :body
+       (json/decode true)
+       :async-task-id)
    (catch Object e
      (log/error e)
      (email/send-permanent-id-request-data-move-error path dest-path current-user (:body e (str e)))
-     path)))
+     nil)))
+
+
+(defn- async-move-poller
+  [{:keys [id path]} dest-path async-task-id post-move-fn]
+  (try+
+    (log/info "Waiting for async move to complete for" id path)
+
+    (loop [sleep-seconds 1]
+      (Thread/sleep (* sleep-seconds 1000))
+
+      (let [{:keys [statuses end_date]} (async-tasks-client/get-by-id async-task-id)
+            last-status (-> statuses last :status)]
+        (when (and end_date (not= last-status "completed"))
+          (log/warn "Async folder move not completed successfully:" last-status))
+
+        (if end_date
+          ;; Async move completed.
+          (post-move-fn (:path (data-info/stat-by-uuid (config/irods-user)
+                                                       id
+                                                       :filter-include "path")))
+          ;; Else keep waiting for up to wait-seconds-max.
+          ;; Since the sleep seconds are doubled each time,
+          ;; then this thread has already been waiting
+          ;; ((sleep-seconds * 2) - 1) number of seconds.
+          (if (< (dec (* sleep-seconds 2)) (config/permanent-id-async-move-wait-seconds-max))
+            (recur (* sleep-seconds 2))
+            (throw+ (str "Async move took too long to complete successfully. Last status: "
+                         last-status))))))
+
+    (catch Object e
+      (log/error e)
+      (email/send-permanent-id-request-data-move-error path
+                                                       dest-path
+                                                       current-user
+                                                       (:body e (str e))))))
 
 (defn- move-data-item-to-staging
-  [user folder]
+  [user {:keys [path] :as folder}]
   (let [curators-group (config/permanent-id-curators-group)
-        staged-path    (move-folder (config/irods-user)
+        async-task-id  (move-folder (config/irods-user)
                                     folder
-                                    (config/permanent-id-staging-dir))]
-    (data-info/share (config/irods-user) [curators-group] [staged-path] "own")
-    (data-info/share (config/irods-user) [user] [staged-path] "write")
-    staged-path))
+                                    (config/permanent-id-staging-dir))
+        share-fn       (fn [staged-path]
+                         (data-info/share (config/irods-user) [curators-group] [staged-path] "own")
+                         (data-info/share (config/irods-user) [user] [staged-path] "write"))
+        share-poller   #(async-move-poller folder
+                                           (config/permanent-id-staging-dir)
+                                           async-task-id
+                                           share-fn)]
+
+    (when async-task-id
+      (async-tasks-client/run-async-thread async-task-id
+                                           share-poller
+                                           "permanent-id-move-staging"))
+    (format-staging-path path)))
 
 (defn- stage-data-item
   [user {:keys [path] :as folder}]
   (let [staged-path (format-staging-path path)]
-    (if (not= path staged-path)
-      (move-data-item-to-staging user folder)
-      staged-path)))
+    (when (not= path staged-path)
+      (move-data-item-to-staging user folder))
+    staged-path))
 
 (defn- move-data-item-to-published
-  [user folder]
+  [{:keys [path] :as folder}]
   (let [curators-group (config/permanent-id-curators-group)
-        publish-path   (move-folder (config/irods-user)
+        async-task-id  (move-folder (config/irods-user)
                                     folder
-                                    (config/permanent-id-publish-dir))]
-    (data-info/share (config/irods-user) [curators-group] [publish-path] "own")
-    publish-path))
+                                    (config/permanent-id-publish-dir))
+        share-fn       (fn [publish-path]
+                         (data-info/share (config/irods-user) [curators-group] [publish-path] "own"))
+        share-poller   #(async-move-poller folder
+                                           (config/permanent-id-publish-dir)
+                                           async-task-id
+                                           share-fn)]
+
+    (when async-task-id
+      (async-tasks-client/run-async-thread async-task-id
+                                           share-poller
+                                           "permanent-id-move-publish"))
+    (format-publish-path path)))
 
 (defn- publish-data-item
-  [user {:keys [path] :as folder}]
+  [{:keys [path] :as folder}]
   (let [publish-path (format-publish-path path)]
-    (if (not= path publish-path)
-      (move-data-item-to-published user folder)
-      publish-path)))
+    (when (not= path publish-path)
+      (move-data-item-to-published folder))
+    publish-path))
 
 (defn- publish-metadata
   [{:keys [id type]} publish-avus]
@@ -296,7 +353,10 @@ If this dataset accompanies a paper, please contact us with the DOI for that pap
   "Gets data-info stat for the given ID and checks if the data item is valid for a Permanent ID request.
   Should filter the stat to what's needed for validation and by callers."
   [user request-type data-id]
-  (let [data-item (->> (data-info/stat-by-uuid user data-id :filter-include "path,id,type,permission,file-count,dir-count") (validate-data-item user))
+  (let [data-item (->> (data-info/stat-by-uuid user
+                                               data-id
+                                               :filter-include "path,id,type,permission,file-count,dir-count")
+                       (validate-data-item user))
         metadata (data-info/get-metadata-json user data-id)]
     (parse-valid-ezid-metadata request-type data-item (format-avus metadata))
     data-item))
@@ -417,7 +477,7 @@ If this dataset accompanies a paper, please contact us with the DOI for that pap
           ezid-response   (ezid/mint-id shoulder (parse-valid-ezid-metadata type folder avus))
           identifier      (get ezid-response (keyword type))
           publish-avus    (format-publish-avus avus identifier type)
-          publish-path    (publish-data-item user folder)]
+          publish-path    (publish-data-item folder)]
       (email/send-permanent-id-request-complete type
                                                 publish-path
                                                 (json/encode ezid-response {:pretty true})

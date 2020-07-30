@@ -1,6 +1,7 @@
 (ns terrain.util.config
   (:use [slingshot.slingshot :only [throw+]])
-  (:require [clojure-commons.config :as cc]
+  (:require [async-tasks-client.core :as async-tasks-client]
+            [clojure-commons.config :as cc]
             [clojure-commons.error-codes :as ce]
             [metadata-client.core :as metadata-client]))
 
@@ -154,6 +155,11 @@
   "The base URL to use when connecting to secured Apps services."
   [props config-valid configs app-routes-enabled]
   "terrain.apps.base-url" "http://apps")
+
+(cc/defprop-optstr async-tasks-base-url
+  "The base URL to use when connecting to the async-tasks services."
+  [props config-valid configs]
+  "terrain.async-tasks.base-url" "http://async-tasks:60000")
 
 (cc/defprop-optstr metadata-base-url
   "The base URL to use when connecting to the metadata services."
@@ -413,6 +419,13 @@
   [props config-valid configs]
   "terrain.job-exec.default-output-folder" "analyses")
 
+(cc/defprop-optint permanent-id-async-move-wait-seconds-max
+  "The max amount of time to wait for async folder moves, in seconds.
+   By default, 1023 = (2^10-1) seconds, since the waiting thread doubles its
+   sleep-seconds each time it polls until the async task completes."
+  [props config-valid configs]
+  "terrain.permanent-id.async-move.wait-seconds.max" 1023)  ;; Just over 17 minutes
+
 (cc/defprop-optstr permanent-id-curators-group
   "The data store group that manages permanent ID request data."
   [props config-valid configs]
@@ -542,6 +555,9 @@
   "The URL to the dashboard-aggregator service."
   [props config-valid configs]
   "terrain.dashboard-aggregator.base-uri" "http://dashboard-aggregator")
+
+(def async-tasks-client
+  (memoize #(async-tasks-client/new-async-tasks-client (async-tasks-base-url))))
 
 (def metadata-client
   (memoize #(metadata-client/new-metadata-client (metadata-base-url))))
