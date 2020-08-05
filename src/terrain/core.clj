@@ -2,8 +2,7 @@
   (:gen-class)
   (:use [clojure.java.io :only [file resource]]
         [terrain.middleware :only [wrap-fake-user]])
-  (:require [terrain.routes :as routes]
-            [terrain.util.config :as config]
+  (:require [terrain.util.config :as config]
             [clojure.tools.nrepl.server :as nrepl]
             [me.raynes.fs :as fs]
             [clj-http.client :as http]
@@ -83,7 +82,7 @@
   (require 'terrain.routes 'ring.adapter.jetty)
   (log/warn "Started listening on" port)
   ((eval 'ring.adapter.jetty/run-jetty)
-   (wrap-fake-user routes/app-wrapper fake-user)
+   (wrap-fake-user (eval 'terrain.routes/app-wrapper) fake-user)
    {:port port}))
 
 (defn- load-config
