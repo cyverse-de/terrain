@@ -71,12 +71,14 @@
    :art-id "terrain"
    :service "terrain"})
 
+;; terrain.routes MUST be required and eval'd here or the configuration won't yet be loaded
 (defn dev-handler
   [req]
   (tc/with-logging-context svc-info
     (require 'terrain.routes)
     ((eval 'terrain.routes/app-wrapper) req)))
 
+;; terrain.routes MUST be required and eval'd here or the configuration won't yet be loaded
 (defn run-jetty
   [port fake-user]
   (require 'terrain.routes 'ring.adapter.jetty)
