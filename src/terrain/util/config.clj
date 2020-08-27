@@ -61,6 +61,11 @@
   [props config-valid configs]
   "terrain.routes.apps" true)
 
+(cc/defprop-optboolean bag-routes-enabled
+  "Enables or disables bag endpoints."
+  [props config-valid configs]
+  "terrain.routes.bags" true)
+
 (cc/defprop-optboolean metadata-routes-enabled
   "Enables or disables metadata endpoints."
   [props config-valid configs]
@@ -203,6 +208,8 @@
 
 
 ;;;iRODS connection information
+
+
 (cc/defprop-optstr irods-home
   "Returns the path to the home directory in iRODS. Usually /iplant/home"
   [props config-valid configs data-routes-enabled]
