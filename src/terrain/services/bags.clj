@@ -29,5 +29,3 @@
 (defn delete-bag
   [username bag-id]
   (bags/delete-bag username bag-id))
-
-
