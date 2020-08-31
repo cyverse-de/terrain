@@ -32,7 +32,7 @@
        :description AddBagDescription
        :body        [body BagContents]
        :return      AddBagResponse
-       (ok (add-bag (:username current-user) (log/spy body))))
+       (ok (add-bag (:username current-user) body)))
 
      (DELETE "/" []
        :summary     DeleteAllBagsSummary
@@ -50,7 +50,7 @@
        (POST "/" []
          :summary     UpdateBagSummary
          :description UpdateBagDescription
-         :body        [body Bag]
+         :body        [body BagContents]
          (ok (update-bag (:username current-user) bag-id body)))
 
        (DELETE "/" []

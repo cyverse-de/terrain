@@ -5,10 +5,13 @@
 
 (def BagIDPathParam (describe String "The ID of the bag located in the path of the URL"))
 
+(defschema BagContents
+  {(describe Keyword "Bag key") (describe Any "Bag value")})
+
 (defschema Bag
   {:id       (describe UUID "The bag id")
    :user_id  (describe UUID "The user's id")
-   :contents (describe String "JSON-encoded bag")})
+   :contents (describe BagContents "JSON-encoded bag")})
 
 (defschema AddBagResponse
   {:id (describe UUID "The UUID assigned to the bag")})
@@ -21,9 +24,6 @@
 
 (defschema BagList
   {:bags (describe [Bag] "The list of bags associated with the user")})
-
-(defschema BagContents
-  {(describe Keyword "Bag key") (describe Any "Bag value")})
 
 (def HasBagsSummary "Tells whether a user has a bag")
 (def HasBagsDescription "Tells whether a user has one or more bags in the database")

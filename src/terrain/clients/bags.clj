@@ -15,7 +15,7 @@
 
 (defn has-bags
   [username]
-  (<= 200 (:status (http/head (bags-url [username]))) 299))
+  (:body (http/head (bags-url [username]))))
 
 (defn get-bags
   [username]
@@ -30,7 +30,7 @@
 
 (defn delete-all-bags
   [username]
-  (<= 200 (:status (http/delete (bags-url [username]))) 299))
+  (:body (http/delete (bags-url [username]))))
 
 (defn get-bag
   [username id]
@@ -44,4 +44,4 @@
 
 (defn delete-bag
   [username id]
-  (<= 200 (:status (http/delete (bags-url [username id]))) 299))
+  (:body (http/delete (bags-url [username id]))))
