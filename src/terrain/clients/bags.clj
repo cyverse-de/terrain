@@ -24,9 +24,9 @@
 (defn add-bag
   [username contents]
   (:body (http/put (bags-url [username])
-                   {:content-type :json
-                    :as           :json
-                    :form-params  contents})))
+                   {:form-params  contents
+                    :content-type :json
+                    :as           :json})))
 
 (defn delete-all-bags
   [username]
@@ -38,9 +38,9 @@
 
 (defn update-bag
   [username id contents]
-  (:body (http/post (bags-url [username id]) {:content-type :json
-                                              :as           :json
-                                              :form-params  contents})))
+  (:body (http/post (bags-url [username id]) {:form-params  contents
+                                              :content-type :json
+                                              :as           :json})))
 
 (defn delete-bag
   [username id]

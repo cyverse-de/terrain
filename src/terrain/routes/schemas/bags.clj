@@ -22,6 +22,9 @@
 (defschema BagList
   {:bags (describe [Bag] "The list of bags associated with the user")})
 
+(defschema BagContents
+  {(describe Keyword "Bag key") (describe Any "Bag value")})
+
 (def HasBagsSummary "Tells whether a user has a bag")
 (def HasBagsDescription "Tells whether a user has one or more bags in the database")
 
