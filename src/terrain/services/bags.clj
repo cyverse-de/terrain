@@ -1,25 +1,33 @@
 (ns terrain.services.bags
-  (:use [terrain.util.service]))
+  (:use [terrain.util.service])
+  (:require [terrain.clients.bags :as bags]))
 
 (defn has-bags
-  [username])
+  [username]
+  (bags/has-bags username))
 
 (defn get-bags
-  [username])
+  [username]
+  (bags/get-bags username))
 
 (defn get-bag
-  [username bag-id])
+  [username bag-id]
+  (bags/get-bag username bag-id))
 
 (defn add-bag
-  [username contents])
+  [username contents]
+  (bags/add-bag username contents))
 
 (defn update-bag
-  [username bag-id contents])
+  [username bag-id contents]
+  (bags/update-bag username bag-id contents))
 
 (defn delete-all-bags
-  [username])
+  [username]
+  (bags/delete-all-bags username))
 
 (defn delete-bag
-  [username bag-id])
+  [username bag-id]
+  (bags/delete-bag username bag-id))
 
 
