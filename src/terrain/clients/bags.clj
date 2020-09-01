@@ -7,11 +7,9 @@
             [terrain.util.config :as config]))
 
 (defn- bags-url
-  ([]
-   (bags-url []))
-  ([components]
-   (-> (apply url (config/bags-base-url) components)
-       (str))))
+[& [components]]
+  (-> (apply url (config/bags-base-url) components)
+      (str)))
 
 (defn has-bags
   [username]
