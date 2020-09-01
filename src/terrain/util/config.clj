@@ -61,6 +61,11 @@
   [props config-valid configs]
   "terrain.routes.apps" true)
 
+(cc/defprop-optboolean bag-routes-enabled
+  "Enables or disables bag endpoints."
+  [props config-valid configs]
+  "terrain.routes.bags" true)
+
 (cc/defprop-optboolean metadata-routes-enabled
   "Enables or disables metadata endpoints."
   [props config-valid configs]
@@ -203,6 +208,8 @@
 
 
 ;;;iRODS connection information
+
+
 (cc/defprop-optstr irods-home
   "Returns the path to the home directory in iRODS. Usually /iplant/home"
   [props config-valid configs data-routes-enabled]
@@ -489,7 +496,7 @@
 (cc/defprop-optstr prefs-base-url
   "The hostname of the user-preferences service"
   [props config-valid configs]
-  "terrain.preferences.host" "http://user-preferences")
+  "terrain.preferences.host" "http://user-info/preferences")
 
 (cc/defprop-optstr search-base-url
   "The hostname of the search service"
@@ -499,12 +506,17 @@
 (cc/defprop-optstr sessions-base-url
   "The hostname of the user-sessions service"
   [props config-valid configs]
-  "terrain.sessions.host" "http://user-sessions")
+  "terrain.sessions.host" "http://user-info/sessions")
 
 (cc/defprop-optstr saved-searches-base-url
   "The base URL of the saved-searches service"
   [props config-valid configs]
-  "terrain.saved-searches.host" "http://saved-searches")
+  "terrain.saved-searches.host" "http://user-info/searches")
+
+(cc/defprop-optstr bags-base-url
+  "The base URL for accessing bag information"
+  [props config-valid configs]
+  "terrain.bags.host" "http://user-info/bags")
 
 (cc/defprop-optstr oauth-base-uri
   "The base URI for the OAuth API endpoints."

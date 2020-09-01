@@ -19,6 +19,7 @@
         [terrain.routes.apps.pipelines]
         [terrain.routes.apps.reference-genomes]
         [terrain.routes.apps.tools]
+        [terrain.routes.bags]
         [terrain.routes.bootstrap]
         [terrain.routes.dashboard-aggregator]
         [terrain.routes.data]
@@ -74,9 +75,9 @@
    the next set of routes (`secured-routes-no-context`) if nothing matches."
   []
   (util/flagged-routes
-    (dashboard-aggregator-routes)
-    (filesystem-navigation-routes)
-    (secured-filesystem-routes)))
+   (dashboard-aggregator-routes)
+   (filesystem-navigation-routes)
+   (secured-filesystem-routes)))
 
 ; Add new secured routes to this function, not to (secured-routes).
 ; This function allows for secured routes without the /secured content/prefix,
@@ -108,6 +109,7 @@
    (oauth-routes)
    (quicklaunch-routes)
    (request-routes)
+   (bag-routes)
    (route/not-found (service/unrecognized-path-response))))
 
 ; The old way of adding secured routes. Prepends /secured to the URL
