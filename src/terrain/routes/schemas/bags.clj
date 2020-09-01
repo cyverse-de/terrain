@@ -38,4 +38,4 @@
 (def DeleteAllBagsDescription "Deletes all of a user's bags")
 
 (def DeleteBagSummary "Delete a bag")
-(def DeleteBagDescription "Delete's a bag for a user based on its UUID")
+(def DeleteBagDescription "Deletes a bag for a user based on its UUID")

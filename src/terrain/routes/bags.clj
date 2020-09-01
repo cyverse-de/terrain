@@ -19,7 +19,8 @@
      (HEAD "/" []
        :summary     HasBagsSummary
        :description HasBagsDescription
-       (ok (has-bags (:username current-user))))
+       (has-bags (:username current-user))
+       (ok))
 
      (GET "/" []
        :summary     BagListSummary
@@ -37,7 +38,8 @@
      (DELETE "/" []
        :summary     DeleteAllBagsSummary
        :description DeleteAllBagsDescription
-       (ok (delete-all-bags (:username current-user))))
+       (delete-all-bags (:username current-user))
+       (ok))
 
      (context "/:bag-id" []
        :path-params [bag-id :- BagIDPathParam]
@@ -56,4 +58,5 @@
        (DELETE "/" []
          :summary     DeleteBagSummary
          :description DeleteBagDescription
-         (ok (delete-bag (:username current-user) bag-id)))))))
+         (delete-bag (:username current-user) bag-id)
+         (ok))))))

@@ -13,7 +13,8 @@
 
 (defn has-bags
   [username]
-  (:body (http/head (bags-url [username]))))
+  (:body (http/head (bags-url [username])))
+  nil)
 
 (defn get-bags
   [username]
@@ -28,7 +29,8 @@
 
 (defn delete-all-bags
   [username]
-  (:body (http/delete (bags-url [username]))))
+  (:body (http/delete (bags-url [username])))
+  nil)
 
 (defn get-bag
   [username id]
@@ -42,4 +44,5 @@
 
 (defn delete-bag
   [username id]
-  (:body (http/delete (bags-url [username id]))))
+  (:body (http/delete (bags-url [username id])))
+  nil)
