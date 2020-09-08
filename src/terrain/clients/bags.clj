@@ -7,7 +7,7 @@
             [terrain.util.config :as config]))
 
 (defn- bags-url
-[& [components]]
+  [& [components]]
   (-> (apply url (config/bags-base-url) components)
       (str)))
 
@@ -45,4 +45,20 @@
 (defn delete-bag
   [username id]
   (:body (http/delete (bags-url [username id])))
+  nil)
+
+(defn get-default-bag
+  [username]
+  [username]
+  (:body (http/delete (bags-url [username]) {:as :json})))
+
+(defn update-default-bag
+  [username contents]
+  (:body (http/post (bags-url [username]) {:form-params  contents
+                                           :content-type :json
+                                           :as           :json})))
+
+(defn delete-default-bag
+  [username]
+  (:body (http/delete (bags-url [username])))
   nil)

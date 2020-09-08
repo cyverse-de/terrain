@@ -41,6 +41,25 @@
        (delete-all-bags (:username current-user))
        (ok))
 
+     (context "/default" []
+
+       (GET "/" []
+         :summary     GetDefaultBagSummary
+         :description GetDefaultBagDescription
+         (ok (get-default-bag (:username current-user))))
+
+       (POST "/" []
+         :summary     UpdateDefaultBagSummary
+         :description UpdateDefaultBagDescription
+         :body        [body BagContents]
+         (ok (update-default-bag (:username current-user) body)))
+
+       (DELETE "/" []
+         :summary     DeleteDefaultBagSummary
+         :description DeleteDefaultBagDescription
+         (delete-default-bag (:username current-user))
+         (ok)))
+
      (context "/:bag-id" []
        :path-params [bag-id :- BagIDPathParam]
 

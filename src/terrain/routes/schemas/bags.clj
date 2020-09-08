@@ -39,3 +39,12 @@
 
 (def DeleteBagSummary "Delete a bag")
 (def DeleteBagDescription "Deletes a bag for a user based on its UUID")
+
+(def GetDefaultBagSummary "Get the user's default bag")
+(def GetDefaultBagDescription "Get the user's default bag. Most interactions should go through the default bag. Creates the bag with default contents if it doesn't already exist")
+
+(def UpdateDefaultBagSummary "Updates the contents of the user's default bag")
+(def UpdateDefaultBagDescription "Updates the contents of the user's default bag. Must be JSON. Will create the bag if it doesn't yet exist")
+
+(def DeleteDefaultBagSummary "Delete the default bag for the user")
+(def DeleteDefaultBagDescription "Deletes the default bag for the user. If you try to retrieve the bag after this, it will return a new, empty bag")
