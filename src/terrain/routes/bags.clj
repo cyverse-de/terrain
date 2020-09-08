@@ -46,6 +46,7 @@
        (GET "/" []
          :summary     GetDefaultBagSummary
          :description GetDefaultBagDescription
+         :return      Bag
          (ok (get-default-bag (:username current-user))))
 
        (POST "/" []

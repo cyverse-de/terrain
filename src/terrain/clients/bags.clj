@@ -50,15 +50,15 @@
 (defn get-default-bag
   [username]
   [username]
-  (:body (http/delete (bags-url [username]) {:as :json})))
+  (:body (http/get (bags-url [username "default"]) {:as :json})))
 
 (defn update-default-bag
   [username contents]
-  (:body (http/post (bags-url [username]) {:form-params  contents
-                                           :content-type :json
-                                           :as           :json})))
+  (:body (http/post (bags-url [username "default"]) {:form-params  contents
+                                                     :content-type :json
+                                                     :as           :json})))
 
 (defn delete-default-bag
   [username]
-  (:body (http/delete (bags-url [username])))
+  (:body (http/delete (bags-url [username "default"])))
   nil)
