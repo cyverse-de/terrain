@@ -29,3 +29,15 @@
 (defn delete-bag
   [username bag-id]
   (bags/delete-bag username bag-id))
+
+(defn get-default-bag
+  [username]
+  (bags/get-default-bag username))
+
+(defn update-default-bag
+  [username contents]
+  (bags/update-default-bag username contents))
+
+(defn delete-default-bag
+  [username]
+  (bags/delete-default-bag username))
