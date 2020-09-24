@@ -53,13 +53,14 @@
          :summary     UpdateDefaultBagSummary
          :description UpdateDefaultBagDescription
          :body        [body BagContents]
+         :return      Bag
          (ok (update-default-bag (:username current-user) body)))
 
        (DELETE "/" []
          :summary     DeleteDefaultBagSummary
          :description DeleteDefaultBagDescription
-         (delete-default-bag (:username current-user))
-         (ok)))
+         :return      Bag
+         (ok (delete-default-bag (:username current-user)))))
 
      (context "/:bag-id" []
        :path-params [bag-id :- BagIDPathParam]
