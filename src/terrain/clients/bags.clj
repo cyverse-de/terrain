@@ -60,5 +60,4 @@
 
 (defn delete-default-bag
   [username]
-  (:body (http/delete (bags-url [username "default"])))
-  nil)
+  (:body (http/delete (bags-url [username "default"]) {:as :json})))
