@@ -11,7 +11,7 @@
   []
   (context "/dashboard" []
     :tags ["dashboard"]
-    
+
     (GET "/" []
       :query [params DashboardRequestParams]
       :return DashboardAggregatorResponse
