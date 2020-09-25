@@ -5,6 +5,7 @@
 
 (defschema DashboardApp
   {:id                              (describe String "The app ID")
+   :system_id                       (describe String "The system ID for the app")
    (optional-key :name)             (describe (maybe String) "The name of the app")
    (optional-key :description)      (describe (maybe String) "The description of the app")
    :username                        (describe String "The name of the user that created the app")
