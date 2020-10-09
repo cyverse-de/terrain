@@ -11,7 +11,8 @@
    :username                        (describe String "The name of the user that created the app")
    (optional-key :wiki_url)         (describe (maybe String) "The URL to the wiki entry for the app")
    (optional-key :integration_date) (describe (maybe String) "The date the app was integrated. Milliseconds since epoch")
-   (optional-key :edited_date)      (describe (maybe String) "The date the app was last edited")})
+   (optional-key :edited_date)      (describe (maybe String) "The date the app was last edited")
+   (optional-key :is_favorite)      (describe (maybe Boolean) "True if the user has marked the app as a favorite")})
 
 (defschema DashboardAnalysis
   {:id                                (describe UUID "The analysis/job ID")
