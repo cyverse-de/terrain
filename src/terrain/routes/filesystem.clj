@@ -109,7 +109,6 @@
        (controller req data/delete-trash :params))
 
      (POST "/read-chunk" [:as req]
-       :middleware [require-authentication]
        (controller req data/read-chunk :params :body))
 
      (POST "/read-csv-chunk" [:as req]

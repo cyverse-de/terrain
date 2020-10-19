@@ -90,8 +90,10 @@
 (defn read-chunk
   "Uses the data-info read-chunk endpoint."
   [params body]
-  (let [path-uuid (uuid-for-path (:user params) (:path body))]
-    (raw/read-chunk (:user params) path-uuid (:position body) (:chunk-size body))))
+  (let [path      (:path body)
+        user      (get-request-user (:user params) path)
+        path-uuid (uuid-for-path user path)]
+    (raw/read-chunk user path-uuid (:position body) (:chunk-size body))))
 
 (defn read-tabular-chunk
   "Uses the data-info read-tabular-chunk endpoint."
