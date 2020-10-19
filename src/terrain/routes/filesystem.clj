@@ -90,7 +90,6 @@
        (controller req data/move-contents :params :body))
 
      (GET "/file/manifest" [:as req]
-       :middleware [require-authentication]
        (controller req data/manifest :params))
 
      (POST "/user-permissions" [:as req]

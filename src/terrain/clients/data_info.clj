@@ -102,8 +102,10 @@
 (defn manifest
   "Uses the data-info manifest endpoint."
   [params]
-  (let [path-uuid (uuid-for-path (:user params) (:path params))]
-    (raw/manifest (:user params) path-uuid)))
+  (let [path      (:path params)
+        user      (get-request-user (:user params) path)
+        path-uuid (uuid-for-path user path)]
+    (raw/manifest user path-uuid)))
 
 (defn create-dirs
   [{:keys [user]} {:keys [paths]}]
