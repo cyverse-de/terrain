@@ -98,8 +98,10 @@
 (defn read-tabular-chunk
   "Uses the data-info read-tabular-chunk endpoint."
   [params body]
-  (let [path-uuid (uuid-for-path (:user params) (:path body))]
-    (raw/read-tabular-chunk (:user params) path-uuid (:separator body) (:page body) (:chunk-size body))))
+  (let [path      (:path body)
+        user      (get-request-user (:user params) path)
+        path-uuid (uuid-for-path user path)]
+    (raw/read-tabular-chunk user path-uuid (:separator body) (:page body) (:chunk-size body))))
 
 (defn manifest
   "Uses the data-info manifest endpoint."

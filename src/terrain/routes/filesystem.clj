@@ -112,7 +112,6 @@
        (controller req data/read-chunk :params :body))
 
      (POST "/read-csv-chunk" [:as req]
-       :middleware [require-authentication]
        (controller req data/read-tabular-chunk :params :body))
 
      (POST "/anon-files" [:as req]
