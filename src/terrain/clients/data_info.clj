@@ -77,6 +77,16 @@
   [^String user ^String dir]
   (cr/ensure-created user dir))
 
+(defn get-request-user
+  "Returns the anonymous user for public data if a user is not provided"
+  [user path]
+  (if-let [request-user (if (string/starts-with? path (cfg/fs-community-data))
+                          (or user "anonymous")
+                          user)]
+    request-user
+    (throw+ {:type :clojure-commons.exception/not-authorized
+             :user user})))
+
 (defn read-chunk
   "Uses the data-info read-chunk endpoint."
   [params body]

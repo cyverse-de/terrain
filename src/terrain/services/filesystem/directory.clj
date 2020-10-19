@@ -163,12 +163,8 @@
 (defn do-paged-listing
   "Entrypoint for the API that calls (paged-dir-listing)."
   [{user :shortUsername} {:keys [path] :as params}]
-  (if-let [listing-user (if (= path (cfg/fs-community-data))
-                          (or user "anonymous")
-                          user)]
-    (let [params (dissoc params :path)]
-      (->> (fix-paged-listing-params listing-user params)
-           (data/list-folder-contents path)
-           (format-page user)))
-    (throw+ {:type :clojure-commons.exception/not-authorized
-             :user user})))
+  (let [listing-user (data/get-request-user user path)
+        params (dissoc params :path)]
+    (->> (fix-paged-listing-params listing-user params)
+         (data/list-folder-contents path)
+         (format-page user))))
