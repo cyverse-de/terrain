@@ -79,13 +79,16 @@
 
 (defn get-request-user
   "Returns the anonymous user for public data if a user is not provided"
-  [user path]
-  (if-let [request-user (if (string/starts-with? path (cfg/fs-community-data))
-                          (or user "anonymous")
-                          user)]
-    request-user
-    (throw+ {:type :clojure-commons.exception/not-authorized
-             :user user})))
+  [user paths]
+  (let [paths (if (= (type paths) String)
+                [paths]
+                paths)
+        has-private-paths? (some #(not (string/starts-with? % (cfg/fs-community-data))) paths)
+        request-user (if has-private-paths?
+                       user
+                       (or user "anonymous"))]
+    (or request-user (throw+ {:type :clojure-commons.exception/not-authorized
+                              :user user}))))
 
 (defn read-chunk
   "Uses the data-info read-chunk endpoint."
