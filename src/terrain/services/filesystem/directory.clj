@@ -163,7 +163,7 @@
 (defn do-paged-listing
   "Entrypoint for the API that calls (paged-dir-listing)."
   [{user :shortUsername} {:keys [path] :as params}]
-  (let [listing-user (data/get-request-user user path)
+  (let [listing-user (data/get-public-data-user user path)
         params (dissoc params :path)]
     (->> (fix-paged-listing-params listing-user params)
          (data/list-folder-contents path)

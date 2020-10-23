@@ -77,7 +77,7 @@
   [^String user ^String dir]
   (cr/ensure-created user dir))
 
-(defn get-request-user
+(defn get-public-data-user
   "Returns the anonymous user for public data if a user is not provided"
   [user paths]
   (let [paths (if (= (type paths) String)
@@ -94,7 +94,7 @@
   "Uses the data-info read-chunk endpoint."
   [params body]
   (let [path      (:path body)
-        user      (get-request-user (:user params) path)
+        user      (get-public-data-user (:user params) path)
         path-uuid (uuid-for-path user path)]
     (raw/read-chunk user path-uuid (:position body) (:chunk-size body))))
 
@@ -102,7 +102,7 @@
   "Uses the data-info read-tabular-chunk endpoint."
   [params body]
   (let [path      (:path body)
-        user      (get-request-user (:user params) path)
+        user      (get-public-data-user (:user params) path)
         path-uuid (uuid-for-path user path)]
     (raw/read-tabular-chunk user path-uuid (:separator body) (:page body) (:chunk-size body))))
 
@@ -110,7 +110,7 @@
   "Uses the data-info manifest endpoint."
   [params]
   (let [path      (:path params)
-        user      (get-request-user (:user params) path)
+        user      (get-public-data-user (:user params) path)
         path-uuid (uuid-for-path user path)]
     (raw/manifest user path-uuid)))
 
