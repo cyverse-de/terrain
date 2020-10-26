@@ -75,6 +75,7 @@
    the next set of routes (`secured-routes-no-context`) if nothing matches."
   []
   (util/flagged-routes
+   (apps-routes)
    (dashboard-aggregator-routes)
    (filesystem-stat-routes)
    (secured-data-routes)
@@ -95,7 +96,6 @@
    (app-community-tag-routes)
    (app-elements-routes)
    (app-pipeline-routes)
-   (apps-routes)
    (analysis-routes)
    (coge-routes)
    (collaborator-list-routes)
