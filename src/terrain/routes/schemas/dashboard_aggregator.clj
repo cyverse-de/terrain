@@ -117,6 +117,9 @@
   {(optional-key :recentlyAdded)
    (describe (maybe [DashboardApp]) "Apps recently added by the user")
 
+   (optional-key :recentlyRan)
+   (describe (maybe [DashboardApp]) "Public apps that were recently used in jobs")
+
    :public
    (describe [DashboardApp] "Apps recently made public")})
 
