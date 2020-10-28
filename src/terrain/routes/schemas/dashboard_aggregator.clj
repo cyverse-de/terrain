@@ -117,8 +117,8 @@
   {(optional-key :recentlyAdded)
    (describe (maybe [DashboardApp]) "Apps recently added by the user")
 
-   (optional-key :recentlyRan)
-   (describe (maybe [DashboardApp]) "Public apps that were recently used in jobs")
+   (optional-key :recentlyUsed)
+   (describe (maybe [DashboardApp]) "Apps that the user has used recently")
 
    :public
    (describe [DashboardApp] "Apps recently made public")})
@@ -140,6 +140,13 @@
    (optional-key :feeds)
    (describe DashboardFeeds "Information from RSS feeds on the website")})
 
+(def start-date-interval-description
+  (str "The amount of time in the past to search for usages of apps to include in the list of recently used apps "
+       "(e.g. \"1 year\", \"1 week\", or \"2 days\")"))
+
 (defschema DashboardRequestParams
   {(optional-key :limit)
-   (describe (maybe Long) "The number of responses to include in each field.")})
+   (describe (maybe Long) "The number of responses to include in each field")
+
+   (optional-key :start-date-interval)
+   (describe (maybe String) start-date-interval-description)})
