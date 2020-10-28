@@ -13,14 +13,18 @@
 
 (defn add-current-user-to-map
   "Adds the name and e-mail address of the currently authenticated user to a
-   map that can be used to generate a query string."
-  [query]
-  (->> (assoc query
-         :user       (:shortUsername current-user)
-         :email      (:email current-user)
-         :first-name (:firstName current-user)
-         :last-name  (:lastName current-user))
-       (remove-vals invalid-query-param-value?)))
+   map that can be used to generate a query string. If no user is authenticated,
+   the `user` parameter is set to `anonymous` and the rest of the user attribute
+   parameters are omitted."
+  ([query]
+    (add-current-user-to-map query "anonymous"))
+  ([query default-username]
+    (->> (assoc query
+           :user       (or (:shortUsername current-user) default-username)
+           :email      (:email current-user)
+           :first-name (:firstName current-user)
+           :last-name  (:lastName current-user))
+         (remove-vals invalid-query-param-value?))))
 
 (defn secured-params
   "Generates a set of query parameters to pass to a remote service that requires
