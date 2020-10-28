@@ -80,9 +80,7 @@
 (defn get-public-data-user
   "Returns the anonymous user for public data if a user is not provided"
   [user paths]
-  (let [paths (if (= (type paths) String)
-                [paths]
-                paths)
+  (let [paths (if (sequential? paths) paths [paths])
         has-private-paths? (some #(not (string/starts-with? % (cfg/fs-community-data))) paths)
         request-user (if has-private-paths?
                        user
