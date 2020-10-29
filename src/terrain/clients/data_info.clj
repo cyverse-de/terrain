@@ -77,23 +77,40 @@
   [^String user ^String dir]
   (cr/ensure-created user dir))
 
+(defn get-public-data-user
+  "Returns the anonymous user for public data if a user is not provided"
+  [user paths]
+  (let [paths (if (sequential? paths) paths [paths])
+        has-private-paths? (some #(not (string/starts-with? % (cfg/fs-community-data))) paths)
+        request-user (if has-private-paths?
+                       user
+                       (or user "anonymous"))]
+    (or request-user (throw+ {:type :clojure-commons.exception/not-authorized
+                              :user user}))))
+
 (defn read-chunk
   "Uses the data-info read-chunk endpoint."
   [params body]
-  (let [path-uuid (uuid-for-path (:user params) (:path body))]
-    (raw/read-chunk (:user params) path-uuid (:position body) (:chunk-size body))))
+  (let [path      (:path body)
+        user      (get-public-data-user (:user params) path)
+        path-uuid (uuid-for-path user path)]
+    (raw/read-chunk user path-uuid (:position body) (:chunk-size body))))
 
 (defn read-tabular-chunk
   "Uses the data-info read-tabular-chunk endpoint."
   [params body]
-  (let [path-uuid (uuid-for-path (:user params) (:path body))]
-    (raw/read-tabular-chunk (:user params) path-uuid (:separator body) (:page body) (:chunk-size body))))
+  (let [path      (:path body)
+        user      (get-public-data-user (:user params) path)
+        path-uuid (uuid-for-path user path)]
+    (raw/read-tabular-chunk user path-uuid (:separator body) (:page body) (:chunk-size body))))
 
 (defn manifest
   "Uses the data-info manifest endpoint."
   [params]
-  (let [path-uuid (uuid-for-path (:user params) (:path params))]
-    (raw/manifest (:user params) path-uuid)))
+  (let [path      (:path params)
+        user      (get-public-data-user (:user params) path)
+        path-uuid (uuid-for-path user path)]
+    (raw/manifest user path-uuid)))
 
 (defn create-dirs
   [{:keys [user]} {:keys [paths]}]

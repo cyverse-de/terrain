@@ -77,7 +77,9 @@
   (util/flagged-routes
    (dashboard-aggregator-routes)
    (filesystem-navigation-routes)
-   (secured-filesystem-routes)))
+   (secured-data-routes)
+   (secured-filesystem-routes)
+   (secured-search-routes)))
 
 ; Add new secured routes to this function, not to (secured-routes).
 ; This function allows for secured routes without the /secured content/prefix,

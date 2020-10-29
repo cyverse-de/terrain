@@ -23,6 +23,7 @@
      :tags ["data"]
 
      (POST "/type" []
+       :middleware [require-authentication]
        :summary "Set or Remove File Type Labels"
        :body [body (describe FileType "The file type to set")]
        :return FileTypeReturn
@@ -36,6 +37,7 @@
        (ok (data/get-type-list))))
 
    (POST "/share" []
+     :middleware [require-authentication]
      :tags ["data"]
      :summary "Share Files or Folders"
      :body [body SharingRequest]
@@ -44,6 +46,7 @@
      (ok (share body)))
 
    (POST "/unshare" [:as req]
+     :middleware [require-authentication]
      :tags ["data"]
      :summary "Unshare Files or Folders"
      :body [body UnshareRequest]
@@ -55,12 +58,14 @@
      :tags ["data"]
 
      (GET "/" []
+       :middleware [require-authentication]
        :summary "Get Saved Searches"
        :return (describe s/Any "Previously stored saved searches")
        :description-file "docs/get-saved-searches.md"
        (ok (saved/get-saved-searches (:username current-user))))
 
      (POST "/" []
+       :middleware [require-authentication]
        :summary "Set Saved Searches"
        :body [body (describe s/Any "The saved searches to store")]
        :description-file "docs/post-saved-searches.md"
@@ -68,6 +73,7 @@
        (ok))
 
      (DELETE "/" []
+       :middleware [require-authentication]
        :summary "Delete Saved Searches"
        :description "Deletes all previously saved searches for the authenticated user."
        (saved/delete-saved-searches (:username current-user))
