@@ -201,7 +201,6 @@
                 (ok (apps/copy-app system-id app-id)))
 
           (GET "/listing" []
-                :middleware [require-authentication]
                 :summary schema/SingleAppListingSummary
                 :return schema/AppListing
                 :description schema/SingleAppListingDocs
