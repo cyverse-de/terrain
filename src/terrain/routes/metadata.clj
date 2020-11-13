@@ -207,7 +207,6 @@
                 (ok (apps/list-single-app system-id app-id)))
 
           (GET "/details" []
-               :middleware [require-authentication]
                :return schema/AppDetails
                :summary schema/AppDetailsSummary
                :description schema/AppDetailsDocs
