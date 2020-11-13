@@ -10,7 +10,7 @@
    (analyses-url components {}))
   ([components query]
    (-> (apply url (analyses-base-uri) components)
-       (assoc :query (assoc query :user (:username current-user)))
+       (assoc :query (assoc query :user (or (:username current-user) "anonymous")))
        (str))))
 
 (defn get-quicklaunch
