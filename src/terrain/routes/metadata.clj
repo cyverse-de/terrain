@@ -213,7 +213,6 @@
                (ok (apps/get-app-details system-id app-id)))
 
           (GET "/documentation" []
-               :middleware [require-authentication]
                :return schema/AppDocumentation
                :summary schema/AppDocumentationSummary
                :description schema/AppDocumentationDocs
