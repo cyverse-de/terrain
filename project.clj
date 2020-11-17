@@ -18,7 +18,7 @@
                  [org.clojure/data.codec "0.1.1"]
                  [org.clojure/tools.nrepl "0.2.13"]
                  [cheshire "5.10.0"]
-                 [clj-http "3.10.0"]
+                 [clj-http "3.11.0"]
                  [clj-time "0.15.2"]
                  [clojurewerkz/elastisch "2.2.0"]
                  [com.cemerick/url "0.1.1" :exclusions [com.cemerick/clojurescript.test]]
@@ -47,7 +47,8 @@
                  [org.cyverse/service-logging "2.8.2"]]
   :eastwood {:exclude-namespaces [terrain.util.jwt :test-paths]
              :linters [:wrong-arity :wrong-ns-form :wrong-pre-post :wrong-tag :misplaced-docstrings]}
-  :plugins [[lein-cljfmt "0.6.4"]
+  :plugins [[lein-ancient "0.6.15"]
+            [lein-cljfmt "0.6.4"]
             [lein-ring "0.12.5" :exclusions [org.clojure/clojure]]
             [swank-clojure "1.4.2" :exclusions [org.clojure/clojure]]
             [test2junit "1.2.2"]
