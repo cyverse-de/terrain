@@ -91,6 +91,9 @@
    :link
    (describe String "Link to the source of the feed item. Probably leads to the website")
 
+   (optional-key :thumbnailUrl)
+   (describe String "The URL for a thumbnail associated with the item, most likely a video.")
+
    :date_added
    (describe String "The date the item was added to the feed")
 
