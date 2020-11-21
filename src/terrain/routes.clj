@@ -76,7 +76,6 @@
   []
   (util/flagged-routes
    (dashboard-aggregator-routes)
-   (filesystem-navigation-routes)
    (secured-data-routes)
    (secured-filesystem-routes)
    (secured-search-routes)))

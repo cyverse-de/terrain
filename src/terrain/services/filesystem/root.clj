@@ -12,7 +12,7 @@
 
 (defn do-root-listing
   [{user :user}]
-  (-> (data-raw/list-roots (or user "anonymous"))
+  (-> (data-raw/list-roots user)
       :body
       (json/string->json true)
       format-roots))
