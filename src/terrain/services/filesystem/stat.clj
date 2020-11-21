@@ -1,10 +1,12 @@
 (ns terrain.services.filesystem.stat
   (:use [clojure-commons.validators]
+        [clojure.string :as string]
         [clj-jargon.init :only [with-jargon]]
         [clj-jargon.item-info :only [exists? is-dir? stat]]
         [clj-jargon.item-ops :only [input-stream]]
         [clj-jargon.metadata :only [get-attribute]]
-        [clj-jargon.permissions :only [is-writeable? list-user-perms permission-for owns?]])
+        [clj-jargon.permissions :only [is-writeable? list-user-perms permission-for owns?]]
+        [slingshot.slingshot :only [throw+]])
   (:require [cheshire.core :as json]
             [clojure.tools.logging :as log]
             [clojure-commons.file-utils :as ft]
@@ -66,6 +68,17 @@
   [stat-map user path]
   (assoc stat-map
          :label (paths/id->label user path)))
+
+(defn get-public-data-user
+  "Returns the anonymous user for public data if a user is not provided"
+  [user paths]
+  (let [paths (if (sequential? paths) paths [paths])
+        has-private-paths? (some #(not (string/starts-with? % (cfg/fs-community-data))) paths)
+        request-user (if has-private-paths?
+                       user
+                       (or user "anonymous"))]
+    (or request-user (throw+ {:type :clojure-commons.exception/not-authorized
+                              :user user}))))
 
 (defn path-is-dir?
   [path]
