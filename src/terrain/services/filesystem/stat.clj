@@ -128,6 +128,9 @@
 
 (defn do-stat
   [{user :user} body]
-  (-> (data-raw/collect-stats user body)
-      :body
-      (json/decode true)))
+  (let [paths         (:paths body)
+        ids           (:ids body)
+        request-user  (if ids user (get-public-data-user user paths))]
+    (-> (data-raw/collect-stats request-user body)
+        :body
+        (json/decode true))))
