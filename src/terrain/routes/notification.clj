@@ -19,7 +19,7 @@
         (service/success-response (rn/get-unseen-messages params)))
 
    (GET "/notifications/last-ten-messages" []
-        (service/success-response (rn/last-ten-messages)))
+        (service/success-response (cn/last-ten-messages)))
 
    (GET "/notifications/count-messages" [:as {:keys [params]}]
         (service/success-response (rn/count-messages params)))

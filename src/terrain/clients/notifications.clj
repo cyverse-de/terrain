@@ -15,6 +15,19 @@
      (build-url-with-query (notificationagent-base-url)
                            (add-current-user-to-map query) relative-url)))
 
+(def ^:private last-ten-messages-params
+  {:limit      10
+   :offset     0
+   :sort-field :timestamp
+   :sort-dir   :desc})
+
+(defn last-ten-messages
+  []
+  (-> (client/get (notificationagent-url "messages")
+                  {:query-params (add-current-user-to-map last-ten-messages-params)
+                   :as           :json})
+      (update :messages (partial sort-by (comp :timestamp :message)))))
+
 (defn send-notification
   "Sends a notification to a user."
   [m]

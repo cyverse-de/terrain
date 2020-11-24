@@ -25,12 +25,6 @@
               {:query-params (secured-params params na-message-params)
                :as           :stream}))
 
-(defn last-ten-messages
-  []
-  (client/get (na-url "last-ten-messages")
-              {:query-params (secured-params)
-               :as           :stream}))
-
 (defn count-messages
   [params]
   (client/get (na-url "count-messages")
