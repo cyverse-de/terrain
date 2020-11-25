@@ -23,9 +23,8 @@
 
 (defn last-ten-messages
   []
-  (-> (client/get (notificationagent-url "messages")
-                  {:query-params (add-current-user-to-map last-ten-messages-params)
-                   :as           :json})
+  (-> (client/get (notificationagent-url "messages" last-ten-messages-params) {:as :json})
+      :body
       (update :messages (partial sort-by (comp :timestamp :message)))))
 
 (defn send-notification
