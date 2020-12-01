@@ -3,7 +3,7 @@
         [clj-jargon.permissions]
         [clj-jargon.tickets]
         [clj-jargon.users]
-        [clj-icat-direct.icat :as icat]
+        [clj-icat-direct.icat :as icat :exclude [user-group-ids]]
         [clojure-commons.error-codes]
         [slingshot.slingshot :only [try+ throw+]])
   (:require [terrain.services.filesystem.common-paths :as cp]
