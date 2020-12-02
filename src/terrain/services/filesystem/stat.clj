@@ -71,14 +71,16 @@
 
 (defn get-public-data-user
   "Returns the anonymous user for public data if a user is not provided"
-  [user paths]
-  (let [paths (if (sequential? paths) paths [paths])
-        has-private-paths? (some #(not (string/starts-with? % (cfg/fs-community-data))) paths)
-        request-user (if has-private-paths?
-                       user
-                       (or user "anonymous"))]
-    (or request-user (throw+ {:type :clojure-commons.exception/not-authorized
-                              :user user}))))
+  ([user paths ids]
+   (let [paths (if (sequential? paths) paths [paths])
+         has-ids-or-private-paths? (or (seq ids) (some #(not (string/starts-with? % (cfg/fs-community-data))) paths))
+         request-user (if has-ids-or-private-paths?
+                        user
+                        (or user "anonymous"))]
+     (or request-user (throw+ {:type :clojure-commons.exception/not-authorized
+                               :user user}))))
+  ([user paths]
+   (get-public-data-user user paths nil)))
 
 (defn path-is-dir?
   [path]
@@ -130,7 +132,7 @@
   [{user :user} body]
   (let [paths         (:paths body)
         ids           (:ids body)
-        request-user  (if ids user (get-public-data-user user paths))]
+        request-user  (get-public-data-user user paths ids)]
     (-> (data-raw/collect-stats request-user body)
         :body
         (json/decode true))))
