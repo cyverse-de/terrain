@@ -35,7 +35,7 @@
                  [org.cyverse/async-tasks-client "0.0.3"]
                  [org.cyverse/clj-icat-direct "2.9.0"]
                  [org.cyverse/clj-jargon "2.8.9"]
-                 [org.cyverse/clojure-commons "3.0.5"]
+                 [org.cyverse/clojure-commons "3.0.6-SNAPSHOT"]
                  [org.cyverse/cyverse-groups-client "0.1.8"]
                  [org.cyverse/common-cfg "2.8.1"]
                  [org.cyverse/common-cli "2.8.1"]
@@ -53,7 +53,8 @@
             [swank-clojure "1.4.2" :exclusions [org.clojure/clojure]]
             [test2junit "1.2.2"]
             [jonase/eastwood "0.3.10"]]
-  :profiles {:dev     {:resource-paths ["conf/test"]}
+  :profiles {:dev     {:dependencies [[clj-http-fake "1.0.3"]]
+                       :resource-paths ["conf/test" "test-resources"]}
              :uberjar {:aot :all}}
   :main ^:skip-aot terrain.core
   :ring {:handler terrain.core/dev-handler

@@ -1,0 +1,228 @@
+{
+  "total": "77",
+  "unseen_total": "27",
+  "messages": [
+    {
+      "deleted": false,
+      "email": false,
+      "payload": {
+        "action": "share",
+        "analyses": [
+          {
+            "analysis_id": "431dd792-2118-11eb-92bd-008cfa5ae621",
+            "analysis_name": "Discovery_Environment_Alpha_Testing_App_analysis1",
+            "category_id": ""
+          }
+        ]
+      },
+      "email_template": null,
+      "type": "analysis",
+      "seen": false,
+      "user": "ipcdev",
+      "subject": "meidanis has shared 1 analysis with you.",
+      "message": {
+        "id": "1DE61363-0BAC-4544-9E96-6FDC6F0B31CD",
+        "timestamp": "1604767802096",
+        "text": "meidanis has shared the following analysis with you: Discovery_Environment_Alpha_Testing_App_analysis1"
+      }
+    },
+    {
+      "deleted": false,
+      "email": false,
+      "payload": {
+        "action": "share",
+        "paths": [
+          "/iplant/home/meidanis/analyses/main.pdf"
+        ]
+      },
+      "email_template": null,
+      "type": "data",
+      "seen": false,
+      "user": "ipcdev",
+      "subject": "meidanis has shared 1 file(s)/folder(s) with you.",
+      "message": {
+        "id": "CA937B14-79C7-4027-99D2-E671B81E4A11",
+        "timestamp": "1604765984400",
+        "text": "meidanis has shared the following file(s)/folder(s) with you: main.pdf"
+      }
+    },
+    {
+      "deleted": false,
+      "email": false,
+      "payload": {
+        "action": "share",
+        "analyses": [
+          {
+            "analysis_id": "5f0a6572-205c-11eb-aa57-008cfa5ae621",
+            "analysis_name": "DE_Word_Count_analysis1",
+            "category_id": ""
+          }
+        ]
+      },
+      "email_template": null,
+      "type": "analysis",
+      "seen": false,
+      "user": "ipcdev",
+      "subject": "sriram has shared 1 analysis with you.",
+      "message": {
+        "id": "174B4C96-FF28-4715-9093-5DA9A4D99F26",
+        "timestamp": "1604686886421",
+        "text": "sriram has shared the following analysis with you: DE_Word_Count_analysis1"
+      }
+    },
+    {
+      "deleted": false,
+      "email": false,
+      "payload": {
+        "action": "share",
+        "paths": [
+          "/iplant/home/sriram/1KB.zip",
+          "/iplant/home/sriram/.chirp.config"
+        ]
+      },
+      "email_template": null,
+      "type": "data",
+      "seen": false,
+      "user": "ipcdev",
+      "subject": "sriram has shared 2 file(s)/folder(s) with you.",
+      "message": {
+        "id": "1B536A4B-C449-4F78-ADEB-6787A07912C1",
+        "timestamp": "1604686883552",
+        "text": "sriram has shared the following file(s)/folder(s) with you: 1KB.zip, .chirp.config"
+      }
+    },
+    {
+      "deleted": false,
+      "email": false,
+      "payload": {
+        "action": "share",
+        "apps": [
+          {
+            "app_id": "5b52c412-6b8e-11e9-81f7-008cfa5ae621",
+            "app_name": "Austria Demo",
+            "category_id": "eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee"
+          }
+        ]
+      },
+      "email_template": null,
+      "type": "apps",
+      "seen": false,
+      "user": "ipcdev",
+      "subject": "sriram has shared 1 app with you.",
+      "message": {
+        "id": "B3038CE5-8D1E-4976-98E9-9F8ADBCACFC3",
+        "timestamp": "1604686881340",
+        "text": "sriram has shared the following app with you: Austria Demo"
+      }
+    },
+    {
+      "deleted": false,
+      "email": false,
+      "payload": {
+        "action": "share",
+        "analyses": [
+          {
+            "analysis_id": "3c9825f0-2017-11eb-8f93-008cfa5ae621",
+            "analysis_name": "JupyterLab-with-sql-1.0.9_analysis1",
+            "category_id": ""
+          }
+        ]
+      },
+      "email_template": null,
+      "type": "analysis",
+      "seen": false,
+      "user": "ipcdev",
+      "subject": "kcklang has shared 1 analysis with you.",
+      "message": {
+        "id": "FA1EF3A4-DC6E-47A0-9124-0A2A21915770",
+        "timestamp": "1604657381801",
+        "text": "kcklang has shared the following analysis with you: JupyterLab-with-sql-1.0.9_analysis1"
+      }
+    },
+    {
+      "deleted": false,
+      "email": false,
+      "payload": {
+        "action": "share",
+        "paths": [
+          "/iplant/home/kcklang/test/TEST-Sonora-06112020.txt"
+        ]
+      },
+      "email_template": null,
+      "type": "data",
+      "seen": false,
+      "user": "ipcdev",
+      "subject": "kcklang has shared 1 file(s)/folder(s) with you.",
+      "message": {
+        "id": "E37FBD1C-9CD6-4D93-82EB-A35AE325C486",
+        "timestamp": "1604656088396",
+        "text": "kcklang has shared the following file(s)/folder(s) with you: TEST-Sonora-06112020.txt"
+      }
+    },
+    {
+      "deleted": false,
+      "email": false,
+      "payload": {
+        "action": "share",
+        "paths": [
+          "/iplant/home/ryank/inputfile.txt"
+        ]
+      },
+      "email_template": null,
+      "type": "data",
+      "seen": false,
+      "user": "ipcdev",
+      "subject": "ryank has shared 1 file(s)/folder(s) with you.",
+      "message": {
+        "id": "957BB6FE-F2CB-4114-A970-91BC5AC1243A",
+        "timestamp": "1604593562152",
+        "text": "ryank has shared the following file(s)/folder(s) with you: inputfile.txt"
+      }
+    },
+    {
+      "deleted": false,
+      "email": false,
+      "payload": {
+        "action": "share",
+        "analyses": [
+          {
+            "analysis_id": "4f1d4b64-1a3c-11eb-8e14-008cfa5ae621",
+            "analysis_name": "ten-rules-jupyter_analysis1",
+            "category_id": ""
+          }
+        ]
+      },
+      "email_template": null,
+      "type": "analysis",
+      "seen": false,
+      "user": "ipcdev",
+      "subject": "sriram has shared 1 analysis with you.",
+      "message": {
+        "id": "5AA1FBED-2AAC-45E8-AA08-03EAF1FE4876",
+        "timestamp": "1604523356160",
+        "text": "sriram has shared the following analysis with you: ten-rules-jupyter_analysis1"
+      }
+    },
+    {
+      "deleted": false,
+      "email": false,
+      "payload": {
+        "action": "share",
+        "paths": [
+          "/iplant/home/sriram/bulk/ten-rules-jupyter_analysis1-2020-10-29-23-13-08.1/ten-rules-jupyter"
+        ]
+      },
+      "email_template": null,
+      "type": "data",
+      "seen": false,
+      "user": "ipcdev",
+      "subject": "sriram has shared 1 file(s)/folder(s) with you.",
+      "message": {
+        "id": "CFC94232-5FDC-4F74-9F3A-9E575A606E0F",
+        "timestamp": "1604523354527",
+        "text": "sriram has shared the following file(s)/folder(s) with you: ten-rules-jupyter"
+      }
+    }
+  ],
+  "system-messages": []
+}

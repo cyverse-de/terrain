@@ -15,11 +15,11 @@
      (build-url-with-query (notificationagent-base-url)
                            (add-current-user-to-map query) relative-url)))
 
-(def ^:private last-ten-messages-params
+(def last-ten-messages-params
   {:limit      10
    :offset     0
-   :sort-field :timestamp
-   :sort-dir   :desc})
+   :sort-field "timestamp"
+   :sort-dir   "desc"})
 
 (defn last-ten-messages
   []
