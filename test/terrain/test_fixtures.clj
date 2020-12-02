@@ -13,7 +13,10 @@
    :terrain.keycloak.client-id           "keycloak-client-id"
    :terrain.keycloak.client-secret       "keycloak-client-secret"})
 
-(defn with-test-config [f]
+(defn with-test-config
+  "Runs a series of tests after loading the test configuration defined by `test-config` above. This fixture should
+   be used any time the code used by a set of tests requires one or more configuration settings."
+  [f]
   (config/load-config-from-map test-config)
   (f))
 
@@ -23,5 +26,8 @@
    "firstName" "Ipc"
    "lastName" "Dev"})
 
-(defn with-test-user [f]
+(defn with-test-user
+  "Runs a series of tests as if the user defined by `test-user` above has authenticated to an endpoint. This fixture
+   should be used whenever an endpoint that requires user authentication is being tested."
+  [f]
   (user-attributes/with-user [test-user] (f)))
