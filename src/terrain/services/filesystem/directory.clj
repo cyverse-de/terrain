@@ -12,6 +12,7 @@
             [clojure-commons.error-codes :as error]
             [terrain.clients.data-info :as data]
             [terrain.clients.data-info.raw :as data-raw]
+            [terrain.services.filesystem.stat :as st]
             [terrain.services.metadata.favorites :as favorites]
             [terrain.util.config :as cfg]
             [terrain.util.validators :as duv]
@@ -163,7 +164,7 @@
 (defn do-paged-listing
   "Entrypoint for the API that calls (paged-dir-listing)."
   [{user :shortUsername} {:keys [path] :as params}]
-  (let [listing-user (data/get-public-data-user user path)
+  (let [listing-user (st/get-public-data-user user path)
         params (dissoc params :path)]
     (->> (fix-paged-listing-params listing-user params)
          (data/list-folder-contents path)
