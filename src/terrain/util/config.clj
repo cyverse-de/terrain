@@ -171,10 +171,10 @@
   [props config-valid configs metadata-routes-enabled]
   "terrain.metadata.base-url" "http://metadata")
 
-(cc/defprop-optstr notificationagent-base-url
+(cc/defprop-optstr notifications-base-url
   "The base URL to use when connecting to the notification agent."
   [props config-valid configs notification-routes-enabled]
-  "terrain.notificationagent.base-url" "http://notification-agent")
+  "terrain.notifications.base.url" "http://notifications")
 
 (cc/defprop-optstr ipg-base
   "The base URL for the iplant-groups service."
@@ -599,5 +599,12 @@
   [cfg-path]
   (cc/load-config-from-file cfg-path props)
   (cc/log-config props :filters [#"irods\.user" #"icat\.user" #"oauth\.pem"])
+  (validate-config)
+  (ce/register-filters (exception-filters)))
+
+(defn load-config-from-map
+  "Loads the configuration settings from a Clojure map. This function is used for unit testing."
+  [config-map]
+  (cc/load-config-from-map config-map props)
   (validate-config)
   (ce/register-filters (exception-filters)))

@@ -69,7 +69,7 @@
 (defn perform-notificationagent-check
   []
   (try
-    (let [base-url (scrub-url (config/notificationagent-base-url))
+    (let [base-url (scrub-url (config/notifications-base-url))
           s        (:status (get-with-timeout base-url))]
       (log/info "HTTP Status from NotificationAgent: " s)
       (<= 200 s 299))

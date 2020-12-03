@@ -1,6 +1,6 @@
 (ns terrain.clients.notifications
   (:use [clojure-commons.client :only [build-url-with-query]]
-        [terrain.util.config :only [notificationagent-base-url]]
+        [terrain.util.config :only [notifications-base-url]]
         [terrain.util.transformers :only [add-current-user-to-map]])
   (:require [cheshire.core :as cheshire]
             [clj-http.client :as client]
@@ -12,14 +12,14 @@
   ([relative-url]
      (notificationagent-url relative-url {}))
   ([relative-url query]
-     (build-url-with-query (notificationagent-base-url)
+     (build-url-with-query (notifications-base-url)
                            (add-current-user-to-map query) relative-url)))
 
-(def ^:private last-ten-messages-params
+(def last-ten-messages-params
   {:limit      10
    :offset     0
-   :sort-field :timestamp
-   :sort-dir   :desc})
+   :sort-field "timestamp"
+   :sort-dir   "desc"})
 
 (defn last-ten-messages
   []
