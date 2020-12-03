@@ -17,7 +17,7 @@
         [common-swagger-api.schema.apps.rating]
         [common-swagger-api.schema.integration-data :only [IntegrationData]]
         [ring.util.http-response :only [ok]]
-        [terrain.auth.user-attributes]
+        [terrain.auth.user-attributes :only [require-authentication]]
         [terrain.routes.schemas.apps]
         [terrain.services.metadata.apps :only [send-support-email]]
         [terrain.util])

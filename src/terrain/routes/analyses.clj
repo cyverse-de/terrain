@@ -14,7 +14,7 @@
                 UpdateQuickLaunchGlobalDefault
                 NewQuickLaunchGlobalDefault]]
         [ring.util.http-response :only [ok]]
-        [terrain.auth.user-attributes]
+        [terrain.auth.user-attributes :only [require-authentication]]
         [terrain.util :only [optional-routes]])
   (:require [common-swagger-api.routes]                         ;; for :description-file
             [common-swagger-api.schema.analyses :as schema]
