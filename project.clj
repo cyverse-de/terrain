@@ -35,7 +35,7 @@
                  [org.cyverse/async-tasks-client "0.0.3"]
                  [org.cyverse/clj-icat-direct "2.9.0"]
                  [org.cyverse/clj-jargon "2.8.9"]
-                 [org.cyverse/clojure-commons "3.0.6-SNAPSHOT"]
+                 [org.cyverse/clojure-commons "3.0.6"]
                  [org.cyverse/cyverse-groups-client "0.1.8"]
                  [org.cyverse/common-cfg "2.8.1"]
                  [org.cyverse/common-cli "2.8.1"]
