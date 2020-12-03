@@ -35,7 +35,7 @@
 {{ with $v := (key (printf "%s/metadata/base" $base)) }}terrain.metadata.base-url = {{ $v }}{{ end }}
 
 # Notification agent connection settings.
-{{ with $v := (key (printf "%s/notifications/base" $base)) }}terrain.notifications.base.url = {{ $v }}{{ end }}
+{{ with $v := (key (printf "%s/notifications/base" $base)) }}terrain.notifications.base-url = {{ $v }}{{ end }}
 
 # The settings to use for authorization.
 {{ with $v := (key (printf "%s/de/authorized-groups" $base)) }}terrain.cas.allowed-groups  = {{ $v }}{{ end }}
