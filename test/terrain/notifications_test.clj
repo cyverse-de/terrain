@@ -12,7 +12,7 @@
 (use-fixtures :once test-fixtures/with-test-config test-fixtures/with-test-user)
 
 (defn- notification-url [& components]
-  (str (apply curl/url (config/notificationagent-base-url) components)))
+  (str (apply curl/url (config/notifications-base-url) components)))
 
 (deftest last-ten-messages
   (with-fake-routes-in-isolation

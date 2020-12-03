@@ -171,10 +171,10 @@
   [props config-valid configs metadata-routes-enabled]
   "terrain.metadata.base-url" "http://metadata")
 
-(cc/defprop-optstr notificationagent-base-url
+(cc/defprop-optstr notifications-base-url
   "The base URL to use when connecting to the notification agent."
   [props config-valid configs notification-routes-enabled]
-  "terrain.notificationagent.base-url" "http://notifications")
+  "terrain.notifications.base.url" "http://notifications")
 
 (cc/defprop-optstr ipg-base
   "The base URL for the iplant-groups service."
