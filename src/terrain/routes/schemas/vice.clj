@@ -57,8 +57,8 @@
    (optional-key :signal)      (describe Long "The numerical signal sent to the container process")
    (optional-key :reason)      (describe (maybe String) "The reason the container terminated")
    (optional-key :message)     (describe (maybe String) "The message associated with the container termination")
-   (optional-key :startedAt)   (describe String "The time the container started")
-   (optional-key :finishedAt)  (describe String "The time the container finished")
+   (optional-key :startedAt)   (describe (maybe String) "The time the container started")
+   (optional-key :finishedAt)  (describe (maybe String) "The time the container finished")
    (optional-key :containerID) (describe String "The ID of the container")})
 
 (defschema ContainerState
