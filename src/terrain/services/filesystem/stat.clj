@@ -129,7 +129,7 @@
      (can-create-dir? cm user path))))
 
 (defn do-stat
-  [{user :user} body]
+  [{user :shortUsername} body]
   (let [paths         (:paths body)
         ids           (:ids body)
         request-user  (get-public-data-user user paths ids)]
