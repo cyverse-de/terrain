@@ -75,8 +75,10 @@
    the next set of routes (`secured-routes-no-context`) if nothing matches."
   []
   (util/flagged-routes
+   (apps-routes)
    (dashboard-aggregator-routes)
    (filesystem-stat-routes)
+   (quicklaunch-routes)
    (secured-data-routes)
    (secured-filesystem-routes)
    (secured-search-routes)))
@@ -95,7 +97,6 @@
    (app-community-tag-routes)
    (app-elements-routes)
    (app-pipeline-routes)
-   (apps-routes)
    (analysis-routes)
    (coge-routes)
    (collaborator-list-routes)
@@ -109,7 +110,6 @@
    (webhook-routes)
    (misc-metadata-routes)
    (oauth-routes)
-   (quicklaunch-routes)
    (request-routes)
    (bag-routes)
    (route/not-found (service/unrecognized-path-response))))
