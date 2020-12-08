@@ -1,4 +1,4 @@
-(ns terrain.routes.schemas.instantlaunch
+(ns terrain.routes.schemas.instantlaunches
   (:use [common-swagger-api.schema :only [describe NonBlankString]]
         [schema.core :only [defschema Any Keyword optional-key]])
   (:import [java.util UUID]))
@@ -22,4 +22,7 @@
   {:id      (describe UUID "The UUID of the default instant launch mapping")
    :version (describe String "The format version of the instant launch mapping")
    :mapping (describe InstantLaunchMapping "The set of patterns use to match files to instant launches")})
+
+(def LatestILMappingsDefaultsSummary "The latest defaults for instant launch mappings")
+(def LatestILMappingsDefaultsDescription "The latest defaults for instant launch mappings, which determine which files can be used with a particular instant launch")
 
