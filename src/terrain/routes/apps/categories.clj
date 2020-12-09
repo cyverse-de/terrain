@@ -7,6 +7,7 @@
                                                      OntologyHierarchyFilterParams
                                                      OntologyHierarchyList]]
         [ring.util.http-response :only [ok]]
+        [terrain.auth.user-attributes :only [require-authentication]]
         [terrain.routes.schemas.categories]
         [terrain.util :only [optional-routes]])
   (:require [common-swagger-api.routes]                     ;; for :description-file
@@ -49,6 +50,7 @@
       :tags ["app-hierarchies"]
 
       (GET "/" []
+           :middleware [require-authentication]
            :return OntologyHierarchyList
            :summary schema/AppHierarchiesListingSummary
            :description schema/AppHierarchiesListingDocs
@@ -58,6 +60,7 @@
         :path-params [root-iri :- OntologyClassIRIParam]
 
         (GET "/" []
+             :middleware [require-authentication]
              :query [params OntologyHierarchyFilterParams]
              :return OntologyHierarchy
              :summary schema/AppCategoryHierarchyListingSummary
@@ -65,6 +68,7 @@
              (ok (apps/get-app-category-hierarchy root-iri params)))
 
         (GET "/apps" []
+             :middleware [require-authentication]
              :query [params OntologyAppListingPagingParams]
              :return AppListing
              :summary schema/AppCategoryAppListingSummary
@@ -72,6 +76,7 @@
              (ok (apps/get-hierarchy-app-listing root-iri params)))
 
         (GET "/unclassified" []
+             :middleware [require-authentication]
              :query [params OntologyAppListingPagingParams]
              :return AppListing
              :summary schema/AppHierarchyUnclassifiedListingSummary

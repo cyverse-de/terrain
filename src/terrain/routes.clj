@@ -75,6 +75,7 @@
    the next set of routes (`secured-routes-no-context`) if nothing matches."
   []
   (util/flagged-routes
+   (app-ontology-routes)
    (apps-routes)
    (dashboard-aggregator-routes)
    (filesystem-stat-routes)
@@ -92,7 +93,6 @@
    (app-category-routes)
    (app-avu-routes)
    (app-comment-routes)
-   (app-ontology-routes)
    (app-community-routes)
    (app-community-tag-routes)
    (app-elements-routes)
