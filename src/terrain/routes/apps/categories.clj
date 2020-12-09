@@ -25,6 +25,7 @@
       :tags ["app-categories"]
 
       (GET "/" []
+           :middleware [require-authentication]
            :query [params schema/CategoryListingParams]
            :return schema/AppCategoryListing
            :summary schema/AppCategoryListingSummary
@@ -32,6 +33,7 @@
            (ok (apps/get-app-categories params)))
 
       (GET "/:system-id/:category-id" []
+           :middleware [require-authentication]
            :path-params [system-id :- apps-schema/SystemId
                          category-id :- apps-schema/AppCategoryIdPathParam]
            :query [params AppListingPagingParams]
@@ -93,6 +95,7 @@
       :tags ["app-communities"]
 
       (GET "/:community-id/apps" []
+           :middleware [require-authentication]
            :path-params [community-id :- schema/AppCommunityGroupNameParam]
            :query [params AppListingPagingParams]
            :return AppListing

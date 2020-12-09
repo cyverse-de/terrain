@@ -75,14 +75,21 @@
    the next set of routes (`secured-routes-no-context`) if nothing matches."
   []
   (util/flagged-routes
-   (app-ontology-routes)
-   (apps-routes)
    (dashboard-aggregator-routes)
    (filesystem-stat-routes)
    (quicklaunch-routes)
    (secured-data-routes)
    (secured-filesystem-routes)
-   (secured-search-routes)))
+   (secured-search-routes)
+   (app-category-routes)
+   (app-avu-routes)
+   (app-comment-routes)
+   (app-ontology-routes)
+   (app-community-routes)
+   (app-community-tag-routes)
+   (app-elements-routes)
+   (app-pipeline-routes)
+   (apps-routes)))
 
 ; Add new secured routes to this function, not to (secured-routes).
 ; This function allows for secured routes without the /secured content/prefix,
@@ -90,13 +97,6 @@
 (defn secured-routes-no-context
   []
   (util/flagged-routes
-   (app-category-routes)
-   (app-avu-routes)
-   (app-comment-routes)
-   (app-community-routes)
-   (app-community-tag-routes)
-   (app-elements-routes)
-   (app-pipeline-routes)
    (analysis-routes)
    (coge-routes)
    (collaborator-list-routes)
