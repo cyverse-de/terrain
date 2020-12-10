@@ -1,6 +1,7 @@
 (ns terrain.routes.comments
   (:use [common-swagger-api.schema]
         [ring.util.http-response :only [ok]]
+        [terrain.auth.user-attributes :only [require-authentication]]
         [terrain.routes.schemas.comments]
         [terrain.routes.schemas.filesystem])
   (:require [common-swagger-api.routes]                     ;; Required for :description-file
@@ -66,12 +67,14 @@
       :tags ["apps"]
 
       (GET "/" []
+        :middleware [require-authentication]
         :summary "Get App Comments"
         :return comment-schema/CommentList
         :description "Lists all of the comments associated with an app."
         (ok (comments/list-app-comments app-id)))
 
       (POST "/" []
+        :middleware [require-authentication]
         :summary "Add an App Comment"
         :body [body (describe comment-schema/CommentRequest "The comment to add")]
         :return comment-schema/CommentResponse
@@ -79,6 +82,7 @@
         (ok (comments/add-app-comment app-id body)))
 
       (PATCH "/:comment-id" []
+        :middleware [require-authentication]
         :summary "Retract or Readmit an App Comment"
         :path-params [comment-id :- comment-schema/CommentIdPathParam]
         :query [{:keys [retracted]} RetractCommentQueryParams]
