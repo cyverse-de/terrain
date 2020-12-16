@@ -30,6 +30,7 @@
         [terrain.routes.filesystem.stats]
         [terrain.routes.filesystem.tickets]
         [terrain.routes.groups]
+        [terrain.routes.instantlaunches]
         [terrain.routes.metadata]
         [terrain.routes.misc]
         [terrain.routes.notification]
@@ -112,6 +113,7 @@
    (oauth-routes)
    (request-routes)
    (bag-routes)
+   (instant-launch-routes)
    (route/not-found (service/unrecognized-path-response))))
 
 ; The old way of adding secured routes. Prepends /secured to the URL
