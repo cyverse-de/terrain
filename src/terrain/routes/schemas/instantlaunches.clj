@@ -24,5 +24,6 @@
    :mapping (describe InstantLaunchMapping "The set of patterns use to match files to instant launches")})
 
 (def LatestILMappingsDefaultsSummary "The latest defaults for instant launch mappings")
-(def LatestILMappingsDefaultsDescription "The latest defaults for instant launch mappings, which determine which files can be used with a particular instant launch")
+(def LatestILMappingsDefaultsDescription "The latest defaults for instant launch mappings,
+   which determine which files can be used with a particular instant launch")
 
