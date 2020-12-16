@@ -14,7 +14,7 @@
    [config/app-routes-enabled]
 
    (context "/instantlaunches" []
-     :tags ["instantlaunches"]
+     :tags ["instant-launches"]
 
      (context "/mappings" []
        (context "/defaults" []

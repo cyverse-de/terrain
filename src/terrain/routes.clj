@@ -270,6 +270,7 @@
                                      {:name "app-element-types", :description, "App Element Endpoints"}
                                      {:name "app-metadata", :description "App Metadata Endpoints"}
                                      {:name "app-pipelines", :description "App Pipeline Endpoints"}
+                                     {:name "bags", :description "Item Bag Endpoints"}
                                      {:name "bootstrap", :description "Bootstrap Endpoints"}
                                      {:name "coge", :description "CoGe Endpoints"}
                                      {:name "collaborator-lists", :description "Collaborator List Endpoints"}
@@ -279,6 +280,7 @@
                                      {:name "favorites", :description "Favorites Endpoints"}
                                      {:name "fileio", :description "File Input/Output Endpoints"}
                                      {:name "filesystem", :description "Filesystem Endpoints"}
+                                     {:name "instant-launches", :description "Instant Launch Endpoints"}
                                      {:name "reference-genomes", :description "Reference Genome Endpoints"}
                                      {:name "requests", :description "Request Endpoints"}
                                      {:name "subjects", :description "Subject Endpoints"}
