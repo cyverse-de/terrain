@@ -9,7 +9,6 @@
             [clojure.java.io :as io]
             [terrain.auth.user-attributes :refer [current-user]]))
 
-
 (defn- augment-query
   [query {:keys [no-user]}]
   (as-> query q
@@ -17,11 +16,11 @@
 
 (defn- app-exposer-url
   ([components]
-    (app-exposer-url components {}))
+   (app-exposer-url components {}))
   ([components query & {:as opts}]
-    (-> (apply curl/url (config/app-exposer-base-uri) components)
-        (assoc :query (augment-query query opts))
-        str)))
+   (-> (apply curl/url (config/app-exposer-base-uri) components)
+       (assoc :query (augment-query query opts))
+       str)))
 
 (defn get-pod-logs
   "Returns the logs for a pod"
@@ -92,3 +91,7 @@
   "Tells the vice-transfer-files tool to download inputs without affecting the analysis status"
   [analysis-id]
   (:body (client/post (app-exposer-url ["vice" "admin" "analyses" analysis-id "download-input-files"] {} :no-user true) {:as :json})))
+
+(defn latest-instant-launch-mappings-defaults
+  []
+  (:body (client/get (app-exposer-url ["instantlaunches" "mappings" "defaults" "latest"] {} :no-user true) {:as :json})))
