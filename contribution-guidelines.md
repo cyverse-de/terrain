@@ -28,7 +28,7 @@ convert field names.
 
 ### Query Parameter Names
 
-Names of query paramters should be all lower case, with words separated by hyphens. This is a common query parameter
+Names of query parameters should be all lower case, with words separated by hyphens. This is a common query parameter
 naming convention in REST APIs.
 
 ### Timestamp Formats
@@ -127,7 +127,7 @@ the performance of an endoint), consider the following questions:
 
 Many APIs provide multiple ways to perform tasks. This can be convenient for advanced API users because it provide
 flexibility. Unforunately, having multiple ways to peform tasks also has drawbacks. First, it makes the software more
-difficult to maintain because pieces of code the perform related tasks need to be updated in tandem. Second, it makes
+difficult to maintain because pieces of code that perform related tasks need to be updated in tandem. Second, it makes
 the API less approachable to new users. Whenever a new endpoint is being added (or a new feature is being added to an
 existing endpoint), care should be taken to ensure that redundancy is not introduced.
 
