@@ -98,12 +98,16 @@ like this:
 
 ``` JavaScript
 {
-    "message": "error details here"
+    "message": "error details here",
+    "error_code": "ERR_SOMETHING_BAD_HAPPENED"
 }
 ```
 
-Additional fields may be present, but the `message` field should always be included. Note that this is the default error
-response body format used by [labstack/echo][10].
+The `message` field should always be included so that users can look at the response body and know what went wrong. In
+cases where it might be useful for an automated client to examine the error and respond appropriately, it's useful to
+have the `error_code` field present as well. (This field does break the `camelCase` convention mentioned above, but it's
+already in use in several places.) Additional fields may be present as well. The default response body format used by
+[labstack/echo][10] is the same, but the `error_code` field is not present.
 
 ## Performance
 
