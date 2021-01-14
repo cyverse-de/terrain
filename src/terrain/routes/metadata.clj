@@ -325,7 +325,12 @@
    [config/app-routes-enabled]
 
    (POST "/support-email" [:as {body :body}]
-     (send-support-email body))))
+     :tags ["support"]
+     :body [body SupportEmailRequest]
+     :summary SupportEmailSummary
+     :description SupportEmailDescription
+     (send-support-email body)
+     (ok))))
 
 (defn admin-integration-data-routes
   []

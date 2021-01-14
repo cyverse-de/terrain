@@ -156,6 +156,11 @@
   [props config-valid configs app-routes-enabled]
   "terrain.email.support-email-dest")
 
+(cc/defprop-str support-email-src-addr
+  "The default source email address for DE support request messages."
+  [props config-valid configs app-routes-enabled]
+  "terrain.email.support-email-src")
+
 (cc/defprop-optstr apps-base-url
   "The base URL to use when connecting to secured Apps services."
   [props config-valid configs app-routes-enabled]
