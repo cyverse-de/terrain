@@ -3,6 +3,7 @@
         [clojure-commons.lcase-params :only [wrap-lcase-params]]
         [clojure-commons.query-params :only [wrap-query-params]]
         [common-swagger-api.schema]
+        [otel.middleware :only [otel-middleware]]
         [ring.middleware.keyword-params :only [wrap-keyword-params]]
         [service-logging.middleware :only [wrap-logging clean-context]]
         [terrain.auth.user-attributes]
@@ -293,7 +294,8 @@
                                      {:name "webhooks", :description "Webhook Endpoints"}]
                :securityDefinitions security-definitions}})
   (middleware
-   [[wrap-query-param-remover "ip-address" #{#"^/terrain/secured/bootstrap"
+   [otel-middleware
+    [wrap-query-param-remover "ip-address" #{#"^/terrain/secured/bootstrap"
                                              #"^/terrain/secured/logout"}]
     wrap-query-params
     wrap-lcase-params
