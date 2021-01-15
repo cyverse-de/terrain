@@ -100,16 +100,16 @@
   [[k v]]
   (str (->> (if (sequential? v) v [v])
             (mapv (partial str " - "))
-            (concat [k])
+            (concat [(name k)])
             (string/join "\n"))
        "\n\n"))
 
 (defn send-support-email
   "Sends email messages containing information about a request for support."
-  [{:strs [email fields subject]}]
+  [{:keys [email fields subject]}]
   (send-email
    :to        (config/support-email-dest-addr)
-   :from-addr (or email (:email current-user))
+   :from-addr (or email (:email current-user) (config/support-email-src-addr))
    :subject   (or subject "DE Support Request")
    :template  "blank"
    :values    {:contents (apply str (mapv format-field fields))}))

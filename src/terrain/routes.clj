@@ -91,7 +91,8 @@
    (app-community-tag-routes)
    (app-elements-routes)
    (app-pipeline-routes)
-   (apps-routes)))
+   (apps-routes)
+   (misc-metadata-routes)))
 
 ; Add new secured routes to this function, not to (secured-routes).
 ; This function allows for secured routes without the /secured content/prefix,
@@ -110,7 +111,6 @@
    (tool-request-routes)
    (permanent-id-request-routes)
    (webhook-routes)
-   (misc-metadata-routes)
    (oauth-routes)
    (request-routes)
    (bag-routes)
@@ -285,6 +285,7 @@
                                      {:name "reference-genomes", :description "Reference Genome Endpoints"}
                                      {:name "requests", :description "Request Endpoints"}
                                      {:name "subjects", :description "Subject Endpoints"}
+                                     {:name "support", :description "Support Endpoints"}
                                      {:name "tags", :description "Tag Endpoints"}
                                      {:name "teams", :description "Team Endpoints"}
                                      {:name "tools", :description "Tool Endpoints"}

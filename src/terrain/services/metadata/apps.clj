@@ -30,5 +30,4 @@
 (defn send-support-email
   "Sends a support email from the user."
   [body]
-  (email/send-support-email (cheshire/decode-stream (reader body)))
-  (success-response))
+  (email/send-support-email body))
