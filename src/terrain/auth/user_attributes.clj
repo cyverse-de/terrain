@@ -47,6 +47,23 @@
   [{:keys [jwt-claims]}]
   (jwt/terrain-user-from-jwt-claims jwt-claims jwt/user-from-wso2-assertion))
 
+(defn lookup-user
+  "Looks up the user with the given username."
+  [username]
+  (try+
+   (let [subject (subjects/lookup-subject (cfg/grouper-user) username)]
+     {:username      (str (:id subject) "@" (cfg/uid-domain))
+      :password      nil
+      :email         (:email subject)
+      :shortUsername (:id subject)
+      :firstName     (:first_name subject)
+      :lastName      (:last_name subject)
+      :commonName    (:description subject)})
+   (catch [:status 404] _
+     (cxu/internal-system-error (str "fake user " username " not found")))
+   (catch Object o
+     (cxu/internal-system-error (str "fake user lookup for username " username " failed")))))
+
 (defn fake-user-from-attributes
   "Uses the username bound to `fake-user` to obtain user attributes. The subject lookup happens with every request
    so that terrain doesn't have to be restarted if the subject lookup fails when terrain is starting up. This adds
@@ -54,19 +71,7 @@
    example, iplant-groups isn't available when terrain is started."
   [& _]
   (if fake-user
-    (try+
-     (let [subject (subjects/lookup-subject (cfg/grouper-user) fake-user)]
-       {:username      (str (:id subject) "@" (cfg/uid-domain))
-        :password      nil
-        :email         (:email subject)
-        :shortUsername (:id subject)
-        :firstName     (:first_name subject)
-        :lastName      (:last_name subject)
-        :commonName    (:description subject)})
-     (catch [:status 404] _
-       (cxu/internal-system-error (str "fake user " fake-user " not found")))
-     (catch Object _
-       (cxu/internal-system-error (str "fake user lookup for username " fake-user " failed"))))
+    (lookup-user fake-user)
     (cxu/internal-system-error (str "no fake user specified on command line"))))
 
 (defn- user-info-from-current-user
@@ -207,9 +212,16 @@
       (handler req)
       (resp/unauthorized "No authentication information found in request."))))
 
+(defn resolve-test-user
+  "Attempts to resolve a test user from either a username or a map of user attributes."
+  [user]
+  (cond (string? user) (lookup-user user)
+        (map? user)    (user-from-attributes {:user-attribues user})
+        :else          (cxu/internal-system-error "user must be a string or a map of attributes")))
+
 (defmacro with-user
   "Performs a task with the given user information bound to current-user. This macro is used
    for debugging in the REPL."
   [[user] & body]
-  `(binding [current-user (user-from-attributes {:user-attributes ~user})]
+  `(binding [current-user (resolve-test-user ~user)]
      (do ~@body)))
