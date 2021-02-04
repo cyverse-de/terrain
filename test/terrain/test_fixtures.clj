@@ -9,6 +9,7 @@
    :terrain.email.perm-id-req.dest       "perm-id-request-dest@example.org"
    :terrain.email.perm-id-req.src        "perm-id-request-src@example.org"
    :terrain.email.support-email-dest     "support-email-dest@example.org"
+   :terrain.email.support-email-src      "support-email-src@example.org"
    :terrain.permanent-id.target-base-url "http://perm-id-target-base-url"
    :terrain.keycloak.client-id           "keycloak-client-id"
    :terrain.keycloak.client-secret       "keycloak-client-secret"})
