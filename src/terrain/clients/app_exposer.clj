@@ -97,16 +97,16 @@
   (:body (client/get (app-exposer-url ["instantlaunches" "mappings" "defaults" "latest"] {} :no-user true) {:as :json})))
 
 (defn add-latest-instant-launch-mappings-defaults
-  [latest]
-  (:body (client/put (app-exposer-url ["instantlaunches" "mappings" "defaults" "latest"] {} :no-user true) {:as           :json
-                                                                                                            :content-type :json
-                                                                                                            :form-params  latest})))
+  [username latest]
+  (:body (client/put (app-exposer-url ["instantlaunches" "mappings" "defaults" "latest"] {:username username} :no-user true) {:as           :json
+                                                                                                                              :content-type :json
+                                                                                                                              :form-params  latest})))
 
 (defn update-latest-instant-launch-mappings-defaults
-  [latest]
-  (:body (client/post (app-exposer-url ["instantlaunches" "mappings" "defaults" "latest"] {} :no-user true) {:as           :json
-                                                                                                             :content-type :json
-                                                                                                             :form-params  latest})))
+  [username latest]
+  (:body (client/post (app-exposer-url ["instantlaunches" "mappings" "defaults" "latest"] {:username username} :no-user true) {:as           :json
+                                                                                                                               :content-type :json
+                                                                                                                               :form-params  latest})))
 
 (defn delete-latest-instant-launch-mappings-defaults
   []
@@ -114,17 +114,19 @@
 
 (defn get-instant-launch-list
   []
-  (:body (client/get (app-exposer-url ["instantlaunches"] {} :no-user true) {:as :json})))
+  {:instant_launches (:body (client/get (app-exposer-url ["instantlaunches"] {} :no-user true) {:as :json}))})
 
 (defn get-instant-launch
   [id]
-  (:body (client/get (app-exposer-url ["instantlaunches"] {} :no-user true) {:as :json})))
+  (:body (client/get (app-exposer-url ["instantlaunches" id] {} :no-user true) {:as :json})))
 
 (defn add-instant-launch
   [username il]
-  (:body (client/put (app-exposer-url ["instantlaunches"] {} :no-user true) {:content-type :json
-                                                                             :as           :json
-                                                                             :form-params  (update il :added_by #(if (not %1) username %1))})))
+  (let [u (app-exposer-url ["instantlaunches/"] {} :no-user true)]
+    (println u)
+    (:body (client/put u {:content-type :json
+                          :as           :json
+                          :form-params  (update il :added_by #(if (not %1) username %1))}))))
 
 (defn update-instant-launch
   [id il]

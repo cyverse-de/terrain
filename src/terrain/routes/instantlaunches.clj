@@ -45,26 +45,26 @@
   (optional-routes
    [config/app-routes-enabled]
 
-   (context "instant-launches" []
+   (context "/instant-launches" []
      :tags ["admin-instant-launches"]
 
      (context "/mappings" []
        (context "/defaults" []
-         (PUT "/" []
+         (PUT "/latest" []
            :summary AddLatestILMappingsDefaultsSummary
            :description AddLatestILMappingsDefaultsDescription
-           :body [body DefaultInstantLaunchMapping]
-           :return DefaultInstantLaunchMapping
-           (ok (add-latest-instant-launch-mappings-defaults body)))
+           :body [body InstantLaunchMapping]
+           :return InstantLaunchMapping
+           (ok (add-latest-instant-launch-mappings-defaults (:username current-user) body)))
 
-         (POST "/" []
+         (POST "/latest" []
            :summary UpdateLatestILMappingsDefaultsSummary
            :description UpdateLatestILMappingsDefaultsDescription
-           :body [body DefaultInstantLaunchMapping]
-           :return DefaultInstantLaunchMapping
-           (ok (update-latest-instant-launch-mappings-defaults body)))
+           :body [body InstantLaunchMapping]
+           :return InstantLaunchMapping
+           (ok (update-latest-instant-launch-mappings-defaults (:username current-user) body)))
 
-         (DELETE "/" []
+         (DELETE "/latest" []
            :summary DeleteLatestILMappingsDefaultsSummary
            :description DeleteLatestILMappingsDefaultsDescription
            (ok (delete-latest-instant-launch-mappings-defaults)))))
