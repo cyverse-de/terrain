@@ -40,7 +40,7 @@
          :return InstantLaunch
          (ok (get-instant-launch id)))))))
 
-(defn instant-launch-admin-routes
+(defn admin-instant-launch-routes
   []
   (optional-routes
    [config/app-routes-enabled]
