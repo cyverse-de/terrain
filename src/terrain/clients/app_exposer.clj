@@ -94,46 +94,63 @@
 
 (defn latest-instant-launch-mappings-defaults
   []
-  (:body (client/get (app-exposer-url ["instantlaunches" "mappings" "defaults" "latest"] {} :no-user true) {:as :json})))
+  (-> (app-exposer-url ["instantlaunches" "mappings" "defaults" "latest"] {} :no-user true)
+      (client/get {:as :json})
+      (:body)))
 
 (defn add-latest-instant-launch-mappings-defaults
   [username latest]
-  (:body (client/put (app-exposer-url ["instantlaunches" "mappings" "defaults" "latest"] {:username username} :no-user true) {:as           :json
-                                                                                                                              :content-type :json
-                                                                                                                              :form-params  latest})))
+  (-> (app-exposer-url ["instantlaunches" "mappings" "defaults" "latest"] {:username username} :no-user true)
+      (client/put {:as           :json
+                   :content-type :json
+                   :form-params  latest})
+      (:body)))
 
 (defn update-latest-instant-launch-mappings-defaults
   [username latest]
-  (:body (client/post (app-exposer-url ["instantlaunches" "mappings" "defaults" "latest"] {:username username} :no-user true) {:as           :json
-                                                                                                                               :content-type :json
-                                                                                                                               :form-params  latest})))
+  (-> (app-exposer-url ["instantlaunches" "mappings" "defaults" "latest"] {:username username} :no-user true)
+      (client/post {:as           :json
+                    :content-type :json
+                    :form-params  latest})
+      (:body)))
 
 (defn delete-latest-instant-launch-mappings-defaults
   []
-  (:body (client/delete (app-exposer-url ["instantlaunches" "mappings" "defaults" "latest"] {} :no-user true) {:as :json})))
+  (-> (app-exposer-url ["instantlaunches" "mappings" "defaults" "latest"] {} :no-user true)
+      (client/delete {:as :json})
+      (:body)))
 
 (defn get-instant-launch-list
   []
-  {:instant_launches (:body (client/get (app-exposer-url ["instantlaunches"] {} :no-user true) {:as :json}))})
+  {:instant_launches
+   (-> (app-exposer-url ["instantlaunches"] {} :no-user true)
+       (client/get {:as :json})
+       (:body))})
 
 (defn get-instant-launch
   [id]
-  (:body (client/get (app-exposer-url ["instantlaunches" id] {} :no-user true) {:as :json})))
+  (-> (app-exposer-url ["instantlaunches" id] {} :no-user true)
+      (client/get {:as :json})
+      (:body)))
 
 (defn add-instant-launch
   [username il]
-  (let [u (app-exposer-url ["instantlaunches/"] {} :no-user true)]
-    (println u)
-    (:body (client/put u {:content-type :json
-                          :as           :json
-                          :form-params  (update il :added_by #(if (not %1) username %1))}))))
+  (-> (app-exposer-url ["instantlaunches/"] {} :no-user true)
+      (client/put {:content-type :json
+                   :as           :json
+                   :form-params  (update il :added_by #(if (not %1) username %1))})
+      (:body)))
 
 (defn update-instant-launch
   [id il]
-  (:body (client/post (app-exposer-url ["instantlaunches" id] {} :no-user true) {:content-type :json
-                                                                                 :as           :json
-                                                                                 :form-params  il})))
+  (-> (app-exposer-url ["instantlaunches" id] {} :no-user true)
+      (client/post {:content-type :json
+                    :as           :json
+                    :form-params  il})
+      (:body)))
 
 (defn delete-instant-launch
   [id]
-  (:body (client/delete (app-exposer-url ["instantlaunches" id] {} :no-user true) {:as :json})))
+  (-> (app-exposer-url ["instantlaunches" id] {} :no-user true)
+      (client/delete {:as :json})
+      (:body)))
