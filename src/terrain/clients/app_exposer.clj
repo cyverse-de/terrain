@@ -138,7 +138,7 @@
   (-> (app-exposer-url ["instantlaunches/"] {} :no-user true)
       (client/put {:content-type :json
                    :as           :json
-                   :form-params  (update il :added_by #(if (not %1) username %1))})
+                   :form-params  (update il :added_by #(or %1 username))})
       (:body)))
 
 (defn update-instant-launch
