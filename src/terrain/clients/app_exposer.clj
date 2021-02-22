@@ -94,4 +94,63 @@
 
 (defn latest-instant-launch-mappings-defaults
   []
-  (:body (client/get (app-exposer-url ["instantlaunches" "mappings" "defaults" "latest"] {} :no-user true) {:as :json})))
+  (-> (app-exposer-url ["instantlaunches" "mappings" "defaults" "latest"] {} :no-user true)
+      (client/get {:as :json})
+      (:body)))
+
+(defn add-latest-instant-launch-mappings-defaults
+  [username latest]
+  (-> (app-exposer-url ["instantlaunches" "mappings" "defaults" "latest"] {:username username} :no-user true)
+      (client/put {:as           :json
+                   :content-type :json
+                   :form-params  latest})
+      (:body)))
+
+(defn update-latest-instant-launch-mappings-defaults
+  [username latest]
+  (-> (app-exposer-url ["instantlaunches" "mappings" "defaults" "latest"] {:username username} :no-user true)
+      (client/post {:as           :json
+                    :content-type :json
+                    :form-params  latest})
+      (:body)))
+
+(defn delete-latest-instant-launch-mappings-defaults
+  []
+  (-> (app-exposer-url ["instantlaunches" "mappings" "defaults" "latest"] {} :no-user true)
+      (client/delete {:as :json})
+      (:body)))
+
+(defn get-instant-launch-list
+  []
+  {:instant_launches
+   (-> (app-exposer-url ["instantlaunches"] {} :no-user true)
+       (client/get {:as :json})
+       (:body))})
+
+(defn get-instant-launch
+  [id]
+  (-> (app-exposer-url ["instantlaunches" id] {} :no-user true)
+      (client/get {:as :json})
+      (:body)))
+
+(defn add-instant-launch
+  [username il]
+  (-> (app-exposer-url ["instantlaunches/"] {} :no-user true)
+      (client/put {:content-type :json
+                   :as           :json
+                   :form-params  (update il :added_by #(or %1 username))})
+      (:body)))
+
+(defn update-instant-launch
+  [id il]
+  (-> (app-exposer-url ["instantlaunches" id] {} :no-user true)
+      (client/post {:content-type :json
+                    :as           :json
+                    :form-params  il})
+      (:body)))
+
+(defn delete-instant-launch
+  [id]
+  (-> (app-exposer-url ["instantlaunches" id] {} :no-user true)
+      (client/delete {:as :json})
+      (:body)))

@@ -157,6 +157,7 @@
    (admin-community-routes)
    (admin-filesystem-metadata-routes)
    (admin-groups-routes)
+   (admin-instant-launch-routes)
    (admin-notification-routes)
    (admin-ontology-routes)
    (admin-reference-genomes-routes)
@@ -253,6 +254,7 @@
                                      {:name "admin-comments", :description "Comment Administration Endpoints"}
                                      {:name "admin-communities", :description "Community Administration Endpoints"}
                                      {:name "admin-filesystem", :description "File System Administration Endpoints"}
+                                     {:name "admin-instant-launches", :description "Instant Launch Administration Endpoints"}
                                      {:name "admin-reference-genomes", :description "Admin Reference Genome Endpoints"}
                                      {:name "admin-requests", :description "Admin Request Endpoints"}
                                      {:name "admin-settings", :description "Admin Setting Endpoints"}
