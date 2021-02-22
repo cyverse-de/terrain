@@ -28,7 +28,7 @@
 (defschema InstantLaunch
   {(optional-key :id)              (describe UUID "The UUID of the instant launch")
    :quick_launch_id                (describe UUID "The UUID for the quick launch used for the instant launch")
-   (optional-key :added_by)        (describe String "The username of the user that created the instant launch")
+   (optional-key :added_by)        (describe String "The username of the user who created the instant launch")
    (optional-key :added_on)        (describe String "The date and time when the instant launch was created")})
 
 (defschema InstantLaunchList
