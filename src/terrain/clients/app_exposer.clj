@@ -154,3 +154,31 @@
   (-> (app-exposer-url ["instantlaunches" id] {} :no-user true)
       (client/delete {:as :json})
       (:body)))
+
+(defn list-metadata
+  [attr value unit]
+  (-> (app-exposer-url ["instantlaunches" "avus"] {:attribute attr :value value :unit unit})
+      (client/get {:as :json})
+      (:body)))
+
+(defn get-metadata
+  [id]
+  (-> (app-exposer-url ["instantlaunches" id "metadata"] {})
+      (client/get {:as :json})
+      (:body)))
+
+(defn upsert-metadata
+  [id data]
+  (-> (app-exposer-url ["instantlaunches" id "metadata"] {})
+      (client/post {:content-type :json
+                    :as :json
+                    :form-params data})
+      (:body)))
+
+(defn reset-metadata
+  [id data]
+  (-> (app-exposer-url ["instantlaunches" id "metadata"] {})
+      (client/post {:content-type :json
+                    :as :json
+                    :form-params data})
+      (:body)))
