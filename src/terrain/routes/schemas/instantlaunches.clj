@@ -24,6 +24,14 @@
 (def LatestILMappingsDefaultsSummary "The latest defaults for instant launch mappings")
 (def LatestILMappingsDefaultsDescription "The latest defaults for instant launch mappings,
    which determine which files can be used with a particular instant launch")
+(def ListMetadataSummary "Lists the AVUs associated with instant launches")
+(def ListMetadataDescription "Lists the AVUs associated with instant launches while allowing filters based on attributes, values, and units")
+(def GetMetadataSummary "Lists the AVUs associated with an instant launch")
+(def GetMetadataDescription "Lists the AVUs associated with a single instant launch")
+(def UpsertMetadataSummary "Adds/Updates AVUs for an instant launch")
+(def UpsertMetadataDescription "Adds or updates AVUs asssociated with a single instant launch")
+(def ResetMetadataSummary "Resets the AVUs associated with an instant launch")
+(def ResetMetadataDescription "Resets all of the AVUs associated with an instant launch to the AVUs passed into the API call")
 
 (defschema InstantLaunch
   {(optional-key :id)              (describe UUID "The UUID of the instant launch")
@@ -47,6 +55,12 @@
   {:id      (describe UUID "The UUID of the default instant launch mapping")
    :version (describe String "The format version of the instant launch mapping")
    :mapping (describe InstantLaunchMapping "The set of patterns use to match files to instant launches")})
+
+;;; Slightly different from the one in the metadata service. Doesn't include user info or the target-type.
+(defschema MetadataListingQueryMap
+  {(optional-key :attribute) (describe [String] "A list of attributes to filter metadata listings by")
+   (optional-key :value)     (describe [String] "A list of values to filter metadata listing by")
+   (optional-key :unit)      (describe [String] "A list of units to filter metadata listing by")})
 
 
 

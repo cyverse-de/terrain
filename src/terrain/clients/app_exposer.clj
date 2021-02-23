@@ -156,8 +156,8 @@
       (:body)))
 
 (defn list-metadata
-  [attr value unit]
-  (-> (app-exposer-url ["instantlaunches" "avus"] {:attribute attr :value value :unit unit})
+  [query]
+  (-> (app-exposer-url ["instantlaunches" "avus"] query)
       (client/get {:as :json})
       (:body)))
 
@@ -178,7 +178,7 @@
 (defn reset-metadata
   [id data]
   (-> (app-exposer-url ["instantlaunches" id "metadata"] {})
-      (client/post {:content-type :json
-                    :as :json
-                    :form-params data})
+      (client/put {:content-type :json
+                   :as :json
+                   :form-params data})
       (:body)))
