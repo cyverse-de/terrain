@@ -75,47 +75,47 @@
        :description ListMetadataDescription
        :query [query MetadataListingQueryMap]
        :return AvuList
-       (ok (list-metadata query))
+       (ok (list-metadata query)))
 
-       (PUT "/" []
-         :summary AddInstantLaunchSummary
-         :description AddInstantLaunchDescription
+     (context "/:id" []
+       :path-params [id :- InstantLaunchIDParam]
+
+       (POST "/" []
+         :summary UpdateInstantLaunchSummary
+         :description UpdateInstantLaunchDescription
          :body [body InstantLaunch]
          :return InstantLaunch
-         (ok (add-instant-launch (:username current-user) body)))
+         (ok (update-instant-launch id body)))
 
-       (context "/:id" []
-         :path-params [id :- InstantLaunchIDParam]
+       (DELETE "/" []
+         :summary DeleteInstantLaunchSummary
+         :description DeleteInstantLaunchDescription
+         (ok (delete-instant-launch id)))
+
+       (context "/metadata" []
+         (GET "/" []
+           :summary GetMetadataSummary
+           :description GetMetadataDescription
+           :return AvuList
+           (ok (get-metadata id)))
 
          (POST "/" []
-           :summary UpdateInstantLaunchSummary
-           :description UpdateInstantLaunchDescription
-           :body [body InstantLaunch]
-           :return InstantLaunch
-           (ok (update-instant-launch id body)))
+           :summary UpsertMetadataSummary
+           :description UpsertMetadataDescription
+           :body [data AvuListRequest]
+           :return AvuList
+           (ok (upsert-metadata id data)))
 
-         (DELETE "/" []
-           :summary DeleteInstantLaunchSummary
-           :description DeleteInstantLaunchDescription
-           (ok (delete-instant-launch id)))
+         (PUT "/" []
+           :summary ResetMetadataSummary
+           :description ResetMetadataDescription
+           :body [data SetAvuRequest]
+           :return AvuList
+           (ok (reset-metadata id data)))))
 
-         (context "/metadata" []
-           (GET "/" []
-             :summary GetMetadataSummary
-             :description GetMetadataDescription
-             :return AvuList
-             (ok (get-metadata id)))
-
-           (POST "/" []
-             :summary UpsertMetadataSummary
-             :description UpsertMetadataDescription
-             :body [data AvuListRequest]
-             :return AvuList
-             (ok (upsert-metadata id data)))
-
-           (PUT "/" []
-             :summary ResetMetadataSummary
-             :description ResetMetadataDescription
-             :body [data SetAvuRequest]
-             :return AvuList
-             (ok (reset-metadata id data)))))))))
+     (PUT "/" []
+       :summary AddInstantLaunchSummary
+       :description AddInstantLaunchDescription
+       :body [body InstantLaunch]
+       :return InstantLaunch
+       (ok (add-instant-launch (:username current-user) body))))))
