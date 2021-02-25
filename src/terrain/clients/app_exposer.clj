@@ -155,9 +155,11 @@
       (client/delete {:as :json})
       (:body)))
 
-;;; We bypass the query map handling built into (app-exposer-url) to use the
-;;; one from clj-http because the former does not handle having an seq of
-;;; values for an entry while the latter does.
+;;; For the (list-metadata) function, we bypass the query map handling built 
+;;; into (app-exposer-url) to use the one from clj-http because the former 
+;;; does not handle having an seq of values for an entry while the latter does.
+;;; This isn't necessary for other calls, so the change was not made in the
+;;; (app-exposer-url) function.
 (defn list-metadata
   [query]
   (-> (app-exposer-url ["instantlaunches" "metadata"] {} :no-user true)
