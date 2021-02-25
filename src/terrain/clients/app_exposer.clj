@@ -154,3 +154,37 @@
   (-> (app-exposer-url ["instantlaunches" id] {} :no-user true)
       (client/delete {:as :json})
       (:body)))
+
+;;; For the (list-metadata) function, we bypass the query map handling built 
+;;; into (app-exposer-url) to use the one from clj-http because the former 
+;;; does not handle having an seq of values for an entry while the latter does.
+;;; This isn't necessary for other calls, so the change was not made in the
+;;; (app-exposer-url) function.
+(defn list-metadata
+  [query]
+  (-> (app-exposer-url ["instantlaunches" "metadata"] {} :no-user true)
+      (client/get {:as           :json
+                   :query-params (assoc query :user (:shortUsername current-user))})
+      (:body)))
+
+(defn get-metadata
+  [id]
+  (-> (app-exposer-url ["instantlaunches" id "metadata"] {})
+      (client/get {:as :json})
+      (:body)))
+
+(defn upsert-metadata
+  [id data]
+  (-> (app-exposer-url ["instantlaunches" id "metadata"] {})
+      (client/post {:content-type :json
+                    :as :json
+                    :form-params data})
+      (:body)))
+
+(defn reset-metadata
+  [id data]
+  (-> (app-exposer-url ["instantlaunches" id "metadata"] {})
+      (client/put {:content-type :json
+                   :as :json
+                   :form-params data})
+      (:body)))
