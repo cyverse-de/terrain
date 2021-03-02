@@ -115,6 +115,7 @@
    (request-routes)
    (bag-routes)
    (instant-launch-routes)
+   (vice-routes)
    (route/not-found (service/unrecognized-path-response))))
 
 ; The old way of adding secured routes. Prepends /secured to the URL
