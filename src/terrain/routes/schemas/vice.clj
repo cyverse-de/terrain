@@ -128,3 +128,20 @@
    (optional-key :external-id)   (describe (maybe UUID) "The value of the external_id field in the job_steps table. Used widely in the API")
    (optional-key :user-id)       (describe (maybe UUID) "The UUID assigned to the user that launched the analysis")
    (optional-key :username)      (describe (maybe String) "The user of the user that launched the analysis")})
+
+(defschema NonAdminFilterParams
+  (dissoc FilterParams (optional-key :user-id) (optional-key :username)))
+
+(def URLReadySummary "Whether or not a VICE analysis is browser accessible")
+(def URLReadyDescription "Returns a map detailing whether or not the VICE analysis is ready to be accessed through a browser")
+(def AdminURLReadySummary "Whether or not a VICE analysis is browser accessible. No permissions checks")
+(def AdminURLReadyDescription "Returns a map detailing whether or not the VICE analysis is ready to be accessed through a browser. No permissions checks.")
+
+(def DescriptionSummary "Returns a JSON description of the VICE analysis")
+(def DescriptionDescription "Returns a JSON description of the VICE analysis after verifying the user has access to it")
+(def AdminDescriptionDescription "Returns a JSON description of the VICE analysis, bypassing permissions checks")
+
+(def Host (describe String "The hostname/subdomain of a VICE analysis"))
+
+(defschema URLReady
+  {:ready (describe Boolean "Whether or not the analysis is ready to be accessed.")})

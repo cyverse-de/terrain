@@ -48,9 +48,52 @@
   (:body (client/post (app-exposer-url ["vice" "admin" "analyses" analysis-id "time-limit"] {} :no-user true) {:as :json})))
 
 (defn get-resources
-  "Calls app-exposer's GET /vice/listing endpoint, with filter as the query filter map."
+  "Calls app-exposer's GET /vice/listing endpoint, with filter as the query filter map. 
+  Returns only results applicable to the user."
   [filter]
-  (:body (client/get (app-exposer-url ["vice" "listing"] filter :no-user true) {:as :json})))
+  (:body (client/get (app-exposer-url ["vice" "listing"] filter) {:as :json})))
+
+(defn admin-get-resources
+  "Calls app-exposer's GET /vice/admin/listing endpoint, with the filter as the
+   query parameter map. Bypasses the user filter present in the non-admin version."
+  [filter]
+  (-> (app-exposer-url ["vice" "admin" "listing"] filter :no-user true)
+      (client/get  {:as :json})
+      (:body)))
+
+(defn url-ready
+  "Calls app-exposer's GET /vice/:host/url-ready endpoint, which returns a map
+   containing a boolean that tells whether the analysis is ready for browser access.
+   Checks if the logged in user has permission to access the analysis before returning
+   a result."
+  [host]
+  (-> (app-exposer-url ["vice" host "url-ready"] {})
+      (client/get  {:as :json})
+      (:body)))
+
+(defn admin-url-ready
+  "Same as url-ready, but calls the admin version that bypasses the permissions check
+   present in the non-admin version of the call."
+  [host]
+  (-> (app-exposer-url ["vice" "admin" host "url-ready"] {} :no-user true)
+      (client/get {:as :json})
+      (:body)))
+
+(defn get-description-by-host
+  "Returns a JSON description of the resources created for the analyis with the supplied
+   host/subdomain."
+  [host]
+  (-> (app-exposer-url ["vice" host "description"] {})
+      (client/get {:as :json})
+      (:body)))
+
+(defn admin-get-description-by-host
+  "Returns a JSON description of the resources created for the analysis with the supplied
+   host/subdomain. Bypasses the permissions check present in the non-admin version of this call."
+  [host]
+  (-> (app-exposer-url ["vice" "admin" host "description"] {} :no-user true)
+      (client/get {:as :json})
+      (:body)))
 
 (defn cancel-analysis
   "Calls app-exposer's POST /vice/{id}/save-and-exit endpoint"
