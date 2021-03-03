@@ -9,12 +9,13 @@
 
 (defn user-from-oauth-profile
   [{{:keys [id attributes]} :oauth-profile}]
-  {:shortUsername id
-   :username               (str id "@" (config/uid-domain))
-   :email                  (first (:email attributes))
-   :firstName              (first (:firstName attributes))
-   :lastName               (first (:lastName attributes))
-   :commonName             (first (:name attributes))})
+  (let [get-attr (fn [k] (let [v (get attributes k)] (if (sequential? v) (first v) v)))]
+    {:shortUsername id
+     :username      (str id "@" (config/uid-domain))
+     :email         (get-attr :email)
+     :firstName     (get-attr :firstName)
+     :lastName      (get-attr :lastName)
+     :commonName    (get-attr :name)}))
 
 (def ^:private required-fields [[:attributes :email] [:id]])
 
