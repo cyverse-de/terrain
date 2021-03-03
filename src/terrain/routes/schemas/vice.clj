@@ -129,6 +129,9 @@
    (optional-key :user-id)       (describe (maybe UUID) "The UUID assigned to the user that launched the analysis")
    (optional-key :username)      (describe (maybe String) "The user of the user that launched the analysis")})
 
+(defschema NonAdminFilterParams
+  (dissoc FilterParams (optional-key :user-id) (optional-key :username)))
+
 (def URLReadySummary "Whether or not a VICE analysis is browser accessible")
 (def URLReadyDescription "Returns a map detailing whether or not the VICE analysis is ready to be accessed through a browser")
 (def AdminURLReadySummary "Whether or not a VICE analysis is browser accessible. No permissions checks")
@@ -141,4 +144,4 @@
 (def Host (describe String "The hostname/subdomain of a VICE analysis"))
 
 (defschema URLReady
-  {:url-ready (describe Boolean "Whether or not the analysis is ready to be accessed.")})
+  {:ready (describe Boolean "Whether or not the analysis is ready to be accessed.")})

@@ -97,7 +97,7 @@
      :tags ["vice"]
 
      (GET "/resources" []
-       :query [filter vice-schema/FilterParams]
+       :query [filter vice-schema/NonAdminFilterParams]
        :return vice-schema/FullResourceListing
        :summary "List Kubernetes resources deployed in the cluster"
        :description "Lists all Kubernetes resources associated with an analysis running in the cluster for a user"

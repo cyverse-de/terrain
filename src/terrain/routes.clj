@@ -295,7 +295,8 @@
                                      {:name "tool-requests", :description "Tool Request Endpoints"}
                                      {:name "token", :description "OAuth Tokens"}
                                      {:name "user-info", :description "User Information Endpoints"}
-                                     {:name "webhooks", :description "Webhook Endpoints"}]
+                                     {:name "webhooks", :description "Webhook Endpoints"}
+                                     {:name "vice", :description "VICE Endpoints"}]
                :securityDefinitions security-definitions}})
   (middleware
    [otel-middleware
