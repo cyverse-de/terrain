@@ -41,23 +41,11 @@
   {(optional-key :name)
    (describe NonBlankString "The user's name")
 
-   :institution
-   (describe NonBlankString "The name of the institution that user works for")
-
    (optional-key :email)
    (describe NonBlankString "The user's email address")
 
    :intended_use
    (describe NonBlankString "The reason for requesting VICE access")
-
-   :funding_award_number
-   (describe NonBlankString "The award number from any relevant funding agency")
-
-   :references
-   (describe [NonBlankString] "The names of other CyVerse users who can vouch for the user")
-
-   :orcid
-   (describe NonBlankString "The user's ORCID identifier")
 
    :concurrent_jobs
    (describe Integer "The requested number of concurrently running VICE jobs")})
