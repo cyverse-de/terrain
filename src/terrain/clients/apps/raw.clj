@@ -238,6 +238,16 @@
                  :content-type :json
                  :as           :json}))))
 
+(defn admin-remove-app-blessing
+  [system-id app-id]
+  (client/delete (apps-url "admin" "apps" system-id app-id "blessing")
+                 (disable-redirects {:query-params (secured-params)})))
+
+(defn admin-bless-app
+  [system-id app-id]
+  (client/post (apps-url "admin" "apps" system-id app-id "blessing")
+               (disable-redirects {:query-params (secured-params)})))
+
 (defn copy-app
   [system-id app-id]
   (:body

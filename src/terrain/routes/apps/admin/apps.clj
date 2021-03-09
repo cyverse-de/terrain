@@ -67,6 +67,18 @@
          :description-file "docs/apps/admin/app-label-update.md"
          (ok (apps/admin-update-app system-id app-id body)))
 
+       (DELETE "/blessing" []
+         :summary schema/RemoveAppBlessingSummary
+         :description schema/RemoveAppBlessingDescription
+         (apps/admin-remove-app-blessing system-id app-id)
+         (ok))
+
+       (POST "/blessing" []
+         :summary schema/BlessAppSummary
+         :description schema/BlessAppDescription
+         (apps/admin-bless-app system-id app-id)
+         (ok))
+
        (GET "/details" []
          :return schema/AdminAppDetails
          :summary apps-schema/AppDetailsSummary
