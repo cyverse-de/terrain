@@ -88,7 +88,8 @@
          :summary ListFullMetadataSummary
          :description ListFullMetadataDescription
          :query [query MetadataListingQueryMap]
-         :return FullInstantLaunchList))
+         :return FullInstantLaunchList
+         (ok (list-full-metadata query))))
 
      (context "/:id" []
        :path-params [id :- InstantLaunchIDParam]
