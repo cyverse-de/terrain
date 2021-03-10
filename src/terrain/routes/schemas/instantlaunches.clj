@@ -32,6 +32,10 @@
 (def UpsertMetadataDescription "Adds or updates AVUs asssociated with a single instant launch")
 (def ResetMetadataSummary "Resets the AVUs associated with an instant launch")
 (def ResetMetadataDescription "Resets all of the AVUs associated with an instant launch to the AVUs passed into the API call")
+(def GetFullInstantLaunchSummary "Returns full description of an instant launch")
+(def GetFullInstantLaunchDescription "Returns full description of an instant launch, including more info about the quick launch, submission, and app")
+(def ListFullMetadataSummary "Returns a listing containing full descriptions of instant launches")
+(def ListFullMetadataDescription "Returns a listing containing full description of instant launches based on the metadata passed in")
 
 (defschema InstantLaunch
   {(optional-key :id)              (describe UUID "The UUID of the instant launch")
@@ -55,6 +59,9 @@
 
 (defschema InstantLaunchList
   {:instant_launches (describe [InstantLaunch] "A list of instant launches")})
+
+(defschema FullInstantLaunchList
+  {:instant_launches (describe [FullInstantLaunch] "A list of full instant launches")})
 
 (defschema InstantLaunchSelector
   {:pattern    (describe String "The pattern used to match against the file. Interpretation is defined by the 'kind' field")
