@@ -1,5 +1,6 @@
 (ns terrain.routes.schemas.dashboard-aggregator
   (:use [common-swagger-api.schema :only [describe]]
+        [terrain.routes.schemas.instantlaunches :only [FullInstantLaunch]]
         [schema.core :only [defschema Any maybe optional-key]])
   (:import [java.util UUID]))
 
@@ -141,7 +142,10 @@
    (describe DashboardAggregatedAnalyses "The analysis listings returned for the dashboard")
 
    (optional-key :feeds)
-   (describe DashboardFeeds "Information from RSS feeds on the website")})
+   (describe DashboardFeeds "Information from RSS feeds on the website")
+   
+   (optional-key :instantLaunches)
+   (describe [FullInstantLaunch] "The instant launches marked for the dashboard")})
 
 (def start-date-interval-description
   (str "The amount of time in the past to search for usages of apps to include in the list of recently used apps "
