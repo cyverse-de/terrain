@@ -176,6 +176,12 @@
       (client/get {:as :json})
       (:body)))
 
+(defn get-full-instant-launch
+  [id]
+  (-> (app-exposer-url ["instantlaunches" id "full"] {} :no-user true)
+      (client/get {:as :json})
+      (:body)))
+
 (defn add-instant-launch
   [username il]
   (-> (app-exposer-url ["instantlaunches/"] {} :no-user true)
@@ -209,6 +215,13 @@
       (client/get {:as           :json
                    :query-params (assoc query :user (:shortUsername current-user))})
       (:body)))
+
+(defn list-full-metadata
+  [query]
+  {:instant_launches (-> (app-exposer-url ["instantlaunches" "metadata" "full"] {} :no-user true)
+                         (client/get {:as           :json
+                                      :query-params (assoc query :user (:shortUsername current-user))})
+                         (:body))})
 
 (defn get-metadata
   [id]

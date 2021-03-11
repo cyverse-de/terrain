@@ -39,7 +39,13 @@
          :summary GetInstantLaunchSummary
          :description GetInstantLaunchDescription
          :return InstantLaunch
-         (ok (get-instant-launch id)))))))
+         (ok (get-instant-launch id)))
+
+       (GET "/full" []
+         :summary GetFullInstantLaunchSummary
+         :description GetFullInstantLaunchDescription
+         :return FullInstantLaunch
+         (ok (get-full-instant-launch id)))))))
 
 (defn admin-instant-launch-routes
   []
@@ -70,12 +76,20 @@
            :description DeleteLatestILMappingsDefaultsDescription
            (ok (delete-latest-instant-launch-mappings-defaults)))))
 
-     (GET "/metadata" []
-       :summary ListMetadataSummary
-       :description ListMetadataDescription
-       :query [query MetadataListingQueryMap]
-       :return AvuList
-       (ok (list-metadata query)))
+     (context "/metadata" []
+       (GET "/" []
+         :summary ListMetadataSummary
+         :description ListMetadataDescription
+         :query [query MetadataListingQueryMap]
+         :return AvuList
+         (ok (list-metadata query)))
+
+       (GET "/full" []
+         :summary ListFullMetadataSummary
+         :description ListFullMetadataDescription
+         :query [query MetadataListingQueryMap]
+         :return FullInstantLaunchList
+         (ok (list-full-metadata query))))
 
      (context "/:id" []
        :path-params [id :- InstantLaunchIDParam]

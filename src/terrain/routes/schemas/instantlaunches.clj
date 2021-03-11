@@ -32,6 +32,10 @@
 (def UpsertMetadataDescription "Adds or updates AVUs asssociated with a single instant launch")
 (def ResetMetadataSummary "Resets the AVUs associated with an instant launch")
 (def ResetMetadataDescription "Resets all of the AVUs associated with an instant launch to the AVUs passed into the API call")
+(def GetFullInstantLaunchSummary "Returns full description of an instant launch")
+(def GetFullInstantLaunchDescription "Returns full description of an instant launch, including more info about the quick launch, submission, and app")
+(def ListFullMetadataSummary "Returns a listing containing full descriptions of instant launches")
+(def ListFullMetadataDescription "Returns a listing containing full description of instant launches based on the metadata passed in")
 
 (defschema InstantLaunch
   {(optional-key :id)              (describe UUID "The UUID of the instant launch")
@@ -39,8 +43,25 @@
    (optional-key :added_by)        (describe String "The username of the user who created the instant launch")
    (optional-key :added_on)        (describe String "The date and time when the instant launch was created")})
 
+(defschema FullInstantLaunch
+  (assoc InstantLaunch
+         :quick_launch_name        (describe String "The name of the quick launch")
+         :quick_launch_description (describe String "The description of the quick launch")
+         :quick_launch_creator     (describe String "The username of the person that created the quick launch")
+         :is_public                (describe Boolean "Whether or not the quick launch is public")
+         :submission               (describe Any "The submission associated with the instant launch/quick launch")
+         :app_id                   (describe String "The UUID of the app used in the instant launch/quick launch")
+         :app_name                 (describe String "The name of the app used in the instant launch/quick launch")
+         :app_description          (describe String "The description of the app used in the instant launch/quick launch")
+         :app_deleted              (describe Boolean "Whether or not the app is deleted")
+         :app_disabled             (describe Boolean "Whether or not the app is disabled")
+         :integrator               (describe String "The username of the person that integrated the app used in the instant launch/quick launch")))
+
 (defschema InstantLaunchList
   {:instant_launches (describe [InstantLaunch] "A list of instant launches")})
+
+(defschema FullInstantLaunchList
+  {:instant_launches (describe [FullInstantLaunch] "A list of full instant launches")})
 
 (defschema InstantLaunchSelector
   {:pattern    (describe String "The pattern used to match against the file. Interpretation is defined by the 'kind' field")
