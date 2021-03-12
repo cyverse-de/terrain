@@ -73,7 +73,7 @@
 
 (def mark-request-approved
   "Marks a request as having been approved."
-  (request-update-fn "Your request has been approved." "complete"))
+  (request-update-fn "Your request has been approved." "approved"))
 
 (defn fulfill-vice-request
   "Fulfills a request for VICE access by changing the user's limit for the number of cuncurrently running VICE
