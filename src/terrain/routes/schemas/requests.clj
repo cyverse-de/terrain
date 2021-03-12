@@ -30,8 +30,21 @@
    :details         (describe Any "The request details")
    :updates         (describe [RequestUpdate] "Updates that were made to the request")})
 
+(defschema RequestSummary
+  (st/assoc
+   (st/dissoc Request :updates)
+
+   :created_date
+   (describe NonBlankString "The date and time the request was submitted")
+
+   :status
+   (describe String "The most recently assigned request status code")
+
+   :updated_date
+   (describe NonBlankString "The date and time the request was most recently updated")))
+
 (defschema RequestListing
-  {:requests (describe [(st/dissoc Request :updates)] "A listing of administrative requests")})
+  {:requests (describe [RequestSummary] "A listing of administrative requests")})
 
 (defschema RequestUpdateMessage
   {(optional-key :message)
@@ -54,5 +67,9 @@
   (st/assoc Request
             :details (describe ViceRequestDetails "The request details")))
 
+(defschema ViceRequestSummary
+  (st/assoc RequestSummary
+            :details (describe ViceRequestDetails "The request details")))
+
 (defschema ViceRequestListing
-  {:requests (describe [(st/dissoc ViceRequest :updates)] "A listing of VICE access requests")})
+  {:requests (describe [ViceRequestSummary] "A listing of VICE access requests")})

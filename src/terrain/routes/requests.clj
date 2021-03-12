@@ -4,8 +4,7 @@
         [schema.core :only [Any]]
         [terrain.auth.user-attributes :only [current-user]]
         [terrain.util :only [optional-routes]])
-  (:require [schema-tools.core :as st]
-            [terrain.util.config :as config]
+  (:require [terrain.util.config :as config]
             [terrain.routes.schemas.requests :as schema]
             [terrain.services.requests :as requests]))
 
@@ -32,7 +31,7 @@
        (POST "/" []
          :summary "Request VICE Access"
          :body [body schema/ViceRequestDetails]
-         :return (st/dissoc schema/ViceRequest :updates)
+         :return schema/ViceRequestSummary
          :description "Submits a request for VICE access for the authenticated user."
          (ok (requests/submit-vice-request current-user body)))
 
