@@ -78,8 +78,9 @@
 (defn fulfill-vice-request
   "Fulfills a request for VICE access by changing the user's limit for the number of cuncurrently running VICE
    analyses to the requested number."
-  [{username :requesting_user {concurrent-jobs :concurrent_jobs} :details}]
-  (ac/set-concurrent-job-limit username concurrent-jobs))
+  [{username :requesting_user request-details :details} message-body]
+  (let [concurrent-jobs (some :concurrent_jobs [message-body request-details])]
+    (ac/set-concurrent-job-limit username concurrent-jobs)))
 
 (def fulfillment-fns
   "The functions required to fulfill different types of requests."
@@ -88,14 +89,14 @@
 (defn fulfill-request
   "Performs actions required to fulfill a request. The specific action taken varies depending on the type of
    request being fulfilled."
-  [{request-type :request_type :as request}]
+  [{request-type :request_type :as request} message-body]
   (if-let [fulfillment-fn (fulfillment-fns request-type)]
-    (fulfillment-fn request)
+    (fulfillment-fn request message-body)
     (cxu/internal-system-error (str "request type " request-type " is not supported yet"))))
 
 (defn request-approved
   "Performs actions required to fulfill a request and marks the request as approved."
   [user request-id message-body]
   (let [request (get-request request-id)]
-    (fulfill-request request)
+    (fulfill-request request message-body)
     (mark-request-approved user request-id message-body)))

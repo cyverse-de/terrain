@@ -50,6 +50,11 @@
   {(optional-key :message)
    (describe NonBlankString "The message to store with the request.")})
 
+(defschema ViceRequestApprovalMessage
+  (st/assoc RequestUpdateMessage
+            (optional-key :concurrent_jobs)
+            (describe Integer "If provided, this setting overrides the number of jobs the user requested.")))
+
 (defschema ViceRequestDetails
   {(optional-key :name)
    (describe NonBlankString "The user's name")
