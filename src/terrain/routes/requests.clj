@@ -89,9 +89,18 @@
          :description "Marks a request as having been rejected."
          (ok (requests/request-rejected current-user request-id body)))
 
-       (POST "/approved" []
-         :summary "Approve a Request"
-         :body [body schema/RequestUpdateMessage]
-         :return schema/RequestUpdate
-         :description "Marks a request as approved and performs any actions required to fulfill the request."
-         (ok (requests/request-approved current-user request-id body)))))))
+       (context "/approved" []
+
+         (POST "/" []
+           :summary "Approve a Request"
+           :body [body schema/RequestUpdateMessage]
+           :return schema/RequestUpdate
+           :description "Marks a request as approved and performs any actions required to fulfill the request."
+           (ok (requests/request-approved current-user request-id body)))
+
+         (POST "/vice" []
+           :summary "Approve a Request for VICE Access"
+           :body [body schema/ViceRequestApprovalMessage]
+           :return schema/RequestUpdate
+           :description "Marks a request for VICE access and performs actions required to fulfill the request."
+           (ok (requests/request-approved current-user request-id body))))))))
