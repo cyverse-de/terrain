@@ -14,7 +14,7 @@
             :url "http://www.cyverse.org/sites/default/files/CyVerse-LICENSE.txt"}
   :manifest {"Git-Ref" ~(git-ref)}
   :uberjar-name "terrain-standalone.jar"
-  :dependencies [[org.clojure/clojure "1.10.1"]
+  :dependencies [[org.clojure/clojure "1.10.3"]
                  [org.clojure/data.codec "0.1.1"]
                  [org.clojure/tools.nrepl "0.2.13"]
                  [cheshire "5.10.0"]
@@ -39,7 +39,7 @@
                  [org.cyverse/cyverse-groups-client "0.1.8"]
                  [org.cyverse/common-cfg "2.8.1"]
                  [org.cyverse/common-cli "2.8.1"]
-                 [org.cyverse/common-swagger-api "3.0.10"]
+                 [org.cyverse/common-swagger-api "3.1.0-SNAPSHOT"]
                  [org.cyverse/kameleon "3.0.4"]
                  [org.cyverse/metadata-client "3.1.1"]
                  [org.cyverse/metadata-files "1.0.3"]
