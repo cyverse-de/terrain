@@ -32,6 +32,12 @@
        :return InstantLaunchList
        (ok (get-instant-launch-list)))
 
+     (GET "/full" []
+       :summary ListFullInstantLaunchesSummary
+       :description ListFullInstantLaunchesDescription
+       :return FullInstantLaunchList
+       (ok (get-full-instant-launch-list)))
+
      (context "/:id" []
        :path-params [id :- InstantLaunchIDParam]
 

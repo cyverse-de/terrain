@@ -170,6 +170,13 @@
        (client/get {:as :json})
        (:body))})
 
+(defn get-full-instant-launch-list
+  []
+  {:instant_launches
+   (-> (app-exposer-url ["instantlaunches" "full"] {} :no-user true)
+       (client/get {:as :json})
+       (:body))})
+
 (defn get-instant-launch
   [id]
   (-> (app-exposer-url ["instantlaunches" id] {} :no-user true)
