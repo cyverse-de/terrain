@@ -7,6 +7,8 @@
 
 (def ListInstantLaunchesSummary "Lists instant launches")
 (def ListInstantLaunchesDescription "Lists the instant launches available in the system")
+(def ListFullInstantLaunchesSummary "Lists instant launches with more info")
+(def ListFullInstantLaunchesDescription "Lists instant launches with quick launch, submission, and app information")
 (def AddInstantLaunchSummary "Adds an instant launch")
 (def AddInstantLaunchDescription "Creates a new instant launch")
 (def GetInstantLaunchSummary "Returns an instant launch")
