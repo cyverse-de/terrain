@@ -251,3 +251,9 @@
                    :as :json
                    :form-params data})
       (:body)))
+
+(defn list-quicklaunches-for-public-apps
+  []
+  (-> (app-exposer-url ["instantlaunches" "quicklaunches" "public"] {})
+      (client/get {:as :json})
+      (:body)))

@@ -1,6 +1,7 @@
 (ns terrain.routes.instantlaunches
   (:use [common-swagger-api.schema]
         [ring.util.http-response :only [ok]]
+        [common-swagger-api.schema.quicklaunches :only [QuickLaunch]]
         [terrain.routes.schemas.instantlaunches]
         [common-swagger-api.schema.metadata :only [AvuList AvuListRequest SetAvuRequest]]
         [terrain.auth.user-attributes :only [current-user]]
@@ -37,6 +38,14 @@
        :description ListFullInstantLaunchesDescription
        :return FullInstantLaunchList
        (ok (get-full-instant-launch-list)))
+
+     (context "/quicklaunches" []
+       (context "/public" []
+         (GET "/" []
+           :summary ListQuickLaunchesForPublicAppsSummary
+           :description ListQuickLaunchesForPublicAppsDescription
+           :return [QuickLaunch]
+           (ok (list-quicklaunches-for-public-apps)))))
 
      (context "/:id" []
        :path-params [id :- InstantLaunchIDParam]

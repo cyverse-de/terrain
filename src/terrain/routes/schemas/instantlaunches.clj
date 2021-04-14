@@ -38,6 +38,8 @@
 (def GetFullInstantLaunchDescription "Returns full description of an instant launch, including more info about the quick launch, submission, and app")
 (def ListFullMetadataSummary "Returns a listing containing full descriptions of instant launches")
 (def ListFullMetadataDescription "Returns a listing containing full description of instant launches based on the metadata passed in")
+(def ListQuickLaunchesForPublicAppsSummary "Lists quick launches for public apps")
+(def ListQuickLaunchesForPublicAppsDescription "Lists public quick launches for public apps along with quick launches the user has access to")
 
 (defschema InstantLaunch
   {(optional-key :id)              (describe UUID "The UUID of the instant launch")
