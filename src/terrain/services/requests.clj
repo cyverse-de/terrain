@@ -67,13 +67,37 @@
   "Marks a request as being in progress."
   (request-update-fn "Your request is in progress." "in-progress"))
 
-(def request-rejected
+(def mark-request-rejected
   "Marks a request as having been rejected."
   (request-update-fn "No deinal reason given." "rejected"))
 
 (def mark-request-approved
   "Marks a request as having been approved."
   (request-update-fn "Your request has been approved." "approved"))
+
+(defn reject-vice-request
+  "Rejects a request for VICE access by changing the user's limit for the number of concurrently running VICE
+   analyses to zero."
+  [{username :requesting_user} message-body]
+  (ac/set-concurrent-job-limit username 0))
+
+(def rejection-fns
+  "The functions required to reject different types of requests."
+  {vice-request-type reject-vice-request})
+
+(defn- reject-request
+  "Performs actions required to reject a request. The specific action taken varies depending on the type of
+   request being rejected. In some cases, no action will be taken at all."
+  [{request-type :request_type :as request} message-body]
+  (when-let [rejection-fn (rejection-fns request-type)]
+    (rejection-fn request message-body)))
+
+(defn request-rejected
+  "Performs actions required to reject a request and marks the request as rejected."
+  [user request-id message-body]
+  (let [request (get-request request-id)]
+    (reject-request request message-body)
+    (mark-request-rejected user request-id message-body)))
 
 (defn fulfill-vice-request
   "Fulfills a request for VICE access by changing the user's limit for the number of cuncurrently running VICE
