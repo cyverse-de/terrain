@@ -69,7 +69,7 @@
 
 (def mark-request-rejected
   "Marks a request as having been rejected."
-  (request-update-fn "No deinal reason given." "rejected"))
+  (request-update-fn "No denial reason given." "rejected"))
 
 (def mark-request-approved
   "Marks a request as having been approved."
