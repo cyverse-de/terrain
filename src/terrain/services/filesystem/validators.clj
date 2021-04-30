@@ -2,7 +2,7 @@
   (:use [clj-jargon.item-info]
         [clj-jargon.permissions]
         [clj-jargon.tickets]
-        [clj-jargon.users]
+        [clj-jargon.users :exclude [user]]
         [clj-icat-direct.icat :as icat :exclude [user-group-ids]]
         [clojure-commons.error-codes]
         [slingshot.slingshot :only [try+ throw+]])
