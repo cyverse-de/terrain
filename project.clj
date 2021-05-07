@@ -44,7 +44,7 @@
                  [org.cyverse/kameleon "3.0.4"]
                  [org.cyverse/metadata-client "3.1.1"]
                  [org.cyverse/metadata-files "1.0.3"]
-                 [org.cyverse/otel "0.2.3"]
+                 [org.cyverse/otel "0.2.4"]
                  [org.cyverse/permissions-client "2.8.1"]
                  [org.cyverse/service-logging "2.8.2"]
                  [net.logstash.logback/logstash-logback-encoder "4.11"]]
