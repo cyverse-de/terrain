@@ -66,7 +66,10 @@
    (describe NonBlankString "The reason for requesting VICE access")
 
    :concurrent_jobs
-   (describe Integer "The requested number of concurrently running VICE jobs")})
+   (describe Integer "The requested number of concurrently running VICE jobs")
+
+   (optional-key :intercom_profile)
+   (describe NonBlankString "The URL to the user's profile in Intercom")})
 
 (defschema ViceRequest
   (st/assoc Request
