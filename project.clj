@@ -34,7 +34,8 @@
                  [slingshot "0.12.2"]
                  [org.cyverse/async-tasks-client "0.0.3"]
                  [org.cyverse/clj-icat-direct "2.9.0"]
-                 [org.cyverse/clj-jargon "2.8.9"]
+                 [org.cyverse/clj-jargon "3.0.0"
+                  :exclusions [org.bouncycastle/bcprov-jdk16]]
                  [org.cyverse/clojure-commons "3.0.6"]
                  [org.cyverse/cyverse-groups-client "0.1.8"]
                  [org.cyverse/common-cfg "2.8.1"]
@@ -43,9 +44,10 @@
                  [org.cyverse/kameleon "3.0.4"]
                  [org.cyverse/metadata-client "3.1.1"]
                  [org.cyverse/metadata-files "1.0.3"]
-                 [org.cyverse/otel "0.2.3"]
+                 [org.cyverse/otel "0.2.4"]
                  [org.cyverse/permissions-client "2.8.1"]
-                 [org.cyverse/service-logging "2.8.2"]]
+                 [org.cyverse/service-logging "2.8.2"]
+                 [net.logstash.logback/logstash-logback-encoder "4.11"]]
   :eastwood {:exclude-namespaces [terrain.util.jwt :test-paths]
              :linters [:wrong-arity :wrong-ns-form :wrong-pre-post :wrong-tag :misplaced-docstrings]}
   :plugins [[lein-ancient "0.6.15"]
