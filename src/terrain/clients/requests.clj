@@ -1,6 +1,7 @@
 (ns terrain.clients.requests
   (:require [cemerick.url :as curl]
             [clj-http.client :as http]
+            [clojure-commons.core :refer [remove-nil-values]]
             [terrain.util.config :as config]))
 
 (defn- requests-url
@@ -10,8 +11,11 @@
 (def ^:private register-request-type
   "Registers a request type if it hasn't already been registered and returns the response body of the request
    type registration. This function is memoized so that we don't unnecessarily hammer the requests service."
-  (memoize (fn [request-type]
-             (:body (http/post (requests-url "request-types" request-type)) {:as :json}))))
+  (memoize (fn [request-type maximum-requests-per-user]
+             (let [params (remove-nil-values {:maximum-requests-per-user  maximum-requests-per-user})]
+               (:body (http/post (requests-url "request-types" request-type)
+                                 {:query-params params
+                                  :as           :json}))))))
 
 (defn list-requests
   "Lists requests, optionally filtered by requesting user, request type, and whether or not completed requests
@@ -24,8 +28,8 @@
 
 (defn submit-request
   "Submits a request to the requests service."
-  [request-type username details]
-  (register-request-type request-type)
+  [request-type maximum-requests-per-user username details]
+  (register-request-type request-type maximum-requests-per-user)
   (:body (http/post (requests-url "requests")
                     {:query-params {:user username}
                      :form-params  {:request_type request-type

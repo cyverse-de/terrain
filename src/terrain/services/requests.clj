@@ -10,6 +10,7 @@
 
 ;; Request type constants
 (def vice-request-type "vice")
+(def vice-maximum-requests-per-user 1)
 
 (defn list-requests
   "Lists requests for administrative endpoints."
@@ -31,7 +32,11 @@
 (defn submit-vice-request
   "Submits a VICE request. Details about the currently authenticated user are automatically added to the request."
   [{username :shortUsername :as user} details]
-  (rc/submit-request vice-request-type username (add-user-to-request-details user details)))
+  (rc/submit-request
+   vice-request-type
+   vice-maximum-requests-per-user
+   username
+   (add-user-to-request-details user details)))
 
 (defn- validate-request-type
   "Verifies that a request has the expected type. This is useful for endpoints where the request type is included
