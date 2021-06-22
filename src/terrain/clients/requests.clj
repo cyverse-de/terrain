@@ -11,8 +11,8 @@
 (def ^:private register-request-type
   "Registers a request type if it hasn't already been registered and returns the response body of the request
    type registration. This function is memoized so that we don't unnecessarily hammer the requests service."
-  (memoize (fn [request-type maximum-requests-per-user]
-             (let [params (remove-nil-values {:maximum-requests-per-user  maximum-requests-per-user})]
+  (memoize (fn [request-type request-type-opts]
+             (let [params (remove-nil-values request-type-opts)]
                (:body (http/post (requests-url "request-types" request-type)
                                  {:query-params params
                                   :as           :json}))))))
@@ -28,8 +28,8 @@
 
 (defn submit-request
   "Submits a request to the requests service."
-  [request-type maximum-requests-per-user username details]
-  (register-request-type request-type maximum-requests-per-user)
+  [request-type request-type-opts username details]
+  (register-request-type request-type request-type-opts)
   (:body (http/post (requests-url "requests")
                     {:query-params {:user username}
                      :form-params  {:request_type request-type
