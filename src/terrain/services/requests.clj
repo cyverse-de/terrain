@@ -10,7 +10,9 @@
 
 ;; Request type constants
 (def vice-request-type "vice")
-(def vice-maximum-requests-per-user 1)
+(def vice-request-type-opts
+  {:maximum-requests-per-user            1
+   :maximum-concurrent-requests-per-user 10})
 
 (defn list-requests
   "Lists requests for administrative endpoints."
@@ -34,7 +36,7 @@
   [{username :shortUsername :as user} details]
   (rc/submit-request
    vice-request-type
-   vice-maximum-requests-per-user
+   vice-request-type-opts
    username
    (add-user-to-request-details user details)))
 
