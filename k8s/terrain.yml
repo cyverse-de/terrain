@@ -76,7 +76,7 @@ spec:
                 path: terrain.properties
       containers:
       - name: terrain
-        image: discoenv/terrain
+        image: harbor.cyverse.org/de/terrain
         resources:
           requests:
             cpu: "320m"
