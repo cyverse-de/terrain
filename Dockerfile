@@ -1,4 +1,4 @@
-FROM clojure:lein-alpine
+FROM clojure:openjdk-17-lein-alpine
 
 WORKDIR /usr/src/app
 
@@ -17,7 +17,7 @@ COPY conf/main/logback.xml /usr/src/app/
 COPY project.clj /usr/src/app/
 RUN lein deps
 
-RUN ln -s "/usr/bin/java" "/bin/terrain"
+RUN ln -s "/opt/openjdk-17/bin/java" "/bin/terrain"
 
 COPY . /usr/src/app
 
@@ -38,6 +38,7 @@ ARG descriptive_version=unknown
 LABEL org.cyverse.git-ref="$git_commit"
 LABEL org.cyverse.version="$version"
 LABEL org.cyverse.descriptive-version="$descriptive_version"
-LABEL org.label-schema.vcs-ref="$git_commit"
-LABEL org.label-schema.vcs-url="https://github.com/cyverse-de/terrain"
-LABEL org.label-schema.version="$descriptive_version"
+LABEL org.opencontainers.image.authors="CyVerse Core Software Team <support@cyverse.org>"
+LABEL org.opencontainers.image.revision="$git_commit"
+LABEL org.opencontainers.image.source="https://github.com/cyverse-de/terrain"
+LABEL org.opencontainers.image.version="$descriptive_version"
