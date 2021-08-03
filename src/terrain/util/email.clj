@@ -1,7 +1,6 @@
 (ns terrain.util.email
   (:use [terrain.auth.user-attributes :only [current-user]])
-  (:require [cheshire.core :as cheshire]
-            [clj-http.client :as client]
+  (:require [clj-http.client :as client]
             [clojure.string :as string]
             [terrain.util.config :as config]))
 
@@ -11,12 +10,12 @@
   (client/post
    (config/iplant-email-base-url)
    {:content-type :json
-    :body         (cheshire/encode {:to        to
-                                    :from-addr from-addr
-                                    :from-name from-name
-                                    :subject   subject
-                                    :template  template
-                                    :values    values})}))
+    :form-params  {:to        to
+                   :from-addr from-addr
+                   :from-name from-name
+                   :subject   subject
+                   :template  template
+                   :values    values}}))
 
 (defn send-tool-request-email
   "Sends the email message informing Core Services of a tool request."
@@ -24,7 +23,7 @@
   (let [template-values {:username           (str firstname " " lastname)
                          :environment        (config/environment-name)
                          :toolrequestid      (:uuid tool-req)
-                         :toolrequestdetails (cheshire/encode tool-req {:pretty true})}]
+                         :toolrequestdetails tool-req}]
     (send-email
       :to        (config/tool-request-dest-addr)
       :from-addr (config/tool-request-src-addr)
