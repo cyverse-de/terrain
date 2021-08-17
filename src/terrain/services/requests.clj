@@ -19,6 +19,21 @@
   []
   (rc/list-request-types))
 
+(defn get-request-type
+  "Obtains information about the request type with the given name."
+  [name]
+  (rc/get-request-type name))
+
+(defn add-request-type
+  "Adds a request type of the given name with the given options."
+  [name opts]
+  (rc/add-request-type name opts))
+
+(defn update-request-type
+  "Updates the request type of the given name to use the given options."
+  [name opts]
+  (rc/update-request-type name opts))
+
 (defn list-requests
   "Lists requests for administrative endpoints."
   [params]

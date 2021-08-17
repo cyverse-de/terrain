@@ -5,6 +5,7 @@
   (:import [java.util UUID]))
 
 (def RequestId (describe UUID "The request ID"))
+(def RequestTypeName (describe String "The name of the request type"))
 
 (defschema RequestListingQueryParams
   {(optional-key :include-completed)
@@ -79,6 +80,13 @@
 (defschema ViceRequestListing
   {:requests (describe [ViceRequestSummary] "A listing of VICE access requests")})
 
+(defschema RequestTypeQueryParams
+  {(optional-key :maximum-concurrent-requests-per-user)
+   (describe Long "The maximum number of active requests of this type for a user")
+
+   (optional-key :maximum-requests-per-user)
+   (describe Long "The absolute maximum number of requests of this type for a user")})
+
 (defschema RequestType
   {:id
    (describe UUID "The request type ID")
@@ -87,10 +95,10 @@
    (describe String "The request type name")
 
    :maximum_concurrent_requests_per_user
-   (describe Integer "The maximum number of active requests of this type for a user")
+   (describe Long "The maximum number of active requests of this type for a user")
 
    :maximum_requests_per_user
-   (describe Integer "The absolute maximum requests of this type for a user")})
+   (describe Long "The absolute maximum number of requests of this type for a user")})
 
 (defschema RequestTypeListing
   {:request_types (describe [RequestType] "The list of request types")})
