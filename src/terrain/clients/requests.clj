@@ -17,6 +17,12 @@
                                  {:query-params params
                                   :as           :json}))))))
 
+(defn list-request-types
+  "Lists all administrative request types that have been defined."
+  []
+  (:body (http/get (requests-url "request-types")
+                   {:as :json})))
+
 (defn list-requests
   "Lists requests, optionally filtered by requesting user, request type, and whether or not completed requests
    should be included in the listing. The available options are keywords with the same names as the query

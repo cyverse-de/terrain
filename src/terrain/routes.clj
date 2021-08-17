@@ -169,6 +169,7 @@
    (admin-integration-data-routes)
    (admin-workspace-routes)
    (admin-user-info-routes)
+   (admin-request-type-routes)
    (admin-request-routes)
    (admin-setting-routes)
    (admin-vice-routes)
@@ -257,6 +258,7 @@
                                      {:name "admin-filesystem", :description "File System Administration Endpoints"}
                                      {:name "admin-instant-launches", :description "Instant Launch Administration Endpoints"}
                                      {:name "admin-reference-genomes", :description "Admin Reference Genome Endpoints"}
+                                     {:name "admin-request-types", :description "Admin Request Type Endpoints"}
                                      {:name "admin-requests", :description "Admin Request Endpoints"}
                                      {:name "admin-settings", :description "Admin Setting Endpoints"}
                                      {:name "admin-token", :description "Admin OAuth Tokens"}

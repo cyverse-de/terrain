@@ -14,6 +14,11 @@
   {:maximum-requests-per-user            1
    :maximum-concurrent-requests-per-user 10})
 
+(defn list-request-types
+  "List request types."
+  []
+  (rc/list-request-types))
+
 (defn list-requests
   "Lists requests for administrative endpoints."
   [params]
