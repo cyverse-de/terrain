@@ -46,6 +46,45 @@
                 (requests/validate-request-user current-user)
                 ok)))))))
 
+(defn admin-request-type-routes
+  "Routes for listing and configuring administrative request types."
+  []
+
+  (optional-routes
+   [#(and (config/admin-routes-enabled) (config/request-routes-enabled))]
+
+   (context "/request-types" []
+     :tags ["admin-request-types"]
+
+     (GET "/" []
+       :summary "List Administrative Request Types"
+       :return schema/RequestTypeListing
+       :description "Lists existing administrative request types"
+       (ok (requests/list-request-types)))
+
+     (context "/:name" []
+       :path-params [name :- schema/RequestTypeName]
+
+       (GET "/" []
+         :summary "Get Request Type"
+         :return schema/RequestType
+         :description "Returns information about a single administrative request type"
+         (ok (requests/get-request-type name)))
+
+       (POST "/" []
+         :summary "Add Request Type"
+         :return schema/RequestType
+         :description "Adds a new type of administrative request"
+         :query [params schema/RequestTypeQueryParams]
+         (ok (requests/add-request-type name params)))
+
+       (PATCH "/" []
+         :summary "Update Request Type"
+         :return schema/RequestType
+         :description "Updates an existing administrative request type"
+         :query [params schema/RequestTypeQueryParams]
+         (ok (requests/update-request-type name params)))))))
+
 (defn admin-request-routes
   "Routes for administering requests. The administrative routes are defined in a more consolidated fashion than their
    non-administrative counterparts. The reason for doing this is that the request details don't need to be documented
