@@ -102,7 +102,7 @@
   [user team-name]
   (send-notification {:type           "community"
                       :user           (:id user)
-                      :subject        (format "Added as community admin to %s" team-name)
+                      :subject        (format "Added as collection admin to %s" team-name)
                       :email          true
                       :email_template "blank"
                       :payload        {:action        "added_to_community"
