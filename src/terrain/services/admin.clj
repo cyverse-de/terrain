@@ -78,15 +78,15 @@
       (log/error (ce/format-exception e))
       false)))
 
-(defn- perform-ezid-check
+(defn- perform-datacite-check
   []
   (try
-    (let [ezid-status-url (str (url/url (config/ezid-base-url) "status"))
-          ezid-status     (:body (get-with-timeout ezid-status-url))]
-      (log/info "HTTP Status from EZID: " ezid-status)
-      ezid-status)
+    (let [datacite-status-url   (str (url/url (config/datacite-api-url) "heartbeat"))
+          {:keys [status body]} (get-with-timeout datacite-status-url)]
+      (log/info "HTTP response from DataCite API: " status body)
+      (<= 200 status 299))
     (catch Exception e
-      (log/error "Error performing EZID status check:")
+      (log/error "Error performing DataCite status check:")
       (log/error (ce/format-exception e))
       false)))
 
@@ -115,9 +115,9 @@
     (merge overall-status {:notificationagent (perform-notificationagent-check)})
     overall-status))
 
-(defn- status-ezid
+(defn- status-datacite
   [overall-status]
-  (merge overall-status {:ezid (perform-ezid-check)}))
+  (merge overall-status {:datacite (perform-datacite-check)}))
 
 (defn status
   "Returns JSON containing the Terrain's status."
@@ -127,4 +127,4 @@
     (status-jex)
     (status-apps)
     (status-notificationagent)
-    (status-ezid)))
+    (status-datacite)))

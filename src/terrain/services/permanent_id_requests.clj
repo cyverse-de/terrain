@@ -12,7 +12,7 @@
             [terrain.clients.async-tasks :as async-tasks-client]
             [terrain.clients.data-info :as data-info]
             [terrain.clients.data-info.raw :as data-info-client]
-            [terrain.clients.ezid :as ezid]
+            [terrain.clients.datacite :as datacite-client]
             [terrain.clients.iplant-groups :as groups]
             [terrain.clients.metadata.raw :as metadata]
             [terrain.clients.notifications :as notifications]
@@ -33,8 +33,6 @@ Your dataset is now available to CyVerse users and the public.
 If you need to make any changes to the dataset, including the metadata, please contact doi@cyverse.org.
 
 If this dataset accompanies a paper, please contact us with the DOI for that paper once it is published.")
-
-(def ^:private ezid-target-attr "_target")
 
 (defn- parse-service-json
   [response]
@@ -59,7 +57,7 @@ If this dataset accompanies a paper, please contact us with the DOI for that pap
        first
        :value))
 
-(defn- validate-ezid-metadata
+(defn- validate-datacite-metadata
   [avus]
   (when (empty? avus)
     (throw+ {:type :clojure-commons.exception/bad-request
@@ -72,8 +70,18 @@ If this dataset accompanies a paper, please contact us with the DOI for that pap
                :identifier identifier})))
   avus)
 
+(defn- validate-request-type
+  [request-type]
+  (when-not (= "DOI" (string/upper-case request-type))
+    (throw+ {:type         :clojure-commons.exception/bad-request-field
+             :error        (str "Permanent ID Request type '"
+                                request-type
+                                "' not supported by this service.")
+             :request-type request-type})))
+
 (defn- validate-request-for-completion
-  [{:keys [folder original_path permanent_id]}]
+  [{:keys [folder original_path permanent_id type]}]
+  (validate-request-type type)
   (when (empty? folder)
     (throw+ {:type :clojure-commons.exception/not-found
              :error "Folder not found."
@@ -311,43 +319,29 @@ If this dataset accompanies a paper, please contact us with the DOI for that pap
         subject (str type " Request for " folder-name " Status Changed to " status)]
     (send-notification username email subject comments id)))
 
-(defn- request-type->shoulder
-  [type]
-  (case type
-    "ARK" (config/ezid-shoulders-ark)
-    "DOI" (config/ezid-shoulders-doi)
-    (throw+ {:type :clojure-commons.exception/bad-request-field
-             :error "No EZID shoulder defined for this Permanent ID Request type."
-             :request-type type})))
-
 (defn- format-avus
   [{:keys [avus irods-avus]}]
   (concat avus irods-avus [{:attr (config/permanent-id-date-attr) :value (str (time/year (time/now)))}]))
 
 (defn- append-placeholder-identifier
-  "Append a placeholder identifier AVU to the given metadata to allow the generated DataCite XML to pass validation.
-   Assumes `request-type->shoulder` will return a value such as `doi:10.5072/FK2`,
-   which will be parsed into an AVU value such as `10.5072/FK2/placeholder`."
+  "Appends a placeholder `identifier` AVU to the given metadata,
+   with a value such as `10.33540/placeholder`,
+   to allow the generated DataCite XML to pass validation."
   [request-type avus]
   (conj avus {:attr  (config/permanent-id-identifier-attr)
-              :value (-> request-type
-                         request-type->shoulder
-                         (string/split #":")
-                         second
-                         (str "/placeholder"))
+              :value (str (config/datacite-doi-prefix) "/placeholder")
               :unit  ""
               :avus  [{:attr  (config/permanent-id-identifier-type-attr)
                        :value request-type
                        :unit  ""}]}))
 
-(defn- parse-valid-ezid-metadata
-  [request-type {:keys [path]} avus]
-  (validate-ezid-metadata avus)
-  {ezid-target-attr (format-metadata-target-url path)
-   :datacite        (->> avus
-                         (append-placeholder-identifier request-type)
-                         datacite/build-datacite
-                         xml/emit-str)})
+(defn- parse-valid-datacite-metadata
+  [request-type avus]
+  (validate-datacite-metadata avus)
+  (->> avus
+       (append-placeholder-identifier request-type)
+       datacite/build-datacite
+       xml/emit-str))
 
 (defn- get-validated-data-item
   "Gets data-info stat for the given ID and checks if the data item is valid for a Permanent ID request.
@@ -358,7 +352,7 @@ If this dataset accompanies a paper, please contact us with the DOI for that pap
                                                :filter-include "path,id,type,permission,file-count,dir-count")
                        (validate-data-item user))
         metadata (data-info/get-metadata-json user data-id)]
-    (parse-valid-ezid-metadata request-type data-item (format-avus metadata))
+    (parse-valid-datacite-metadata request-type (format-avus metadata))
     data-item))
 
 (defn- format-publish-avus
@@ -469,18 +463,19 @@ If this dataset accompanies a paper, please contact us with the DOI for that pap
   [user {request-id :id :keys [folder type] :as request}]
   (validate-request-for-completion request)
   (try+
-    (let [shoulder        (request-type->shoulder type)
-          folder          (validate-publish-dest folder)
+    (let [folder          (validate-publish-dest folder)
           folder-id       (uuidify (:id folder))
           metadata        (data-info/get-metadata-json user folder-id)
           avus            (format-avus metadata)
-          ezid-response   (ezid/mint-id shoulder (parse-valid-ezid-metadata type folder avus))
-          identifier      (get ezid-response (keyword type))
+          target-url      (format-metadata-target-url (:path folder))
+          datacite-xml    (parse-valid-datacite-metadata type avus)
+          doi-response    (datacite-client/create-doi datacite-xml target-url)
+          identifier      (get-in doi-response [:data :id])
           publish-avus    (format-publish-avus avus identifier type)
           publish-path    (publish-data-item folder)]
       (email/send-permanent-id-request-complete type
                                                 publish-path
-                                                (json/encode ezid-response {:pretty true})
+                                                (json/encode doi-response {:pretty true})
                                                 identifier)
       (publish-metadata folder publish-avus)
       [identifier publish-path])
@@ -508,4 +503,4 @@ If this dataset accompanies a paper, please contact us with the DOI for that pap
         folder-id (uuidify (:id folder))
         metadata  (data-info/get-metadata-json user folder-id)
         avus      (format-avus metadata)]
-    (parse-valid-ezid-metadata type folder avus)))
+    (parse-valid-datacite-metadata type avus)))

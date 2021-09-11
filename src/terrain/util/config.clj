@@ -473,30 +473,25 @@
   [props config-valid configs]
   "terrain.permanent-id.attr.publication-year" "publicationYear")
 
-(cc/defprop-optstr ezid-base-url
-  "The EZID API base URL."
+(cc/defprop-optstr datacite-api-url
+  "The DataCite API URL."
   [props config-valid configs]
-  "terrain.permanent-id.ezid.base-url" "https://ez.test.datacite.org")
+  "terrain.permanent-id.datacite.base-url" "https://api.test.datacite.org")
 
-(cc/defprop-optstr ezid-username
-  "The EZID API account username."
+(cc/defprop-optstr datacite-username
+  "The DataCite API account username."
   [props config-valid configs]
-  "terrain.permanent-id.ezid.username" "apitest")
+  "terrain.permanent-id.datacite.username" "apitest")
 
-(cc/defprop-optstr ezid-password
-  "The EZID API account password."
+(cc/defprop-optstr datacite-password
+  "The DataCite API account password."
   [props config-valid configs]
-  "terrain.permanent-id.ezid.password" "notprod")
+  "terrain.permanent-id.datacite.password" "notprod")
 
-(cc/defprop-optstr ezid-shoulders-ark
-  "The EZID ARK shoulder or namespace."
+(cc/defprop-optstr datacite-doi-prefix
+  "The DOI prefix or namespace to use when creating DOIs."
   [props config-valid configs]
-  "terrain.permanent-id.ezid.shoulders.ark" "ark:/99999/fk4")
-
-(cc/defprop-optstr ezid-shoulders-doi
-  "The EZID DOI shoulder or namespace."
-  [props config-valid configs]
-  "terrain.permanent-id.ezid.shoulders.doi" "doi:10.5072/FK2")
+  "terrain.permanent-id.datacite.doi-prefix" "10.33540")
 
 (cc/defprop-optstr prefs-base-url
   "The hostname of the user-preferences service"
