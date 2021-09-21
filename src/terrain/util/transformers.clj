@@ -21,7 +21,7 @@
   ([query default-username]
     (->> (assoc query
            :user       (or (:shortUsername current-user) default-username)
-           :email      (:email current-user)
+           :email      (or (:email current-user) default-username)
            :first-name (:firstName current-user)
            :last-name  (:lastName current-user))
          (remove-vals invalid-query-param-value?))))
