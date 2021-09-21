@@ -119,6 +119,14 @@
                 {:query-params (secured-params params)
                  :as            :json}))))
 
+(defn featured-apps
+  [params]
+  (:body
+    (client/get (apps-url "apps" "categories" "featured")
+                (disable-redirects
+                  {:query-params (secured-params params)
+                   :as           :json}))))
+
 (defn apps-in-community
   [community-id]
   (:body

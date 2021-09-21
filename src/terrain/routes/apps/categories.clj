@@ -32,6 +32,13 @@
            :description schema/AppCategoryListingDocs
            (ok (apps/get-app-categories params)))
 
+      (GET "/featured" []
+           :query [params AppListingPagingParams]
+           :return schema/AppCategoryAppListing
+           :summary schema/FeaturedAppListingSummary
+           :description schema/FeaturedAppListingDocs
+           (ok (apps/featured-apps params)))
+
       (GET "/:system-id/:category-id" []
            :middleware [require-authentication]
            :path-params [system-id :- apps-schema/SystemId
