@@ -34,10 +34,6 @@ If you need to make any changes to the dataset, including the metadata, please c
 
 If this dataset accompanies a paper, please contact us with the DOI for that paper once it is published.")
 
-(defn- parse-service-json
-  [response]
-  (-> response :body service/decode-json))
-
 (defn- format-staging-path
   [path]
   (ft/path-join (config/permanent-id-staging-dir) (ft/basename path)))
@@ -162,13 +158,11 @@ If this dataset accompanies a paper, please contact us with the DOI for that pap
 (defn- submit-permanent-id-request
   "Submits the request to the metadata create-permanent-id-request endpoint."
   [type folder-id target-type path]
-  (-> {:type type
-       :target_id folder-id
-       :target_type target-type
-       :original_path path}
-      json/encode
-      metadata/create-permanent-id-request
-      parse-service-json))
+  (metadata/create-permanent-id-request
+    {:type          type
+     :target_id     folder-id
+     :target_type   target-type
+     :original_path path}))
 
 (defn- create-publish-dir
   "Creates the Permanent ID Requests publish directory, if it doesn't already exist."
@@ -402,15 +396,12 @@ If this dataset accompanies a paper, please contact us with the DOI for that pap
 (defn list-permanent-id-requests
   [params]
   (-> (metadata/list-permanent-id-requests params)
-      parse-service-json
       (update :requests format-perm-id-req-list)))
 
 (defn create-permanent-id-request
-  [body]
+  [{type :type folder-id :folder}]
   (create-staging-dir)
-  (let [{type :type folder-id :folder} (service/decode-json body)
-        folder-id                      (uuidify folder-id)
-        user                           (:shortUsername current-user)
+  (let [user                           (:shortUsername current-user)
         {:keys [path] :as folder}      (get-validated-data-item user type folder-id)
         target-type                    (validate-request-target-type folder)
         {request-id :id :as response}  (submit-permanent-id-request type folder-id target-type path)
@@ -436,25 +427,21 @@ If this dataset accompanies a paper, please contact us with the DOI for that pap
 (defn get-permanent-id-request
   [request-id]
   (->> (metadata/get-permanent-id-request request-id)
-       parse-service-json
        (format-permanent-id-request-details (:shortUsername current-user))))
 
 (defn admin-list-permanent-id-requests
   [params]
   (-> (metadata/admin-list-permanent-id-requests params)
-      parse-service-json
       (update :requests format-perm-id-req-list)))
 
 (defn admin-get-permanent-id-request
   [request-id]
   (->> (metadata/admin-get-permanent-id-request request-id)
-       parse-service-json
        (format-permanent-id-request-details (:shortUsername current-user))))
 
 (defn update-permanent-id-request
   [request-id body]
   (let [response (->> (metadata/update-permanent-id-request request-id body)
-                      parse-service-json
                       (format-permanent-id-request-details (:shortUsername current-user)))]
     (send-update-notification response)
     response))
@@ -481,7 +468,7 @@ If this dataset accompanies a paper, please contact us with the DOI for that pap
       [identifier publish-path])
     (catch Object e
       (log/error e)
-      (update-permanent-id-request request-id (json/encode {:status status-code-failed}))
+      (update-permanent-id-request request-id {:status status-code-failed})
       (throw+ e))))
 
 (defn create-permanent-id
@@ -492,9 +479,9 @@ If this dataset accompanies a paper, please contact us with the DOI for that pap
         comments                         (if (= "DOI" request-type)
                                            (format completion-comment-fmt publish-path identifier)
                                            identifier)]
-    (update-permanent-id-request request-id (json/encode {:status       status-code-completion
-                                                          :comments     comments
-                                                          :permanent_id identifier}))))
+    (update-permanent-id-request request-id {:status       status-code-completion
+                                             :comments     comments
+                                             :permanent_id identifier})))
 
 (defn preview-datacite-xml
   [request-id]

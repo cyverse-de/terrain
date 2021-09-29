@@ -40,7 +40,9 @@
    (json-get-options {}))
   ([params]
    {:query-params (user-params params)
-    :as           :json}))
+    :as           :json})
+  ([params param-keys]
+   (json-get-options (user-params params param-keys))))
 
 (def json-delete-options json-get-options)
 
@@ -270,40 +272,43 @@
 
 (defn list-permanent-id-requests
   [params]
-  (http/get (metadata-url "permanent-id-requests") (get-options params [:statuses
-                                                                        :limit
-                                                                        :offset
-                                                                        :sort-field
-                                                                        :sort-dir])))
+  (:body (http/get (metadata-url "permanent-id-requests")
+                   (json-get-options params [:statuses
+                                             :limit
+                                             :offset
+                                             :sort-field
+                                             :sort-dir]))))
 
 (defn create-permanent-id-request
   [request]
-  (http/post (metadata-url "permanent-id-requests") (post-options request)))
+  (:body (http/post (metadata-url "permanent-id-requests") (json-post-options request))))
 
 (defn list-permanent-id-request-status-codes
   []
-  (http/get (metadata-url "permanent-id-requests" "status-codes") (get-options)))
+  (:body (http/get (metadata-url "permanent-id-requests" "status-codes") (json-get-options))))
 
 (defn list-permanent-id-request-types
   []
-  (http/get (metadata-url "permanent-id-requests" "types") (get-options)))
+  (:body (http/get (metadata-url "permanent-id-requests" "types") (json-get-options))))
 
 (defn get-permanent-id-request
   [request-id]
-  (http/get (metadata-url "permanent-id-requests" request-id) (get-options)))
+  (:body (http/get (metadata-url "permanent-id-requests" request-id) (json-get-options))))
 
 (defn admin-list-permanent-id-requests
   [params]
-  (http/get (metadata-url "admin" "permanent-id-requests") (get-options params [:statuses
-                                                                                :limit
-                                                                                :offset
-                                                                                :sort-field
-                                                                                :sort-dir])))
+  (:body (http/get (metadata-url "admin" "permanent-id-requests")
+                   (json-get-options params [:statuses
+                                             :limit
+                                             :offset
+                                             :sort-field
+                                             :sort-dir]))))
 
 (defn admin-get-permanent-id-request
   [request-id]
-  (http/get (metadata-url "admin" "permanent-id-requests" request-id) (get-options)))
+  (:body (http/get (metadata-url "admin" "permanent-id-requests" request-id) (json-get-options))))
 
 (defn update-permanent-id-request
   [request-id request]
-  (http/post (metadata-url "admin" "permanent-id-requests" request-id "status") (post-options request)))
+  (:body (http/post (metadata-url "admin" "permanent-id-requests" request-id "status")
+                    (json-post-options request))))
