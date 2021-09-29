@@ -39,6 +39,14 @@
        :return FullInstantLaunchList
        (ok (get-full-instant-launch-list)))
 
+     (context "/metadata" []
+       (GET "/full" []
+         :summary ListFullMetadataSummary
+         :description ListFullMetadataDescription
+         :query [query MetadataListingQueryMap]
+         :return FullInstantLaunchList
+         (ok (list-full-metadata query))))
+
      (context "/quicklaunches" []
        (context "/public" []
          (GET "/" []
