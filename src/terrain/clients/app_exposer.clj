@@ -224,10 +224,10 @@
       (:body)))
 
 (defn list-full-metadata
-  [query]
+  [query username]
   {:instant_launches (-> (app-exposer-url ["instantlaunches" "metadata" "full"] {} :no-user true)
                          (client/get {:as           :json
-                                      :query-params (assoc query :user (:shortUsername current-user))})
+                                      :query-params (assoc query :user username)})
                          (:body))})
 
 (defn get-metadata

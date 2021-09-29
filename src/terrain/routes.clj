@@ -80,6 +80,7 @@
    (dashboard-aggregator-routes)
    (filesystem-stat-routes)
    (quicklaunch-routes)
+   (instant-launch-routes)
    (secured-data-routes)
    (secured-filesystem-routes)
    (secured-search-routes)
@@ -114,7 +115,6 @@
    (oauth-routes)
    (request-routes)
    (bag-routes)
-   (instant-launch-routes)
    (vice-routes)
    (route/not-found (service/unrecognized-path-response))))
 
