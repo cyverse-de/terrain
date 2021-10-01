@@ -36,38 +36,9 @@ spec:
         - name: signing-keys
           secret:
             secretName: signing-keys
-            items:
-              - key: private-key.pem
-                path: private-key.pem
-                mode: 0644
-
-              - key: public-key.pem
-                path: public-key.pem
-                mode: 0644
-
-              - key: QApubkey.pem
-                path: accepted_keys/QApubkey.pem
-                mode: 0644
-
-              - key: apim_staging.pub
-                path: accepted_keys/apim_staging.pub
-                mode: 0644
-
-              - key: legfed-pubkey.pem
-                path: accepted_keys/legfed-pubkey.pem
-                mode: 0644
-
-              - key: mirrors.pem
-                path: accepted_keys/mirrors.pem
-                mode: 0644
-
-              - key: peanutbase-pubkey.pem
-                path: accepted_keys/peanutbase-pubkey.pem
-                mode: 0644
-
-              - key: projects-pubkey.pem
-                path: accepted_keys/project-pubkey.pem
-                mode: 0644
+        - name: accepted-keys
+          secret:
+            secretName: accepted-keys
         - name: service-configs
           secret:
             secretName: service-configs
@@ -89,7 +60,10 @@ spec:
           - /etc/iplant/de/terrain.properties
         volumeMounts:
           - name: signing-keys
-            mountPath: /etc/iplant/crypto
+            mountPath: /etc/iplant/crypto/signing_key
+            readOnly: true
+          - name: accepted-keys
+            mountPath: /etc/iplant/crypto/accepted_keys
             readOnly: true
           - name: localtime
             mountPath: /etc/localtime

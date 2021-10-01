@@ -2,6 +2,7 @@
   (:use [slingshot.slingshot :only [try+ throw+]])
   (:require [clj-time.core :as time]
             [clojure.string :as string]
+            [clojure.tools.logging :as log]
             [clojure-commons.error-codes :as ce]
             [clojure-commons.jwt :as jwt]
             [clojure-commons.response :as resp]
@@ -90,6 +91,7 @@
         (if-let [assertion (assertion-fn request)]
           (let [claims ((jwt-validator) assertion)]
             (validate-claims claims user-extraction-fn)
+            (log/info "user authenticated using a legacy JWT assertion")
             (handler (assoc request :jwt-claims claims)))
           (resp/unauthorized "Custom JWT header not found."))
         (catch [:type :validation] _
