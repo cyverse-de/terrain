@@ -87,10 +87,10 @@
 
 (defschema DashboardAggregatedAnalyses
   {(optional-key :recent)
-   (describe (maybe analyses-listing/AnalysisList) "Analyses recent launched by the user")
+   (describe (maybe [analyses-listing/Analysis]) "Analyses recent launched by the user")
 
    (optional-key :running)
-   (describe (maybe analyses-listing/AnalysisList) "Analyses currently running for the user")})
+   (describe (maybe [analyses-listing/Analysis]) "Analyses currently running for the user")})
 
 (defschema DashboardAggregatorResponse
   {:apps
