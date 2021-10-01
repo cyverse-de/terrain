@@ -4,7 +4,7 @@
         [common-swagger-api.schema.quicklaunches :only [QuickLaunch]]
         [terrain.routes.schemas.instantlaunches]
         [common-swagger-api.schema.metadata :only [AvuList AvuListRequest SetAvuRequest]]
-        [terrain.auth.user-attributes :only [current-user]]
+        [terrain.auth.user-attributes :only [current-user require-authentication]]
         [terrain.clients.app-exposer]
         [terrain.util :only [optional-routes]])
   (:require [terrain.util.config :as config]
@@ -22,26 +22,37 @@
        (context "/defaults" []
 
          (GET "/latest" []
+           :middleware  [require-authentication]
            :summary LatestILMappingsDefaultsSummary
            :description LatestILMappingsDefaultsDescription
            :return DefaultInstantLaunchMapping
            (ok (latest-instant-launch-mappings-defaults)))))
 
      (GET "/" []
+       :middleware  [require-authentication]
        :summary ListInstantLaunchesSummary
        :description ListInstantLaunchesDescription
        :return InstantLaunchList
        (ok (get-instant-launch-list)))
 
      (GET "/full" []
+       :middleware  [require-authentication]
        :summary ListFullInstantLaunchesSummary
        :description ListFullInstantLaunchesDescription
        :return FullInstantLaunchList
        (ok (get-full-instant-launch-list)))
 
+     (GET "/metadata/full" []
+       :summary ListFullMetadataSummary
+       :description ListFullMetadataDescription
+       :query [query MetadataListingQueryMap]
+       :return FullInstantLaunchList
+       (ok (list-full-metadata query (or (:username current-user) "anonymous"))))
+
      (context "/quicklaunches" []
        (context "/public" []
          (GET "/" []
+           :middleware  [require-authentication]
            :summary ListQuickLaunchesForPublicAppsSummary
            :description ListQuickLaunchesForPublicAppsDescription
            :return [QuickLaunch]
@@ -51,12 +62,14 @@
        :path-params [id :- InstantLaunchIDParam]
 
        (GET "/" []
+         :middleware  [require-authentication]
          :summary GetInstantLaunchSummary
          :description GetInstantLaunchDescription
          :return InstantLaunch
          (ok (get-instant-launch id)))
 
        (GET "/full" []
+         :middleware  [require-authentication]
          :summary GetFullInstantLaunchSummary
          :description GetFullInstantLaunchDescription
          :return FullInstantLaunch
@@ -104,7 +117,7 @@
          :description ListFullMetadataDescription
          :query [query MetadataListingQueryMap]
          :return FullInstantLaunchList
-         (ok (list-full-metadata query))))
+         (ok (list-full-metadata query (:username current-user)))))
 
      (context "/:id" []
        :path-params [id :- InstantLaunchIDParam]
