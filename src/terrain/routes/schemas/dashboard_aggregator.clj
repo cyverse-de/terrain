@@ -2,6 +2,7 @@
   (:use [common-swagger-api.schema :only [describe]]
         [terrain.routes.schemas.instantlaunches :only [FullInstantLaunch]]
         [schema.core :only [defschema Any maybe optional-key]])
+  (:require [common-swagger-api.schema.analyses.listing :as analyses-listing])
   (:import [java.util UUID]))
 
 (defschema DashboardApp
@@ -34,49 +35,6 @@
 
    (optional-key :is_public)
    (describe (maybe Boolean) "True if the app is publicly accessible")})
-
-(defschema DashboardAnalysis
-  {:id
-   (describe UUID "The analysis/job ID")
-
-   :name
-   (describe String "The name of the analysis")
-
-   (optional-key :description)
-   (describe (maybe String) "The description of the analysis")
-
-   :username
-   (describe String "The name of the user that created the app")
-
-   :app_id
-   (describe String "The ID of the app used for the analysis")
-
-   (optional-key :app_name)
-   (describe (maybe String) "The name of the app used for the analysis")
-
-   (optional-key :app_description)
-   (describe (maybe String) "The description of the app used for the analysis")
-
-   (optional-key :result_folder_path)
-   (describe (maybe String) "The path to the analysis outputs")
-
-   :start_date
-   (describe (maybe String) "The date the analysis was started. Milliseconds since the epoch")
-
-   (optional-key :end_date)
-   (describe (maybe String) "The date the analysis ended. Milliseconds since the epoch")
-
-   (optional-key :planned_end_date)
-   (describe (maybe String) "The date the analysis was scheduled to end. VICE only. Milliseconds since the epoch")
-
-   (optional-key :status)
-   (describe (maybe String) "The current status of the analysis")
-
-   (optional-key :subdomain)
-   (describe (maybe String) "The subdomain assigned to the analysis. VICE only")
-
-   (optional-key :parent_id)
-   (describe (maybe UUID) "The UUID of the parent analysis. Only for batch analyses")})
 
 (defschema DashboardFeedItem
   {:id
@@ -129,10 +87,10 @@
 
 (defschema DashboardAggregatedAnalyses
   {(optional-key :recent)
-   (describe (maybe [DashboardAnalysis]) "Analyses recent launched by the user")
+   (describe (maybe [analyses-listing/Analysis]) "Analyses recent launched by the user")
 
    (optional-key :running)
-   (describe (maybe [DashboardAnalysis]) "Analyses currently running for the user")})
+   (describe (maybe [analyses-listing/Analysis]) "Analyses currently running for the user")})
 
 (defschema DashboardAggregatorResponse
   {:apps
@@ -143,7 +101,7 @@
 
    (optional-key :feeds)
    (describe DashboardFeeds "Information from RSS feeds on the website")
-   
+
    (optional-key :instantLaunches)
    (describe [FullInstantLaunch] "The instant launches marked for the dashboard")})
 
