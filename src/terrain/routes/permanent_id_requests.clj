@@ -77,18 +77,27 @@
                            :description schema/PermanentIDRequestAdminDetailsDescription
                            (ok (admin-get-permanent-id-request request-id)))
 
-                      (POST "/ezid" [request-id]
+                      (POST "/doi" [request-id]
                             :return PermanentIDRequestDetails
-                            :summary "Create a Permanent ID"
+                            :summary "Create a DOI"
                             :description
-                            "This endopint will mint a permanent ID using the
+                            "This endpoint will create a DOI using the
                             [DataCite API](https://support.datacite.org/docs/api-create-dois)
                             and the requested folder's metadata,
-                            add the new ID(s) to the folder's metadata,
+                            add the new DOI to the folder's metadata,
                             move the folder to a curated directory,
                             then set the Permanent ID Request's status to `Completed`.
                             If an error is encountered during this process,
                             then the Permanent ID Request's status will be set to `Failed`."
+                            (ok (create-permanent-id request-id)))
+
+                      (POST "/ezid" [request-id]
+                            :deprecated true
+                            :return PermanentIDRequestDetails
+                            :summary "Create a Permanent ID"
+                            :description
+                            "This endpoint has been replaced by the `POST .../doi` endpoint above,
+                             which now only supports creating DOIs."
                             (ok (create-permanent-id request-id)))
 
                       (GET "/preview-submission" [request-id]
