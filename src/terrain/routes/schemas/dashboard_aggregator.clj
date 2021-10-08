@@ -34,7 +34,10 @@
    (describe (maybe Boolean) "True if the user has marked the app as a favorite")
 
    (optional-key :is_public)
-   (describe (maybe Boolean) "True if the app is publicly accessible")})
+   (describe (maybe Boolean) "True if the app is publicly accessible")
+
+   (optional-key :job_count)
+   (describe (maybe String) "The number of times the app has been run recently")})
 
 (defschema DashboardFeedItem
   {:id
@@ -81,6 +84,9 @@
 
    (optional-key :recentlyUsed)
    (describe (maybe [DashboardApp]) "Apps that the user has used recently")
+
+   (optional-key :popularFeatured)
+   (describe (maybe [DashboardApp]) "Apps that are the most popular featured apps")
 
    :public
    (describe [DashboardApp] "Apps recently made public")})
