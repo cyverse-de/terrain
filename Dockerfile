@@ -15,15 +15,13 @@ RUN mkdir -p /etc/iplant/de/crypto && \
 
 COPY conf/main/logback.xml /usr/src/app/
 
-COPY project.clj /usr/src/app/
-RUN lein deps
-
 RUN ln -s "/opt/openjdk-17/bin/java" "/bin/terrain"
 
 COPY . /usr/src/app
-
 RUN lein do clean, uberjar && \
-    cp target/terrain-standalone.jar .
+    mv target/terrain-standalone.jar . && \
+    lein clean && \
+    rm -r ~/.m2/repository
 
 # Add the Internet2 InCommon intermediate CA certificate.
 ADD "https://incommon.org/wp-content/uploads/2019/06/sha384-Intermediate-cert.txt" "/usr/local/share/ca-certificates/"
