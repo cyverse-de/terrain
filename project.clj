@@ -24,7 +24,7 @@
                  [com.cemerick/url "0.1.1" :exclusions [com.cemerick/clojurescript.test]]
                  [compojure "1.6.1"]
                  [dire "0.5.4"]
-                 [me.raynes/fs "1.4.6"]
+                 [me.raynes/fs "1.4.6" :exclusions [org.apache.commons/commons-compress]]
                  [medley "1.3.0"]
                  [metosin/ring-http-response "0.9.1"]
                  [potemkin "0.4.5"]
