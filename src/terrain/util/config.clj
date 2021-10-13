@@ -169,7 +169,7 @@
 (cc/defprop-optstr async-tasks-base-url
   "The base URL to use when connecting to the async-tasks services."
   [props config-valid configs]
-  "terrain.async-tasks.base-url" "http://async-tasks:60000")
+  "terrain.async-tasks.base-url" "http://async-tasks")
 
 (cc/defprop-optstr metadata-base-url
   "The base URL to use when connecting to the metadata services."
