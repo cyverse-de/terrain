@@ -8,8 +8,7 @@
 (use-fixtures :once integration/run-integration-tests integration/with-test-data-item)
 
 ;; Re-def private functions so they can be tested in this namespace.
-(def parse-valid-ezid-metadata #'terrain.services.permanent-id-requests/parse-valid-ezid-metadata)
-(def ezid-target-attr #'terrain.services.permanent-id-requests/ezid-target-attr)
+(def parse-valid-datacite-metadata #'terrain.services.permanent-id-requests/parse-valid-datacite-metadata)
 
 (defn- get-test-item-metadata
   []
@@ -35,15 +34,14 @@
                              (:id integration/test-data-item)
                              {:irods-avus []}))
 
-(deftest test-parse-valid-ezid-metadata
-  (testing "Test parse-valid-ezid-metadata return values and exceptions"
+(deftest test-parse-valid-datacite-metadata
+  (testing "Test parse-valid-datacite-metadata return values and exceptions"
     (set-test-item-metadata [{:attr  "test-attr-1"
                               :value "test-value-1"
                               :unit  "test-unit-1"}])
 
-    (let [ezid-metadata (parse-valid-ezid-metadata integration/test-data-item (get-test-item-metadata))]
-      (is (contains? ezid-metadata @ezid-target-attr))
-      (is (contains? ezid-metadata (config/permanent-id-date-attr))))
+    (let [datacite-metadata (parse-valid-datacite-metadata integration/test-data-item (get-test-item-metadata))]
+      (is (contains? datacite-metadata (config/permanent-id-date-attr))))
 
     (add-test-item-metadata [{:attr  (config/permanent-id-identifier-attr)
                               :value "test-ID"
@@ -51,12 +49,12 @@
 
     (is (thrown-with-msg? clojure.lang.ExceptionInfo
                           #"already contains a Permanent Identifier"
-                          (parse-valid-ezid-metadata integration/test-data-item
-                                                     (get-test-item-metadata))))
+                          (parse-valid-datacite-metadata integration/test-data-item
+                                                         (get-test-item-metadata))))
 
     (remove-test-item-metadata)
 
     (is (thrown-with-msg? clojure.lang.ExceptionInfo
                           #"No metadata found"
-                          (parse-valid-ezid-metadata integration/test-data-item
-                                                     (get-test-item-metadata))))))
+                          (parse-valid-datacite-metadata integration/test-data-item
+                                                         (get-test-item-metadata))))))

@@ -1,8 +1,11 @@
 (ns terrain.routes.permanent-id-requests
   (:use [common-swagger-api.schema]
+        [ring.util.http-response :only [ok]]
+        [terrain.routes.schemas.permanent-id-requests]
         [terrain.services.permanent-id-requests]
         [terrain.util :only [optional-routes]])
-  (:require [terrain.util.config :as config]
+  (:require [common-swagger-api.schema.permanent-id-requests :as schema]
+            [terrain.util.config :as config]
             [terrain.util.service :as service]))
 
 (defn permanent-id-request-routes
@@ -11,20 +14,42 @@
   (optional-routes
     [config/filesystem-routes-enabled]
 
-    (GET "/permanent-id-requests" [:as {params :params}]
-      (service/success-response (list-permanent-id-requests params)))
+    (context
+      "/permanent-id-requests" []
+      :tags ["permanent-id-requests"]
 
-    (POST "/permanent-id-requests" [:as {:keys [body]}]
-      (service/success-response (create-permanent-id-request body)))
+      (GET "/" []
+           :query [params schema/PermanentIDRequestListPagingParams]
+           :return PermanentIDRequestList
+           :summary schema/PermanentIDRequestListSummary
+           :description schema/PermanentIDRequestListDescription
+           (ok (list-permanent-id-requests params)))
 
-    (GET "/permanent-id-requests/status-codes" []
-      (service/success-response (list-permanent-id-request-status-codes)))
+      (POST "/" []
+            :body [body PermanentIDRequest]
+            :return PermanentIDRequestDetails
+            :summary schema/PermanentIDRequestSummary
+            :description schema/PermanentIDRequestDescription
+            (ok (create-permanent-id-request body)))
 
-    (GET "/permanent-id-requests/types" []
-      (service/success-response (list-permanent-id-request-types)))
+      (GET "/status-codes" []
+           :return schema/PermanentIDRequestStatusCodeList
+           :summary schema/PermanentIDRequestStatusCodeListSummary
+           :description schema/PermanentIDRequestStatusCodeListDescription
+           (ok (list-permanent-id-request-status-codes)))
 
-    (GET "/permanent-id-requests/:request-id" [request-id]
-      (service/success-response (get-permanent-id-request request-id)))))
+      (GET "/types" []
+           :return schema/PermanentIDRequestTypeList
+           :summary schema/PermanentIDRequestTypesSummary
+           :description schema/PermanentIDRequestTypesDescription
+           (ok (list-permanent-id-request-types)))
+
+      (GET "/:request-id" []
+           :path-params [request-id :- schema/PermanentIDRequestIdParam]
+           :return PermanentIDRequestDetails
+           :summary schema/PermanentIDRequestDetailsSummary
+           :description schema/PermanentIDRequestDetailsDescription
+           (ok (get-permanent-id-request request-id))))))
 
 (defn admin-permanent-id-request-routes
   "The admin routes for Permanent ID Request endpoints."
@@ -33,17 +58,58 @@
     [#(and (config/admin-routes-enabled)
            (config/filesystem-routes-enabled))]
 
-    (GET "/permanent-id-requests" [:as {params :params}]
-      (service/success-response (admin-list-permanent-id-requests params)))
+    (context "/permanent-id-requests" []
+             :tags ["admin-permanent-id-requests"]
 
-    (GET "/permanent-id-requests/:request-id" [request-id]
-      (service/success-response (admin-get-permanent-id-request request-id)))
+             (GET "/" []
+                  :query [params schema/PermanentIDRequestListPagingParams]
+                  :return PermanentIDRequestList
+                  :summary schema/PermanentIDRequestAdminListSummary
+                  :description schema/PermanentIDRequestAdminListDescription
+                  (ok (admin-list-permanent-id-requests params)))
 
-    (POST "/permanent-id-requests/:request-id/ezid" [request-id]
-      (service/success-response (create-permanent-id request-id)))
+             (context "/:request-id" []
+                      :path-params [request-id :- schema/PermanentIDRequestIdParam]
 
-    (GET "/permanent-id-requests/:request-id/preview-submission" [request-id]
-      (service/success-response (preview-datacite-xml request-id)))
+                      (GET "/" []
+                           :return PermanentIDRequestDetails
+                           :summary schema/PermanentIDRequestAdminDetailsSummary
+                           :description schema/PermanentIDRequestAdminDetailsDescription
+                           (ok (admin-get-permanent-id-request request-id)))
 
-    (POST "/permanent-id-requests/:request-id/status" [request-id :as {:keys [body]}]
-      (service/success-response (update-permanent-id-request request-id body)))))
+                      (POST "/doi" [request-id]
+                            :return PermanentIDRequestDetails
+                            :summary "Create a DOI"
+                            :description
+                            "This endpoint will create a DOI using the
+                            [DataCite API](https://support.datacite.org/docs/api-create-dois)
+                            and the requested folder's metadata,
+                            add the new DOI to the folder's metadata,
+                            move the folder to a curated directory,
+                            then set the Permanent ID Request's status to `Completed`.
+                            If an error is encountered during this process,
+                            then the Permanent ID Request's status will be set to `Failed`."
+                            (ok (create-permanent-id request-id)))
+
+                      (POST "/ezid" [request-id]
+                            :deprecated true
+                            :return PermanentIDRequestDetails
+                            :summary "Create a Permanent ID"
+                            :description
+                            "This endpoint has been replaced by the `POST .../doi` endpoint above,
+                             which now only supports creating DOIs."
+                            (ok (create-permanent-id request-id)))
+
+                      (GET "/preview-submission" [request-id]
+                           :summary "Preview DataCite XML submission"
+                           :description
+                           "This endpoint returns the DataCite XML generated from the data set's metadata,
+                            which will be used in the submission when creating a DOI."
+                           (ok (preview-datacite-xml request-id)))
+
+                      (POST "/status" []
+                            :body [body PermanentIDRequestStatusUpdate]
+                            :return PermanentIDRequestDetails
+                            :summary schema/PermanentIDRequestAdminStatusUpdateSummary
+                            :description schema/PermanentIDRequestAdminStatusUpdateDescription
+                            (ok (update-permanent-id-request request-id body)))))))

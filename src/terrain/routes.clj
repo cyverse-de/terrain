@@ -257,6 +257,7 @@
                                      {:name "admin-communities", :description "Community Administration Endpoints"}
                                      {:name "admin-filesystem", :description "File System Administration Endpoints"}
                                      {:name "admin-instant-launches", :description "Instant Launch Administration Endpoints"}
+                                     {:name "admin-permanent-id-requests", :description "Admin Permanent ID Request Endpoints"}
                                      {:name "admin-reference-genomes", :description "Admin Reference Genome Endpoints"}
                                      {:name "admin-request-types", :description "Admin Request Type Endpoints"}
                                      {:name "admin-requests", :description "Admin Request Endpoints"}
@@ -287,6 +288,7 @@
                                      {:name "fileio", :description "File Input/Output Endpoints"}
                                      {:name "filesystem", :description "Filesystem Endpoints"}
                                      {:name "instant-launches", :description "Instant Launch Endpoints"}
+                                     {:name "permanent-id-requests", :description "Permanent ID Request Endpoints"}
                                      {:name "reference-genomes", :description "Reference Genome Endpoints"}
                                      {:name "requests", :description "Request Endpoints"}
                                      {:name "subjects", :description "Subject Endpoints"}
