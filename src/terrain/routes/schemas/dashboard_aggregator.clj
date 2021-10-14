@@ -85,10 +85,10 @@
    (optional-key :recentlyUsed)
    (describe (maybe [DashboardApp]) "Apps that the user has used recently")
 
-   (optional-key :popularFeatured)
+   :popularFeatured
    (describe (maybe [DashboardApp]) "Apps that are the most popular featured apps")
 
-   :public
+   (optional-key :public)
    (describe [DashboardApp] "Apps recently made public")})
 
 (defschema DashboardAggregatedAnalyses
