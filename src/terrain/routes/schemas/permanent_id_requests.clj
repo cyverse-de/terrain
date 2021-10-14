@@ -1,10 +1,18 @@
 (ns terrain.routes.schemas.permanent-id-requests
-  (:use [common-swagger-api.schema :only [describe]])
+  (:use [common-swagger-api.schema :only [describe transform-enum]])
   (:require [common-swagger-api.schema.permanent-id-requests :as schema]
             [common-swagger-api.schema.stats :as stats-schema]
             [schema-tools.core :as st]
             [schema.core :as s])
   (:import [java.util UUID]))
+
+;; Convert the sort field keywords in PermanentIDRequestListPagingParams to strings,
+;; so that the correct param format is passed through to the metadata service.
+(s/defschema PermanentIDRequestListPagingParams
+  (st/update schema/PermanentIDRequestListPagingParams
+             :sort-field
+             transform-enum
+             name))
 
 (s/defschema PermanentIDRequest
   (st/merge schema/PermanentIDRequest
