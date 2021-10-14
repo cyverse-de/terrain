@@ -5,8 +5,7 @@
         [terrain.services.permanent-id-requests]
         [terrain.util :only [optional-routes]])
   (:require [common-swagger-api.schema.permanent-id-requests :as schema]
-            [terrain.util.config :as config]
-            [terrain.util.service :as service]))
+            [terrain.util.config :as config]))
 
 (defn permanent-id-request-routes
   "The routes for Permanent ID Request endpoints."
@@ -19,7 +18,7 @@
       :tags ["permanent-id-requests"]
 
       (GET "/" []
-           :query [params schema/PermanentIDRequestListPagingParams]
+           :query [params PermanentIDRequestListPagingParams]
            :return PermanentIDRequestList
            :summary schema/PermanentIDRequestListSummary
            :description schema/PermanentIDRequestListDescription
@@ -62,7 +61,7 @@
              :tags ["admin-permanent-id-requests"]
 
              (GET "/" []
-                  :query [params schema/PermanentIDRequestListPagingParams]
+                  :query [params PermanentIDRequestListPagingParams]
                   :return PermanentIDRequestList
                   :summary schema/PermanentIDRequestAdminListSummary
                   :description schema/PermanentIDRequestAdminListDescription
