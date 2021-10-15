@@ -79,6 +79,20 @@
       "permanent_id_request_complete"
       template-values)))
 
+(defn send-permanent-id-request-complete-for-user
+  "Sends an email message informing the requesting user of a Permanent ID Request completion."
+  [request-type doi path {:keys [name email]}]
+  (let [template-values {:user name
+                         :path path
+                         :doi  doi}
+        subject         (str request-type " Permanent ID Request Complete")]
+    (send-email
+      :to        email
+      :from-addr (config/permanent-id-request-src-addr)
+      :subject   subject
+      :template  "permanent_id_request_completion_user"
+      :values    template-values)))
+
 (defn send-permanent-id-request-submitted
   "Sends an email message to the user requesting a new Permanent ID Request."
   [request-type path {:keys [commonName email]}]

@@ -450,7 +450,7 @@ If this dataset accompanies a paper, please contact us with the DOI for that pap
     response))
 
 (defn- complete-permanent-id-request
-  [user {request-id :id :keys [folder type] :as request}]
+  [user {request-id :id :keys [folder type requested_by] :as request}]
   (validate-request-for-completion request)
   (try+
     (let [folder          (validate-publish-dest folder)
@@ -467,6 +467,7 @@ If this dataset accompanies a paper, please contact us with the DOI for that pap
                                                 publish-path
                                                 (json/encode doi-response {:pretty true})
                                                 identifier)
+      (email/send-permanent-id-request-complete-for-user type identifier publish-path requested_by)
       (publish-metadata folder publish-avus)
       [identifier publish-path])
     (catch Object e
