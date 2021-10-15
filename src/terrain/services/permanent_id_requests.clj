@@ -464,9 +464,9 @@ If this dataset accompanies a paper, please contact us with the DOI for that pap
           publish-avus    (format-publish-avus avus identifier type)
           publish-path    (publish-data-item current-user folder)]
       (email/send-permanent-id-request-complete type
+                                                identifier
                                                 publish-path
-                                                (json/encode doi-response {:pretty true})
-                                                identifier)
+                                                (json/encode doi-response {:pretty true}))
       (email/send-permanent-id-request-complete-for-user type identifier publish-path requested_by)
       (publish-metadata folder publish-avus)
       [identifier publish-path])
