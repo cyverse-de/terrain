@@ -43,8 +43,8 @@
 
 (defn send-permanent-id-request-new
   "Sends an email message informing data curators of a new Permanent ID Request."
-  [request-type path {:keys [commonName email]}]
-  (let [template-values {:username     commonName
+  [request-type path {:keys [commonName]}]
+  (let [template-values {:user         commonName
                          :environment  (config/environment-name)
                          :request_type request-type
                          :path         path}]
@@ -56,11 +56,11 @@
 (defn send-permanent-id-request-data-move-error
   "Sends an email message informing data curators that a Permanent ID Request data folder could not be moved to the
    commons repo folder."
-  [path dest-path {:keys [commonName]} error-msg]
+  [path dest-path requesting-user error-msg]
   (send-permanent-id-request
     "Could not move Permanent ID Request data folder"
     "permanent_id_request_move_error"
-    {:username      commonName
+    {:user          requesting-user
      :environment   (config/environment-name)
      :path          path
      :dest          dest-path
@@ -82,7 +82,7 @@
 (defn send-permanent-id-request-submitted
   "Sends an email message to the user requesting a new Permanent ID Request."
   [request-type path {:keys [commonName email]}]
-  (let [template-values {:username     commonName
+  (let [template-values {:user         commonName
                          :environment  (config/environment-name)
                          :request_type request-type
                          :path         path}

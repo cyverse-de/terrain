@@ -17,8 +17,7 @@
             [terrain.clients.metadata.raw :as metadata]
             [terrain.clients.notifications :as notifications]
             [terrain.util.config :as config]
-            [terrain.util.email :as email]
-            [terrain.util.service :as service]))
+            [terrain.util.email :as email]))
 
 ;; Status Codes.
 (def ^:private status-code-completion "Completion")
@@ -185,7 +184,7 @@ If this dataset accompanies a paper, please contact us with the DOI for that pap
       (data-info/share (config/irods-user) [curators] [staging-path] "own"))))
 
 (defn- move-folder
-  [user {:keys [id path]} dest-path]
+  [requesting-user user {:keys [id path]} dest-path]
   (try+
    (-> (data-info-client/move-single user id dest-path)
        :body
@@ -193,12 +192,12 @@ If this dataset accompanies a paper, please contact us with the DOI for that pap
        :async-task-id)
    (catch Object e
      (log/error e)
-     (email/send-permanent-id-request-data-move-error path dest-path current-user (:body e (str e)))
+     (email/send-permanent-id-request-data-move-error path dest-path requesting-user (:body e (str e)))
      nil)))
 
 
 (defn- async-move-poller
-  [{:keys [id path]} dest-path async-task-id post-move-fn]
+  [requesting-user {:keys [id path]} dest-path async-task-id post-move-fn]
   (try+
     (log/info "Waiting for async move to complete for" id path)
 
@@ -228,19 +227,21 @@ If this dataset accompanies a paper, please contact us with the DOI for that pap
       (log/error e)
       (email/send-permanent-id-request-data-move-error path
                                                        dest-path
-                                                       current-user
+                                                       requesting-user
                                                        (:body e (str e))))))
 
 (defn- move-data-item-to-staging
-  [user {:keys [path] :as folder}]
+  [{:keys [commonName shortUsername]} {:keys [path] :as folder}]
   (let [curators-group (config/permanent-id-curators-group)
-        async-task-id  (move-folder (config/irods-user)
+        async-task-id  (move-folder commonName
+                                    (config/irods-user)
                                     folder
                                     (config/permanent-id-staging-dir))
         share-fn       (fn [staged-path]
                          (data-info/share (config/irods-user) [curators-group] [staged-path] "own")
-                         (data-info/share (config/irods-user) [user] [staged-path] "write"))
-        share-poller   #(async-move-poller folder
+                         (data-info/share (config/irods-user) [shortUsername] [staged-path] "write"))
+        share-poller   #(async-move-poller commonName
+                                           folder
                                            (config/permanent-id-staging-dir)
                                            async-task-id
                                            share-fn)]
@@ -252,21 +253,23 @@ If this dataset accompanies a paper, please contact us with the DOI for that pap
     (format-staging-path path)))
 
 (defn- stage-data-item
-  [user {:keys [path] :as folder}]
+  [requesting-user {:keys [path] :as folder}]
   (let [staged-path (format-staging-path path)]
     (when (not= path staged-path)
-      (move-data-item-to-staging user folder))
+      (move-data-item-to-staging requesting-user folder))
     staged-path))
 
 (defn- move-data-item-to-published
-  [{:keys [path] :as folder}]
+  [{:keys [commonName]} {:keys [path] :as folder}]
   (let [curators-group (config/permanent-id-curators-group)
-        async-task-id  (move-folder (config/irods-user)
+        async-task-id  (move-folder commonName
+                                    (config/irods-user)
                                     folder
                                     (config/permanent-id-publish-dir))
         share-fn       (fn [publish-path]
                          (data-info/share (config/irods-user) [curators-group] [publish-path] "own"))
-        share-poller   #(async-move-poller folder
+        share-poller   #(async-move-poller commonName
+                                           folder
                                            (config/permanent-id-publish-dir)
                                            async-task-id
                                            share-fn)]
@@ -278,10 +281,10 @@ If this dataset accompanies a paper, please contact us with the DOI for that pap
     (format-publish-path path)))
 
 (defn- publish-data-item
-  [{:keys [path] :as folder}]
+  [requesting-user {:keys [path] :as folder}]
   (let [publish-path (format-publish-path path)]
     (when (not= path publish-path)
-      (move-data-item-to-published folder))
+      (move-data-item-to-published requesting-user folder))
     publish-path))
 
 (defn- publish-metadata
@@ -405,7 +408,7 @@ If this dataset accompanies a paper, please contact us with the DOI for that pap
         {:keys [path] :as folder}      (get-validated-data-item user type folder-id)
         target-type                    (validate-request-target-type folder)
         {request-id :id :as response}  (submit-permanent-id-request type folder-id target-type path)
-        staged-path                    (stage-data-item user folder)]
+        staged-path                    (stage-data-item current-user folder)]
     (send-notification
       user
       (:email current-user)
@@ -459,7 +462,7 @@ If this dataset accompanies a paper, please contact us with the DOI for that pap
           doi-response    (datacite-client/create-doi datacite-xml target-url)
           identifier      (get-in doi-response [:data :id])
           publish-avus    (format-publish-avus avus identifier type)
-          publish-path    (publish-data-item folder)]
+          publish-path    (publish-data-item current-user folder)]
       (email/send-permanent-id-request-complete type
                                                 publish-path
                                                 (json/encode doi-response {:pretty true})
