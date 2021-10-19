@@ -231,16 +231,16 @@ If this dataset accompanies a paper, please contact us with the DOI for that pap
                                                        (:body e (str e))))))
 
 (defn- move-data-item-to-staging
-  [{:keys [commonName shortUsername]} {:keys [path] :as folder}]
+  [{:keys [shortUsername] :as requesting-user} {:keys [path] :as folder}]
   (let [curators-group (config/permanent-id-curators-group)
-        async-task-id  (move-folder commonName
+        async-task-id  (move-folder requesting-user
                                     (config/irods-user)
                                     folder
                                     (config/permanent-id-staging-dir))
         share-fn       (fn [staged-path]
                          (data-info/share (config/irods-user) [curators-group] [staged-path] "own")
                          (data-info/share (config/irods-user) [shortUsername] [staged-path] "write"))
-        share-poller   #(async-move-poller commonName
+        share-poller   #(async-move-poller requesting-user
                                            folder
                                            (config/permanent-id-staging-dir)
                                            async-task-id
@@ -260,15 +260,15 @@ If this dataset accompanies a paper, please contact us with the DOI for that pap
     staged-path))
 
 (defn- move-data-item-to-published
-  [{:keys [commonName]} {:keys [path] :as folder}]
+  [requesting-user {:keys [path] :as folder}]
   (let [curators-group (config/permanent-id-curators-group)
-        async-task-id  (move-folder commonName
+        async-task-id  (move-folder requesting-user
                                     (config/irods-user)
                                     folder
                                     (config/permanent-id-publish-dir))
         share-fn       (fn [publish-path]
                          (data-info/share (config/irods-user) [curators-group] [publish-path] "own"))
-        share-poller   #(async-move-poller commonName
+        share-poller   #(async-move-poller requesting-user
                                            folder
                                            (config/permanent-id-publish-dir)
                                            async-task-id
