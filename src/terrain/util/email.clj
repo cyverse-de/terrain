@@ -43,8 +43,9 @@
 
 (defn send-permanent-id-request-new
   "Sends an email message informing data curators of a new Permanent ID Request."
-  [request-type path {:keys [commonName email]}]
-  (let [template-values {:username     commonName
+  [request-type path {:keys [commonName shortUsername]}]
+  (let [template-values {:username     shortUsername
+                         :user         commonName
                          :environment  (config/environment-name)
                          :request_type request-type
                          :path         path}]
@@ -56,11 +57,12 @@
 (defn send-permanent-id-request-data-move-error
   "Sends an email message informing data curators that a Permanent ID Request data folder could not be moved to the
    commons repo folder."
-  [path dest-path {:keys [commonName]} error-msg]
+  [path dest-path {:keys [commonName shortUsername]} error-msg]
   (send-permanent-id-request
     "Could not move Permanent ID Request data folder"
     "permanent_id_request_move_error"
-    {:username      commonName
+    {:username      shortUsername
+     :user          commonName
      :environment   (config/environment-name)
      :path          path
      :dest          dest-path
@@ -68,21 +70,35 @@
 
 (defn send-permanent-id-request-complete
   "Sends an email message informing data curators of a Permanent ID Request completion."
-  [request-type path identifiers doi]
+  [request-type doi path api-response]
   (let [template-values {:environment  (config/environment-name)
                          :request_type request-type
+                         :doi          doi
                          :path         path
-                         :identifiers  identifiers
-                         :doi          doi}]
+                         :api_response api-response}]
     (send-permanent-id-request
       "Permanent ID Request Complete"
       "permanent_id_request_complete"
       template-values)))
 
+(defn send-permanent-id-request-complete-for-user
+  "Sends an email message informing the requesting user of a Permanent ID Request completion."
+  [request-type doi path {:keys [name email]}]
+  (let [template-values {:user name
+                         :path path
+                         :doi  doi}
+        subject         (str request-type " Permanent ID Request Complete")]
+    (send-email
+      :to        email
+      :from-addr (config/permanent-id-request-src-addr)
+      :subject   subject
+      :template  "permanent_id_request_completion_user"
+      :values    template-values)))
+
 (defn send-permanent-id-request-submitted
   "Sends an email message to the user requesting a new Permanent ID Request."
   [request-type path {:keys [commonName email]}]
-  (let [template-values {:username     commonName
+  (let [template-values {:user         commonName
                          :environment  (config/environment-name)
                          :request_type request-type
                          :path         path}
