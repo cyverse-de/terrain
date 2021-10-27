@@ -543,6 +543,11 @@
   [props config-valid configs]
   "terrain.app-exposer.base-uri" "http://app-exposer")
 
+(cc/defprop-optstr resource-usage-api-uri
+  "The base URI for the resource-usage-api service."
+  [props config-valid configs]
+  "terrain.resource-usage-api.base-uri" "http://resource-usage-api")
+
 (cc/defprop-optstr keycloak-base-uri
   "The base URI for the Keycloak server."
   [props config-valid configs]
