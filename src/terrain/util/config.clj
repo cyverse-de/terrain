@@ -126,6 +126,11 @@
   [props config-valid configs]
   "terrain.routes.coge" true)
 
+(cc/defprop-optboolean resource-usage-api-routes-enabled
+  "Enables or disables resource-usage-api endpoints."
+  [props config-valid configs]
+  "terrain.routes.resource-usage-api" true)
+
 (cc/defprop-optstr iplant-email-base-url
   "The base URL to use when connnecting to the iPlant email service."
   [props config-valid configs app-routes-enabled]
