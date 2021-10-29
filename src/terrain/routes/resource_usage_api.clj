@@ -51,8 +51,17 @@
          :description schema/ResetHoursDescription
          (ok (rua/reset-cpu-hours (current-user) hours))))
      
-     (context "/admin" []
-       (context "/workers" []
+     )))
+
+(defn admin-resource-usage-api-routes
+  []
+  (optional-routes
+   [config/resource-usage-api-routes-enabled]
+
+   (context "/resource-usage" []
+     :tags ["admin-resource-usage"]
+
+     (context "/workers" []
          (GET "/" []
            :middleware [require-authentication]
            :summary schema/ListWorkersSummary
@@ -67,37 +76,36 @@
            :description schema/GetWorkerDescription
            :return schema/Worker
            (ok (rua/worker worker-id)))
-         
+
          (POST "/:worker-id" []
            :middleware [require-authentication]
            :path-params [worker-id :- schema/WorkerID]
            :body [body schema/UpdateWorker]
            :summary schema/UpdateWorkerSummary
            :description schema/UpdateWorkerDescription
-           (ok (rua/worker worker-id body))
-           )
+           (ok (rua/worker worker-id body)))
          (DELETE "/:worker-id" []
            :middleware [require-authentication]
            :path-params [worker-id :- schema/WorkerID]
            :summary schema/DeleteWorkerSummary
            :description schema/DeleteWorkerDescription
            (ok (rua/delete-worker worker-id))))
-
-       (context "/cpu" []
+     
+     (context "/cpu" []
          (GET "/totals" []
            :middleware [require-authentication]
            :summary schema/AllUsersCurrentCPUTotalSummary
            :description schema/AllUsersCurrentCPUTotalDescription
            :return [schema/CPUHoursTotal]
            (ok (rua/current-cpu-hours-total)))
-         
+
          (GET "/totals/all" []
            :middleware [require-authentication]
            :summary schema/AllUsersAllCPUTotalsSummary
            :description schema/AllUsersAllCPUTotalsDescription
            :return [schema/CPUHoursTotal]
            (ok (rua/all-cpu-hours-totals)))
-         
+
          (context "/events" []
            (GET "/" []
              :middleware [require-authentication]
@@ -120,7 +128,7 @@
              :description schema/GetEventDescription
              :return schema/Event
              (ok (rua/event event-id)))
-           
+
            (POST "/:event-id" []
              :middleware [require-authentication]
              :path-params [event-id :- schema/EventID]
@@ -128,10 +136,10 @@
              :summary schema/UpdateEventSummary
              :description schema/UpdateEventDescription
              (ok (rua/event event-id body)))
-           
+
            (DELETE "/:event-id" []
              :middleware [require-authentication]
              :path-params [event-id :- schema/EventID]
              :summary schema/DeleteEventSummary
              :description schema/DeleteEventDescription
-             (ok (rua/delete-event event-id)))))))))
+             (ok (rua/delete-event event-id))))))))
