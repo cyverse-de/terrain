@@ -37,6 +37,7 @@
         [terrain.routes.notification]
         [terrain.routes.permanent-id-requests]
         [terrain.routes.pref]
+        [terrain.routes.resource-usage-api]
         [terrain.routes.session]
         [terrain.routes.user-info]
         [terrain.routes.collaborator]
@@ -116,6 +117,7 @@
    (request-routes)
    (bag-routes)
    (vice-routes)
+   (resource-usage-api-routes)
    (route/not-found (service/unrecognized-path-response))))
 
 ; The old way of adding secured routes. Prepends /secured to the URL
@@ -173,6 +175,7 @@
    (admin-request-routes)
    (admin-setting-routes)
    (admin-vice-routes)
+   (admin-resource-usage-api-routes)
    (route/not-found (service/unrecognized-path-response))))
 
 (defn unsecured-routes
