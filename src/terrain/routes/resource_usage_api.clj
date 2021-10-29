@@ -5,8 +5,7 @@
             [terrain.util :refer [optional-routes]]
             [common-swagger-api.schema :refer [context GET POST DELETE]]
             [terrain.routes.schemas.resource-usage-api :as schema]
-            [ring.util.http-response :refer [ok]])
-  (:import [java.util UUID]))
+            [ring.util.http-response :refer [ok]]))
 
 (defn resource-usage-api-routes
   []
@@ -33,21 +32,21 @@
        
        (POST "/add/:hours" []
          :middleware [require-authentication]
-         :path-params [ hours :- Integer ]
+         :path-params [hours :- schema/HoursNumber]
          :summary schema/AddHoursSummary
          :description schema/AddHoursDescription
          (ok (rua/add-cpu-hours (current-user) hours)))
        
        (POST "/subtract/:hours" []
          :middleware [require-authentication]
-         :path-params [hours :- Integer]
+         :path-params [hours :- schema/HoursNumber]
          :summary schema/SubtractHoursSummary
          :description schema/SubtractHoursDescription
          (ok (rua/subtract-cpu-hours (current-user) hours)))
        
        (POST "/reset/:hours" []
          :middleware [require-authentication]
-         :path-params [hours :- Integer]
+         :path-params [hours :- schema/HoursNumber]
          :summary schema/ResetHoursSummary
          :description schema/ResetHoursDescription
          (ok (rua/reset-cpu-hours (current-user) hours))))
@@ -63,7 +62,7 @@
 
          (GET "/:worker-id" []
            :middleware [require-authentication]
-           :path-params [worker-id :- UUID]
+           :path-params [worker-id :- schema/WorkerID]
            :summary schema/GetWorkerSummary
            :description schema/GetWorkerDescription
            :return schema/Worker
@@ -71,7 +70,7 @@
          
          (POST "/:worker-id" []
            :middleware [require-authentication]
-           :path-params [worker-id :- UUID]
+           :path-params [worker-id :- schema/WorkerID]
            :body [body schema/UpdateWorker]
            :summary schema/UpdateWorkerSummary
            :description schema/UpdateWorkerDescription
@@ -79,7 +78,7 @@
            )
          (DELETE "/:worker-id" []
            :middleware [require-authentication]
-           :path-params [worker-id :- UUID]
+           :path-params [worker-id :- schema/WorkerID]
            :summary schema/DeleteWorkerSummary
            :description schema/DeleteWorkerDescription
            (ok (rua/delete-worker worker-id))))
@@ -116,7 +115,7 @@
 
            (GET "/:event-id" []
              :middleware [require-authentication]
-             :path-params [event-id :- UUID]
+             :path-params [event-id :- schema/EventID]
              :summary schema/GetEventSummary
              :description schema/GetEventDescription
              :return schema/Event
@@ -124,7 +123,7 @@
            
            (POST "/:event-id" []
              :middleware [require-authentication]
-             :path-params [event-id :- UUID]
+             :path-params [event-id :- schema/EventID]
              :body [body schema/UpdateEvent]
              :summary schema/UpdateEventSummary
              :description schema/UpdateEventDescription
@@ -132,7 +131,7 @@
            
            (DELETE "/:event-id" []
              :middleware [require-authentication]
-             :path-params [event-id :- UUID]
+             :path-params [event-id :- schema/EventID]
              :summary schema/DeleteEventSummary
              :description schema/DeleteEventDescription
              (ok (rua/delete-event event-id)))))))))

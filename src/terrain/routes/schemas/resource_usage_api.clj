@@ -36,8 +36,13 @@
 (def DeleteEventSummary "Deletes an event")
 (def DeleteEventDescription "Deletes a single event in the system")
 
+(def WorkerID (describe UUID "The UUID assigned to a worker"))
+(def EventID (describe UUID "The UUID assigned to an event"))
+(def CPUHoursTotalID (describe UUID "The assigned to the record containing the CPU hours total"))
+(def HoursNumber (describe Integer "The number of CPU hours"))
+
 (defschema Worker
-  {:id                      (describe UUID "The UUID assigned to the Worker")
+  {:id                      WorkerID
    :name                    (describe String "The name of the worker")
    :added_on                (describe String "When the worker was added to the system. Automatically set by the system")
    :active                  (describe Boolean "Whether the worker is available for processing items. Set by the worker")
@@ -76,7 +81,7 @@
    :last_modified   (describe String "The date the record in the database was last modified")})
 
 (defschema Event
-  {:id                      (describe UUID "The UUID assigned to the event")
+  {:id                      EventID
    :record_date             (describe String "The date the event was added to the system")
    :effective_date          (describe String "The date the event is effective")
    :event_type              (describe String "The type of event")
