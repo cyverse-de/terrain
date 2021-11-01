@@ -75,21 +75,7 @@
            :summary schema/GetWorkerSummary
            :description schema/GetWorkerDescription
            :return schema/Worker
-           (ok (rua/worker worker-id)))
-
-         (POST "/:worker-id" []
-           :middleware [require-authentication]
-           :path-params [worker-id :- schema/WorkerID]
-           :body [body schema/UpdateWorker]
-           :summary schema/UpdateWorkerSummary
-           :description schema/UpdateWorkerDescription
-           (ok (rua/worker worker-id body)))
-         (DELETE "/:worker-id" []
-           :middleware [require-authentication]
-           :path-params [worker-id :- schema/WorkerID]
-           :summary schema/DeleteWorkerSummary
-           :description schema/DeleteWorkerDescription
-           (ok (rua/delete-worker worker-id))))
+           (ok (rua/worker worker-id))))
      
      (context "/cpu" []
          (GET "/totals" []
@@ -127,19 +113,4 @@
              :summary schema/GetEventSummary
              :description schema/GetEventDescription
              :return schema/Event
-             (ok (rua/event event-id)))
-
-           (POST "/:event-id" []
-             :middleware [require-authentication]
-             :path-params [event-id :- schema/EventID]
-             :body [body schema/UpdateEvent]
-             :summary schema/UpdateEventSummary
-             :description schema/UpdateEventDescription
-             (ok (rua/event event-id body)))
-
-           (DELETE "/:event-id" []
-             :middleware [require-authentication]
-             :path-params [event-id :- schema/EventID]
-             :summary schema/DeleteEventSummary
-             :description schema/DeleteEventDescription
-             (ok (rua/delete-event event-id))))))))
+             (ok (rua/event event-id))))))))
