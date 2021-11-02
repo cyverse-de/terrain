@@ -19,7 +19,7 @@
    (describe (maybe String) "The description of the app")
 
    :username
-   (describe String "The name of the user that created the app")
+   (describe (maybe String) "The name of the user that created the app")
 
    (optional-key :wiki_url)
    (describe (maybe String) "The URL to the wiki entry for the app")
