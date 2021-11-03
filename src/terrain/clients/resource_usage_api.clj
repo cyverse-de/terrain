@@ -33,19 +33,19 @@
 
 (defn add-cpu-hours
   [username hours]
-  (-> (resource-usage-api [username "cpu" "add" hours])
+  (-> (resource-usage-api [username "cpu" "update" "add" hours])
       (http/post  {:as :json})
       (:body)))
 
 (defn subtract-cpu-hours
   [username hours]
-  (-> (resource-usage-api [username "cpu" "subtract" hours])
+  (-> (resource-usage-api [username "cpu" "update" "subtract" hours])
       (http/post  {:as :json})
       (:body)))
 
 (defn reset-cpu-hours
   [username hours]
-  (-> (resource-usage-api [username "cpu" "reset" hours])
+  (-> (resource-usage-api [username "cpu" "update" "reset" hours])
       (http/post  {:as :json})
       (:body)))
 
