@@ -69,7 +69,7 @@
 
 (defn delete-worker
   [worker-id]
-  (-> (resource-usage-api ["admin" "workers" worker-id] {:as :json})
+  (-> (resource-usage-api ["admin" "workers" worker-id])
       (http/delete)
       (:body)))
 
@@ -88,7 +88,7 @@
    (-> (resource-usage-api ["admin" "cpu" "events" event-id])
        (http/get {:as :json})
        (:body)))
-  
+
   ([event-id update-info]
    (-> (resource-usage-api ["admin" "cpu" "events" event-id])
        (http/post {:content-type :json
