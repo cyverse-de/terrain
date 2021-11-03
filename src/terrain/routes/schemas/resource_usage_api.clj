@@ -40,6 +40,7 @@
 (def EventID (describe UUID "The UUID assigned to an event"))
 (def CPUHoursTotalID (describe UUID "The assigned to the record containing the CPU hours total"))
 (def HoursNumber (describe Integer "The number of CPU hours"))
+(def Username (describe String "A username in the system"))
 
 (defschema Worker
   {:id                      WorkerID
