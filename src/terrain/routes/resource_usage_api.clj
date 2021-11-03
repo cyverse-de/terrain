@@ -28,28 +28,7 @@
          :summary schema/AllTotalsSummary
          :description schema/AllTotalsDescription
          :return [schema/CPUHoursTotal]
-         (ok (rua/all-cpu-hours-totals (:username current-user))))
-
-       (POST "/add/:hours" []
-         :middleware [require-authentication]
-         :path-params [hours :- schema/HoursNumber]
-         :summary schema/AddHoursSummary
-         :description schema/AddHoursDescription
-         (ok (rua/add-cpu-hours (:username current-user) hours)))
-
-       (POST "/subtract/:hours" []
-         :middleware [require-authentication]
-         :path-params [hours :- schema/HoursNumber]
-         :summary schema/SubtractHoursSummary
-         :description schema/SubtractHoursDescription
-         (ok (rua/subtract-cpu-hours (:username current-user) hours)))
-
-       (POST "/reset/:hours" []
-         :middleware [require-authentication]
-         :path-params [hours :- schema/HoursNumber]
-         :summary schema/ResetHoursSummary
-         :description schema/ResetHoursDescription
-         (ok (rua/reset-cpu-hours (:username current-user) hours)))))))
+         (ok (rua/all-cpu-hours-totals (:username current-user))))))))
 
 (defn admin-resource-usage-api-routes
   []
@@ -98,13 +77,38 @@
            :return [schema/Event]
            (ok (rua/list-events)))
 
-         (GET "/user/:username" []
-           :middleware [require-authentication]
+         (context "/user/:username" []
            :path-params [username :- schema/Username]
-           :summary schema/ListUserEventsSummary
-           :description schema/ListUserEventsDescription
-           :return [schema/Event]
-           (ok (rua/list-events username)))
+
+           (GET "/" []
+             :middleware [require-authentication]
+             :path-params [username :- schema/Username]
+             :summary schema/ListUserEventsSummary
+             :description schema/ListUserEventsDescription
+             :return [schema/Event]
+             (ok (rua/list-events username)))
+
+           (POST "/add/:hours" []
+             :middleware [require-authentication]
+             :path-params [hours :- schema/HoursNumber]
+             :summary schema/AddHoursSummary
+             :description schema/AddHoursDescription
+             (ok (rua/add-cpu-hours username hours)))
+
+           (POST "/subtract/:hours" []
+             :middleware [require-authentication]
+             :path-params [hours :- schema/HoursNumber]
+             :summary schema/SubtractHoursSummary
+             :description schema/SubtractHoursDescription
+             (ok (rua/subtract-cpu-hours username hours)))
+
+           (POST "/reset/:hours" []
+             :middleware [require-authentication]
+             :path-params [hours :- schema/HoursNumber]
+             :summary schema/ResetHoursSummary
+             :description schema/ResetHoursDescription
+             (ok (rua/reset-cpu-hours username hours))))
+
 
          (GET "/:event-id" []
            :middleware [require-authentication]
