@@ -17,9 +17,10 @@
        (http/get {:as :json})
        (:body)))
   ([username]
-   (-> (resource-usage-api [username "cpu" "total"])
-       (http/get {:as :json})
-       (:body))))
+   (when-not (= username "admin")
+     (-> (resource-usage-api [username "cpu" "total"])
+         (http/get {:as :json})
+         (:body)))))
 
 (defn all-cpu-hours-totals
   ([]
@@ -27,9 +28,10 @@
        (http/get {:as :json})
        (:body)))
   ([username]
-   (-> (resource-usage-api [username "cpu" "total" "all"])
-       (http/get {:as :json})
-       (:body))))
+   (when-not (= username "admin")
+     (-> (resource-usage-api [username "cpu" "total" "all"])
+         (http/get {:as :json})
+         (:body)))))
 
 (defn add-cpu-hours
   [username hours]
