@@ -31,3 +31,6 @@ test2junit
 Dockerfile.local
 terrain.properties
 .eastwood
+.calva
+.clj-kondo
+.lsp

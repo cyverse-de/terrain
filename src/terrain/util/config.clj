@@ -126,6 +126,11 @@
   [props config-valid configs]
   "terrain.routes.coge" true)
 
+(cc/defprop-optboolean resource-usage-api-routes-enabled
+  "Enables or disables resource-usage-api endpoints."
+  [props config-valid configs]
+  "terrain.routes.resource-usage-api" true)
+
 (cc/defprop-optstr iplant-email-base-url
   "The base URL to use when connnecting to the iPlant email service."
   [props config-valid configs app-routes-enabled]
@@ -542,6 +547,11 @@
   "The base URI for the app-exposer service."
   [props config-valid configs]
   "terrain.app-exposer.base-uri" "http://app-exposer")
+
+(cc/defprop-optstr resource-usage-api-uri
+  "The base URI for the resource-usage-api service."
+  [props config-valid configs]
+  "terrain.resource-usage-api.base-uri" "http://resource-usage-api")
 
 (cc/defprop-optstr keycloak-base-uri
   "The base URI for the Keycloak server."

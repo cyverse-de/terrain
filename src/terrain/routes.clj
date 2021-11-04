@@ -37,6 +37,7 @@
         [terrain.routes.notification]
         [terrain.routes.permanent-id-requests]
         [terrain.routes.pref]
+        [terrain.routes.resource-usage-api]
         [terrain.routes.session]
         [terrain.routes.user-info]
         [terrain.routes.collaborator]
@@ -116,6 +117,7 @@
    (request-routes)
    (bag-routes)
    (vice-routes)
+   (resource-usage-api-routes)
    (route/not-found (service/unrecognized-path-response))))
 
 ; The old way of adding secured routes. Prepends /secured to the URL
@@ -173,6 +175,7 @@
    (admin-request-routes)
    (admin-setting-routes)
    (admin-vice-routes)
+   (admin-resource-usage-api-routes)
    (route/not-found (service/unrecognized-path-response))))
 
 (defn unsecured-routes
@@ -261,6 +264,7 @@
                                      {:name "admin-reference-genomes", :description "Admin Reference Genome Endpoints"}
                                      {:name "admin-request-types", :description "Admin Request Type Endpoints"}
                                      {:name "admin-requests", :description "Admin Request Endpoints"}
+                                     {:name "admin-resource-usage", :description "Resource Usage Administration Endpoints"}
                                      {:name "admin-settings", :description "Admin Setting Endpoints"}
                                      {:name "admin-token", :description "Admin OAuth Tokens"}
                                      {:name "admin-tools", :description "Admin Tool Endpoints"}
@@ -291,6 +295,7 @@
                                      {:name "permanent-id-requests", :description "Permanent ID Request Endpoints"}
                                      {:name "reference-genomes", :description "Reference Genome Endpoints"}
                                      {:name "requests", :description "Request Endpoints"}
+                                     {:name "resource-usage" :description "Resource Usage Endpoints"}
                                      {:name "subjects", :description "Subject Endpoints"}
                                      {:name "support", :description "Support Endpoints"}
                                      {:name "tags", :description "Tag Endpoints"}
