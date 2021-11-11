@@ -20,7 +20,7 @@
 
 (s/defschema PermanentIDRequestBase
   (st/merge schema/PermanentIDRequestBase
-            {:folder (describe stats-schema/DirStatInfo "The target folder's details")}))
+            {:folder (describe (s/maybe stats-schema/DirStatInfo) "The target folder's details")}))
 
 (s/defschema PermanentIDRequestStatusUpdate
   (st/dissoc schema/PermanentIDRequestStatusUpdate :permanent_id))
