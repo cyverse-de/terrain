@@ -131,6 +131,11 @@
   [props config-valid configs]
   "terrain.routes.resource-usage-api" true)
 
+(cc/defprop-optboolean data-usage-api-routes-enabled
+  "Enables or disables data-usage-api endpoints."
+  [props config-valid configs]
+  "terrain.routes.data-usage-api" true)
+
 (cc/defprop-optstr iplant-email-base-url
   "The base URL to use when connnecting to the iPlant email service."
   [props config-valid configs app-routes-enabled]
@@ -552,6 +557,11 @@
   "The base URI for the resource-usage-api service."
   [props config-valid configs]
   "terrain.resource-usage-api.base-uri" "http://resource-usage-api")
+
+(cc/defprop-optstr data-usage-api-uri
+  "The base URI for the data-usage-api service."
+  [props config-valid configs]
+  "terrain.data-usage-api.base-uri" "http://data-usage-api")
 
 (cc/defprop-optstr keycloak-base-uri
   "The base URI for the Keycloak server."
