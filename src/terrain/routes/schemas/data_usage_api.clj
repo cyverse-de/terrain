@@ -11,6 +11,6 @@
   {:id            (describe UUID "The UUID assigned to the current reading")
    :user_id       (describe UUID "The UUID assigned to the user the reading applies to")
    :username      (describe String "The username of the user the reading applies to")
-   :total         (describe Integer "The total number of bytes the user is consuming in the Data Store")
+   :total         (describe Long "The total number of bytes the user is consuming in the Data Store")
    :time          (describe String "The date of the reading")
    :last_modified (describe String "The date the reading in the database was last modified")})
