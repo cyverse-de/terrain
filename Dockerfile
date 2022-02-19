@@ -31,7 +31,7 @@ ADD "https://incommon.org/wp-content/uploads/2019/06/sha384-Intermediate-cert.tx
 RUN sed -i -E 's/\r\n?/\n/g' "/usr/local/share/ca-certificates/sha384-Intermediate-cert.txt" && \
     update-ca-certificates
 
-ENTRYPOINT ["terrain", "-Dlogback.configurationFile=/etc/iplant/de/logging/terrain-logging.xml", "-javaagent:/usr/src/app/opentelemetry-javaagent.jar", "-cp", ".:terrain-standalone.jar", "terrain.core"]
+ENTRYPOINT ["terrain", "-Dlogback.configurationFile=/etc/iplant/de/logging/terrain-logging.xml", "-javaagent:/usr/src/app/opentelemetry-javaagent.jar", "-Dotel.resource.attributes=service.name=terrain", "-cp", ".:terrain-standalone.jar", "terrain.core"]
 
 ARG git_commit=unknown
 ARG version=unknown
