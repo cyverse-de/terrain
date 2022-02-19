@@ -18,6 +18,8 @@ COPY conf/main/logback.xml /usr/src/app/
 
 RUN ln -s "/opt/openjdk-17/bin/java" "/bin/terrain"
 
+ENV OTEL_TRACES_EXPORTER logging
+
 COPY . /usr/src/app
 RUN lein do clean, uberjar && \
     mv target/terrain-standalone.jar . && \
@@ -29,7 +31,7 @@ ADD "https://incommon.org/wp-content/uploads/2019/06/sha384-Intermediate-cert.tx
 RUN sed -i -E 's/\r\n?/\n/g' "/usr/local/share/ca-certificates/sha384-Intermediate-cert.txt" && \
     update-ca-certificates
 
-ENTRYPOINT ["terrain", "-Dlogback.confonFile=/etc/iplant/de/logging/terrain-logging.xml", "-cp", ".:terrain-standalone.jar", "terrain.core"]
+ENTRYPOINT ["terrain", "-Dlogback.configurationFile=/etc/iplant/de/logging/terrain-logging.xml", "-javaagent:/usr/src/app/opentelemetry-javaagent.jar", "-cp", ".:terrain-standalone.jar", "terrain.core"]
 
 ARG git_commit=unknown
 ARG version=unknown

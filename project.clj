@@ -46,7 +46,7 @@
                  [com.impossibl.pgjdbc-ng/pgjdbc-ng "0.8.9"]
                  [org.cyverse/metadata-client "3.1.1"]
                  [org.cyverse/metadata-files "1.0.3"]
-                 [org.cyverse/otel "0.2.4"]
+                 [org.cyverse/otel "0.2.5"]
                  [org.cyverse/permissions-client "2.8.1"]
                  [org.cyverse/service-logging "2.8.3"]]
   :eastwood {:exclude-namespaces [terrain.util.jwt :test-paths]
@@ -70,4 +70,4 @@
                   {:url "https://raw.github.com/cyverse-de/mvn/master/releases"}]
                  ["sonatype-releases"
                   {:url "https://oss.sonatype.org/content/repositories/releases/"}]]
-  :jvm-opts ["-Dlogback.configurationFile=/etc/iplant/de/logging/terrain-logging.xml"])
+  :jvm-opts ["-Dlogback.configurationFile=/etc/iplant/de/logging/terrain-logging.xml" "-javaagent:./opentelemetry-javaagent.jar" "-Dotel.resource.attributes=service.name=terrain"])
