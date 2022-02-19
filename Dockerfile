@@ -18,7 +18,7 @@ COPY conf/main/logback.xml /usr/src/app/
 
 RUN ln -s "/opt/openjdk-17/bin/java" "/bin/terrain"
 
-ENV OTEL_TRACES_EXPORTER logging
+ENV OTEL_TRACES_EXPORTER none
 
 COPY . /usr/src/app
 RUN lein do clean, uberjar && \
