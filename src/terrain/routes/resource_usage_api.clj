@@ -15,6 +15,14 @@
    (context "/resource-usage" []
      :tags ["resource-usage"]
 
+     (context "/summary" []
+       (GET "/" []
+         :middleware [require-authentication]
+         :summary schema/ResourceSummarySummary
+         :description schema/ResourceSummaryDescription
+         :return schema/ResourceSummary
+         (ok (rua/resource-summary (:username current-user)))))
+
      (context "/cpu" []
        (GET "/total" []
          :middleware [require-authentication]

@@ -103,3 +103,10 @@
   (-> (resource-usage-api ["admin" "cpu" "events" event-id])
       (http/delete)
       (:body)))
+
+(defn resource-summary
+  "Calls the /summary/:username endpoint in the resource-usage-api service and returns the result"
+  [username]
+  (-> (resource-usage-api ["summary" username])
+      (http/get {:as :json})
+      (:body)))
