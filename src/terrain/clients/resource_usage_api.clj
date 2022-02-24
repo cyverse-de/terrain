@@ -105,7 +105,6 @@
       (:body)))
 
 (defn resource-summary
-  "Calls the /summary/:username endpoint in the resource-usage-api service and returns the result"
   [username]
   (-> (resource-usage-api ["summary" username])
       (http/get {:as :json})
