@@ -103,3 +103,9 @@
   (-> (resource-usage-api ["admin" "cpu" "events" event-id])
       (http/delete)
       (:body)))
+
+(defn resource-summary
+  [username]
+  (-> (resource-usage-api ["summary" username])
+      (http/get {:as :json})
+      (:body)))

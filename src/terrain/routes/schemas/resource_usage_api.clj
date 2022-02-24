@@ -1,6 +1,7 @@
 (ns terrain.routes.schemas.resource-usage-api
   (:require [common-swagger-api.schema :refer [describe]]
-            [schema.core :refer [defschema optional-key maybe]])
+            [schema.core :refer [defschema optional-key maybe]]
+            [terrain.routes.schemas.data-usage-api :refer [UserCurrentDataTotal]])
   (:import [java.util UUID]))
 
 (def CurrentTotalSummary "Get the current CPU hours total for the user")
@@ -35,6 +36,8 @@
 (def UpdateEventDescription "Updates a single event in the system")
 (def DeleteEventSummary "Deletes an event")
 (def DeleteEventDescription "Deletes a single event in the system")
+(def ResourceSummarySummary "A summary of a user's resource usage")
+(def ResourceSummaryDescription "A summary of a user's resource usage, including CPU hours, data usage, jobs run, and current plan")
 
 (def WorkerID (describe UUID "The UUID assigned to a worker"))
 (def EventID (describe UUID "The UUID assigned to an event"))
@@ -80,6 +83,10 @@
    :effective_start (describe String "The start date for the time range during which the total is applicable")
    :effective_end   (describe String "The end date for the time range during which the total is applicable ")
    :last_modified   (describe String "The date the record in the database was last modified")})
+
+(defschema ResourceSummary
+  {:cpu_usage  (describe CPUHoursTotal "The object containing the CPU hours total")
+   :data_usage (describe UserCurrentDataTotal "The object containing the data usage total")})
 
 (defschema Event
   {:id                      EventID
