@@ -106,13 +106,10 @@
 (defschema Quota
   {:id                (describe String "The UUID assigned to the quota")
    :quota             (describe (maybe Double) "The quota's value")
-   :added_by          (describe (maybe String) "The user that added the quota")
-   :last_modified_by  (describe (maybe String) "When the quota was last modified")
    :resource_type     (describe ResourceType "The resource type of the quota")})
 
 (defschema UserPlan
   {:id                   (describe String "The user plan's UUID")
-   :added_by             (describe String "Who added the user plan")
    :effective_start_date (describe String "The date the user's plan takes effect")
    :effective_end_date   (describe String "The date the user's plan ends")
    :last_modified_by     (describe String "The date the record was last modified")
