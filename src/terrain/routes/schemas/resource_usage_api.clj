@@ -112,7 +112,6 @@
   {:id                   (describe String "The user plan's UUID")
    :effective_start_date (describe String "The date the user's plan takes effect")
    :effective_end_date   (describe String "The date the user's plan ends")
-   :last_modified_by     (describe String "The date the record was last modified")
    :plan                 (describe Plan "The type of plan the user has")
    :quotas               (describe [Quota] "The list of quotas that the user has with their plan")
    :users                (describe QMSUser "User information from the quota management system")})
