@@ -99,9 +99,9 @@
    :username (describe String "The user's username in QMS, probably the same as in the DE")})
 
 (defschema ResourceType
-  {:id   (describe String "The UUID for the resource type")
-   :name (describe String "The name of the resource type")
-   :unit (describe String "The unit type for the resource")})
+  {:id          (describe String "The UUID for the resource type")
+   :name        (describe String "The name of the resource type")
+   :description (describe String "The description of the resource type")})
 
 (defschema Quota
   {:id                (describe String "The UUID assigned to the quota")
