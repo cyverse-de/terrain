@@ -131,6 +131,11 @@
   [props config-valid configs]
   "terrain.routes.resource-usage-api" true)
 
+(cc/defprop-optboolean qms-api-routes-enabled
+  "Enables or disables the QMS related endpoints"
+  [props config-valid configs]
+  "terrain.routes.qms-api" true)
+
 (cc/defprop-optboolean data-usage-api-routes-enabled
   "Enables or disables data-usage-api endpoints."
   [props config-valid configs]
@@ -557,6 +562,11 @@
   "The base URI for the resource-usage-api service."
   [props config-valid configs]
   "terrain.resource-usage-api.base-uri" "http://resource-usage-api")
+
+(cc/defprop-optstr qms-api-uri
+  "The base URI for the QMS service."
+  [props config-valid configs]
+  "terrain.qms.base-uri" "http://qms")
 
 (cc/defprop-optstr data-usage-api-uri
   "The base URI for the data-usage-api service."
