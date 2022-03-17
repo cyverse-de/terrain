@@ -40,7 +40,7 @@
    :usage         (describe Double "The usage value")
    :resource_type ResourceType})
 
-(defschema AdminUsagesResponse
+(defschema UsagesResponse
   {(optional-key :result) (describe (maybe [Usage]) "The list of usages")
    (optional-key :error)  (describe (maybe String) "The error message")
    :status                (describe String "The status of the response")})
@@ -91,7 +91,7 @@
    :usages               (describe [Usage] "The list of usages associated with the user's plan")})
 
 (defschema UserPlanResponse
-  {(optional-key :result) (describe (maybe [UserPlan]) "The user's plan")
+  {(optional-key :result) (describe (maybe UserPlan) "The user's plan")
    (optional-key :error)  (describe (maybe String) "The error message")
    :status                (describe String "The status of the response")})
 

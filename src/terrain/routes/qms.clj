@@ -31,13 +31,23 @@
          :return schema/PlanResponse
          (ok (qms/single-plan plan-id))))
 
-     (context "/users" []
+     ;;; It's /user and not /users since this is for the logged-in user and not
+     ;;; an admin-only lookup, which would require the username to be included
+     ;;; in the path or query-parameters.
+     (context "/user" []
        (GET "/plan" []
          :middleware [require-authentication]
          :summary schema/GetUserPlanSummary
          :description schema/GetUserPlanDescription
          :return schema/UserPlanResponse
-         (ok (qms/user-plan current-user)))))))
+         (ok (qms/user-plan current-user)))
+
+       (GET "/usages" []
+         :middleware [require-authentication]
+         :summary schema/GetUserUsagesSummary
+         :description schema/GetUserUsagesDescription
+         :return schema/UsagesResponse
+         (ok (qms/get-usages current-user)))))))
 
 (defn admin-qms-api-routes
   []
@@ -63,8 +73,15 @@
            :middleware [require-authentication]
            :summary schema/GetUserUsagesSummary
            :description schema/GetUserUsagesDescription
-           :return schema/AdminUsagesResponse
+           :return schema/UsagesResponse
            (ok (qms/get-usages username)))
+
+         (GET "/plan" []
+           :middleware [require-authentication]
+           :summary schema/GetUserPlanSummary
+           :description schema/GetUserPlanDescription
+           :return schema/UserPlanResponse
+           (ok (qms/user-plan username)))
 
          (PUT "/plan/:plan-name" []
            :middleware [require-authentication]
