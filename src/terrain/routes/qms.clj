@@ -47,7 +47,7 @@
          :summary schema/GetUserUsagesSummary
          :description schema/GetUserUsagesDescription
          :return schema/UsagesResponse
-         (ok (qms/get-usages current-user)))))))
+         (ok (qms/get-usages (:shortUsername current-user))))))))
 
 (defn admin-qms-api-routes
   []
