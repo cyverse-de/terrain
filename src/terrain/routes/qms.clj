@@ -40,7 +40,7 @@
          :summary schema/GetUserPlanSummary
          :description schema/GetUserPlanDescription
          :return schema/UserPlanResponse
-         (ok (qms/user-plan current-user)))
+         (ok (qms/user-plan (:shortUsername current-user))))
 
        (GET "/usages" []
          :middleware [require-authentication]
