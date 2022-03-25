@@ -16,7 +16,8 @@
             [terrain.clients.data-info.raw :as data-raw]
             [terrain.util.config :as cfg]
             [terrain.services.filesystem.common-paths :as paths]
-            [terrain.services.filesystem.icat :as jargon])
+            [terrain.services.filesystem.icat :as jargon]
+            [otel.otel :as otel])
   (:import [clojure.lang IPersistentMap]
            [java.io InputStream]
            [org.apache.tika Tika]))
