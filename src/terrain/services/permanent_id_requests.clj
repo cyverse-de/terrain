@@ -17,7 +17,8 @@
             [terrain.clients.metadata.raw :as metadata]
             [terrain.clients.notifications :as notifications]
             [terrain.util.config :as config]
-            [terrain.util.email :as email]))
+            [terrain.util.email :as email]
+            [otel.otel :as otel]))
 
 ;; Status Codes.
 (def ^:private status-code-completion "Completion")
@@ -232,25 +233,26 @@ If this dataset accompanies a paper, please contact us with the DOI for that pap
 
 (defn- move-data-item-to-staging
   [{:keys [shortUsername] :as requesting-user} {:keys [path] :as folder}]
-  (let [curators-group (config/permanent-id-curators-group)
-        async-task-id  (move-folder requesting-user
-                                    (config/irods-user)
-                                    folder
-                                    (config/permanent-id-staging-dir))
-        share-fn       (fn [staged-path]
-                         (data-info/share (config/irods-user) [curators-group] [staged-path] "own")
-                         (data-info/share (config/irods-user) [shortUsername] [staged-path] "write"))
-        share-poller   #(async-move-poller requesting-user
-                                           folder
-                                           (config/permanent-id-staging-dir)
-                                           async-task-id
-                                           share-fn)]
+  (otel/with-span [s ["move-data-item-to-staging"]]
+    (let [curators-group (config/permanent-id-curators-group)
+          async-task-id  (move-folder requesting-user
+                                      (config/irods-user)
+                                      folder
+                                      (config/permanent-id-staging-dir))
+          share-fn       (fn [staged-path]
+                           (data-info/share (config/irods-user) [curators-group] [staged-path] "own")
+                           (data-info/share (config/irods-user) [shortUsername] [staged-path] "write"))
+          share-poller   #(async-move-poller requesting-user
+                                             folder
+                                             (config/permanent-id-staging-dir)
+                                             async-task-id
+                                             share-fn)]
 
-    (when async-task-id
-      (async-tasks-client/run-async-thread async-task-id
-                                           share-poller
-                                           "permanent-id-move-staging"))
-    (format-staging-path path)))
+      (when async-task-id
+        (async-tasks-client/run-async-thread async-task-id
+                                             share-poller
+                                             "permanent-id-move-staging"))
+      (format-staging-path path))))
 
 (defn- stage-data-item
   [requesting-user {:keys [path] :as folder}]
@@ -261,24 +263,25 @@ If this dataset accompanies a paper, please contact us with the DOI for that pap
 
 (defn- move-data-item-to-published
   [requesting-user {:keys [path] :as folder}]
-  (let [curators-group (config/permanent-id-curators-group)
-        async-task-id  (move-folder requesting-user
-                                    (config/irods-user)
-                                    folder
-                                    (config/permanent-id-publish-dir))
-        share-fn       (fn [publish-path]
-                         (data-info/share (config/irods-user) [curators-group] [publish-path] "own"))
-        share-poller   #(async-move-poller requesting-user
-                                           folder
-                                           (config/permanent-id-publish-dir)
-                                           async-task-id
-                                           share-fn)]
+  (otel/with-span [s ["move-data-item-to-published"]]
+    (let [curators-group (config/permanent-id-curators-group)
+          async-task-id  (move-folder requesting-user
+                                      (config/irods-user)
+                                      folder
+                                      (config/permanent-id-publish-dir))
+          share-fn       (fn [publish-path]
+                           (data-info/share (config/irods-user) [curators-group] [publish-path] "own"))
+          share-poller   #(async-move-poller requesting-user
+                                             folder
+                                             (config/permanent-id-publish-dir)
+                                             async-task-id
+                                             share-fn)]
 
-    (when async-task-id
-      (async-tasks-client/run-async-thread async-task-id
-                                           share-poller
-                                           "permanent-id-move-publish"))
-    (format-publish-path path)))
+      (when async-task-id
+        (async-tasks-client/run-async-thread async-task-id
+                                             share-poller
+                                             "permanent-id-move-publish"))
+      (format-publish-path path))))
 
 (defn- publish-data-item
   [requesting-user {:keys [path] :as folder}]
