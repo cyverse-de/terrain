@@ -84,9 +84,10 @@
 
 (defn path-is-dir?
   [path]
-  (with-jargon (jargon/jargon-cfg) [cm]
-    (validators/path-exists cm path)
-    (is-dir? cm path)))
+  (otel/with-span [s ["path-is-dir?" {:attributes {"irods.path" path}}]]
+    (with-jargon (jargon/jargon-cfg) [cm]
+      (validators/path-exists cm path)
+      (is-dir? cm path))))
 
 (defn decorate-stat
   [cm user stat]
@@ -101,14 +102,15 @@
 
 (defn path-stat
   ([cm user path]
-   (let [path (ft/rm-last-slash path)]
-     (log/warn "[path-stat] user:" user "path:" path)
-     (validators/path-exists cm path)
-     (decorate-stat cm user (stat cm path))))
-
+   (otel/with-span [s ["path-stat [inner]" {:attributes {"irods.path" path}}]]
+     (let [path (ft/rm-last-slash path)]
+       (log/warn "[path-stat] user:" user "path:" path)
+       (validators/path-exists cm path)
+       (decorate-stat cm user (stat cm path)))))
   ([user path]
-   (with-jargon (jargon/jargon-cfg) [cm]
-     (path-stat cm user path))))
+   (otel/with-span [s ["path-stat" {:attributes {"irods.path" path}}]]
+     (with-jargon (jargon/jargon-cfg) [cm]
+       (path-stat cm user path)))))
 
 (defn- dir-stack
   "Obtains a stack of parent directories for a directory path."
@@ -122,11 +124,13 @@
 
 (defn can-create-dir?
   ([cm user path]
-   ((every-pred (partial is-dir? cm) (partial is-writeable? cm user))
-    (log/spy :warn (deepest-extant-parent cm path))))
+   (otel/with-span [s ["can-create-dir? [inner]" {:attributes {"irods.path" path}}]]
+     ((every-pred (partial is-dir? cm) (partial is-writeable? cm user))
+      (log/spy :warn (deepest-extant-parent cm path)))))
   ([user path]
-   (with-jargon (jargon/jargon-cfg) [cm]
-     (can-create-dir? cm user path))))
+   (otel/with-span [s ["can-create-dir?" {:attributes {"irods.path" path}}]]
+     (with-jargon (jargon/jargon-cfg) [cm]
+       (can-create-dir? cm user path)))))
 
 (defn do-stat
   [{user :user} body]
