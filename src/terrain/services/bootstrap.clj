@@ -8,7 +8,8 @@
     [terrain.clients.apps.raw :as apps-client]
     [terrain.clients.data-info :as data-info-client]
     [terrain.services.user-prefs :as prefs]
-    [terrain.util.service :as service]))
+    [terrain.util.service :as service]
+    [otel.otel :as otel]))
 
 (defn- decode-error-response
   [body]
@@ -35,22 +36,26 @@
 
 (defn- get-login-session
   [ip-address user-agent]
-  (trap-bootstrap-request
-    #(select-keys (apps-client/record-login ip-address user-agent) [:login_time :auth_redirect])))
+  (otel/with-span [s ["get-login-session"]]
+    (trap-bootstrap-request
+      #(select-keys (apps-client/record-login ip-address user-agent) [:login_time :auth_redirect]))))
 
 (defn- get-apps-info
   []
-  (trap-bootstrap-request #(apps-client/bootstrap)))
+  (otel/with-span [s ["get-apps-info"]]
+    (trap-bootstrap-request #(apps-client/bootstrap))))
 
 (defn- get-user-data-info
   [user]
-  (trap-bootstrap-request
-    #(data-info-client/user-base-paths user)))
+  (otel/with-span [s ["get-user-data-info"]]
+    (trap-bootstrap-request
+      #(data-info-client/user-base-paths user))))
 
 (defn- get-user-prefs
   [username]
-  (trap-bootstrap-request
-    #(prefs/user-prefs username)))
+  (otel/with-span [s ["get-user-prefs"]]
+    (trap-bootstrap-request
+      #(prefs/user-prefs username))))
 
 (defn bootstrap
   "This service obtains information about and initializes the workspace for the authenticated user.
