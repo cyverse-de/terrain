@@ -5,7 +5,8 @@
             [clojure.tools.logging :as log]
             [clojure-commons.file-utils :as ft]
             [terrain.clients.data-info :as di]
-            [terrain.util.config :as cfg]))
+            [terrain.util.config :as cfg]
+            [otel.otel :as otel]))
 
 (defn- convert-default-output-dir-keys
   [prefs]
@@ -54,17 +55,18 @@
    default output directory then this function ensures that it exists. Otherwise, this function
    ensures that the system default output directory exists."
   [prefs]
-  (let [sys-output-dir (ft/rm-last-slash (sysdefoutdir prefs))
-        output-dir     (ft/rm-last-slash (extract-default-output-dir prefs))
-        user           (:shortUsername current-user)]
-    (log/debug "sys-output-dir" sys-output-dir)
-    (log/debug "output-dir" output-dir)
-    (cond
-      (not (string/blank? output-dir))     (di/ensure-dir-created user output-dir)
-      (not (string/blank? sys-output-dir)) (di/ensure-dir-created user sys-output-dir)
-      :else                                (log/warn "Not creating default output directory for"
-                                                     user))
-    prefs))
+  (otel/with-span [s ["create-default-output-dir"]]
+    (let [sys-output-dir (ft/rm-last-slash (sysdefoutdir prefs))
+          output-dir     (ft/rm-last-slash (extract-default-output-dir prefs))
+          user           (:shortUsername current-user)]
+      (log/debug "sys-output-dir" sys-output-dir)
+      (log/debug "output-dir" output-dir)
+      (cond
+        (not (string/blank? output-dir))     (di/ensure-dir-created user output-dir)
+        (not (string/blank? sys-output-dir)) (di/ensure-dir-created user sys-output-dir)
+        :else                                (log/warn "Not creating default output directory for"
+                                                       user))
+      prefs)))
 
 (defn handle-blank-default-output-dir
   [user prefs]
@@ -82,26 +84,29 @@
 
 (defn validate-selected-output-dir
   [prefs]
-  (let [user                (:shortUsername current-user)
-        user-default        (default-output-dir-key prefs)
-        sys-default         (:system_default_output_dir prefs)
-        restore-sys-default #(assoc prefs default-output-dir-key sys-default)]
-    (cond (= user-default sys-default)                   prefs
-          (di/can-create-dir? user (:path user-default)) prefs
-          :else                                          (restore-sys-default))))
+  (otel/with-span [s ["validate-selected-output-dir"]]
+    (let [user                (:shortUsername current-user)
+          user-default        (default-output-dir-key prefs)
+          sys-default         (:system_default_output_dir prefs)
+          restore-sys-default #(assoc prefs default-output-dir-key sys-default)]
+      (cond (= user-default sys-default)                   prefs
+            (di/can-create-dir? user (:path user-default)) prefs
+            :else                                          (restore-sys-default)))))
 
 (defn process-outgoing
   [user prefs]
-  (->> prefs
-       (convert-default-output-dir-keys)
-       (handle-blank-default-output-dir user)
-       (handle-string-default-output-dir)
-       (add-system-default-output-dir)
-       (validate-selected-output-dir)
-       (create-default-output-dir)))
+  (otel/with-span [s ["process-outgoing"]]
+    (->> prefs
+         (convert-default-output-dir-keys)
+         (handle-blank-default-output-dir user)
+         (handle-string-default-output-dir)
+         (add-system-default-output-dir)
+         (validate-selected-output-dir)
+         (create-default-output-dir))))
 
 (defn process-incoming
   [user prefs]
-  (->> prefs
-       (add-system-default-output-dir)
-       (create-default-output-dir)))
+  (otel/with-span [s ["process-incoming"]]
+    (->> prefs
+         (add-system-default-output-dir)
+         (create-default-output-dir))))
