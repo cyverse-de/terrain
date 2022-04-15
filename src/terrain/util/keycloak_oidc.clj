@@ -1,11 +1,11 @@
 (ns terrain.util.keycloak-oidc
   (:use [slingshot.slingshot :only [try+ throw+]])
   (:require [clojure.string :as string]
-            [clojure.tools.logging :as log]
             [clojure-commons.jwt :as jwt]
             [clojure-commons.response :as resp]
             [terrain.clients.keycloak :as kc]
-            [terrain.util.config :as config]))
+            [terrain.util.config :as config]
+            [otel.otel :as otel]))
 
 (defn user-from-token
   "Extracts user information from a Keycloak OIDC token."
@@ -29,6 +29,28 @@
       (throw+ (ex-info (str "Missing required JWT claims: " missing)
                        {:type :validation :cause :missing-fields})))))
 
+(def cached-certs (atom nil))
+(def cached-certs-time (atom nil))
+(def cache-ttl (* 24 60 60 1000)) ;; 1 day, milliseconds
+
+(defn- update-cert-cache
+  []
+  (otel/with-span [s ["update-cert-cache"]]
+    (let [new-certs (kc/get-oidc-certs)]
+      (reset! cached-certs-time (System/currentTimeMillis))
+      (reset! cached-certs new-certs))))
+
+(defn- validate-with-cache
+  [token]
+  (if (and (sequential? @cached-certs)
+           (number? @cached-certs-time)
+           (< (- (System/currentTimeMillis) @cached-certs-time) cache-ttl)) ;; (now - cached-time) < cache-ttl
+    (try+
+      (jwt/jwk-validate @cached-certs token)
+      (catch Object _
+        (jwt/jwk-validate (update-cert-cache) token)))
+    (jwt/jwk-validate (update-cert-cache) token)))
+
 (defn validate-token
   "Ring middleware to verify that a Keycloak OIDC token is valid. The JWT claims present in the token
    will be extracted and associated with the request."
@@ -36,7 +58,7 @@
   (fn [request]
     (try+
      (if-let [token (token-fn request)]
-       (let [claims (jwt/jwk-validate (kc/get-oidc-certs) token)]
+       (let [claims (validate-with-cache token)]
          (validate-claims claims)
          (handler (assoc request :jwt-claims claims)))
        (resp/unauthorized "No Keycloak OIDC token found in request."))
