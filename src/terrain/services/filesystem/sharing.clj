@@ -77,7 +77,7 @@
 
 (defn share
   [user share-withs fpaths perm]
-  (with-jargon (icat/jargon-cfg) :client-user user [cm]
+  (with-jargon (icat/jargon-cfg) [cm]
     (validators/user-exists cm user)
     (validators/all-users-exist cm share-withs)
     (validators/all-paths-exist cm fpaths)
@@ -145,7 +145,7 @@
   [user unshare-withs fpaths]
   (log/debug "entered unshare")
 
-  (with-jargon (icat/jargon-cfg) :client-user user [cm]
+  (with-jargon (icat/jargon-cfg) [cm]
     (validators/user-exists cm user)
     (validators/all-users-exist cm unshare-withs)
     (validators/all-paths-exist cm fpaths)
