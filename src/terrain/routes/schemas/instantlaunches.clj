@@ -55,6 +55,7 @@
          :is_public                (describe Boolean "Whether or not the quick launch is public")
          :submission               (describe Any "The submission associated with the instant launch/quick launch")
          :app_id                   (describe String "The UUID of the app used in the instant launch/quick launch")
+         :app_version_id           (describe String "The UUID of the app version used in the instant launch/quick launch")
          :app_name                 (describe String "The name of the app used in the instant launch/quick launch")
          :app_description          (describe String "The description of the app used in the instant launch/quick launch")
          :app_deleted              (describe Boolean "Whether or not the app is deleted")
