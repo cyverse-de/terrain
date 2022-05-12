@@ -46,7 +46,7 @@
     :command (describe [String] "The command used to start the analysis")}))
 
 (defschema ContainerStateWaiting
-  {:reason                 (describe (maybe String) "The reason the container is in the waiting state")
+  {(optional-key :reason)  (describe (maybe String) "The reason the container is in the waiting state")
    (optional-key :message) (describe (maybe String) "The message associated with the waiting state")})
 
 (defschema ContainerStateRunning
