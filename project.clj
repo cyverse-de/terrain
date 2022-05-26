@@ -40,7 +40,7 @@
                  [org.cyverse/cyverse-groups-client "0.1.8"]
                  [org.cyverse/common-cfg "2.8.2"]
                  [org.cyverse/common-cli "2.8.1"]
-                 [org.cyverse/common-swagger-api "3.3.0"]
+                 [org.cyverse/common-swagger-api "3.3.2-SNAPSHOT"]
                  [org.cyverse/kameleon "3.0.6"
                   :exclusion [com.impossibl.pgjdbc-ng/pgjdbc-ng]]
                  [com.impossibl.pgjdbc-ng/pgjdbc-ng "0.8.9"]
