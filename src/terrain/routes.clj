@@ -22,6 +22,7 @@
         [terrain.routes.apps.tools]
         [terrain.routes.bags]
         [terrain.routes.bootstrap]
+        [terrain.routes.callbacks]
         [terrain.routes.dashboard-aggregator]
         [terrain.routes.data]
         [terrain.routes.fileio]
@@ -187,6 +188,7 @@
   []
   (util/flagged-routes
    (admin-token-routes)
+   (callback-routes)
    (token-routes)
    (unsecured-misc-routes)
    (unsecured-notification-routes)))
@@ -289,6 +291,7 @@
                                      {:name "app-pipelines", :description "App Pipeline Endpoints"}
                                      {:name "bags", :description "Item Bag Endpoints"}
                                      {:name "bootstrap", :description "Bootstrap Endpoints"}
+                                     {:name "callbacks", :description "Callback Endpoints"}
                                      {:name "coge", :description "CoGe Endpoints"}
                                      {:name "collaborator-lists", :description "Collaborator List Endpoints"}
                                      {:name "communities", :description "Community Endpoints"}

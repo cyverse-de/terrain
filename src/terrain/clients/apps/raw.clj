@@ -122,10 +122,10 @@
 (defn featured-apps
   [params]
   (:body
-    (client/get (apps-url "apps" "categories" "featured")
-                (disable-redirects
-                  {:query-params (secured-params params)
-                   :as           :json}))))
+   (client/get (apps-url "apps" "categories" "featured")
+               (disable-redirects
+                {:query-params (secured-params params)
+                 :as           :json}))))
 
 (defn apps-in-community
   [community-id]
@@ -486,10 +486,10 @@
 (defn list-job-stats
   [params]
   (:body
-    (client/get (apps-url "analyses" "stats")
-                (disable-redirects
-                  {:query-params (secured-params params)
-                   :as           :json}))))
+   (client/get (apps-url "analyses" "stats")
+               (disable-redirects
+                {:query-params (secured-params params)
+                 :as           :json}))))
 
 (defn list-job-permissions
   [body params]
@@ -1220,3 +1220,12 @@
                      (disable-redirects
                       {:query-params (secured-params)
                        :as           :json}))))
+
+(defn update-agave-job-status
+  [job-id body params]
+  (:body (client/post (apps-url "callbacks" "agave-job" job-id)
+                      (disable-redirects
+                       {:query-params params
+                        :form-params  body
+                        :content-type :json
+                        :as           :json}))))
