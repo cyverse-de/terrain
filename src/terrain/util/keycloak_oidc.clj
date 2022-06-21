@@ -36,7 +36,7 @@
   [:preferred_username :email :given_name :family_name :name :entitlement])
 
 (def ^:private required-service-account-claims
-  [:preferred_username :entitlement :realm_access])
+  [:preferred_username :realm_access])
 
 (defn- validate-claims
   "Verifies that all required claims are present in a JWT."
