@@ -7,24 +7,44 @@
             [terrain.util.config :as config]
             [otel.otel :as otel]))
 
+(defn- is-service-account?
+  [{:keys [preferred_username]}]
+  (string/starts-with? preferred_username "service-account-"))
+
 (defn user-from-token
   "Extracts user information from a Keycloak OIDC token."
   [{:keys [jwt-claims]}]
-  {:shortUsername (:preferred_username jwt-claims)
-   :username      (str (:preferred_username jwt-claims) "@" (config/uid-domain))
-   :email         (:email jwt-claims)
-   :firstName     (:given_name jwt-claims)
-   :lastName      (:family_name jwt-claims)
-   :commonName    (:name jwt-claims)
-   :entitlement   (:entitlement jwt-claims)})
+  (if (is-service-account? jwt-claims)
+    nil
+    {:shortUsername (:preferred_username jwt-claims)
+     :username      (str (:preferred_username jwt-claims) "@" (config/uid-domain))
+     :email         (:email jwt-claims)
+     :firstName     (:given_name jwt-claims)
+     :lastName      (:family_name jwt-claims)
+     :commonName    (:name jwt-claims)
+     :entitlement   (:entitlement jwt-claims)}))
+
+(defn service-account-from-token
+  "Extract service account information from a Keycloak OIDC token."
+  [{:keys [jwt-claims]}]
+  (if (is-service-account? jwt-claims)
+    {:username (:preferred_username jwt-claims)
+     :roles (:roles (:realm_access jwt-claims))}
+    nil))
 
 (def ^:private required-claims
   [:preferred_username :email :given_name :family_name :name :entitlement])
 
+(def ^:private required-service-account-claims
+  [:preferred_username :entitlement :realm_access])
+
 (defn- validate-claims
   "Verifies that all required claims are present in a JWT."
   [jwt]
-  (let [missing (into [] (filter (comp nil? jwt) required-claims))]
+  (let [req-claims (if (is-service-account? jwt)
+                       required-service-account-claims
+                       required-claims)
+        missing (into [] (filter (comp nil? jwt) req-claims))]
     (when (seq missing)
       (throw+ (ex-info (str "Missing required JWT claims: " missing)
                        {:type :validation :cause :missing-fields})))))

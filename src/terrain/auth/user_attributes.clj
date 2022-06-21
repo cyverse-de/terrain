@@ -17,9 +17,14 @@
   fake-user nil)
 
 (def
-  ^{:doc "The authenticated user or nil if the service is unsecured."
+  ^{:doc "The authenticated user or nil if the service is unsecured or we have a service account instead."
     :dynamic true}
   current-user nil)
+
+(def
+  ^{:doc "The authenticated service account or nil if the service is unsecured or we have a real user."
+    :dynamic true}
+  service-account nil)
 
 ;; TODO: fix common name retrieval when we add it as an attribute.
 (defn user-from-attributes
@@ -88,6 +93,13 @@
   (fn [request]
     (binding [current-user (user-info-fn request)]
       (handler (assoc request :user-info (user-info-from-current-user current-user))))))
+
+(defn wrap-service-account
+  "Generates a Ring handler function that stores service account information in service-account."
+  [handler service-account-info-fn]
+  (fn [request]
+    (binding [service-account (service-account-info-fn request)]
+      (handler (assoc request :service-account service-account)))))
 
 (defn- find-auth-handler
   "Finds an authentication handler for a request."
@@ -175,7 +187,9 @@
 
 (defn- wrap-keycloak-oidc
   [handler]
-  (-> (wrap-current-user handler keycloak-oidc-util/user-from-token)
+  (-> handler
+      (wrap-current-user keycloak-oidc-util/user-from-token)
+      (wrap-service-account keycloak-oidc-util/service-account-from-token)
       (keycloak-oidc-util/validate-token get-keycloak-oidc-token)))
 
 (defn authenticate-current-user
@@ -210,7 +224,15 @@
   (fn [req]
     (if (:user-info req)
       (handler req)
-      (resp/unauthorized "No authentication information found in request."))))
+      (resp/unauthorized "No user authentication information found in request."))))
+
+(defn require-service-account
+  "Middleware that checks for a service account attached to an incoming requests and returns a 401 if it's not found."
+  [handler]
+  (fn [req]
+    (if (:service-account req)
+      (handler req)
+      (resp/unauthorized "No service account authentication information found in request."))))
 
 (defn resolve-test-user
   "Attempts to resolve a test user from either a username or a map of user attributes."
