@@ -20,6 +20,7 @@
         [terrain.routes.apps.pipelines]
         [terrain.routes.apps.reference-genomes]
         [terrain.routes.apps.tools]
+        [terrain.routes.apps.versions]
         [terrain.routes.bags]
         [terrain.routes.bootstrap]
         [terrain.routes.callbacks]
@@ -97,6 +98,7 @@
    (app-elements-routes)
    (app-pipeline-routes)
    (apps-routes)
+   (app-version-routes)
    (misc-metadata-routes)))
 
 ; Add new secured routes to this function, not to (secured-routes).
@@ -303,6 +305,7 @@
                                      {:name "app-element-types", :description, "App Element Endpoints"}
                                      {:name "app-metadata", :description "App Metadata Endpoints"}
                                      {:name "app-pipelines", :description "App Pipeline Endpoints"}
+                                     {:name "app-versions", :description, "App Version Endpoints"}
                                      {:name "bags", :description "Item Bag Endpoints"}
                                      {:name "bootstrap", :description "Bootstrap Endpoints"}
                                      {:name "callbacks", :description "Callback Endpoints"}
