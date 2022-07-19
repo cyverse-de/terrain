@@ -184,6 +184,12 @@
    (admin-qms-api-routes)
    (route/not-found (service/unrecognized-path-response))))
 
+(defn service-account-routes
+  []
+  (util/flagged-routes
+   (service-account-qms-api-routes)
+   (route/not-found (service/unrecognized-path-response))))
+
 (defn unsecured-routes
   []
   (util/flagged-routes
@@ -201,6 +207,13 @@
     validate-current-user
     wrap-logging]
    (admin-routes)))
+
+(def service-account-handler
+  (middleware
+    [authenticate-current-user
+     wrap-user-info
+     wrap-logging]
+    (service-account-routes)))
 
 (def secured-routes-handler
   (middleware
@@ -235,6 +248,7 @@
   (util/flagged-routes
    unsecured-routes-handler
    (context "/admin" [] admin-handler)
+   (context "/service" [] service-account-handler)
    (context "/secured" [] secured-routes-handler)
    optionally-authenticated-routes-handler
    secured-routes-no-context-handler))
@@ -315,7 +329,8 @@
                                      {:name "token", :description "OAuth Tokens"}
                                      {:name "user-info", :description "User Information Endpoints"}
                                      {:name "webhooks", :description "Webhook Endpoints"}
-                                     {:name "vice", :description "VICE Endpoints"}]
+                                     {:name "vice", :description "VICE Endpoints"}
+                                     {:name "service-account-qms", :description "Service Account Quota Management Service Endpoints"}]
                :securityDefinitions security-definitions}})
   (middleware
    [otel-middleware
