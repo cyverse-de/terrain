@@ -26,6 +26,16 @@
     :dynamic true}
   service-account nil)
 
+(defn no-auth-info
+  "Returns a response indicating that no authentication information was found."
+  []
+  (resp/unauthorized "No user authentication information found in request."))
+
+(defn not-permitted
+  "Returns a response indicating that the authenticated user account is not permitted to call the endpoint."
+  []
+  (resp/forbidden "This account is not permitted to call this endpoint."))
+
 ;; TODO: fix common name retrieval when we add it as an attribute.
 (defn user-from-attributes
   "Creates a map of values from user attributes obtained during the authentication process."
@@ -115,7 +125,7 @@
     (log/log 'AccessLogger :trace nil "entering terrain.auth.user-attributes/wrap-auth-selection")
     (if-let [auth-handler (find-auth-handler request phs)]
       (auth-handler request)
-      (resp/unauthorized "No authentication information found in request."))))
+      (no-auth-info))))
 
 (defn- get-fake-auth
   "Returns a non-nil value if we're using fake authentication."
@@ -224,15 +234,26 @@
   (fn [req]
     (if (:user-info req)
       (handler req)
-      (resp/unauthorized "No user authentication information found in request."))))
+      (no-auth-info))))
 
 (defn require-service-account
   "Middleware that checks for a service account attached to an incoming requests and returns a 401 if it's not found."
-  [handler]
-  (fn [req]
-    (if (:service-account req)
-      (handler req)
-      (resp/unauthorized "No service account authentication information found in request."))))
+  [handler & [authorized-roles]]
+  (fn [{:keys [service-account user-info] :as req}]
+    (let [authorized-roles (set authorized-roles)
+          authorized-role? (fn [role] (contains? authorized-roles role))]
+      (cond
+        (and service-account (empty? authorized-roles))
+        (handler req)
+
+        (and service-account (some authorized-role? (:roles service-account)))
+        (handler req)
+
+        (or service-account user-info)
+        (not-permitted)
+
+        :else
+        (no-auth-info)))))
 
 (defn resolve-test-user
   "Attempts to resolve a test user from either a username or a map of user attributes."
