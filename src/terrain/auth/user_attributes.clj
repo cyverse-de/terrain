@@ -92,10 +92,11 @@
 (defn- user-info-from-current-user
   "Converts the current-user to the user info structure expected in the request."
   [user]
-  {:user       (:shortUsername user)
-   :email      (:email user)
-   :first-name (:firstName user)
-   :last-name  (:lastName user)})
+  (when-not (nil? user)
+    {:user       (:shortUsername user)
+     :email      (:email user)
+     :first-name (:firstName user)
+     :last-name  (:lastName user)}))
 
 (defn wrap-current-user
   "Generates a Ring handler function that stores user information in current-user."
