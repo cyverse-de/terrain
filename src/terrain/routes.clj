@@ -330,7 +330,7 @@
                                      {:name "user-info", :description "User Information Endpoints"}
                                      {:name "webhooks", :description "Webhook Endpoints"}
                                      {:name "vice", :description "VICE Endpoints"}
-                                     {:name "service-account-qms", :description "Service Account Quota Management Service Endpoints"}]
+                                     {:name "service-account-qms", :description "Service Account QMS Endpoints"}]
                :securityDefinitions security-definitions}})
   (middleware
    [otel-middleware
