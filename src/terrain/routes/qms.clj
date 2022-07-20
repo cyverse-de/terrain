@@ -104,7 +104,7 @@
          :path-params [username :- schema/Username]
 
          (PUT "/plan/:plan-name" []
-           :middleware [[require-service-account ["cyverse-subscription-updaters"]]]
+           :middleware [[require-service-account ["cyverse-subscription-updater"]]]
            :summary schema/UpdateUserPlanSummary
            :description schema/UpdateUserPlanDescription
            :path-params [plan-name :- schema/PlanName]
