@@ -1,7 +1,7 @@
 (ns terrain.routes.qms
   (:require [terrain.util.config :as config]
             [terrain.clients.qms :as qms]
-            [terrain.auth.user-attributes :refer [current-user require-authentication]]
+            [terrain.auth.user-attributes :refer [current-user require-authentication require-service-account]]
             [terrain.util :refer [optional-routes]]
             [common-swagger-api.schema :refer [context GET POST DELETE PUT]]
             [terrain.routes.schemas.qms :as schema]
@@ -85,6 +85,26 @@
 
          (PUT "/plan/:plan-name" []
            :middleware [require-authentication]
+           :summary schema/UpdateUserPlanSummary
+           :description schema/UpdateUserPlanDescription
+           :path-params [plan-name :- schema/PlanName]
+           :return schema/SuccessResponse
+           (ok (qms/update-user-plan username plan-name))))))))
+
+(defn service-account-qms-api-routes
+  []
+  (optional-routes
+   [config/qms-api-routes-enabled]
+
+   (context "/qms" []
+     :tags ["service-account-qms"]
+
+     (context "/users" []
+       (context "/:username" []
+         :path-params [username :- schema/Username]
+
+         (PUT "/plan/:plan-name" []
+           :middleware [[require-service-account ["cyverse-subscription-updater"]]]
            :summary schema/UpdateUserPlanSummary
            :description schema/UpdateUserPlanDescription
            :path-params [plan-name :- schema/PlanName]

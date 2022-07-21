@@ -14,13 +14,13 @@
 ;;; Admin
 (defn get-usages
   [username]
-  (-> (qms-api ["v1" "admin" "usages" username])
+  (-> (qms-api ["v1" "usages" username])
       (http/get {:as :json})
       (:body)))
 
 (defn add-usage
   [usage]
-  (-> (qms-api ["v1" "admin" "usages"])
+  (-> (qms-api ["v1" "usages"])
       (http/post {:form-params  usage
                   :as           :json
                   :content-type :json})
@@ -28,7 +28,7 @@
 
 (defn update-user-plan
   [username plan-name]
-  (-> (qms-api ["v1" "admin" "users" username plan-name])
+  (-> (qms-api ["v1" "users" username plan-name])
       (http/put {:as :json})
       (:body)))
 
