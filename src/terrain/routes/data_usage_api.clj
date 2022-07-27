@@ -21,6 +21,8 @@
           :summary schema/UserCurrentDataSummary
           :description schema/UserCurrentDataDescription
           :return schema/UserCurrentDataTotal
-          (ok (dua/user-current-usage (:username current-user))))))))
+          (ok (dua/user-current-usage (:username current-user))))
+        
+        (GET "/overage" [])))))
 
 

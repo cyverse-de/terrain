@@ -6,8 +6,8 @@
   (:require [common-swagger-api.schema.stats :as stats-schema]
             [terrain.util.config :as config]
             [terrain.services.fileio.controllers :as fio]
-            [terrain.util :as util]))
-
+            [terrain.util :as util]
+            [terrain.middleware :as mw]))
 
 (defn secured-fileio-routes
   "The routes for file IO endpoints."
@@ -31,7 +31,7 @@
        :description "Uploads a file to the CyVerse Data Store."
        :query [params FileUploadQueryParams]
        :multipart-params [file :- DataStoreUpload]
-       :middleware [fio/wrap-file-upload]
+       :middleware [fio/wrap-file-upload mw/check-user-data-overages]
        :return stats-schema/FileStat
 
        ;; The upload is handled in the middleware. All that remains to be done is to return the response body.
@@ -41,6 +41,7 @@
        :summary "Upload a File from a URL"
        :description (str "Schedules a task to have the DE retrieve the contents of a new file in the data store from "
                          "an FTP, HTTP, or HTTPS URL.")
+       :middleware [mw/check-user-data-overages]
        :body [body UrlUploadRequestBody]
        :return UrlUploadResponseBody
        (ok (fio/urlupload current-user body)))
@@ -49,6 +50,7 @@
        :summary "Save a File"
        :description (str "Overwrites the contents of a file in the Data Store. The file must exist already for this "
                          "endpoint to work. To save a new file, use the POST /terrain/secured/fileio/saveas endpoint.")
+       :middleware [mw/check-user-data-overages]
        :body [body FileSaveRequestBody]
        :return stats-schema/FileStat
        (ok (fio/save current-user body)))
@@ -57,6 +59,7 @@
        :summary "Save a New File"
        :description (str "Creates a new file in the data store. The file must not exist for this endpoint to work. "
                          "To overwrite an existing file, use the POST /terrain/secured/fileio/save endpoint.")
+       :middleware [mw/check-user-data-overages]
        :body [body FileSaveRequestBody]
        :return stats-schema/FileStat
        (ok (fio/saveas current-user body))))))
