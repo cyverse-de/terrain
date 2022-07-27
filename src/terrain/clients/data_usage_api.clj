@@ -16,3 +16,10 @@
   (-> (data-usage-api [username "data" "current"])
       (http/get {:as :json})
       (:body)))
+
+(defn user-data-overage?
+  [username]
+  (-> (data-usage-api [username "data" "overage"])
+      (http/get {:as :json})
+      (:body)
+      (:has_data_overage)))
