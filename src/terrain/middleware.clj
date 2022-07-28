@@ -1,6 +1,8 @@
 (ns terrain.middleware
   (:require [clojure.string :as string]
-            [terrain.auth.user-attributes :as user-attributes]))
+            [terrain.auth.user-attributes :as user-attributes]
+            [clojure-commons.response :as resp]
+            [terrain.clients.data-usage-api :as dua]))
 
 (defn- add-context-path
   "Adds a context path to the start of a URI path if it's not present."
@@ -36,3 +38,10 @@
       (binding [user-attributes/fake-user fake-user]
         (handler request)))
     handler))
+
+(defn check-user-data-overages
+  [handler]
+  (fn [req]
+    (if (dua/user-data-overage? (:username (:user-info req)))
+      (resp/forbidden "The account has data overages")
+      (handler req))))
