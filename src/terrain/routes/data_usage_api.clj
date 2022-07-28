@@ -10,19 +10,20 @@
 (defn data-usage-api-routes
   []
   (optional-routes
-    [config/data-usage-api-routes-enabled]
+   [config/data-usage-api-routes-enabled]
 
-    (context "/resource-usage" []
-      :tags ["resource-usage"]
+   (context "/resource-usage" []
+     :tags ["resource-usage"]
 
-      (context "/data" []
-        (GET "/current" []
-          :middleware [require-authentication]
-          :summary schema/UserCurrentDataSummary
-          :description schema/UserCurrentDataDescription
-          :return schema/UserCurrentDataTotal
-          (ok (dua/user-current-usage (:username current-user))))
-        
-        (GET "/overage" [])))))
+     (context "/data" []
+       (GET "/current" []
+         :middleware [require-authentication]
+         :summary schema/UserCurrentDataSummary
+         :description schema/UserCurrentDataDescription
+         :return schema/UserCurrentDataTotal
+         (ok (dua/user-current-usage (:username current-user))))
+
+       (GET "/overage" []
+         :middleware [require-authentication])))))
 
 

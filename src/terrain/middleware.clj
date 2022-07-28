@@ -43,5 +43,5 @@
   [handler]
   (fn [req]
     (if (dua/user-data-overage? (:username (:user-info req)))
-      (handler req)
-      (resp/forbidden "The account has data overages"))))
+      (resp/forbidden "The account has data overages")
+      (handler req))))
