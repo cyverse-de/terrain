@@ -2,6 +2,7 @@
   (:require [clojure.string :as string]
             [terrain.auth.user-attributes :as user-attributes]
             [clojure-commons.response :as resp]
+            [clojure.tools.logging :as log]
             [terrain.clients.data-usage-api :as dua]))
 
 (defn- add-context-path
@@ -42,6 +43,6 @@
 (defn check-user-data-overages
   [handler]
   (fn [req]
-    (if (dua/user-data-overage? (:username (:user-info req)))
+    (if (dua/user-data-overage? (:user (:user-info req)))
       (resp/forbidden "The account has data overages")
       (handler req))))
