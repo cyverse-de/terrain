@@ -527,10 +527,30 @@
                   :content-type :json
                   :as           :json}))))
 
+(defn add-pipeline-version
+  [app-id pipeline]
+  (:body
+   (client/post (apps-url "apps" "pipelines" app-id "versions")
+                (disable-redirects
+                 {:query-params (secured-params)
+                  :form-params  pipeline
+                  :content-type :json
+                  :as           :json}))))
+
 (defn update-pipeline
   [app-id pipeline]
   (:body
    (client/put (apps-url "apps" "pipelines" app-id)
+               (disable-redirects
+                {:query-params (secured-params)
+                 :form-params  pipeline
+                 :content-type :json
+                 :as           :json}))))
+
+(defn update-pipeline-version
+  [app-id version-id pipeline]
+  (:body
+   (client/put (apps-url "apps" "pipelines" app-id "versions" version-id)
                (disable-redirects
                 {:query-params (secured-params)
                  :form-params  pipeline
@@ -545,10 +565,26 @@
                  {:query-params (secured-params)
                   :as           :json}))))
 
+(defn copy-pipeline-version
+  [app-id version-id]
+  (:body
+   (client/post (apps-url "apps" "pipelines" app-id "versions" version-id "copy")
+                (disable-redirects
+                 {:query-params (secured-params)
+                  :as           :json}))))
+
 (defn edit-pipeline
   [app-id]
   (:body
    (client/get (apps-url "apps" "pipelines" app-id "ui")
+               (disable-redirects
+                {:query-params (secured-params)
+                 :as           :json}))))
+
+(defn edit-pipeline-version
+  [app-id version-id]
+  (:body
+   (client/get (apps-url "apps" "pipelines" app-id "versions" version-id "ui")
                (disable-redirects
                 {:query-params (secured-params)
                  :as           :json}))))
