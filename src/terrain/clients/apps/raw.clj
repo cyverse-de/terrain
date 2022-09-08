@@ -334,6 +334,14 @@
                 {:query-params (secured-params)
                  :as           :json}))))
 
+(defn get-admin-app-version-details
+  [system-id app-id version-id]
+  (:body
+   (client/get (apps-url "admin" "apps" system-id app-id "versions" version-id "details")
+               (disable-redirects
+                {:query-params (secured-params)
+                 :as           :json}))))
+
 (defn get-app-details
   [system-id app-id]
   (:body

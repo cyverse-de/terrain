@@ -115,6 +115,12 @@
        (context "/versions/:version-id" []
                 :path-params [version-id :- apps-schema/AppVersionIdParam]
 
+                (GET "/details" []
+                     :return schema/AdminAppDetails
+                     :summary schema/AppVersionDetailsSummary
+                     :description schema/AppVersionDetailsDocs
+                     (ok (apps/get-admin-app-version-details system-id app-id version-id)))
+
                 (PATCH "/documentation" []
                        :body [body apps-schema/AppDocumentationRequest]
                        :return apps-schema/AppDocumentation
