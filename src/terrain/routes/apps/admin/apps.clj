@@ -115,6 +115,16 @@
        (context "/versions/:version-id" []
                 :path-params [version-id :- apps-schema/AppVersionIdParam]
 
+                (PATCH "/" []
+                       :body [body schema/AdminAppPatchRequest]
+                       :return schema/AdminAppDetails
+                       :summary schema/AdminAppVersionPatchSummary
+                       :description-file "docs/apps/admin/app-label-update.md"
+                       (ok (apps/admin-update-app-version system-id
+                                                          app-id
+                                                          version-id
+                                                          body)))
+
                 (GET "/details" []
                      :return schema/AdminAppDetails
                      :summary schema/AppVersionDetailsSummary

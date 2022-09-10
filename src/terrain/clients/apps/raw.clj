@@ -785,6 +785,16 @@
                    :content-type :json
                    :as           :json}))))
 
+(defn admin-update-app-version
+  [system-id app-id version-id body]
+  (:body
+   (client/patch (apps-url "admin" "apps" system-id app-id "versions" version-id)
+                 (disable-redirects
+                  {:query-params (secured-params)
+                   :form-params  body
+                   :content-type :json
+                   :as           :json}))))
+
 (defn get-admin-app-categories
   [params]
   (client/get (apps-url "admin" "apps" "categories")
