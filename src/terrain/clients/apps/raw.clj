@@ -160,6 +160,16 @@
                   :content-type :json
                   :as           :json}))))
 
+(defn create-app-version
+  [system-id app-id app]
+  (:body
+   (client/post (apps-url "apps" system-id app-id "versions")
+                (disable-redirects
+                 {:query-params (secured-params)
+                  :form-params  app
+                  :content-type :json
+                  :as           :json}))))
+
 (defn preview-args
   [system-id app]
   (:body
@@ -218,10 +228,26 @@
                 {:query-params (secured-params)
                  :as           :json}))))
 
+(defn get-app-version
+  [system-id app-id version-id]
+  (:body
+   (client/get (apps-url "apps" system-id app-id "versions" version-id)
+               (disable-redirects
+                {:query-params (secured-params)
+                 :as           :json}))))
+
 (defn delete-app
   [system-id app-id]
   (:body
    (client/delete (apps-url "apps" system-id app-id)
+                  (disable-redirects
+                   {:query-params (secured-params)
+                    :as           :json}))))
+
+(defn delete-app-version
+  [system-id app-id version-id]
+  (:body
+   (client/delete (apps-url "apps" system-id app-id "versions" version-id)
                   (disable-redirects
                    {:query-params (secured-params)
                     :as           :json}))))
@@ -236,10 +262,30 @@
                    :content-type :json
                    :as           :json}))))
 
+(defn relabel-app-version
+  [system-id app-id version-id relabel-request]
+  (:body
+   (client/patch (apps-url "apps" system-id app-id "versions" version-id)
+                 (disable-redirects
+                  {:query-params (secured-params)
+                   :form-params  relabel-request
+                   :content-type :json
+                   :as           :json}))))
+
 (defn update-app
   [system-id app-id update-request]
   (:body
    (client/put (apps-url "apps" system-id app-id)
+               (disable-redirects
+                {:query-params (secured-params)
+                 :form-params  update-request
+                 :content-type :json
+                 :as           :json}))))
+
+(defn update-app-version
+  [system-id app-id version-id update-request]
+  (:body
+   (client/put (apps-url "apps" system-id app-id "versions" version-id)
                (disable-redirects
                 {:query-params (secured-params)
                  :form-params  update-request
@@ -264,6 +310,14 @@
                  {:query-params (secured-params)
                   :as           :json}))))
 
+(defn copy-app-version
+  [system-id app-id version-id]
+  (:body
+   (client/post (apps-url "apps" system-id app-id "versions" version-id "copy")
+                (disable-redirects
+                 {:query-params (secured-params)
+                  :as           :json}))))
+
 (defn list-single-app
   [system-id app-id]
   (:body
@@ -284,6 +338,14 @@
   [system-id app-id]
   (:body
    (client/get (apps-url "apps" system-id app-id "details")
+               (disable-redirects
+                {:query-params (secured-params)
+                 :as           :json}))))
+
+(defn get-app-version-details
+  [system-id app-id version-id]
+  (:body
+   (client/get (apps-url "apps" system-id app-id "versions" version-id "details")
                (disable-redirects
                 {:query-params (secured-params)
                  :as           :json}))))
@@ -431,6 +493,14 @@
                 {:query-params (secured-params)
                  :as           :json}))))
 
+(defn list-app-version-tasks
+  [system-id app-id version-id]
+  (:body
+   (client/get (apps-url "apps" system-id app-id "versions" version-id "tasks")
+               (disable-redirects
+                {:query-params (secured-params)
+                 :as           :json}))))
+
 (defn get-app-ui
   [system-id app-id]
   (:body
@@ -439,10 +509,28 @@
                 {:query-params (secured-params)
                  :as           :json}))))
 
+(defn get-app-version-ui
+  [system-id app-id version-id]
+  (:body
+   (client/get (apps-url "apps" system-id app-id "versions" version-id "ui")
+               (disable-redirects
+                {:query-params (secured-params)
+                 :as           :json}))))
+
 (defn add-pipeline
   [pipeline]
   (:body
    (client/post (apps-url "apps" "pipelines")
+                (disable-redirects
+                 {:query-params (secured-params)
+                  :form-params  pipeline
+                  :content-type :json
+                  :as           :json}))))
+
+(defn add-pipeline-version
+  [app-id pipeline]
+  (:body
+   (client/post (apps-url "apps" "pipelines" app-id "versions")
                 (disable-redirects
                  {:query-params (secured-params)
                   :form-params  pipeline
@@ -459,6 +547,16 @@
                  :content-type :json
                  :as           :json}))))
 
+(defn update-pipeline-version
+  [app-id version-id pipeline]
+  (:body
+   (client/put (apps-url "apps" "pipelines" app-id "versions" version-id)
+               (disable-redirects
+                {:query-params (secured-params)
+                 :form-params  pipeline
+                 :content-type :json
+                 :as           :json}))))
+
 (defn copy-pipeline
   [app-id]
   (:body
@@ -467,10 +565,26 @@
                  {:query-params (secured-params)
                   :as           :json}))))
 
+(defn copy-pipeline-version
+  [app-id version-id]
+  (:body
+   (client/post (apps-url "apps" "pipelines" app-id "versions" version-id "copy")
+                (disable-redirects
+                 {:query-params (secured-params)
+                  :as           :json}))))
+
 (defn edit-pipeline
   [app-id]
   (:body
    (client/get (apps-url "apps" "pipelines" app-id "ui")
+               (disable-redirects
+                {:query-params (secured-params)
+                 :as           :json}))))
+
+(defn edit-pipeline-version
+  [app-id version-id]
+  (:body
+   (client/get (apps-url "apps" "pipelines" app-id "versions" version-id "ui")
                (disable-redirects
                 {:query-params (secured-params)
                  :as           :json}))))
@@ -710,10 +824,28 @@
                 {:query-params (secured-params)
                  :as           :json}))))
 
+(defn get-app-version-docs
+  [system-id app-id version-id]
+  (:body
+   (client/get (apps-url "apps" system-id app-id "versions" version-id "documentation")
+               (disable-redirects
+                {:query-params (secured-params)
+                 :as           :json}))))
+
 (defn edit-app-docs
   [system-id app-id docs]
   (:body
    (client/patch (apps-url "apps" system-id app-id "documentation")
+                 (disable-redirects
+                  {:query-params (secured-params)
+                   :form-params  docs
+                   :content-type :json
+                   :as           :json}))))
+
+(defn edit-app-version-docs
+  [system-id app-id version-id docs]
+  (:body
+   (client/patch (apps-url "apps" system-id app-id "versions" version-id "documentation")
                  (disable-redirects
                   {:query-params (secured-params)
                    :form-params  docs
@@ -730,6 +862,16 @@
                   :content-type :json
                   :as           :json}))))
 
+(defn add-app-version-docs
+  [system-id app-id version-id docs]
+  (:body
+   (client/post (apps-url "apps" system-id app-id "versions" version-id "documentation")
+                (disable-redirects
+                 {:query-params (secured-params)
+                  :form-params  docs
+                  :content-type :json
+                  :as           :json}))))
+
 (defn admin-edit-app-docs
   [system-id app-id docs]
   (:body
@@ -740,10 +882,30 @@
                    :content-type :json
                    :as           :json}))))
 
+(defn admin-edit-app-version-docs
+  [system-id app-id version-id docs]
+  (:body
+   (client/patch (apps-url "admin" "apps" system-id app-id "versions" version-id "documentation")
+                 (disable-redirects
+                  {:query-params (secured-params)
+                   :form-params  docs
+                   :content-type :json
+                   :as           :json}))))
+
 (defn admin-add-app-docs
   [system-id app-id docs]
   (:body
    (client/post (apps-url "admin" "apps" system-id app-id "documentation")
+                (disable-redirects
+                 {:query-params (secured-params)
+                  :form-params  docs
+                  :content-type :json
+                  :as           :json}))))
+
+(defn admin-add-app-version-docs
+  [system-id app-id version-id docs]
+  (:body
+   (client/post (apps-url "admin" "apps" system-id app-id "versions" version-id "documentation")
                 (disable-redirects
                  {:query-params (secured-params)
                   :form-params  docs
@@ -866,6 +1028,14 @@
   [system-id app-id]
   (:body
    (client/get (apps-url "apps" system-id app-id "tools")
+               (disable-redirects
+                {:query-params (secured-params)
+                 :as           :json}))))
+
+(defn get-tools-in-app-version
+  [system-id app-id version-id]
+  (:body
+   (client/get (apps-url "apps" system-id app-id "versions" version-id "tools")
                (disable-redirects
                 {:query-params (secured-params)
                  :as           :json}))))
@@ -1122,6 +1292,14 @@
                 {:query-params (secured-params)
                  :as           :json}))))
 
+(defn get-app-version-integration-data
+  [system-id app-id version-id]
+  (:body
+   (client/get (apps-url "apps" system-id app-id "versions" version-id "integration-data")
+               (disable-redirects
+                {:query-params (secured-params)
+                 :as           :json}))))
+
 (defn get-tool-integration-data
   [tool-id]
   (:body
@@ -1134,6 +1312,14 @@
   [system-id app-id integration-data-id]
   (:body
    (client/put (apps-url "admin" "apps" system-id app-id "integration-data" integration-data-id)
+               (disable-redirects
+                {:query-params (secured-params)
+                 :as           :json}))))
+
+(defn update-app-version-integration-data
+  [system-id app-id version-id integration-data-id]
+  (:body
+   (client/put (apps-url "admin" "apps" system-id app-id "versions" version-id "integration-data" integration-data-id)
                (disable-redirects
                 {:query-params (secured-params)
                  :as           :json}))))

@@ -110,4 +110,31 @@
          :body [body apps-schema/PublishAppRequest]
          :summary apps-schema/PublishAppSummary
          :description apps-schema/PublishAppDocs
-         (ok (apps/admin-publish-app system-id app-id body)))))))
+         (ok (apps/admin-publish-app system-id app-id body)))
+
+       (context "/versions/:version-id" []
+                :path-params [version-id :- apps-schema/AppVersionIdParam]
+
+                (PATCH "/documentation" []
+                       :body [body apps-schema/AppDocumentationRequest]
+                       :return apps-schema/AppDocumentation
+                       :summary schema/AppVersionDocumentationUpdateSummary
+                       :description schema/AppVersionDocumentationUpdateDocs
+                       (ok (apps/admin-edit-app-version-docs system-id app-id version-id body)))
+
+                (POST "/documentation" []
+                      :body [body apps-schema/AppDocumentationRequest]
+                      :return apps-schema/AppDocumentation
+                      :summary schema/AppVersionDocumentationAddSummary
+                      :description schema/AppVersionDocumentationAddDocs
+                      (ok (apps/admin-add-app-version-docs system-id app-id version-id body)))
+
+                (PUT "/integration-data/:integration-data-id" []
+                     :path-params [integration-data-id :- IntegrationDataIdPathParam]
+                     :return IntegrationData
+                     :summary schema/AppVersionIntegrationDataUpdateSummary
+                     :description schema/AppVersionIntegrationDataUpdateDocs
+                     (ok (apps/update-app-version-integration-data system-id
+                                                                   app-id
+                                                                   version-id
+                                                                   integration-data-id))))))))
