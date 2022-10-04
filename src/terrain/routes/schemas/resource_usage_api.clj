@@ -108,12 +108,18 @@
    :quota             (describe (maybe Double) "The quota's value")
    :resource_type     (describe ResourceType "The resource type of the quota")})
 
+(defschema Usage
+  {:id            (describe String "The UUID assigned to the usage")
+   :usage         (describe (maybe Double) "The usage value")
+   :resource_type (describe ResourceType "The resource type of the usage")})
+
 (defschema UserPlan
   {:id                   (describe String "The user plan's UUID")
    :effective_start_date (describe String "The date the user's plan takes effect")
    :effective_end_date   (describe String "The date the user's plan ends")
    :plan                 (describe Plan "The type of plan the user has")
    :quotas               (describe [Quota] "The list of quotas that the user has with their plan")
+   :usages               (describe [Usage] "The list of usages associated with the subscription")
    :users                (describe QMSUser "User information from the quota management system")})
 
 (defschema ResourceSummary
