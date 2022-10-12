@@ -39,7 +39,6 @@
         [terrain.routes.notification]
         [terrain.routes.permanent-id-requests]
         [terrain.routes.pref]
-        [terrain.routes.resource-usage-api]
         [terrain.routes.data-usage-api]
         [terrain.routes.session]
         [terrain.routes.user-info]
@@ -122,7 +121,6 @@
    (request-routes)
    (bag-routes)
    (vice-routes)
-   (resource-usage-api-routes)
    (data-usage-api-routes)
    (qms-api-routes)
    (route/not-found (service/unrecognized-path-response))))
@@ -182,7 +180,6 @@
    (admin-request-routes)
    (admin-setting-routes)
    (admin-vice-routes)
-   (admin-resource-usage-api-routes)
    (admin-qms-api-routes)
    (route/not-found (service/unrecognized-path-response))))
 
@@ -212,10 +209,10 @@
 
 (def service-account-handler
   (middleware
-    [authenticate-current-user
-     wrap-user-info
-     wrap-logging]
-    (service-account-routes)))
+   [authenticate-current-user
+    wrap-user-info
+    wrap-logging]
+   (service-account-routes)))
 
 (def secured-routes-handler
   (middleware
@@ -288,7 +285,6 @@
                                      {:name "admin-reference-genomes", :description "Admin Reference Genome Endpoints"}
                                      {:name "admin-request-types", :description "Admin Request Type Endpoints"}
                                      {:name "admin-requests", :description "Admin Request Endpoints"}
-                                     {:name "admin-resource-usage", :description "Resource Usage Administration Endpoints"}
                                      {:name "admin-settings", :description "Admin Setting Endpoints"}
                                      {:name "admin-token", :description "Admin OAuth Tokens"}
                                      {:name "admin-tools", :description "Admin Tool Endpoints"}
@@ -322,7 +318,6 @@
                                      {:name "qms", :description "Quota Management Service Endpoints"}
                                      {:name "reference-genomes", :description "Reference Genome Endpoints"}
                                      {:name "requests", :description "Request Endpoints"}
-                                     {:name "resource-usage" :description "Resource Usage Endpoints"}
                                      {:name "subjects", :description "Subject Endpoints"}
                                      {:name "support", :description "Support Endpoints"}
                                      {:name "tags", :description "Tag Endpoints"}
