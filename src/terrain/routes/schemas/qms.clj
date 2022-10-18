@@ -36,9 +36,10 @@
    :unit (describe String "The unit of the resource type")})
 
 (defschema Usage
-  {:id            UsageID
-   :usage         (describe Double "The usage value")
-   :resource_type ResourceType})
+  {:id                              UsageID
+   :usage                           (describe Double "The usage value")
+   :resource_type                   ResourceType
+   (optional-key :last_modified_at) (describe (maybe String) "The time the usage record was last modified")})
 
 (defschema UsagesResponse
   {(optional-key :result) (describe (maybe [Usage]) "The list of usages")
@@ -77,9 +78,10 @@
    :status                (describe String "The status of the response")})
 
 (defschema Quota
-  {:id            QuotaID
-   :quota         (describe Double "The value associated with the quota")
-   :resource_type ResourceType})
+  {:id                              QuotaID
+   :quota                           (describe Double "The value associated with the quota")
+   :resource_type                   ResourceType
+   (optional-key :last_modified_at) (describe (maybe String) "The time the quota was last modified.")})
 
 (defschema UserPlan
   {:id                   (describe (maybe UUID) "The UUID assigned to a user's plan")
@@ -94,4 +96,3 @@
   {(optional-key :result) (describe (maybe UserPlan) "The user's plan")
    (optional-key :error)  (describe (maybe String) "The error message")
    :status                (describe String "The status of the response")})
-
