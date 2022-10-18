@@ -220,6 +220,26 @@
                   :content-type :json
                   :as           :json}))))
 
+(defn admin-share
+  [body]
+  (:body
+   (client/post (apps-url "admin" "apps" "sharing")
+                (disable-redirects
+                 {:query-params (secured-params)
+                  :form-params  body
+                  :content-type :json
+                  :as           :json}))))
+
+(defn admin-unshare
+  [body]
+  (:body
+   (client/post (apps-url "admin" "apps" "unsharing")
+                (disable-redirects
+                 {:query-params (secured-params)
+                  :form-params  body
+                  :content-type :json
+                  :as           :json}))))
+
 (defn get-app
   [system-id app-id]
   (:body

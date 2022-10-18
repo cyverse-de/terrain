@@ -13,6 +13,7 @@
   (:require [common-swagger-api.routes]                     ;; for :description-file
             [common-swagger-api.schema.apps :as apps-schema]
             [common-swagger-api.schema.apps.admin.apps :as schema]
+            [common-swagger-api.schema.apps.permission :as permission-schema]
             [terrain.clients.apps.raw :as apps]
             [terrain.util.config :as config]))
 
@@ -44,6 +45,20 @@
        :description schema/AppPublicationRequestsDocs
        :return schema/AppPublicationRequestListing
        (ok (apps/list-app-publication-requests params)))
+
+     (POST "/sharing" []
+           :body [body permission-schema/AppSharingRequest]
+           :return permission-schema/AppSharingResponse
+           :summary permission-schema/AppSharingSummary
+           :description permission-schema/AppSharingDocs
+           (ok (apps/admin-share body)))
+
+     (POST "/unsharing" []
+           :body [body permission-schema/AppUnsharingRequest]
+           :return permission-schema/AppUnsharingResponse
+           :summary permission-schema/AppUnsharingSummary
+           :description permission-schema/AppUnsharingDocs
+           (ok (apps/admin-unshare body)))
 
      (POST "/shredder" []
        :body [body apps-schema/AppDeletionRequest]
