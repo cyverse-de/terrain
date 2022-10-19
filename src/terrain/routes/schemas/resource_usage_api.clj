@@ -104,14 +104,16 @@
    :description (describe String "The description of the resource type")})
 
 (defschema Quota
-  {:id                (describe String "The UUID assigned to the quota")
-   :quota             (describe (maybe Double) "The quota's value")
-   :resource_type     (describe ResourceType "The resource type of the quota")})
+  {:id               (describe String "The UUID assigned to the quota")
+   :quota            (describe (maybe Double) "The quota's value")
+   :resource_type    (describe ResourceType "The resource type of the quota")
+   :last_modified_at (describe (maybe String) "The time that the quota was last modified")})
 
 (defschema Usage
-  {:id            (describe String "The UUID assigned to the usage")
-   :usage         (describe (maybe Double) "The usage value")
-   :resource_type (describe ResourceType "The resource type of the usage")})
+  {:id               (describe String "The UUID assigned to the usage")
+   :usage            (describe (maybe Double) "The usage value")
+   :resource_type    (describe ResourceType "The resource type of the usage")
+   :last_modified_at (describe (maybe String) "The time that the usage record was last modified")})
 
 (defschema UserPlan
   {:id                   (describe String "The user plan's UUID")
