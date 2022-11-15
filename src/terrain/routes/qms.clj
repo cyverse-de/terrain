@@ -65,6 +65,16 @@
        :return schema/SuccessResponse
        (ok (qms/add-usage body)))
 
+     (context "/subscriptions" []
+       (POST "/" []
+         :middleware [require-authentication]
+         :summary schema/CreateSubscriptionsSummary
+         :description schema/CreateSubscriptionsDescription
+         :query [params schema/BulkSubscriptionParams]
+         :body [body schema/SubscriptionRequests]
+         :return schema/BulkSubscriptionResponse
+         (ok (qms/add-subscriptions params body))))
+
      (context "/users" []
        (context "/:username" []
          :path-params [username :- schema/Username]
