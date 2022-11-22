@@ -1,6 +1,6 @@
 (ns terrain.routes.schemas.qms
-  (:require [common-swagger-api.schema :refer [describe]]
-            [schema.core :refer [defschema Any optional-key maybe]])
+  (:require [common-swagger-api.schema :refer [PagingParams describe]]
+            [schema.core :refer [defschema Any optional-key maybe enum]])
   (:import [java.util UUID]))
 
 (def GetAllPlansSummary "Returns a list of all plans registered in QMS")
@@ -17,6 +17,8 @@
 (def UpdateUsageDescription "Updates resource usage totals for a user")
 (def CreateSubscriptionsSummary "Bulk Subscription Creation")
 (def CreateSubscriptionsDescription "Creates multiple subscriptions in one request")
+(def ListSubscriptionsSummary "List Subscriptions")
+(def ListSubscriptionsDescription "Lists existing subscriptions")
 
 (def PlanID (describe (maybe UUID) "The UUID assigned to a plan in QMS"))
 (def PlanName (describe String "The name of the plan"))
@@ -123,3 +125,17 @@
 (defschema BulkSubscriptionParams
   {(optional-key :force)
    (describe String "True if the subscription should be created even if the user already has a higher level plan")})
+
+(defschema ListSubscriptionsParams
+  (merge PagingParams
+         {(optional-key :search)
+          (describe String "The username substring to search for in the listing")}))
+
+(defschema SubscriptionListing
+  {:subscriptions (describe [UserPlan] "The subscription listing")
+   :total         (describe Integer "The total number of matching subscriptions")})
+
+(defschema SubscriptionListingResponse
+  {(optional-key :result) (describe (maybe SubscriptionListing) "The subscription listing")
+   (optional-key :error)  (describe (maybe String) "The error message if the request could not be completed")
+   :status                (describe String "The status of the request")})

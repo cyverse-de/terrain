@@ -34,6 +34,12 @@
                   :content-type :json})
       (:body)))
 
+(defn list-subscriptions
+  [params]
+  (-> (qms-api ["v1" "subscriptions"] params)
+      (http/get {:as :json})
+      (:body)))
+
 (defn update-user-plan
   [username plan-name]
   (-> (qms-api ["v1" "users" username plan-name])
