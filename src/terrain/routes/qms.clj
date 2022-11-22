@@ -66,6 +66,14 @@
        (ok (qms/add-usage body)))
 
      (context "/subscriptions" []
+       (GET "/" []
+         :middleware [require-authentication]
+         :summary schema/ListSubscriptionsSummary
+         :description schema/ListSubscriptionsDescription
+         :query [params schema/ListSubscriptionsParams]
+         :return schema/SubscriptionListingResponse
+         (ok (qms/list-subscriptions params)))
+
        (POST "/" []
          :middleware [require-authentication]
          :summary schema/CreateSubscriptionsSummary
