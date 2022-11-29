@@ -182,7 +182,6 @@
    (admin-request-routes)
    (admin-setting-routes)
    (admin-vice-routes)
-   (admin-resource-usage-api-routes)
    (admin-qms-api-routes)
    (route/not-found (service/unrecognized-path-response))))
 
