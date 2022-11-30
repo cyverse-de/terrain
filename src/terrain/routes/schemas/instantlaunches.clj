@@ -48,19 +48,21 @@
    (optional-key :added_on)        (describe String "The date and time when the instant launch was created")})
 
 (defschema FullInstantLaunch
-  (assoc InstantLaunch
-         :quick_launch_name        (describe String "The name of the quick launch")
-         :quick_launch_description (describe String "The description of the quick launch")
-         :quick_launch_creator     (describe String "The username of the person that created the quick launch")
-         :is_public                (describe Boolean "Whether or not the quick launch is public")
-         :submission               (describe Any "The submission associated with the instant launch/quick launch")
-         :app_id                   (describe String "The UUID of the app used in the instant launch/quick launch")
-         :app_version_id           (describe String "The UUID of the app version used in the instant launch/quick launch")
-         :app_name                 (describe String "The name of the app used in the instant launch/quick launch")
-         :app_description          (describe String "The description of the app used in the instant launch/quick launch")
-         :app_deleted              (describe Boolean "Whether or not the app is deleted")
-         :app_disabled             (describe Boolean "Whether or not the app is disabled")
-         :integrator               (describe String "The username of the person that integrated the app used in the instant launch/quick launch")))
+  (assoc
+    InstantLaunch
+    :quick_launch_name          (describe String "The name of the quick launch")
+    :quick_launch_description   (describe String "The description of the quick launch")
+    :quick_launch_creator       (describe String "The username of the person that created the quick launch")
+    :is_public                  (describe Boolean "Whether or not the quick launch is public")
+    :submission                 (describe Any "The submission associated with the instant launch/quick launch")
+    :app_id                     (describe String "The UUID of the app used in the instant launch/quick launch")
+    :app_version_id             (describe String "The UUID of the app version used in the instant launch/quick launch")
+    :app_name                   (describe String "The name of the app used in the instant launch/quick launch")
+    :app_description            (describe String "The description of the app used in the instant launch/quick launch")
+    (optional-key :app_version) (describe String "The label of the app version used in the instant launch/quick launch")
+    :app_deleted                (describe Boolean "Whether or not the app is deleted")
+    :app_disabled               (describe Boolean "Whether or not the app is disabled")
+    :integrator                 (describe String "The username of the person that integrated the app used in the instant launch/quick launch")))
 
 (defschema InstantLaunchList
   {:instant_launches (describe [InstantLaunch] "A list of instant launches")})
