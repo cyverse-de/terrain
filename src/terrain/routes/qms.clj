@@ -1,6 +1,7 @@
 (ns terrain.routes.qms
   (:require [terrain.util.config :as config]
             [terrain.clients.qms :as qms]
+            [terrain.services.qms :as handlers]
             [terrain.auth.user-attributes :refer [current-user require-authentication require-service-account]]
             [terrain.util :refer [optional-routes]]
             [common-swagger-api.schema :refer [context GET POST DELETE PUT]]
@@ -81,7 +82,7 @@
          :query [params schema/BulkSubscriptionParams]
          :body [body schema/SubscriptionRequests]
          :return schema/BulkSubscriptionResponse
-         (ok (qms/add-subscriptions params body))))
+         (ok (handlers/add-subscriptions params body))))
 
      (context "/users" []
        (context "/:username" []

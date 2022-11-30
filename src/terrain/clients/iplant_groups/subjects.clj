@@ -6,13 +6,24 @@
             [clj-http.client :as http]
             [terrain.util.config :as config]))
 
-(defn- lookup-subject-url
-  [short-username]
-  (str (curl/url (config/ipg-base) "subjects" short-username)))
+(defn- iplant-groups-url
+  [& components]
+  (str (apply curl/url (config/ipg-base) components)))
 
 (defn lookup-subject
   "Uses iplant-groups's subject lookup by ID endpoint to retrieve user details."
-  [user short-username]
-  (:body (http/get (lookup-subject-url short-username)
-                   {:query-params {:user user}
+  [grouper-user short-username]
+  (:body (http/get (iplant-groups-url "subjects" short-username)
+                   {:query-params {:user grouper-user}
                     :as           :json})))
+
+(defn lookup-subjects
+  "Uses iplant-groups's multiple subject lookup by ID endpoint to retrieve user details."
+  ([subject-ids]
+   (lookup-subjects (config/grouper-user) subject-ids))
+  ([grouper-user subject-ids]
+   (:body (http/post (iplant-groups-url "subjects" "lookup")
+                     {:query-params {:user grouper-user}
+                      :form-params  {:subject_ids subject-ids}
+                      :content-type :json
+                      :as           :json}))))
