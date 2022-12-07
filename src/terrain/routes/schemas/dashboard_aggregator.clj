@@ -30,6 +30,9 @@
    (optional-key :edited_date)
    (describe (maybe String) "The date the app was last edited")
 
+   (optional-key :most_recent_start_date)
+   (describe (maybe String) "The last time the app was started")
+
    (optional-key :is_favorite)
    (describe (maybe Boolean) "True if the user has marked the app as a favorite")
 
@@ -53,7 +56,7 @@
    :link
    (describe String "Link to the source of the feed item. Probably leads to the website")
 
-   (optional-key :thumbnailUrl)
+   (optional-key :thumbnail_url)
    (describe String "The URL for a thumbnail associated with the item, most likely a video.")
 
    :date_added
