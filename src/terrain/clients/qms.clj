@@ -72,3 +72,9 @@
   (-> (qms-api ["v1" "plans" plan-id])
       (http/get {:as :json})
       (:body)))
+
+(defn list-resource-types
+  []
+  (-> (qms-api ["v1" "resource-types"])
+      (http/get {:as :json})
+      (:body)))

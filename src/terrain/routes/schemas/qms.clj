@@ -7,6 +7,8 @@
 (def GetAllPlansDescription "Returns a list of all plans registered in QMS. New plans may be registered at run-time through QMS itself")
 (def GetPlanSummary "Returns details about a single plan in QMS")
 (def GetPlanDescription "Returns details about a single plan in QMS. Plan is referenced by its UUID")
+(def GetResourceTypesSummary "List Resource Types")
+(def GetResourceTypesDescription "Returns a list of all resource types registered in QMS")
 (def GetUserPlanSummary "Returns details about the user's current plan")
 (def GetUserPlanDescription "Returns details about the user's current plan, including quota and usage information")
 (def UpdateUserPlanQuotaSummary "Updates a quota in the user's current subscription")
@@ -41,6 +43,10 @@
   {:id   ResourceID
    :name ResourceTypeName
    :unit (describe String "The unit of the resource type")})
+
+(defschema ResourceTypesResponse
+  {:result (describe [ResourceType] "The list of resource types")
+   :status (describe String "The status of the response")})
 
 (defschema Usage
   {:id                              UsageID
