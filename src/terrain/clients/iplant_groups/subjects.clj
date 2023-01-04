@@ -12,10 +12,12 @@
 
 (defn lookup-subject
   "Uses iplant-groups's subject lookup by ID endpoint to retrieve user details."
-  [grouper-user short-username]
-  (:body (http/get (iplant-groups-url "subjects" short-username)
-                   {:query-params {:user grouper-user}
-                    :as           :json})))
+  ([short-username]
+   (lookup-subject (config/grouper-user) short-username))
+  ([grouper-user short-username]
+   (:body (http/get (iplant-groups-url "subjects" short-username)
+                    {:query-params {:user grouper-user}
+                     :as           :json}))))
 
 (defn lookup-subjects
   "Uses iplant-groups's multiple subject lookup by ID endpoint to retrieve user details."

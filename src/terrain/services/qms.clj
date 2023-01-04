@@ -1,8 +1,15 @@
 (ns terrain.services.qms
   (:require [clojure.set :refer [difference]]
             [clojure-commons.core :refer [remove-nil-values]]
+            [clojure-commons.exception-util :as cxu]
             [terrain.clients.iplant-groups.subjects :as subjects]
             [terrain.clients.qms :as qms]))
+
+(defn- validate-username
+  "Throws an error if a user with the given username doesn't exist."
+  [username]
+  (when (empty? (:subjects (subjects/lookup-subjects [username])))
+    (cxu/bad-request (str "user '" username "' does not exist"))))
 
 (defn- subscription-error-response
   "Returns a JSON object indicating that a subscription couldn't be created."
@@ -34,3 +41,9 @@
     {:result (for [username (map :username (:subscriptions body))]
                (get-subscription-response response-for username))
      :status (:status qms-response)}))
+
+(defn update-user-plan-quota
+  "Validates the username before forwarding the request to QMS to update a user's resource usage limit."
+  [username resource-type body]
+  (validate-username username)
+  (qms/update-user-plan-quota username resource-type body))
