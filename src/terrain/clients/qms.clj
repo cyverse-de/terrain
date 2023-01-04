@@ -40,6 +40,14 @@
       (http/get {:as :json})
       (:body)))
 
+(defn update-user-plan-quota
+  [username resource-type body]
+  (-> (qms-api ["v1" "users" username "plan" resource-type "quota"])
+      (http/post {:form-params  body
+                  :as           :json
+                  :content-type :json})
+      (:body)))
+
 (defn update-user-plan
   [username plan-name]
   (-> (qms-api ["v1" "users" username plan-name])

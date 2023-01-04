@@ -95,20 +95,30 @@
            :return schema/UsagesResponse
            (ok (qms/get-usages username)))
 
-         (GET "/plan" []
-           :middleware [require-authentication]
-           :summary schema/GetUserPlanSummary
-           :description schema/GetUserPlanDescription
-           :return schema/UserPlanResponse
-           (ok (qms/user-plan username)))
+         (context "/plan" []
+           (GET "/" []
+             :middleware [require-authentication]
+             :summary schema/GetUserPlanSummary
+             :description schema/GetUserPlanDescription
+             :return schema/UserPlanResponse
+             (ok (qms/user-plan username)))
 
-         (PUT "/plan/:plan-name" []
-           :middleware [require-authentication]
-           :summary schema/UpdateUserPlanSummary
-           :description schema/UpdateUserPlanDescription
-           :path-params [plan-name :- schema/PlanName]
-           :return schema/SuccessResponse
-           (ok (qms/update-user-plan username plan-name))))))))
+           (POST "/:resource-type/quota" []
+             :middleware [require-authentication]
+             :summary schema/UpdateUserPlanQuotaSummary
+             :description schema/UpdateUserPlanQuotaDescription
+             :path-params [resource-type :- schema/ResourceTypeName]
+             :body [body schema/QuotaValue]
+             :return schema/SubscriptionUpdateResponse
+             (ok (handlers/update-user-plan-quota username resource-type body)))
+
+           (PUT "/:plan-name" []
+             :middleware [require-authentication]
+             :summary schema/UpdateUserPlanSummary
+             :description schema/UpdateUserPlanDescription
+             :path-params [plan-name :- schema/PlanName]
+             :return schema/SuccessResponse
+             (ok (qms/update-user-plan username plan-name)))))))))
 
 (defn service-account-qms-api-routes
   []
