@@ -32,6 +32,14 @@
          :return schema/PlanResponse
          (ok (qms/single-plan plan-id))))
 
+     (context "/resource-types" []
+       (GET "/" []
+         :middleware [require-authentication]
+         :summary schema/GetResourceTypesSummary
+         :description schema/GetResourceTypesDescription
+         :return schema/ResourceTypesResponse
+         (ok (qms/list-resource-types))))
+
      ;;; It's /user and not /users since this is for the logged-in user and not
      ;;; an admin-only lookup, which would require the username to be included
      ;;; in the path or query-parameters.
