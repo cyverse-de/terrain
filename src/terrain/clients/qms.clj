@@ -1,7 +1,26 @@
 (ns terrain.clients.qms
   (:require [cemerick.url :as curl]
+            [cheshire.core :as json]
             [clj-http.client :as http]
+            [clojure.tools.logging :as log]
+            [slingshot.slingshot :refer  [throw+ try+]]
+            [terrain.clients.util :refer [with-trap]]
             [terrain.util.config :as config]))
+
+(defn- extract-qms-error
+  [body]
+  (let [body (if (string? body) body (slurp body))]
+    (try+
+     (:error (json/parse-string body true) body)
+     (catch Object _
+       body))))
+
+(defn- default-error-handler
+  [error-code {:keys [body] :as response}]
+  (log/error "QMS request failed:" response)
+  (let [error (extract-qms-error body)]
+    (throw+ {:error_code error-code
+             :reason     error})))
 
 (defn- qms-api
   ([components]
@@ -14,67 +33,77 @@
 ;;; Admin
 (defn get-usages
   [username]
-  (-> (qms-api ["v1" "usages" username])
-      (http/get {:as :json})
-      (:body)))
+  (with-trap [default-error-handler]
+    (-> (qms-api ["v1" "usages" username])
+        (http/get {:as :json})
+        (:body))))
 
 (defn add-usage
   [usage]
-  (-> (qms-api ["v1" "usages"])
-      (http/post {:form-params  usage
-                  :as           :json
-                  :content-type :json})
-      (:body)))
+  (with-trap [default-error-handler]
+    (-> (qms-api ["v1" "usages"])
+        (http/post {:form-params  usage
+                    :as           :json
+                    :content-type :json})
+        (:body))))
 
 (defn add-subscriptions
   [params body]
-  (-> (qms-api ["v1" "subscriptions"] params)
-      (http/post {:form-params  body
-                  :as           :json
-                  :content-type :json})
-      (:body)))
+  (with-trap [default-error-handler]
+    (-> (qms-api ["v1" "subscriptions"] params)
+        (http/post {:form-params  body
+                    :as           :json
+                    :content-type :json})
+        (:body))))
 
 (defn list-subscriptions
   [params]
-  (-> (qms-api ["v1" "subscriptions"] params)
-      (http/get {:as :json})
-      (:body)))
+  (with-trap [default-error-handler]
+    (-> (qms-api ["v1" "subscriptions"] params)
+        (http/get {:as :json})
+        (:body))))
 
 (defn update-user-plan-quota
   [username resource-type body]
-  (-> (qms-api ["v1" "users" username "plan" resource-type "quota"])
-      (http/post {:form-params  body
-                  :as           :json
-                  :content-type :json})
-      (:body)))
+  (with-trap [default-error-handler]
+    (-> (qms-api ["v1" "users" username "plan" resource-type "quota"])
+        (http/post {:form-params  body
+                    :as           :json
+                    :content-type :json})
+        (:body))))
 
 (defn update-user-plan
   [username plan-name]
-  (-> (qms-api ["v1" "users" username plan-name])
-      (http/put {:as :json})
-      (:body)))
+  (with-trap [default-error-handler]
+    (-> (qms-api ["v1" "users" username plan-name])
+        (http/put {:as :json})
+        (:body))))
 
 ;;; Non-admin
 (defn user-plan
   [username]
-  (-> (qms-api ["v1" "users" username "plan"])
-      (http/get {:as :json})
-      (:body)))
+  (with-trap [default-error-handler]
+    (-> (qms-api ["v1" "users" username "plan"])
+        (http/get {:as :json})
+        (:body))))
 
 (defn list-all-plans
   []
-  (-> (qms-api ["v1" "plans"])
-      (http/get {:as :json})
-      (:body)))
+  (with-trap [default-error-handler]
+    (-> (qms-api ["v1" "plans"])
+        (http/get {:as :json})
+        (:body))))
 
 (defn single-plan
   [plan-id]
-  (-> (qms-api ["v1" "plans" plan-id])
-      (http/get {:as :json})
-      (:body)))
+  (with-trap [default-error-handler]
+    (-> (qms-api ["v1" "plans" plan-id])
+        (http/get {:as :json})
+        (:body))))
 
 (defn list-resource-types
   []
-  (-> (qms-api ["v1" "resource-types"])
-      (http/get {:as :json})
-      (:body)))
+  (with-trap [default-error-handler]
+    (-> (qms-api ["v1" "resource-types"])
+        (http/get {:as :json})
+        (:body))))
