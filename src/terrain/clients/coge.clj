@@ -1,6 +1,7 @@
 (ns terrain.clients.coge
   (:use [clojure-commons.core :only [remove-nil-values]]
         [terrain.auth.user-attributes :only [current-user]]
+        [terrain.clients.util :only [with-trap]]
         [slingshot.slingshot :only [throw+ try+]])
   (:require [cemerick.url :as curl]
             [cheshire.core :as cheshire]
@@ -19,17 +20,6 @@
   (log/warn "CoGe request failed:" response)
   (throw+ {:error_code error-code
            :reason     (if (string? body) body (slurp body))}))
-
-(defmacro ^:private with-trap
-  [[handle-error] & body]
-  `(try+
-    (do ~@body)
-    (catch [:status 400] bad-request#
-      (~handle-error ce/ERR_BAD_REQUEST bad-request#))
-    (catch [:status 404] not-found#
-      (~handle-error ce/ERR_NOT_FOUND not-found#))
-    (catch (comp number? :status) server-error#
-      (~handle-error ce/ERR_REQUEST_FAILED server-error#))))
 
 (defn search-genomes
   "Searches for genomes in CoGe."
