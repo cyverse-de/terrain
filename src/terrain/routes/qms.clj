@@ -46,10 +46,10 @@
      (context "/user" []
        (GET "/plan" []
          :middleware [require-authentication]
-         :summary schema/GetUserPlanSummary
-         :description schema/GetUserPlanDescription
-         :return schema/UserPlanResponse
-         (ok (qms/user-plan (:shortUsername current-user))))
+         :summary schema/GetSubscriptionSummary
+         :description schema/GetSubscriptionDescription
+         :return schema/SubscriptionResponse
+         (ok (qms/subscription (:shortUsername current-user))))
 
        (GET "/usages" []
          :middleware [require-authentication]
@@ -106,27 +106,27 @@
          (context "/plan" []
            (GET "/" []
              :middleware [require-authentication]
-             :summary schema/GetUserPlanSummary
-             :description schema/GetUserPlanDescription
-             :return schema/UserPlanResponse
-             (ok (qms/user-plan username)))
+             :summary schema/GetSubscriptionSummary
+             :description schema/GetSubscriptionDescription
+             :return schema/SubscriptionResponse
+             (ok (qms/subscription username)))
 
            (POST "/:resource-type/quota" []
              :middleware [require-authentication]
-             :summary schema/UpdateUserPlanQuotaSummary
-             :description schema/UpdateUserPlanQuotaDescription
+             :summary schema/UpdateSubscriptionQuotaSummary
+             :description schema/UpdateSubscriptionQuotaDescription
              :path-params [resource-type :- schema/ResourceTypeName]
              :body [body schema/QuotaValue]
              :return schema/SubscriptionUpdateResponse
-             (ok (handlers/update-user-plan-quota username resource-type body)))
+             (ok (handlers/update-subscription-quota username resource-type body)))
 
            (PUT "/:plan-name" []
              :middleware [require-authentication]
-             :summary schema/UpdateUserPlanSummary
-             :description schema/UpdateUserPlanDescription
+             :summary schema/UpdateSubscriptionSummary
+             :description schema/UpdateSubscriptionDescription
              :path-params [plan-name :- schema/PlanName]
              :return schema/SuccessResponse
-             (ok (qms/update-user-plan username plan-name)))))))))
+             (ok (qms/update-subscription username plan-name)))))))))
 
 (defn service-account-qms-api-routes
   []
@@ -142,8 +142,8 @@
 
          (PUT "/plan/:plan-name" []
            :middleware [[require-service-account ["cyverse-subscription-updater"]]]
-           :summary schema/UpdateUserPlanSummary
-           :description schema/UpdateUserPlanDescription
+           :summary schema/UpdateSubscriptionSummary
+           :description schema/UpdateSubscriptionDescription
            :path-params [plan-name :- schema/PlanName]
            :return schema/SuccessResponse
-           (ok (qms/update-user-plan username plan-name))))))))
+           (ok (qms/update-subscription username plan-name))))))))

@@ -42,8 +42,8 @@
                (get-subscription-response response-for username))
      :status (:status qms-response)}))
 
-(defn update-user-plan-quota
+(defn update-subscription-quota
   "Validates the username before forwarding the request to QMS to update a user's resource usage limit."
   [username resource-type body]
   (validate-username username)
-  (qms/update-user-plan-quota username resource-type body))
+  (qms/update-subscription-quota username resource-type body))

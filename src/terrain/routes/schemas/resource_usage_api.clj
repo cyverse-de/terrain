@@ -115,7 +115,7 @@
    :resource_type    (describe ResourceType "The resource type of the usage")
    :last_modified_at (describe (maybe String) "The time that the usage record was last modified")})
 
-(defschema UserPlan
+(defschema Subscription
   {:id                   (describe String "The user plan's UUID")
    :effective_start_date (describe String "The date the user's plan takes effect")
    :effective_end_date   (describe String "The date the user's plan ends")
@@ -125,10 +125,10 @@
    :users                (describe QMSUser "User information from the quota management system")})
 
 (defschema ResourceSummary
-  {:cpu_usage  (describe CPUHoursTotal "The object containing the CPU hours total")
-   :data_usage (describe UserCurrentDataTotal "The object containing the data usage total")
-   :user_plan  (describe UserPlan "The user's current plan")
-   :errors     (describe [APIError] "The list of errors generated during summary creation")})
+  {:cpu_usage     (describe CPUHoursTotal "The object containing the CPU hours total")
+   :data_usage    (describe UserCurrentDataTotal "The object containing the data usage total")
+   :subscription  (describe Subscription "The user's current plan")
+   :errors        (describe [APIError] "The list of errors generated during summary creation")})
 
 (defschema Event
   {:id                      EventID
