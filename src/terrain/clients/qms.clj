@@ -63,7 +63,7 @@
         (http/get {:as :json})
         (:body))))
 
-(defn update-user-plan-quota
+(defn update-subscription-quota
   [username resource-type body]
   (with-trap [default-error-handler]
     (-> (qms-api ["v1" "users" username "plan" resource-type "quota"])
@@ -72,7 +72,7 @@
                     :content-type :json})
         (:body))))
 
-(defn update-user-plan
+(defn update-subscription
   [username plan-name]
   (with-trap [default-error-handler]
     (-> (qms-api ["v1" "users" username plan-name])
@@ -80,7 +80,7 @@
         (:body))))
 
 ;;; Non-admin
-(defn user-plan
+(defn subscription
   [username]
   (with-trap [default-error-handler]
     (-> (qms-api ["v1" "users" username "plan"])
