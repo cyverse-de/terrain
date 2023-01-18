@@ -48,7 +48,7 @@
          :middleware [require-authentication]
          :summary schema/GetSubscriptionSummary
          :description schema/GetSubscriptionDescription
-         :return schema/SubscriptionResponse
+         :return schema/SubscriptionPlanResponse
          (ok (qms/subscription (:shortUsername current-user))))
 
        (GET "/usages" []
@@ -108,7 +108,7 @@
              :middleware [require-authentication]
              :summary schema/GetSubscriptionSummary
              :description schema/GetSubscriptionDescription
-             :return schema/SubscriptionResponse
+             :return schema/SubscriptionPlanResponse
              (ok (qms/subscription username)))
 
            (POST "/:resource-type/quota" []

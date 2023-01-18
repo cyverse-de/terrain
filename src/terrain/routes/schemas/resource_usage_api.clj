@@ -127,7 +127,7 @@
 (defschema ResourceSummary
   {:cpu_usage     (describe CPUHoursTotal "The object containing the CPU hours total")
    :data_usage    (describe UserCurrentDataTotal "The object containing the data usage total")
-   :subscription  (describe Subscription "The user's current plan")
+   :subscription  (describe Subscription "The user's subscription")
    :errors        (describe [APIError] "The list of errors generated during summary creation")})
 
 (defschema Event
