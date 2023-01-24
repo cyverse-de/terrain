@@ -51,6 +51,9 @@
                  [org.cyverse/otel "0.2.5"]
                  [org.cyverse/permissions-client "2.8.1"]
                  [org.cyverse/service-logging "2.8.3"]
+                 [io.nats/jnats "2.4.0"]
+                 [less-awful-ssl "1.0.6"]
+                 [clojure.java-time "1.2.0"]
                  [org.cyverse.de/cyverse-de-protobufs "b6461cd1c3d775ec21a290e629e1cbbdaf5e8729"]]
   :eastwood {:exclude-namespaces [terrain.util.jwt :test-paths]
              :linters [:wrong-arity :wrong-ns-form :wrong-pre-post :wrong-tag :misplaced-docstrings]}
