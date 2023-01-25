@@ -603,25 +603,20 @@
   [props config-valid configs]
   "terrain.nats.urls" "tls://nats-0.nats,tls://nats-1.nats,tls://nats-2.nats,tls://nats-3.nats")
 
-(cc/defprop-optstr nats-tls-dir
-  "The path to the directory containing the client TLS files needed for connecting to NATS"
-  [props config-valid configs]
-  "terrain.nats.tls.dir" "/etc/nats/tls")
-
-(cc/defprop-optstr nats-tls-key-fname
+(cc/defprop-optstr nats-tls-key
   "The filename of the TLS key used for connecting to NATS. Must be present in nats-tls-dir"
   [props config-valid configs]
-  "terrain.nats.tls.key" "tls.pkcs8")
+  "terrain.nats.tls.key" "/etc/nats/tls/tls.pkcs8")
 
-(cc/defprop-optstr nats-tls-crt-fname
+(cc/defprop-optstr nats-tls-crt
   "The filename of the TLS key used for connecting to NATS. Must be present in nats-tls-dir"
   [props config-valid configs]
-  "terrain.nats.tls.crt" "tls.crt")
+  "terrain.nats.tls.crt" "/etc/nats/tls/tls.crt")
 
-(cc/defprop-optstr nats-tls-ca-fname
+(cc/defprop-optstr nats-tls-ca
   "The filename of the TLS CA crt used for connecting to NATS. Must be present in nats-tls-dir"
   [props config-valid configs]
-  "terrain.nats.tls.ca" "ca.crt")
+  "terrain.nats.tls.ca" "/etc/nats/tls/ca.crt")
 
 (def async-tasks-client
   (memoize #(async-tasks-client/new-async-tasks-client (async-tasks-base-url))))

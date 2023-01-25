@@ -3,6 +3,7 @@
   (:use [clojure.java.io :only [file resource]]
         [terrain.middleware :only [wrap-fake-user]])
   (:require [terrain.util.config :as config]
+            [terrain.util.nats :as nats]
             [clojure.tools.nrepl.server :as nrepl]
             [me.raynes.fs :as fs]
             [clj-http.client :as http]
@@ -41,9 +42,18 @@
 (defn load-configuration-from-file
   "Loads the configuration properties from a file."
   ([]
-     (load-configuration-from-file (find-configuration-file)))
+   (load-configuration-from-file (find-configuration-file)))
   ([path]
-     (config/load-config-from-file path)))
+   (config/load-config-from-file path)))
+
+(defn nats-connect
+  []
+  (nats/set-options
+   (config/nats-urls)
+   (config/nats-tls-crt)
+   (config/nats-tls-key)
+   (config/nats-tls-ca))
+  (nats/set-connection))
 
 (defn lein-ring-init
   "This function is used by leiningen ring plugin to initialize terrain."
@@ -91,10 +101,10 @@
   [config-path]
   (let [config-path (or config-path "/etc/iplant/de/terrain.properties")]
     (when-not (fs/exists? config-path)
-     (ccli/exit 1 (str "The config file does not exist.")))
-   (when-not (fs/readable? config-path)
-     (ccli/exit 1 "The config file is not readable."))
-   (config/load-config-from-file config-path)))
+      (ccli/exit 1 (str "The config file does not exist.")))
+    (when-not (fs/readable? config-path)
+      (ccli/exit 1 "The config file is not readable."))
+    (config/load-config-from-file config-path)))
 
 (defn- get-port
   [{:keys [port]}]
@@ -105,6 +115,7 @@
   (tc/with-logging-context svc-info
     (let [{:keys [options]} (ccli/handle-args svc-info args cli-options)]
       (load-config (:config options))
+      (nats-connect)
       (http/with-connection-pool {:timeout 5 :threads 10 :insecure? false :default-per-route 10}
         (icat/configure-icat)
         (run-jetty (get-port options) (:fake-user options))))))
