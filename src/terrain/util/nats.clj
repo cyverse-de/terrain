@@ -37,8 +37,8 @@
   (json/parse-string (String. b) true))
 
 (defn request-json
-  ([subject in timeout]
-   (let [msg-bytes (-> (json/generate-string in) (.getBytes))]
+  ([subject out timeout]
+   (let [msg-bytes (-> (json/generate-string out) (.getBytes))]
      (->> (.request @nats-conn subject msg-bytes timeout)
           (.getData)
           (parse-map))))

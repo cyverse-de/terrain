@@ -618,6 +618,16 @@
   [props config-valid configs]
   "terrain.nats.tls.ca" "/etc/nats/tls/ca.crt")
 
+(cc/defprop-optstr add-addon-subject
+  "The NATS subject for adding add-ons"
+  [props config-valid configs]
+  "terrain.nats.subjects.addons.add" "cyverse.qms.addon.add")
+
+(cc/defprop-optstr list-addons-subject
+  "The NATS subject for listing add-ons"
+  [props config-valid configs]
+  "terrain.nats.subjects.addons.list" "cyverse.qms.addon.list")
+
 (def async-tasks-client
   (memoize #(async-tasks-client/new-async-tasks-client (async-tasks-base-url))))
 
