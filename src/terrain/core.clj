@@ -52,7 +52,9 @@
    (config/nats-urls)
    (config/nats-tls-crt)
    (config/nats-tls-key)
-   (config/nats-tls-ca))
+   (config/nats-tls-ca)
+   (config/nats-max-reconnects)
+   (config/nats-reconnect-wait))
   (nats/set-connection))
 
 (defn lein-ring-init

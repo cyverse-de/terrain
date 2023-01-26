@@ -603,6 +603,16 @@
   [props config-valid configs]
   "terrain.nats.urls" "tls://nats-0.nats,tls://nats-1.nats,tls://nats-2.nats,tls://nats-3.nats")
 
+(cc/defprop-optint nats-reconnect-wait
+  "How long to wait between NATS reconnection attempts"
+  [props config-valid configs]
+  "terrain.nats.reconnect.wait" 1)
+
+(cc/defprop-optint nats-max-reconnects
+  "The maximum number of reconnection attempts to NATS"
+  [props config-valid configs]
+  "terrain.nats.reconnect.max" 10)
+
 (cc/defprop-optstr nats-tls-key
   "The filename of the TLS key used for connecting to NATS. Must be present in nats-tls-dir"
   [props config-valid configs]
