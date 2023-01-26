@@ -28,19 +28,27 @@
     (reset! nats-options (get-options servers crt key ca))
     @nats-options))
 
-(defn publish-json [subject out]
-  (let [o (json/generate-string out)]
-    (.publish @nats-conn subject o)))
+(defn- encode-key
+  [key]
+  (-> key name (clojure.string/replace "-" "_")))
 
-(defn- parse-map
+(defn- json-encode
+  [o]
+  (json/generate-string o {:key-fn encode-key}))
+
+(defn- json-decode-bytes
   [b]
   (json/parse-string (String. b) true))
 
+(defn publish-json [subject out]
+  (let [o (json-encode out)]
+    (.publish @nats-conn subject o)))
+
 (defn request-json
   ([subject out timeout]
-   (let [msg-bytes (-> (json/generate-string out) (.getBytes))]
+   (let [msg-bytes (-> (json-encode out) (.getBytes))]
      (-> (.request @nats-conn subject msg-bytes timeout)
          (.getData)
-         (parse-map))))
+         (json-decode-bytes))))
   ([subject out]
    (request-json subject out (jt/duration 20 :seconds))))
