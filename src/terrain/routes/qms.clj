@@ -124,9 +124,10 @@
              :middleware [require-authentication]
              :summary schema/UpdateSubscriptionSummary
              :description schema/UpdateSubscriptionDescription
+             :query [params schema/AddSubscriptionParams]
              :path-params [plan-name :- schema/PlanName]
              :return schema/SuccessResponse
-             (ok (qms/update-subscription username plan-name)))))))))
+             (ok (qms/update-subscription username plan-name params)))))))))
 
 (defn service-account-qms-api-routes
   []
@@ -146,4 +147,4 @@
            :description schema/UpdateSubscriptionDescription
            :path-params [plan-name :- schema/PlanName]
            :return schema/SuccessResponse
-           (ok (qms/update-subscription username plan-name))))))))
+           (ok (qms/update-subscription username plan-name {:paid true}))))))))

@@ -106,7 +106,8 @@
    (optional-key :user)                 QMSUser
    (optional-key :plan)                 Plan
    (optional-key :quotas)               (describe (maybe [Quota]) "The list of quotas associated with the user's plan")
-   (optional-key :usages)               (describe (maybe [Usage]) "The list of usages associated with the user's plan")})
+   (optional-key :usages)               (describe (maybe [Usage]) "The list of usages associated with the user's plan")
+   (optional-key :paid)                 (describe (maybe Boolean) "True if the user paid for the subsciption")})
 
 (defschema SubscriptionPlanResponse
   {(optional-key :result) (describe (maybe Subscription) "The user's plan")
@@ -134,7 +135,8 @@
 
 (defschema SubscriptionRequest
   {(optional-key :username)  (describe String "The username to associate with the subscription")
-   (optional-key :plan_name) (describe String "The name of the plan to associate with the subscription")})
+   (optional-key :plan_name) (describe String "The name of the plan to associate with the subscription")
+   :paid                     (describe Boolean "True if the user paid for the subscription")})
 
 (defschema SubscriptionRequests
   {(optional-key :subscriptions) (describe (maybe [SubscriptionRequest]) "The list of subscription requests")})
@@ -142,6 +144,9 @@
 (defschema BulkSubscriptionParams
   {(optional-key :force)
    (describe String "True if the subscription should be created even if the user already has a higher level plan")})
+
+(defschema AddSubscriptionParams
+  {:paid (describe Boolean "True if the user paid for the subscription")})
 
 (defschema ListSubscriptionsParams
   (merge PagingParams

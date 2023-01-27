@@ -73,9 +73,9 @@
         (:body))))
 
 (defn update-subscription
-  [username plan-name]
+  [username plan-name params]
   (with-trap [default-error-handler]
-    (-> (qms-api ["v1" "users" username plan-name])
+    (-> (qms-api ["v1" "users" username plan-name] params)
         (http/put {:as :json})
         (:body))))
 
