@@ -25,9 +25,9 @@
     (reset! nats-conn (Nats/connect @nats-options))
     @nats-conn))
 
-(defn set-options [servers crt key ca]
+(defn set-options [servers crt key ca max-reconns reconn-wait]
   (if (nil? @nats-options)
-    (reset! nats-options (get-options servers crt key ca))
+    (reset! nats-options (get-options servers crt key ca max-reconns reconn-wait))
     @nats-options))
 
 (defn- encode-key
