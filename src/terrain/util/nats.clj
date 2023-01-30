@@ -6,12 +6,15 @@
             [cheshire.core :as json])
   (:import [io.nats.client Nats Options$Builder]))
 
-(defn- get-options [servers-str crt-fpath key-fpath ca-fpath max-reconns reconn-wait]
-  (let [ssl-ctx     (ssl/ssl-context key-fpath crt-fpath ca-fpath)
+(defn- get-options [servers-str tls? crt-fpath key-fpath ca-fpath max-reconns reconn-wait]
+  (let [ssl-ctx     (if tls? (ssl/ssl-context key-fpath crt-fpath ca-fpath))
         server-list (into-array (clojure.string/split servers-str #"\,"))]
     (-> (new Options$Builder)
         (.servers server-list)
-        (.sslContext ssl-ctx)
+        ((fn [b]
+           (if tls?
+             (.sslContext b ssl-ctx)
+             b)))
         (.maxReconnects max-reconns)
         (.reconnectWait (jt/duration reconn-wait :seconds))
         (.build))))
@@ -25,9 +28,9 @@
     (reset! nats-conn (Nats/connect @nats-options))
     @nats-conn))
 
-(defn set-options [servers crt key ca max-reconns reconn-wait]
+(defn set-options [servers tls? crt key ca max-reconns reconn-wait]
   (if (nil? @nats-options)
-    (reset! nats-options (get-options servers crt key ca max-reconns reconn-wait))
+    (reset! nats-options (get-options servers tls? crt key ca max-reconns reconn-wait))
     @nats-options))
 
 (defn- encode-key

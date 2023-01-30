@@ -50,6 +50,7 @@
   []
   (nats/set-options
    (config/nats-urls)
+   (config/nats-tls-enabled)
    (config/nats-tls-crt)
    (config/nats-tls-key)
    (config/nats-tls-ca)

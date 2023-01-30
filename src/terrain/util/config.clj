@@ -613,6 +613,11 @@
   [props config-valid configs]
   "terrain.nats.reconnect.max" 10)
 
+(cc/defprop-optboolean nats-tls-enabled
+  "Whether to use TLS with the connection to NATS"
+  [props config-valid configs]
+  "terrain.nats.tls.enabled" true)
+
 (cc/defprop-optstr nats-tls-key
   "The filename of the TLS key used for connecting to NATS. Must be present in nats-tls-dir"
   [props config-valid configs]
