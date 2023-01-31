@@ -121,7 +121,7 @@
          :summary schema/DeleteAddonSummary
          :description schema/DeleteAddonDescription
          :path-params [uuid :- schema/AddonID]
-         :return schema/AddonResponse
+         :return schema/DeletedAddonResponse
          (ok (handlers/delete-addon uuid))))
 
      (context "/users" []

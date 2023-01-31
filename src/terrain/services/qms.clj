@@ -84,5 +84,5 @@
 
 (defn delete-addon
   [uuid]
-  (let [req (protobuf/create ByUUID {:uuid uuid})]
+  (let [req (protobuf/create ByUUID {:uuid (str uuid)})]
     (select-keys (nats/request-json (cfg/delete-addon-subject) req) [:addon])))
