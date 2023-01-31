@@ -114,7 +114,15 @@
          :description schema/UpdateAddonDescription
          :body [body schema/UpdateAddon]
          :return schema/AddonResponse
-         (ok (handlers/update-addon body))))
+         (ok (handlers/update-addon body)))
+       
+       (DELETE "/:uuid" []
+         :middleware [require-authentication]
+         :summary schema/DeleteAddonSummary
+         :description schema/DeleteAddonDescription
+         :path-params [uuid :- schema/AddonID]
+         :return schema/AddonResponse
+         (ok (handlers/delete-addon uuid))))
 
      (context "/users" []
        (context "/:username" []
