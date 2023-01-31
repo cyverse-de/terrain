@@ -106,7 +106,15 @@
          :summary schema/ListAddonsSummary
          :description schema/ListAddonsDescription
          :return schema/AddonListResponse
-         (ok (handlers/list-addons))))
+         (ok (handlers/list-addons)))
+       
+       (PUT "/" []
+         :middleware [require-authentication]
+         :summary schema/UpdateAddonSummary
+         :description schema/UpdateAddonDescription
+         :body [body schema/UpdateAddon]
+         :return schema/AddonResponse
+         (ok (handlers/update-addon body))))
 
      (context "/users" []
        (context "/:username" []

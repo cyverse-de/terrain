@@ -1,13 +1,12 @@
 (ns terrain.services.qms
-  (:require [clojure.set :refer [difference]]
-            [clojure-commons.core :refer [remove-nil-values]]
+  (:require [clojure-commons.core :refer [remove-nil-values]]
             [clojure-commons.exception-util :as cxu]
             [terrain.clients.iplant-groups.subjects :as subjects]
             [terrain.util.nats :as nats]
             [protobuf.core :as protobuf]
             [terrain.util.config :as cfg]
             [terrain.clients.qms :as qms])
-  (:import [org.cyverse.de.protobufs AddAddonRequest NoParamsRequest]))
+  (:import [org.cyverse.de.protobufs AddAddonRequest NoParamsRequest UpdateAddonRequest]))
 
 (defn- validate-username
   "Throws an error if a user with the given username doesn't exist."
@@ -61,3 +60,24 @@
   []
   (let [req (protobuf/create NoParamsRequest {})]
     (select-keys (nats/request-json (cfg/list-addons-subject) req) [:addons])))
+
+(defn- select-assoc
+  [m a selector assoc-key assoc-val]
+  (if (get-in m selector)
+    (assoc a assoc-key assoc-val)
+    a))
+
+(defn- update-request
+  [m]
+  (let [assocer (partial select-assoc m)]
+    (merge m (-> {}
+                 (assocer [:name]                :update_name           true)
+                 (assocer [:description]         :update_description    true)
+                 (assocer [:resource_type :uuid] :update_resource_type  true)
+                 (assocer [:default_amount]      :update_default_amount true)
+                 (assocer [:default_paid]        :update_default_paid   true)))))
+
+(defn update-addon
+  [addon]
+  (let [req (protobuf/create UpdateAddonRequest (update-request addon))]
+    (select-keys (nats/request-json (cfg/update-addon-subject) req) [:addon])))
