@@ -27,6 +27,8 @@
 (def AddAddonDescription "Adds an available addon that can be applied to a user's subscription")
 (def ListAddonsSummary "Lists available add-ons")
 (def ListAddonsDescription "Lists the add-ons that can be applied to a user's subscription")
+(def UpdateAddonSummary "Updates an add-on")
+(def UpdateAddonDescription "Updates an available add-on that can be applied to a user's subscription")
 
 (def PlanID (describe (maybe UUID) "The UUID assigned to a plan in QMS"))
 (def PlanName (describe String "The name of the plan"))
@@ -166,6 +168,9 @@
    :name ResourceTypeName
    :unit (describe String "The unit of the resource type")})
 
+(defschema ResourceTypeForAddonUpdate
+  {:uuid (describe UUID "The UUID of the new resource type associated with the add-on")})
+
 (defschema AddOn
   {(optional-key :uuid) (describe UUID "The UUID for the add-on")
    :name                (describe String "The name of the add-on")
@@ -173,6 +178,14 @@
    :default_amount      (describe Double "The amount of the resource provided by the add-on")
    :default_paid        (describe Boolean "Whether the add-on needs to be paid for")
    :resource_type       (describe NATSResourceType "The resource type the add-on provides more of")})
+
+(defschema UpdateAddon
+  {:uuid                         (describe UUID "The UUID of the add-on being updated")
+  (optional-key :name)           (describe String "The new name for the add-on being updated")
+  (optional-key :description)    (describe String "The new description fopr the add-on being updated")
+  (optional-key :default_amount) (describe Double "The new amount provided by the add-on being updated")
+  (optional-key :default_paid)   (describe Boolean "Whether the add-on needs to be paid for")
+  (optional-key :resource_type)   ResourceTypeForAddonUpdate})
 
 (defschema AddonResponse
   {:addon (describe AddOn "The returned add-on")})
