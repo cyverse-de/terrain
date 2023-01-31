@@ -70,7 +70,7 @@
 (defn- update-request
   [m]
   (let [assocer (partial select-assoc m)]
-    (merge m (-> {}
+    (merge {:addon (assoc m :uuid (str (:uuid m)))} (-> {}
                  (assocer [:name]                :update_name           true)
                  (assocer [:description]         :update_description    true)
                  (assocer [:resource_type :uuid] :update_resource_type  true)
