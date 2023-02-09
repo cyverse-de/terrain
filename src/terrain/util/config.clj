@@ -621,7 +621,7 @@
 (cc/defprop-optstr nats-tls-key
   "The filename of the TLS key used for connecting to NATS. Must be present in nats-tls-dir"
   [props config-valid configs]
-  "terrain.nats.tls.key" "/etc/nats/tls/tls.pkcs8")
+  "terrain.nats.tls.key" "/etc/nats/tls/pkcs8/tls.pkcs8")
 
 (cc/defprop-optstr nats-tls-crt
   "The filename of the TLS key used for connecting to NATS. Must be present in nats-tls-dir"
