@@ -172,12 +172,25 @@
       path-list
       (str "unable to send unshare error notification for " unsharee))))
 
+(defn- get-user-from-subject
+  [subject]
+  (condp = (:source_id subject)
+    "ldap"  (:id subject)
+    "g:gsa" (str "@grouper-" (:id subject))
+    nil))
+
+(defn- translate-user-for-irods
+  [share-unshare]
+  (let [provided-user (:user share-unshare)
+        provided-subject (:subject share-unshare)]
+    (or provided-user (get-user-from-subject provided-subject))))
+
 (defn- share-with-user
   "Forwards share requests to data-info from the user and list of paths and permissions in the given
    share map, sending any success notifications to the users involved, and any error notifications
    to the current user."
   [share]
-  (let [user (:user share)
+  (let [user (translate-user-for-irods share)
         paths (:paths share)
         user_share_results (map #(forward-data-info-share user %) paths)
         successful_shares (filter :success user_share_results)
@@ -193,7 +206,7 @@
    sending any success notifications to the users involved, and any error notifications to the
    current user."
   [unshare]
-  (let [user (:user unshare)
+  (let [user (translate-user-for-irods unshare)
         paths (:paths unshare)
         unshare_results (map #(forward-data-info-unshare user %) paths)
         successful_unshares (filter :success unshare_results)
