@@ -5,6 +5,7 @@
         [clojure-commons.file-utils :only [basename]]
         [terrain.auth.user-attributes])
   (:require [clojure.tools.logging :as log]
+            [otel.otel :as otel]
             [terrain.clients.data-info :as data]
             [terrain.clients.notifications :as dn]))
 
@@ -190,39 +191,43 @@
    share map, sending any success notifications to the users involved, and any error notifications
    to the current user."
   [share]
-  (let [user (translate-user-for-irods share)
-        paths (:paths share)
-        user_share_results (map #(forward-data-info-share user %) paths)
-        successful_shares (filter :success user_share_results)
-        unsuccessful_shares (remove :success user_share_results)]
-    (when (seq successful_shares)
-      (send-share-notifications user successful_shares))
-    (when (seq unsuccessful_shares)
-      (send-share-err-notification user unsuccessful_shares))
-    {:user user :sharing user_share_results}))
+  (otel/with-span [s ["share-with-user"]]
+    (let [user (translate-user-for-irods share)
+          paths (:paths share)
+          user_share_results (map #(forward-data-info-share user %) paths)
+          successful_shares (filter :success user_share_results)
+          unsuccessful_shares (remove :success user_share_results)]
+      (when (seq successful_shares)
+        (send-share-notifications user successful_shares))
+      (when (seq unsuccessful_shares)
+        (send-share-err-notification user unsuccessful_shares))
+      {:user user :sharing user_share_results})))
 
 (defn- unshare-with-user
   "Forwards unshare requests to data-info from the user and list of paths in the given unshare map,
    sending any success notifications to the users involved, and any error notifications to the
    current user."
   [unshare]
-  (let [user (translate-user-for-irods unshare)
-        paths (:paths unshare)
-        unshare_results (map #(forward-data-info-unshare user %) paths)
-        successful_unshares (filter :success unshare_results)
-        unsuccessful_unshares (remove :success unshare_results)]
-    (when (seq successful_unshares)
-      (send-unshare-notifications user successful_unshares))
-    (when (seq unsuccessful_unshares)
-      (send-unshare-err-notification user unsuccessful_unshares))
-    {:user user :unshare unshare_results}))
+  (otel/with-span [s ["share-with-user"]]
+    (let [user (translate-user-for-irods unshare)
+          paths (:paths unshare)
+          unshare_results (map #(forward-data-info-unshare user %) paths)
+          successful_unshares (filter :success unshare_results)
+          unsuccessful_unshares (remove :success unshare_results)]
+      (when (seq successful_unshares)
+        (send-unshare-notifications user successful_unshares))
+      (when (seq unsuccessful_unshares)
+        (send-unshare-err-notification user unsuccessful_unshares))
+      {:user user :unshare unshare_results})))
 
 (defn share
   "Parses a batch share request, forwarding each user-share request to data-info."
   [{:keys [sharing]}]
-  (walk share-with-user (partial hash-map :sharing) sharing))
+  (otel/with-span [s ["terrain.services.sharing/share"]]
+    (walk share-with-user (partial hash-map :sharing) sharing)))
 
 (defn unshare
   "Parses a batch unshare request, forwarding each user-unshare request to data-info."
   [{:keys [unshare]}]
-  (walk unshare-with-user (partial hash-map :unshare) unshare))
+  (otel/with-span [s ["terrain.services.sharing/unshare"]]
+    (walk unshare-with-user (partial hash-map :unshare) unshare)))
