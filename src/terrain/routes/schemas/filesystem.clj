@@ -3,6 +3,7 @@
         [common-swagger-api.schema.filetypes :only [ValidInfoTypesEnum]])
   (:require [common-swagger-api.schema.data :as data-schema]
             [common-swagger-api.schema.stats :as stats-schema]
+            [common-swagger-api.schema.subjects :as subjects-schema]
             [schema.core :as s]
             [schema-tools.core :as st])
   (:import [java.util UUID]))
@@ -25,8 +26,14 @@
     (describe s/Any "Additional information about the error if the file or folder was not shared successfully")))
 
 (s/defschema UserShareRequest
-  {:user  (describe NonBlankString "The username of the person to grant permissions to")
-   :paths (describe [PathShareRequest] "The paths and permission levels to grant to the user")})
+  {(s/optional-key :user)
+   (describe NonBlankString "The username of the person to grant permissions to. Mutually exclusive with subject.")
+
+   (s/optional-key :subject)
+   (describe subjects-schema/BaseSubject "The subject (user or group) to grant permissions to. Mutually exclusive with user.")
+
+   :paths
+   (describe [PathShareRequest] "The paths and permission levels to grant to the user")})
 
 (s/defschema UserShareResponse
   (assoc (dissoc UserShareRequest :paths)
@@ -49,8 +56,14 @@
    (describe s/Any "Additional information about the error if the file or folder was not unshared successfully")})
 
 (s/defschema UserUnshareRequest
-  {:user  (describe NonBlankString "The username of the person to revoke permissions from")
-   :paths (describe [NonBlankString] "The paths to the files or folders being unshared")})
+  {(s/optional-key :user)
+   (describe NonBlankString "The username of the person to revoke permissions from. Mutually exclusive with subject.")
+
+   (s/optional-key :subject) 
+   (describe subjects-schema/BaseSubject "The subject (user or group) to revoke permissions from. Mutually exclusive with user.")
+
+   :paths
+   (describe [NonBlankString] "The paths to the files or folders being unshared")})
 
 (s/defschema UserUnshareResponse
   (assoc (dissoc UserUnshareRequest :paths)
