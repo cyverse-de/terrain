@@ -23,6 +23,10 @@
 (def CreateSubscriptionsDescription "Creates multiple subscriptions in one request")
 (def ListSubscriptionsSummary "List Subscriptions")
 (def ListSubscriptionsDescription "Lists existing subscriptions")
+(def AddAddonSummary "Adds an available addon")
+(def AddAddonDescription "Adds an available addon that can be applied to a user's subscription")
+(def ListAddonsSummary "Lists available add-ons")
+(def ListAddonsDescription "Lists the add-ons that can be applied to a user's subscription")
 
 (def PlanID (describe (maybe UUID) "The UUID assigned to a plan in QMS"))
 (def PlanName (describe String "The name of the plan"))
@@ -156,3 +160,22 @@
   {(optional-key :result) (describe (maybe SubscriptionListing) "The subscription listing")
    (optional-key :error)  (describe (maybe String) "The error message if the request could not be completed")
    :status                (describe String "The status of the request")})
+
+(defschema NATSResourceType
+  {(optional-key :uuid)  ResourceID
+   :name ResourceTypeName
+   :unit (describe String "The unit of the resource type")})
+
+(defschema AddOn
+  {(optional-key :uuid) (describe UUID "The UUID for the add-on")
+   :name                (describe String "The name of the add-on")
+   :description         (describe String "The description of the add-on")
+   :default_amount      (describe Double "The amount of the resource provided by the add-on")
+   :default_paid        (describe Boolean "Whether the add-on needs to be paid for")
+   :resource_type       (describe NATSResourceType "The resource type the add-on provides more of")})
+
+(defschema AddonResponse
+  {:addon (describe AddOn "The returned add-on")})
+
+(defschema AddonListResponse
+  {:addons (describe [AddOn] "The returned list of add-ons")})

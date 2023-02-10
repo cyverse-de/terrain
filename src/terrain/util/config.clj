@@ -598,6 +598,51 @@
   [props config-valid configs]
   "terrain.dashboard-aggregator.base-uri" "http://dashboard-aggregator")
 
+(cc/defprop-optstr nats-urls
+  "A comma separated list of NATS connection URLs."
+  [props config-valid configs]
+  "terrain.nats.urls" "tls://nats-0.nats,tls://nats-1.nats,tls://nats-2.nats,tls://nats-3.nats")
+
+(cc/defprop-optint nats-reconnect-wait
+  "How long to wait between NATS reconnection attempts"
+  [props config-valid configs]
+  "terrain.nats.reconnect.wait" 1)
+
+(cc/defprop-optint nats-max-reconnects
+  "The maximum number of reconnection attempts to NATS"
+  [props config-valid configs]
+  "terrain.nats.reconnect.max" 10)
+
+(cc/defprop-optboolean nats-tls-enabled
+  "Whether to use TLS with the connection to NATS"
+  [props config-valid configs]
+  "terrain.nats.tls.enabled" true)
+
+(cc/defprop-optstr nats-tls-key
+  "The filename of the TLS key used for connecting to NATS. Must be present in nats-tls-dir"
+  [props config-valid configs]
+  "terrain.nats.tls.key" "/etc/nats/tls/pkcs8/tls.pkcs8")
+
+(cc/defprop-optstr nats-tls-crt
+  "The filename of the TLS key used for connecting to NATS. Must be present in nats-tls-dir"
+  [props config-valid configs]
+  "terrain.nats.tls.crt" "/etc/nats/tls/tls.crt")
+
+(cc/defprop-optstr nats-tls-ca
+  "The filename of the TLS CA crt used for connecting to NATS. Must be present in nats-tls-dir"
+  [props config-valid configs]
+  "terrain.nats.tls.ca" "/etc/nats/tls/ca.crt")
+
+(cc/defprop-optstr add-addon-subject
+  "The NATS subject for adding add-ons"
+  [props config-valid configs]
+  "terrain.nats.subjects.addons.add" "cyverse.qms.addon.add")
+
+(cc/defprop-optstr list-addons-subject
+  "The NATS subject for listing add-ons"
+  [props config-valid configs]
+  "terrain.nats.subjects.addons.list" "cyverse.qms.addon.list")
+
 (def async-tasks-client
   (memoize #(async-tasks-client/new-async-tasks-client (async-tasks-base-url))))
 

@@ -92,6 +92,22 @@
          :return schema/BulkSubscriptionResponse
          (ok (handlers/add-subscriptions params body))))
 
+     (context "/addons" []
+       (POST "/" []
+         :middleware [require-authentication]
+         :summary schema/AddAddonSummary
+         :description schema/AddAddonDescription
+         :body [body schema/AddOn]
+         :return schema/AddonResponse
+         (ok (handlers/add-addon body)))
+
+       (GET "/" []
+         :middleware [require-authentication]
+         :summary schema/ListAddonsSummary
+         :description schema/ListAddonsDescription
+         :return schema/AddonListResponse
+         (ok (handlers/list-addons))))
+
      (context "/users" []
        (context "/:username" []
          :path-params [username :- schema/Username]

@@ -48,6 +48,18 @@ spec:
             items:
               - key: terrain.properties
                 path: terrain.properties
+        - name: nats-client-tls-pkcs8
+          secret:
+            secretName: nats-client-tls-pkcs8
+            items:
+              - key: tls.pkcs8
+                path: tls.pkcs8
+        - name: nats-client-tls
+          secret:
+            secretName: nats-client-tls
+        - name: nats-services-creds
+          secret:
+            secretName: nats-services-creds
       containers:
       - name: terrain
         image: harbor.cyverse.org/de/terrain
@@ -76,6 +88,15 @@ spec:
             subPath: timezone
           - name: service-configs
             mountPath: /etc/iplant/de
+            readOnly: true
+          - name: nats-client-tls-pkcs8
+            mountPath: /etc/nats/tls/pkcs8
+            readOnly: true
+          - name: nats-client-tls
+            mountPath: /etc/nats/tls
+            readOnly: true
+          - name: nats-services-creds
+            mountPath: /etc/nats/creds
             readOnly: true
         env:
           - name: JAVA_TOOL_OPTIONS

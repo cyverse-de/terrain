@@ -14,6 +14,8 @@
             :url "http://www.cyverse.org/sites/default/files/CyVerse-LICENSE.txt"}
   :manifest {"Git-Ref" ~(git-ref)}
   :uberjar-name "terrain-standalone.jar"
+  :middleware [lein-git-down.plugin/inject-properties]
+  :git-down {org.cyverse.de/cyverse-de-protobufs {:coordinates cyverse-de/p}}
   :dependencies [[org.clojure/clojure "1.10.3"]
                  [org.clojure/data.codec "0.1.1"]
                  [org.clojure/tools.nrepl "0.2.13"]
@@ -48,7 +50,11 @@
                  [org.cyverse/metadata-files "1.0.3"]
                  [org.cyverse/otel "0.2.5"]
                  [org.cyverse/permissions-client "2.8.1"]
-                 [org.cyverse/service-logging "2.8.3"]]
+                 [org.cyverse/service-logging "2.8.3"]
+                 [io.nats/jnats "2.4.0"]
+                 [less-awful-ssl "1.0.6"]
+                 [clojure.java-time "1.2.0"]
+                 [org.cyverse.de/cyverse-de-protobufs "b6461cd1c3d775ec21a290e629e1cbbdaf5e8729"]]
   :eastwood {:exclude-namespaces [terrain.util.jwt :test-paths]
              :linters [:wrong-arity :wrong-ns-form :wrong-pre-post :wrong-tag :misplaced-docstrings]}
   :plugins [[lein-ancient "0.6.15"]
@@ -56,7 +62,8 @@
             [lein-ring "0.12.5" :exclusions [org.clojure/clojure]]
             [swank-clojure "1.4.2" :exclusions [org.clojure/clojure]]
             [test2junit "1.2.2"]
-            [jonase/eastwood "0.3.10"]]
+            [jonase/eastwood "0.3.10"]
+            [reifyhealth/lein-git-down "0.4.1"]]
   :profiles {:dev     {:dependencies [[clj-http-fake "1.0.3"]]
                        :resource-paths ["conf/test" "test-resources"]}
              :uberjar {:aot :all}}
@@ -69,5 +76,6 @@
   :repositories [["cyverse-de"
                   {:url "https://raw.github.com/cyverse-de/mvn/master/releases"}]
                  ["sonatype-releases"
-                  {:url "https://oss.sonatype.org/content/repositories/releases/"}]]
+                  {:url "https://oss.sonatype.org/content/repositories/releases/"}]
+                 ["public-github" {:url "git://github.com" :protocol :https}]]
   :jvm-opts ["-Dlogback.configurationFile=/etc/iplant/de/logging/terrain-logging.xml" "-javaagent:./opentelemetry-javaagent.jar" "-Dotel.resource.attributes=service.name=terrain"])

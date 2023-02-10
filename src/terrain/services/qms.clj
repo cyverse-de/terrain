@@ -3,7 +3,11 @@
             [clojure-commons.core :refer [remove-nil-values]]
             [clojure-commons.exception-util :as cxu]
             [terrain.clients.iplant-groups.subjects :as subjects]
-            [terrain.clients.qms :as qms]))
+            [terrain.util.nats :as nats]
+            [protobuf.core :as protobuf]
+            [terrain.util.config :as cfg]
+            [terrain.clients.qms :as qms])
+  (:import [org.cyverse.de.protobufs AddAddonRequest NoParamsRequest]))
 
 (defn- validate-username
   "Throws an error if a user with the given username doesn't exist."
@@ -47,3 +51,13 @@
   [username resource-type body]
   (validate-username username)
   (qms/update-subscription-quota username resource-type body))
+
+(defn add-addon
+  [addon]
+  (let [req (protobuf/create AddAddonRequest {:addon addon})]
+    (select-keys (nats/request-json (cfg/add-addon-subject) req) [:addon])))
+
+(defn list-addons
+  []
+  (let [req (protobuf/create NoParamsRequest {})]
+    (select-keys (nats/request-json (cfg/list-addons-subject) req) [:addons])))
