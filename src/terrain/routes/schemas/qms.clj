@@ -29,6 +29,8 @@
 (def ListAddonsDescription "Lists the add-ons that can be applied to a user's subscription")
 (def UpdateAddonSummary "Updates an add-on")
 (def UpdateAddonDescription "Updates an available add-on that can be applied to a user's subscription")
+(def DeleteAddonSummary "Deletes an add-on")
+(def DeleteAddonDescription "Deletes an add-on that was available to be applied to a user's subscription")
 
 (def PlanID (describe (maybe UUID) "The UUID assigned to a plan in QMS"))
 (def PlanName (describe String "The name of the plan"))
@@ -39,6 +41,7 @@
 (def UsageID (describe (maybe UUID) "The UUID assigned to a user's usage record for a resource"))
 (def Username (describe String "A user's username"))
 (def ResourceTypeName (describe String "The name of the resource type"))
+(def AddonID (describe UUID "The UUID assigned to an add-on"))
 
 (defschema SuccessResponse
   {(optional-key :result) (describe (maybe Any) "The result of the response")
@@ -171,6 +174,11 @@
 (defschema ResourceTypeForAddonUpdate
   {:uuid (describe UUID "The UUID of the new resource type associated with the add-on")})
 
+(defschema ResourceTypeForAddonDeletion
+  {(optional-key :uuid) (describe (maybe String) "The UUID of the resource type associated with the add-on being deleted. Probably blank")
+   (optional-key :name) (describe (maybe String) "The name of the resource type associated with the add-on being deleted. Probably blank")
+   (optional-key :unit) (describe (maybe String) "The unit of the resource type assciated wiht the add-on being deleted. Probably blank")})
+
 (defschema AddOn
   {(optional-key :uuid) (describe UUID "The UUID for the add-on")
    :name                (describe String "The name of the add-on")
@@ -187,8 +195,19 @@
   (optional-key :default_paid)   (describe Boolean "Whether the add-on needs to be paid for")
   (optional-key :resource_type)   ResourceTypeForAddonUpdate})
 
+(defschema DeletedAddon
+  {:uuid (describe UUID "The UUID of the add-on that was deleted")
+  (optional-key :name)           (describe (maybe String) "The name of the deleted addon. Probably blank")
+  (optional-key :description)    (describe (maybe String) "The descriiption of the deleted addon. Probably blank")
+  (optional-key :default_amount) (describe (maybe Double) "The default amount of the deleted addon. Probably blank")
+  (optional-key :default_paid)   (describe (maybe Boolean) "Whether the add-on needs to be paid for. Probably blank")
+  (optional-key :resource_type)  (maybe ResourceTypeForAddonDeletion)})
+
 (defschema AddonResponse
   {:addon (describe AddOn "The returned add-on")})
+
+(defschema DeletedAddonResponse
+  {:addon DeletedAddon})
 
 (defschema AddonListResponse
   {:addons (describe [AddOn] "The returned list of add-ons")})

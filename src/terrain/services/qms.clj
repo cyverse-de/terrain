@@ -6,7 +6,7 @@
             [protobuf.core :as protobuf]
             [terrain.util.config :as cfg]
             [terrain.clients.qms :as qms])
-  (:import [org.cyverse.de.protobufs AddAddonRequest NoParamsRequest UpdateAddonRequest]))
+  (:import [org.cyverse.de.protobufs AddAddonRequest NoParamsRequest UpdateAddonRequest ByUUID]))
 
 (defn- validate-username
   "Throws an error if a user with the given username doesn't exist."
@@ -81,3 +81,8 @@
   [addon]
   (let [req (protobuf/create UpdateAddonRequest (update-request addon))]
     (select-keys (nats/request-json (cfg/update-addon-subject) req) [:addon])))
+
+(defn delete-addon
+  [uuid]
+  (let [req (protobuf/create ByUUID {:uuid (str uuid)})]
+    (select-keys (nats/request-json (cfg/delete-addon-subject) req) [:addon])))
