@@ -643,6 +643,11 @@
   [props config-valid configs]
   "terrain.nats.subjects.addons.list" "cyverse.qms.addon.list")
 
+(cc/defprop-optstr update-addon-subject
+  "The NATS subject for updating an addon"
+  [props config-valid configs]
+  "terrain.nats.subjects.addons.update" "cyverse.qms.addon.update")
+
 (def async-tasks-client
   (memoize #(async-tasks-client/new-async-tasks-client (async-tasks-base-url))))
 
