@@ -208,7 +208,7 @@
    sending any success notifications to the users involved, and any error notifications to the
    current user."
   [unshare]
-  (otel/with-span [s ["share-with-user"]]
+  (otel/with-span [s ["unshare-with-user"]]
     (let [user (translate-user-for-irods unshare)
           paths (:paths unshare)
           unshare_results (map #(forward-data-info-unshare user %) paths)
