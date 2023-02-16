@@ -653,6 +653,32 @@
   [props config-valid configs]
   "terrain.nats.subjects.addons.delete" "cyverse.qms.addon.delete")
 
+(cc/defprop-optstr add-subscription-addon-subject
+  "The NATS subject for adding a subscription addon"
+  [props config-valid configs]
+  "terrain.nats.subjects.subscription.addons.add" "cyverse.qms.user.plan.addons.add")
+
+(cc/defprop-optstr list-subscription-addons-subject
+  "The NATS subject for listing a subscription's addons"
+  [props config-valid configs]
+  "terrain.nats.subjects.subscription.addons.list" "cyverse.qms.user.plan.addons.list")
+
+(cc/defprop-optstr update-subscription-addon-subject
+  "The NATS subject for updating a subscription addon"
+  [props config-valid configs]
+  "terrain.nats.subjects.subscription.addons.update" "cyverse.qms.user.plan.addons.update")
+
+(cc/defprop-optstr delete-subscription-addon-subject
+  "The NATS subject for deleting a subscription addon"
+  [props config-valid configs]
+  "terrain.nats.subjects.subscription.addons.delete" "cyverse.qms.user.plan.addons.delete")
+
+(cc/defprop-optstr get-subscription-addon-subject
+  "The NATS subject for getting a subscription addon"
+  [props config-valid configs]
+  "terrain.nats.subjects.subscription.addons.get" "cyverse.qms.user.plan.addons.get")
+
+
 (def async-tasks-client
   (memoize #(async-tasks-client/new-async-tasks-client (async-tasks-base-url))))
 

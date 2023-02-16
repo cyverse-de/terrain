@@ -6,7 +6,13 @@
             [protobuf.core :as protobuf]
             [terrain.util.config :as cfg]
             [terrain.clients.qms :as qms])
-  (:import [org.cyverse.de.protobufs AddAddonRequest NoParamsRequest UpdateAddonRequest ByUUID]))
+  (:import [org.cyverse.de.protobufs 
+            AddAddonRequest 
+            NoParamsRequest 
+            UpdateAddonRequest 
+            ByUUID
+            AssociateByUUIDs
+            UpdateSubscriptionAddonRequest]))
 
 (defn- validate-username
   "Throws an error if a user with the given username doesn't exist."
@@ -86,3 +92,37 @@
   [uuid]
   (let [req (protobuf/create ByUUID {:uuid (str uuid)})]
     (select-keys (nats/request-json (cfg/delete-addon-subject) req) [:addon])))
+
+(defn add-subscription-addon
+  [parent-uuid child-uuid]
+  (let [req (protobuf/create AssociateByUUIDs {:parent_uuid (str parent-uuid)
+                                               :child_uuid (str child-uuid)})]
+    (select-keys (nats/request-json (cfg/add-subscription-addon-subject) req) [:subscription_addon])))
+
+(defn list-subscription-addons
+  [uuid]
+  (let [req (protobuf/create ByUUID {:uuid (str uuid)})]
+    (select-keys (nats/request-json (cfg/list-subscription-addons-subject) req) [:subscription_addons])))
+
+(defn update-sub-addon-request
+  [m]
+  (let [assocer (partial select-assoc m)]
+    (merge {:subscription_addon (assoc m :uuid (str (:uuid m)))}
+           (-> {}
+               (assocer [:amount] :update_amount true)
+               (assocer [:paid] :update_paid true)))))
+
+(defn update-subscription-addon
+  [sub-addon]
+  (let [req (protobuf/create (update-sub-addon-request sub-addon))]
+    (select-keys (nats/request-json (cfg/update-subscription-addon-subject) req) [:subscription_addon])))
+
+(defn delete-subscription-addon
+  [uuid]
+  (let [req (protobuf/create ByUUID {:uuid (str uuid)})]
+    (select-keys (nats/request-json (cfg/delete-subscription-addon-subject) req) [:subscription_addon])))
+
+(defn get-subscription-addon
+  [uuid]
+  (let [req (protobuf/create ByUUID {:uuid (str uuid)})]
+    (select-keys (nats/request-json (cfg/get-subscription-addon-subject) req) [:subscription_addon])))
