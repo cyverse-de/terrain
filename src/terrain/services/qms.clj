@@ -119,7 +119,7 @@
 
 (defn update-subscription-addon
   [sub-addon]
-  (let [req (protobuf/create (update-sub-addon-request sub-addon))]
+  (let [req (protobuf/create UpdateSubscriptionAddonRequest (update-sub-addon-request sub-addon))]
     (select-keys (nats/request-json (cfg/update-subscription-addon-subject) req) [:subscription_addon])))
 
 (defn delete-subscription-addon

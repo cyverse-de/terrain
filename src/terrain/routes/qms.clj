@@ -118,7 +118,7 @@
                :middleware [require-authentication]
                :summary schema/GetSubscriptionAddonSummary
                :description schema/GetSubscriptionAddonDescription
-               :return schema/SubscriptionAddon
+               :return schema/SubscriptionAddonResponse
                (ok (handlers/get-subscription-addon uuid)))
            
              (PUT "/" []
@@ -132,7 +132,7 @@
                :middleware [require-authentication]
                :summary schema/DeleteSubscriptionAddonSummary
                :description schema/DeleteSubscriptionAddonDescription
-               :return schema/SubscriptionAddon
+               :return schema/SubscriptionAddonResponse
                (ok (handlers/delete-subscription-addon uuid)))))))
 
      (context "/addons" []

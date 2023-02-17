@@ -87,7 +87,8 @@
    :update_type   (describe String "The update type")})
 
 (defschema QMSUser
-  {(optional-key :id)       QMSUserID
+  {(optional-key :uuid)      QMSUserID
+   (optional-key :id)        QMSUserID
    (optional-key :username) (describe String "The user's username in QMS")})
 
 (defschema PlanQuotaDefault
@@ -97,6 +98,7 @@
 
 (defschema Plan
   {(optional-key :id)                  PlanID
+   (optional-key :uuid)                PlanID
    (optional-key :name)                (describe String "The name of the plan in QMS")
    (optional-key :description)         (describe String "The description of the plan")
    (optional-key :plan_quota_defaults) (describe [PlanQuotaDefault] "The list of default values for the quotas")})
@@ -121,7 +123,8 @@
   {:quota (describe Double "The resource usage limit")})
 
 (defschema Subscription
-  {(optional-key :id)                   (describe (maybe UUID) "The UUID assigned to a user's plan")
+  {(optional-key :uuid)                   (describe (maybe UUID) "The UUID assigned to a user's plan")
+   (optional-key :id)                   (describe (maybe UUID) "The UUID assigned to a user's plan")
    (optional-key :effective_start_date) (describe (maybe String) "The date the user's plan takes effect")
    (optional-key :effective_end_date)   (describe (maybe String) "The date the user's plan ends")
    (optional-key :user)                 QMSUser
