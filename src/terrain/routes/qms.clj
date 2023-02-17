@@ -90,7 +90,50 @@
          :query [params schema/BulkSubscriptionParams]
          :body [body schema/SubscriptionRequests]
          :return schema/BulkSubscriptionResponse
-         (ok (handlers/add-subscriptions params body))))
+         (ok (handlers/add-subscriptions params body)))
+       
+       (context "/:subscription-uuid" []
+         :path-params [subscription-uuid :- schema/SubscriptionID]
+         
+         (context "/addons" []
+           (GET "/" []
+             :middleware [require-authentication]
+             :summary schema/ListSubscriptionAddonsSummary
+             :description schema/ListSubscriptionAddonsDescription
+             :return schema/SubscriptionAddonListResponse
+             (ok (handlers/list-subscription-addons subscription-uuid)))
+           
+           (POST "/" []
+             :middleware [require-authentication]
+             :summary schema/AddSubscriptionAddonSummary
+             :description schema/AddSubscriptionAddonDescription
+             :body [body schema/AddonIDBody]
+             :return schema/SubscriptionAddonResponse
+             (ok (handlers/add-subscription-addon subscription-uuid (:uuid body))))
+           
+           (context "/:uuid" []
+             :path-params [uuid :- schema/SubscriptionAddonID]
+             
+             (GET "/" []
+               :middleware [require-authentication]
+               :summary schema/GetSubscriptionAddonSummary
+               :description schema/GetSubscriptionAddonDescription
+               :return schema/SubscriptionAddon
+               (ok (handlers/get-subscription-addon uuid)))
+           
+             (PUT "/" []
+               :middleware [require-authentication]
+               :summary schema/UpdateSubscriptionAddonSummary
+               :description schema/UpdateSubscriptionAddonDescription
+               :body [body schema/UpdateSubscriptionAddon]
+               (ok (handlers/update-subscription-addon (assoc body :uuid uuid))))
+             
+             (DELETE "/" []
+               :middleware [require-authentication]
+               :summary schema/DeleteSubscriptionAddonSummary
+               :description schema/DeleteSubscriptionAddonDescription
+               :return schema/SubscriptionAddon
+               (ok (handlers/delete-subscription-addon uuid)))))))
 
      (context "/addons" []
        (POST "/" []

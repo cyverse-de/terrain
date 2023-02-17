@@ -99,6 +99,11 @@
                                                :child_uuid (str child-uuid)})]
     (select-keys (nats/request-json (cfg/add-subscription-addon-subject) req) [:subscription_addon])))
 
+(defn get-subscription-addon
+  [addon-uuid]
+  (let [req (protobuf/create ByUUID {:uuid (str addon-uuid)})]
+    (select-keys (nats/request-json (cfg/get-subscription-addon-subject) req) [:subscription_addons])))
+
 (defn list-subscription-addons
   [uuid]
   (let [req (protobuf/create ByUUID {:uuid (str uuid)})]

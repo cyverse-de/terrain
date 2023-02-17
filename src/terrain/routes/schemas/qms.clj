@@ -31,6 +31,16 @@
 (def UpdateAddonDescription "Updates an available add-on that can be applied to a user's subscription")
 (def DeleteAddonSummary "Deletes an add-on")
 (def DeleteAddonDescription "Deletes an add-on that was available to be applied to a user's subscription")
+(def GetSubscriptionAddonSummary "Returns a single subscription add-on")
+(def GetSubscriptionAddonDescription "Returns a subscription add-on by its UUID. This has already been applied to the subscription")
+(def AddSubscriptionAddonSummary "Adds an add-on to a subscription")
+(def AddSubscriptionAddonDescription "Adds an add-on to a subscription, increasing the quota for the resource type in the add-on")
+(def ListSubscriptionAddonsSummary "Returns the add-ons applied to a subscription")
+(def ListSubscriptionAddonsDescription "Returns descriptions of all of the add-ons that have been applied to the indicated subscription")
+(def UpdateSubscriptionAddonSummary "Updates a subscription add-on")
+(def UpdateSubscriptionAddonDescription "Updates a subscription add-on with the values contained within")
+(def DeleteSubscriptionAddonSummary "Delete a subscription add-on")
+(def DeleteSubscriptionAddonDescription "Delete a subscription add-on, decreasing the quota for the resource type in the add-on by the amount provided by the add-on")
 
 (def PlanID (describe (maybe UUID) "The UUID assigned to a plan in QMS"))
 (def PlanName (describe String "The name of the plan"))
@@ -42,6 +52,8 @@
 (def Username (describe String "A user's username"))
 (def ResourceTypeName (describe String "The name of the resource type"))
 (def AddonID (describe UUID "The UUID assigned to an add-on"))
+(def SubscriptionID (describe UUID "The UUID assigned to a subscription"))
+(def SubscriptionAddonID (describe UUID "The UUID assigned to a subscription add-on"))
 
 (defschema SuccessResponse
   {(optional-key :result) (describe (maybe Any) "The result of the response")
@@ -216,3 +228,23 @@
 
 (defschema AddonListResponse
   {:addons (describe [AddOn] "The returned list of add-ons")})
+
+(defschema SubscriptionAddon
+  {(optional-key :uuid) (describe UUID "The UUID for the subscribed add-on")
+   :addon               (describe AddOn "The add-on applied to the subscription")
+   :subscription        (describe Subscription "The subscription the add-on was applied to")
+   :amount              (describe Double "The amount of the resource type provided by the add-on that was actually applied to the subscription")
+   :paid                (describe Boolean "Whether the add-on needs/needed to be paid for")})
+
+(defschema AddonIDBody
+  {:uuid AddonID})
+
+(defschema SubscriptionAddonResponse
+  {:subscription_addon (describe SubscriptionAddon "The returned subscription add-on")})
+
+(defschema UpdateSubscriptionAddon
+  {(optional-key :amount) (describe Double "The new amount of the resource provided by the subscription add-on")
+   (optional-key :paid)   (describe Boolean "Sets whether the subscription add-on needs to be charged for")})
+
+(defschema SubscriptionAddonListResponse
+  {:subscription_addons (describe [SubscriptionAddon] "The returned list of subscription add-ons")})
