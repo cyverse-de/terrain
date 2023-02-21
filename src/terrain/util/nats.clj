@@ -3,7 +3,8 @@
             [java-time.api :as jt]
             [clojure.java.io :as io]
             [protobuf.core :as protobuf]
-            [cheshire.core :as json])
+            [cheshire.core :as json]
+            [clojure-commons.error-codes :as error])
   (:import [io.nats.client Nats Options$Builder]))
 
 (defn- get-options [servers-str tls? crt-fpath key-fpath ca-fpath max-reconns reconn-wait]
@@ -57,3 +58,10 @@
          (json-decode-bytes))))
   ([subject out]
    (request-json subject out (jt/duration 20 :seconds))))
+
+(defn nats-error
+  [service-error]
+  (let [status-code (:status_code service-error)
+        error-code (:error_code service-error)])
+  (cond
+    ))

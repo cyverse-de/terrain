@@ -5,7 +5,8 @@
             [terrain.util.nats :as nats]
             [protobuf.core :as protobuf]
             [terrain.util.config :as cfg]
-            [terrain.clients.qms :as qms])
+            [terrain.clients.qms :as qms]
+            [slingshot.slingshot :refer [throw+ try+]])
   (:import [org.cyverse.de.protobufs 
             AddAddonRequest 
             NoParamsRequest 
@@ -57,21 +58,39 @@
   (validate-username username)
   (qms/update-subscription-quota username resource-type body))
 
-(defn add-addon
-  [addon]
-  (let [req (protobuf/create AddAddonRequest {:addon addon})]
-    (select-keys (nats/request-json (cfg/add-addon-subject) req) [:addon])))
-
-(defn list-addons
-  []
-  (let [req (protobuf/create NoParamsRequest {})]
-    (select-keys (nats/request-json (cfg/list-addons-subject) req) [:addons])))
-
 (defn- select-assoc
   [m a selector assoc-key assoc-val]
   (if (get-in m selector)
     (assoc a assoc-key assoc-val)
     a))
+
+(def not-nil? (complement nil?))
+
+(defn- handle-error
+  [m]
+  (if (not-nil? (:error m)) 
+    (throw+ {:error_code (or (get-in m [:error :error_code]) 
+                             (get-in m [:error :status_code]))
+             :reason     (get-in m [:error :message])})
+    m))
+
+(defn- return-keys
+  [m v]
+  (-> m (handle-error) (select-keys v)))
+
+(defn add-addon
+  [addon]
+  (as-> {:addon addon} r
+    (protobuf/create AddAddonRequest r)
+    (nats/request-json (cfg/add-addon-subject) r)
+    (return-keys r [:addon])))
+
+(defn list-addons
+  []
+  (as-> {} r
+    (protobuf/create NoParamsRequest r)
+    (nats/request-json (cfg/list-addons-subject) r) 
+    (select-keys r [:addons])))
 
 (defn- update-request
   [m]
@@ -85,29 +104,39 @@
 
 (defn update-addon
   [addon]
-  (let [req (protobuf/create UpdateAddonRequest (update-request addon))]
-    (select-keys (nats/request-json (cfg/update-addon-subject) req) [:addon])))
+  (as-> (update-request addon) r
+    (protobuf/create UpdateAddonRequest r)
+    (nats/request-json (cfg/update-addon-subject) r)
+    (return-keys r [:addon])))
 
 (defn delete-addon
   [uuid]
-  (let [req (protobuf/create ByUUID {:uuid (str uuid)})]
-    (select-keys (nats/request-json (cfg/delete-addon-subject) req) [:addon])))
+  (as-> {:uuid (str uuid)} r
+    (protobuf/create ByUUID r)
+    (nats/request-json (cfg/delete-addon-subject) r)
+    (return-keys r [:addon])))
 
 (defn add-subscription-addon
   [parent-uuid child-uuid]
-  (let [req (protobuf/create AssociateByUUIDs {:parent_uuid (str parent-uuid)
-                                               :child_uuid (str child-uuid)})]
-    (select-keys (nats/request-json (cfg/add-subscription-addon-subject) req) [:subscription_addon])))
+  (as-> {:parent_uuid (str parent-uuid)
+         :child_uuid  (str child-uuid)} r
+    (protobuf/create AssociateByUUIDs r)
+    (nats/request-json (cfg/add-subscription-addon-subject) r)
+    (return-keys r [:subscription-addon])))
 
 (defn get-subscription-addon
   [addon-uuid]
-  (let [req (protobuf/create ByUUID {:uuid (str addon-uuid)})]
-    (select-keys (nats/request-json (cfg/get-subscription-addon-subject) req) [:subscription_addons])))
+  (as-> {:uuid (str addon-uuid)} r
+    (protobuf/create ByUUID r)
+    (nats/request-json (cfg/get-subscription-addon-subject) r)
+    (return-keys r [:subscription_addons])))
 
 (defn list-subscription-addons
   [uuid]
-  (let [req (protobuf/create ByUUID {:uuid (str uuid)})]
-    (select-keys (nats/request-json (cfg/list-subscription-addons-subject) req) [:subscription_addons])))
+  (as-> {:uuid (str uuid)} r
+        (protobuf/create ByUUID r)
+        (nats/request-json (cfg/list-subscription-addons-subject) r)
+        (return-keys r [:subscription_addons])))
 
 (defn update-sub-addon-request
   [m]
@@ -119,15 +148,21 @@
 
 (defn update-subscription-addon
   [sub-addon]
-  (let [req (protobuf/create UpdateSubscriptionAddonRequest (update-sub-addon-request sub-addon))]
-    (select-keys (nats/request-json (cfg/update-subscription-addon-subject) req) [:subscription_addon])))
+  (as-> (update-sub-addon-request sub-addon) r
+    (protobuf/create UpdateSubscriptionAddonRequest r)
+    (nats/request-json (cfg/update-subscription-addon-subject) r)
+    (return-keys r [:subscription_addon])))
 
 (defn delete-subscription-addon
   [uuid]
-  (let [req (protobuf/create ByUUID {:uuid (str uuid)})]
-    (select-keys (nats/request-json (cfg/delete-subscription-addon-subject) req) [:subscription_addon])))
+  (as-> {:uuid (str uuid)} r
+    (protobuf/create ByUUID r)
+    (nats/request-json (cfg/delete-subscription-addon-subject) r)
+    (return-keys r [:subscription_addon])))
 
 (defn get-subscription-addon
   [uuid]
-  (let [req (protobuf/create ByUUID {:uuid (str uuid)})]
-    (select-keys (nats/request-json (cfg/get-subscription-addon-subject) req) [:subscription_addon])))
+  (as-> {:uuid (str uuid)} r
+    (protobuf/create ByUUID r)
+    (nats/request-json (cfg/get-subscription-addon-subject) r)
+    (return-keys r [:subscription_addon])))
