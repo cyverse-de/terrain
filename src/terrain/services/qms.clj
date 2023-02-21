@@ -6,6 +6,7 @@
             [protobuf.core :as protobuf]
             [terrain.util.config :as cfg]
             [terrain.clients.qms :as qms]
+            [clojure.tools.logging :as log]
             [slingshot.slingshot :refer [throw+ try+]])
   (:import [org.cyverse.de.protobufs 
             AddAddonRequest 
@@ -69,9 +70,8 @@
 (defn- handle-error
   [m]
   (if (not-nil? (:error m)) 
-    (throw+ {:error_code (or (get-in m [:error :error_code]) 
-                             (get-in m [:error :status_code]))
-             :reason     (get-in m [:error :message])})
+    (throw+ {:error_code  (get-in m [:error :error_code])
+             :reason      (get-in m [:error :message])})
     m))
 
 (defn- return-keys

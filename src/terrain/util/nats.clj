@@ -58,10 +58,3 @@
          (json-decode-bytes))))
   ([subject out]
    (request-json subject out (jt/duration 20 :seconds))))
-
-(defn nats-error
-  [service-error]
-  (let [status-code (:status_code service-error)
-        error-code (:error_code service-error)])
-  (cond
-    ))
