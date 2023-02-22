@@ -59,7 +59,7 @@
 
 (defn request-json
   ([subject out timeout]
-   (let [msg-bytes (-> (log/spy (json-encode out)) (.getBytes))]
+   (let [msg-bytes (-> (json-encode out) (.getBytes))]
      (-> (.request @nats-conn subject msg-bytes timeout)
          (.getData)
          (json-decode-bytes))))
