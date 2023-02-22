@@ -10,13 +10,13 @@
             AssociateByUUIDs
             UpdateSubscriptionAddonRequest]))
 
+(def not-nil? (complement nil?))
+
 (defn- select-assoc
   [m a selector assoc-key assoc-val]
-  (if (get-in m selector)
+  (if (not-nil? (get-in m selector))
     (assoc a assoc-key assoc-val)
     a))
-
-(def not-nil? (complement nil?))
 
 (defn- handle-error
   [m]
