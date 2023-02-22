@@ -1,15 +1,22 @@
 (ns terrain.util.nats
   (:require [less.awful.ssl :as ssl]
             [java-time.api :as jt]
-            [clojure.java.io :as io]
-            [protobuf.core :as protobuf]
             [cheshire.core :as json]
-            [clojure-commons.error-codes :as error])
-  (:import [io.nats.client Nats Options$Builder]))
+            [clojure.string :as string]
+            [pronto.core :as p]
+            [clojure.tools.logging :as log])
+  (:import [io.nats.client Nats Options$Builder] 
+           [org.cyverse.de.protobufs
+            AddAddonRequest
+            NoParamsRequest
+            UpdateAddonRequest
+            ByUUID
+            AssociateByUUIDs
+            UpdateSubscriptionAddonRequest]))
 
 (defn- get-options [servers-str tls? crt-fpath key-fpath ca-fpath max-reconns reconn-wait]
-  (let [ssl-ctx     (if tls? (ssl/ssl-context key-fpath crt-fpath ca-fpath))
-        server-list (into-array (clojure.string/split servers-str #"\,"))]
+  (let [ssl-ctx     (when tls? (ssl/ssl-context key-fpath crt-fpath ca-fpath))
+        server-list (into-array (string/split servers-str #"\,"))]
     (-> (new Options$Builder)
         (.servers server-list)
         ((fn [b]
@@ -36,7 +43,7 @@
 
 (defn- encode-key
   [key]
-  (-> key name (clojure.string/replace "-" "_")))
+  (-> key name (string/replace "-" "_")))
 
 (defn- json-encode
   [o]
@@ -52,9 +59,28 @@
 
 (defn request-json
   ([subject out timeout]
-   (let [msg-bytes (-> (json-encode out) (.getBytes))]
+   (let [msg-bytes (-> (log/spy (json-encode out)) (.getBytes))]
      (-> (.request @nats-conn subject msg-bytes timeout)
          (.getData)
          (json-decode-bytes))))
   ([subject out]
    (request-json subject out (jt/duration 20 :seconds))))
+
+(p/defmapper default-mapper [AddAddonRequest
+                             NoParamsRequest
+                             UpdateAddonRequest
+                             ByUUID
+                             AssociateByUUIDs
+                             UpdateSubscriptionAddonRequest])
+
+(defn create
+  ([mapper cl m]
+   (p/clj-map->proto-map mapper cl m))
+  ([cl m]
+   (create default-mapper cl m)))
+
+(defn request
+  ([subject cl m timeout]
+   (request-json subject (create cl m) timeout))
+  ([subject cl m]
+   (request-json subject (create cl m))))
