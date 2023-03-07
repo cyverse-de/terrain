@@ -1,6 +1,7 @@
 (ns terrain.routes.qms
   (:require [terrain.util.config :as config]
             [terrain.clients.qms :as qms]
+            [terrain.clients.qms-nats :as n]
             [terrain.services.qms :as handlers]
             [terrain.auth.user-attributes :refer [current-user require-authentication require-service-account]]
             [terrain.util :refer [optional-routes]]
@@ -101,7 +102,7 @@
              :summary schema/ListSubscriptionAddonsSummary
              :description schema/ListSubscriptionAddonsDescription
              :return schema/SubscriptionAddonListResponse
-             (ok (handlers/list-subscription-addons subscription-uuid)))
+             (ok (n/list-subscription-addons subscription-uuid)))
            
            (POST "/" []
              :middleware [require-authentication]
@@ -109,7 +110,7 @@
              :description schema/AddSubscriptionAddonDescription
              :body [body schema/AddonIDBody]
              :return schema/SubscriptionAddonResponse
-             (ok (handlers/add-subscription-addon subscription-uuid (:uuid body))))
+             (ok (n/add-subscription-addon subscription-uuid (:uuid body))))
            
            (context "/:uuid" []
              :path-params [uuid :- schema/SubscriptionAddonID]
@@ -119,21 +120,21 @@
                :summary schema/GetSubscriptionAddonSummary
                :description schema/GetSubscriptionAddonDescription
                :return schema/SubscriptionAddonResponse
-               (ok (handlers/get-subscription-addon uuid)))
+               (ok (n/get-subscription-addon uuid)))
            
              (PUT "/" []
                :middleware [require-authentication]
                :summary schema/UpdateSubscriptionAddonSummary
                :description schema/UpdateSubscriptionAddonDescription
                :body [body schema/UpdateSubscriptionAddon]
-               (ok (handlers/update-subscription-addon (assoc body :uuid uuid))))
+               (ok (n/update-subscription-addon (assoc body :uuid uuid))))
              
              (DELETE "/" []
                :middleware [require-authentication]
                :summary schema/DeleteSubscriptionAddonSummary
                :description schema/DeleteSubscriptionAddonDescription
                :return schema/SubscriptionAddonResponse
-               (ok (handlers/delete-subscription-addon uuid)))))))
+               (ok (n/delete-subscription-addon uuid)))))))
 
      (context "/addons" []
        (POST "/" []
@@ -142,14 +143,14 @@
          :description schema/AddAddonDescription
          :body [body schema/AddOn]
          :return schema/AddonResponse
-         (ok (handlers/add-addon body)))
+         (ok (n/add-addon body)))
 
        (GET "/" []
          :middleware [require-authentication]
          :summary schema/ListAddonsSummary
          :description schema/ListAddonsDescription
          :return schema/AddonListResponse
-         (ok (handlers/list-addons)))
+         (ok (n/list-addons)))
        
        (PUT "/" []
          :middleware [require-authentication]
@@ -157,7 +158,7 @@
          :description schema/UpdateAddonDescription
          :body [body schema/UpdateAddon]
          :return schema/AddonResponse
-         (ok (handlers/update-addon body)))
+         (ok (n/update-addon body)))
        
        (DELETE "/:uuid" []
          :middleware [require-authentication]
@@ -165,7 +166,7 @@
          :description schema/DeleteAddonDescription
          :path-params [uuid :- schema/AddonID]
          :return schema/DeletedAddonResponse
-         (ok (handlers/delete-addon uuid))))
+         (ok (n/delete-addon uuid))))
 
      (context "/users" []
        (context "/:username" []
@@ -238,7 +239,7 @@
          :summary schema/ListAddonsSummary
          :description schema/ListAddonsDescription
          :return schema/AddonListResponse
-         (ok (handlers/list-addons))))
+         (ok (n/list-addons))))
      
      (context "/subscriptions" []
        (context "/:subscription-uuid" []
@@ -250,7 +251,7 @@
              :summary schema/ListSubscriptionAddonsSummary
              :description schema/ListSubscriptionAddonsDescription
              :return schema/SubscriptionAddonListResponse
-             (ok (handlers/list-subscription-addons subscription-uuid)))
+             (ok (n/list-subscription-addons subscription-uuid)))
            
            (POST "/" []
              :middleware [[require-service-account ["cyverse-subscription-updater"]]]
@@ -258,7 +259,7 @@
              :description schema/AddSubscriptionAddonDescription
              :body [body schema/AddonIDBody]
              :return schema/SubscriptionAddonResponse
-             (ok (handlers/add-subscription-addon subscription-uuid (:uuid body))))
+             (ok (n/add-subscription-addon subscription-uuid (:uuid body))))
            
            (context "/:uuid" []
              :path-params [uuid :- schema/SubscriptionAddonID]
@@ -268,18 +269,18 @@
                :summary schema/GetSubscriptionAddonSummary
                :description schema/GetSubscriptionAddonDescription
                :return schema/SubscriptionAddonResponse
-               (ok (handlers/get-subscription-addon uuid)))
+               (ok (n/get-subscription-addon uuid)))
            
              (PUT "/" []
                :middleware [[require-service-account ["cyverse-subscription-updater"]]]
                :summary schema/UpdateSubscriptionAddonSummary
                :description schema/UpdateSubscriptionAddonDescription
                :body [body schema/UpdateSubscriptionAddon]
-               (ok (handlers/update-subscription-addon (assoc body :uuid uuid))))
+               (ok (n/update-subscription-addon (assoc body :uuid uuid))))
              
              (DELETE "/" []
                :middleware [[require-service-account ["cyverse-subscription-updater"]]]
                :summary schema/DeleteSubscriptionAddonSummary
                :description schema/DeleteSubscriptionAddonDescription
                :return schema/SubscriptionAddonResponse
-               (ok (handlers/delete-subscription-addon uuid))))))))))
+               (ok (n/delete-subscription-addon uuid))))))))))

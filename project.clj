@@ -54,7 +54,8 @@
                  [io.nats/jnats "2.4.0"]
                  [less-awful-ssl "1.0.6"]
                  [clojure.java-time "1.2.0"]
-                 [org.cyverse.de/cyverse-de-protobufs "5648b3a0afc6cdd006c453b5784c28d00b63ef62"]]
+                 [com.appsflyer/pronto "2.1.1"]
+                 [org.cyverse.de/cyverse-de-protobufs "396942dd7473754b3b158ffba17a0b539eafdb42"]]
   :eastwood {:exclude-namespaces [terrain.util.jwt :test-paths]
              :linters [:wrong-arity :wrong-ns-form :wrong-pre-post :wrong-tag :misplaced-docstrings]}
   :plugins [[lein-ancient "0.6.15"]

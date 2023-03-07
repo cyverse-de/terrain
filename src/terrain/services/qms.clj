@@ -2,17 +2,7 @@
   (:require [clojure-commons.core :refer [remove-nil-values]]
             [clojure-commons.exception-util :as cxu]
             [terrain.clients.iplant-groups.subjects :as subjects]
-            [terrain.util.nats :as nats]
-            [protobuf.core :as protobuf]
-            [terrain.util.config :as cfg]
-            [terrain.clients.qms :as qms])
-  (:import [org.cyverse.de.protobufs 
-            AddAddonRequest 
-            NoParamsRequest 
-            UpdateAddonRequest 
-            ByUUID
-            AssociateByUUIDs
-            UpdateSubscriptionAddonRequest]))
+            [terrain.clients.qms :as qms]))
 
 (defn- validate-username
   "Throws an error if a user with the given username doesn't exist."
@@ -56,78 +46,3 @@
   [username resource-type body]
   (validate-username username)
   (qms/update-subscription-quota username resource-type body))
-
-(defn add-addon
-  [addon]
-  (let [req (protobuf/create AddAddonRequest {:addon addon})]
-    (select-keys (nats/request-json (cfg/add-addon-subject) req) [:addon])))
-
-(defn list-addons
-  []
-  (let [req (protobuf/create NoParamsRequest {})]
-    (select-keys (nats/request-json (cfg/list-addons-subject) req) [:addons])))
-
-(defn- select-assoc
-  [m a selector assoc-key assoc-val]
-  (if (get-in m selector)
-    (assoc a assoc-key assoc-val)
-    a))
-
-(defn- update-request
-  [m]
-  (let [assocer (partial select-assoc m)]
-    (merge {:addon (assoc m :uuid (str (:uuid m)))} (-> {}
-                 (assocer [:name]                :update_name           true)
-                 (assocer [:description]         :update_description    true)
-                 (assocer [:resource_type :uuid] :update_resource_type  true)
-                 (assocer [:default_amount]      :update_default_amount true)
-                 (assocer [:default_paid]        :update_default_paid   true)))))
-
-(defn update-addon
-  [addon]
-  (let [req (protobuf/create UpdateAddonRequest (update-request addon))]
-    (select-keys (nats/request-json (cfg/update-addon-subject) req) [:addon])))
-
-(defn delete-addon
-  [uuid]
-  (let [req (protobuf/create ByUUID {:uuid (str uuid)})]
-    (select-keys (nats/request-json (cfg/delete-addon-subject) req) [:addon])))
-
-(defn add-subscription-addon
-  [parent-uuid child-uuid]
-  (let [req (protobuf/create AssociateByUUIDs {:parent_uuid (str parent-uuid)
-                                               :child_uuid (str child-uuid)})]
-    (select-keys (nats/request-json (cfg/add-subscription-addon-subject) req) [:subscription_addon])))
-
-(defn get-subscription-addon
-  [addon-uuid]
-  (let [req (protobuf/create ByUUID {:uuid (str addon-uuid)})]
-    (select-keys (nats/request-json (cfg/get-subscription-addon-subject) req) [:subscription_addons])))
-
-(defn list-subscription-addons
-  [uuid]
-  (let [req (protobuf/create ByUUID {:uuid (str uuid)})]
-    (select-keys (nats/request-json (cfg/list-subscription-addons-subject) req) [:subscription_addons])))
-
-(defn update-sub-addon-request
-  [m]
-  (let [assocer (partial select-assoc m)]
-    (merge {:subscription_addon (assoc m :uuid (str (:uuid m)))}
-           (-> {}
-               (assocer [:amount] :update_amount true)
-               (assocer [:paid] :update_paid true)))))
-
-(defn update-subscription-addon
-  [sub-addon]
-  (let [req (protobuf/create UpdateSubscriptionAddonRequest (update-sub-addon-request sub-addon))]
-    (select-keys (nats/request-json (cfg/update-subscription-addon-subject) req) [:subscription_addon])))
-
-(defn delete-subscription-addon
-  [uuid]
-  (let [req (protobuf/create ByUUID {:uuid (str uuid)})]
-    (select-keys (nats/request-json (cfg/delete-subscription-addon-subject) req) [:subscription_addon])))
-
-(defn get-subscription-addon
-  [uuid]
-  (let [req (protobuf/create ByUUID {:uuid (str uuid)})]
-    (select-keys (nats/request-json (cfg/get-subscription-addon-subject) req) [:subscription_addon])))
