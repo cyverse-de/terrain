@@ -63,6 +63,7 @@
 (defn update-addon
   [addon]
   (as-> (update-request addon) r
+    (assoc-in r [:addon :resource_type :uuid] (str (get-in r [:addon :resource_type :uuid])))
     (nats/request (cfg/update-addon-subject) UpdateAddonRequest r)
     (return-keys r [:addon])))
 
