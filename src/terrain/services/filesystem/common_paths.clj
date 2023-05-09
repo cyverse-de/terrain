@@ -41,14 +41,9 @@
 
 (defn valid-path? [path-to-check] (valid/good-string? path-to-check))
 
-(defn base-trash-path
-  []
-  (item/trash-base-dir (cfg/irods-zone) (cfg/irods-user)))
-
-
 (defn user-trash-path
   [user]
-  (ft/path-join (base-trash-path) user))
+  (item/trash-base-dir (cfg/irods-zone) user))
 
 (defn in-trash?
   [user ^String fpath]

@@ -8,8 +8,6 @@
   (:require [clojure.tools.logging :as log]
             [clojure.string :as string]
             [clojure-commons.file-utils :as ft]
-            [cemerick.url :as url]
-            [dire.core :refer [with-pre-hook! with-post-hook!]]
             [otel.otel :as otel]
             [terrain.services.filesystem.common-paths :as paths]
             [terrain.util.config :as cfg]
@@ -50,7 +48,7 @@
   [cm user share-with perm fpath]
   (otel/with-span [s ["terrain.services.filesystem.sharing/share-path"]]
     (let [hdir      (share-path-home fpath)
-          trash-dir (trash-base-dir (:zone cm) user)
+          trash-dir (trash-base-dir (:zone cm))
           base-dirs #{hdir trash-dir}]
       (log/warn fpath "is being shared with" share-with "by" user)
       (process-parent-dirs (partial set-readable cm share-with true) #(not (base-dirs %)) fpath)
@@ -121,7 +119,7 @@
           access to any other files or subdirectories."
   [cm user unshare-with fpath]
   (otel/with-span [s ["terrain.services.filesystem.sharing/unshare-path"]]
-    (let [base-dirs #{(ft/rm-last-slash (paths/user-home-dir user)) (trash-base-dir (:zone cm) user)}]
+    (let [base-dirs #{(ft/rm-last-slash (paths/user-home-dir user)) (trash-base-dir (:zone cm))}]
       (log/warn "Removing permissions on" fpath "from" unshare-with "by" user)
       (remove-permissions cm unshare-with fpath)
 
