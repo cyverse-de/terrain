@@ -36,7 +36,7 @@
                  [slingshot "0.12.2"]
                  [org.cyverse/async-tasks-client "0.0.3"]
                  [org.cyverse/clj-icat-direct "2.9.0"]
-                 [org.cyverse/clj-jargon "3.1.0-SNAPSHOT"
+                 [org.cyverse/clj-jargon "3.1.0"
                   :exclusions [org.bouncycastle/bcprov-jdk16]]
                  [org.cyverse/clojure-commons "3.0.6"]
                  [org.cyverse/cyverse-groups-client "0.1.8"]
