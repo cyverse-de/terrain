@@ -56,7 +56,7 @@
 (defn- update-cert-cache
   []
   (otel/with-span [s ["update-cert-cache"]]
-    (let [new-certs (kc/get-oidc-certs)]
+    (let [new-certs (filterv (comp (partial = "sig") :use) (kc/get-oidc-certs))]
       (reset! cached-certs-time (System/currentTimeMillis))
       (reset! cached-certs new-certs))))
 
