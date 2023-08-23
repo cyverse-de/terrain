@@ -2,7 +2,9 @@
   (:require [clojure.string :as string]
             [terrain.auth.user-attributes :as user-attributes]
             [clojure-commons.response :as resp]
-            [terrain.clients.data-usage-api :as dua]))
+            [terrain.clients.apps.raw :as apps]
+            [terrain.clients.data-usage-api :as dua]
+            [terrain.util.transformers :refer [secured-params]]))
 
 (defn- add-context-path
   "Adds a context path to the start of a URI path if it's not present."
@@ -45,3 +47,10 @@
     (if (dua/user-data-overage? (:user (:user-info req)))
       (resp/forbidden "The account has data overages")
       (handler req))))
+
+(defn wrap-create-workspace
+  [handler]
+  (fn [request]
+    (when (:user-info request)
+      (apps/workspace-for-user (secured-params)))
+    (handler request)))
