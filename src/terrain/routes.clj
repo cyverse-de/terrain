@@ -7,7 +7,7 @@
         [ring.middleware.keyword-params :only [wrap-keyword-params]]
         [service-logging.middleware :only [wrap-logging clean-context]]
         [terrain.auth.user-attributes]
-        [terrain.middleware :only [wrap-context-path-adder wrap-query-param-remover]]
+        [terrain.middleware :only [wrap-context-path-adder wrap-create-workspace wrap-query-param-remover]]
         [terrain.routes.admin]
         [terrain.routes.analyses]
         [terrain.routes.apps.admin.apps]
@@ -206,7 +206,8 @@
     require-authentication
     wrap-user-info
     validate-current-user
-    wrap-logging]
+    wrap-logging
+    wrap-create-workspace]
    (admin-routes)))
 
 (def service-account-handler
@@ -221,14 +222,16 @@
    [authenticate-current-user
     require-authentication
     wrap-user-info
-    wrap-logging]
+    wrap-logging
+    wrap-create-workspace]
    (secured-routes)))
 
 (def optionally-authenticated-routes-handler
   (middleware
    [authenticate-current-user
     wrap-user-info
-    wrap-logging]
+    wrap-logging
+    wrap-create-workspace]
    (optionally-authenticated-routes)))
 
 (def secured-routes-no-context-handler
@@ -236,7 +239,8 @@
    [authenticate-current-user
     require-authentication
     wrap-user-info
-    wrap-logging]
+    wrap-logging
+    wrap-create-workspace]
    (secured-routes-no-context)))
 
 (def unsecured-routes-handler

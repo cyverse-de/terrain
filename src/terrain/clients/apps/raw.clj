@@ -1393,13 +1393,19 @@
                 :body         body
                 :content-type :json})))
 
+(def workspace-for-user
+  (memoize (fn [params]
+             (-> (apps-url "workspaces")
+                 (client/get (disable-redirects {:query-params params
+                                                 :as           :json}))
+                 :body))))
+
 (defn bootstrap
   []
-  (:body
-   (client/get (apps-url "bootstrap")
-               (disable-redirects
-                {:query-params (secured-params)
-                 :as           :json}))))
+  (-> (apps-url "bootstrap")
+      (client/get (disable-redirects {:query-params (secured-params)
+                                      :as           :json}))
+      :body))
 
 (defn save-webhooks
   [webhooks]
