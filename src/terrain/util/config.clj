@@ -366,6 +366,11 @@
   [props config-valid configs filesystem-routes-enabled]
   "terrain.data-info.base-url" "http://data-info")
 
+(cc/defprop-optboolean es-enabled
+  "Whether Elasticsearch is enabled for the deployment."
+  [props config-valid configs]
+  "terrain.es.enabled" false)
+
 (cc/defprop-optstr es-url
   "The URL for Elastic Search"
   [props config-valid configs data-routes-enabled]
