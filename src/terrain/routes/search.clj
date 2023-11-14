@@ -25,14 +25,14 @@
        :return Any
        :description "Returns documentation of the available querydsl clauses and their
                     arguments/types, plus the list of available sort fields."
-       (ok (c-search/get-data-search-documentation)))))
+       (ok (c-search/get-data-search-documentation)))
 
-  (POST "/search" []
-    :middleware [mw/check-es-enabled]
-    :summary "Perform a data search"
-    :return Any
-    :body [body SearchRequest]
-    :description "Search utilizing the querydsl.
+     (POST "/search" []
+       :middleware [mw/check-es-enabled]
+       :summary "Perform a data search"
+       :return Any
+       :body [body SearchRequest]
+       :description "Search utilizing the querydsl.
                 This endpoint automatically filters results to those the user can see, and adds a
                 `permission` field that summarizes the requesting user's effective permission on each result."
-    (ok (c-search/do-data-search body))))
+       (ok (c-search/do-data-search body))))))
