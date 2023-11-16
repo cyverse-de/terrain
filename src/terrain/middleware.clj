@@ -4,7 +4,8 @@
             [clojure-commons.response :as resp]
             [terrain.clients.apps.raw :as apps]
             [terrain.clients.data-usage-api :as dua]
-            [terrain.util.transformers :refer [secured-params]]))
+            [terrain.util.transformers :refer [secured-params]]
+            [terrain.util.config :as config]))
 
 (defn- add-context-path
   "Adds a context path to the start of a URI path if it's not present."
@@ -54,3 +55,10 @@
     (when (:user-info request)
       (apps/workspace-for-user (secured-params)))
     (handler request)))
+
+(defn check-es-enabled
+  [handler]
+  (fn [req]
+    (if (config/es-enabled)
+      (handler req)
+      (resp/forbidden "Data search is not enabled in this deployment"))))
