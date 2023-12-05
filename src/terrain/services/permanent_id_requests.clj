@@ -8,7 +8,7 @@
             [clojure.string :as string]
             [clojure.tools.logging :as log]
             [clojure-commons.file-utils :as ft]
-            [org.cyverse.metadata-files.datacite-4-1 :as datacite]
+            [org.cyverse.metadata-files.datacite-4-2 :as datacite]
             [terrain.clients.async-tasks :as async-tasks-client]
             [terrain.clients.data-info :as data-info]
             [terrain.clients.data-info.raw :as data-info-client]

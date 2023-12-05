@@ -47,7 +47,7 @@
                   :exclusion [com.impossibl.pgjdbc-ng/pgjdbc-ng]]
                  [com.impossibl.pgjdbc-ng/pgjdbc-ng "0.8.9"]
                  [org.cyverse/metadata-client "3.1.1"]
-                 [org.cyverse/metadata-files "1.0.3"]
+                 [org.cyverse/metadata-files "2.0.0"]
                  [org.cyverse/otel "0.2.5"]
                  [org.cyverse/permissions-client "2.8.1"]
                  [org.cyverse/service-logging "2.8.3"]
