@@ -89,7 +89,7 @@
   [req]
   (tc/with-logging-context svc-info
     (require 'terrain.routes)
-    ((eval 'terrain.routes/app-wrapper) req)))
+    ((wrap-fake-user (eval 'terrain.routes/app-wrapper) (System/getenv "CYVERSE_USERNAME")) req)))
 
 ;; terrain.routes MUST be required and eval'd here or the configuration won't yet be loaded
 (defn run-jetty
