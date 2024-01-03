@@ -69,10 +69,11 @@
                 (ok (apps/delete-private-tool tool-id params)))
 
         (GET "/" []
+             :query [params schema/ToolDetailsParams]
              :responses schema/ToolDetailsResponses
              :summary schema/ToolDetailsSummary
              :description schema/ToolDetailsDocs
-             (ok (apps/get-tool tool-id)))
+             (ok (apps/get-tool tool-id params)))
 
         (PATCH "/" []
                :middleware [schema/coerce-tool-import-requests]
