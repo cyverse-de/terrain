@@ -49,10 +49,11 @@
                 (ok (apps/admin-delete-tool tool-id)))
 
         (GET "/" []
+             :query [params schema/ToolDetailsParams]
              :responses admin-schema/ToolDetailsResponses
              :summary schema/ToolDetailsSummary
              :description admin-schema/ToolDetailsDocs
-             (ok (apps/admin-get-tool tool-id)))
+             (ok (apps/admin-get-tool tool-id params)))
 
         (PATCH "/" []
                :query [params admin-schema/ToolUpdateParams]

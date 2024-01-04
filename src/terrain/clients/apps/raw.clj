@@ -1105,11 +1105,11 @@
                     :as           :json}))))
 
 (defn admin-get-tool
-  [tool-id]
+  [tool-id params]
   (:body
    (client/get (apps-url "admin" "tools" tool-id)
                (disable-redirects
-                {:query-params (secured-params)
+                {:query-params (secured-params params)
                  :as           :json}))))
 
 (defn admin-update-tool
@@ -1197,11 +1197,11 @@
                     :as           :json}))))
 
 (defn get-tool
-  [tool-id]
+  [tool-id params]
   (:body
    (client/get (apps-url "tools" tool-id)
                (disable-redirects
-                {:query-params (secured-params)
+                {:query-params (secured-params params)
                  :as           :json}))))
 
 (defn update-private-tool
