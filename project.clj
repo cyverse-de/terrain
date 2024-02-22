@@ -66,7 +66,8 @@
             [jonase/eastwood "0.3.10"]
             [reifyhealth/lein-git-down "0.4.1"]]
   :profiles {:dev     {:dependencies [[clj-http-fake "1.0.3"]]
-                       :resource-paths ["conf/test" "test-resources"]}
+                       :resource-paths ["conf/test" "test-resources"]
+                       :jvm-opts ["-Dotel.javaagent.enabled=false"]}
              :uberjar {:aot :all}}
   :main ^:skip-aot terrain.core
   :ring {:handler terrain.core/dev-handler
@@ -79,4 +80,6 @@
                  ["sonatype-releases"
                   {:url "https://oss.sonatype.org/content/repositories/releases/"}]
                  ["public-github" {:url "git://github.com" :protocol :https}]]
-  :jvm-opts ["-Dlogback.configurationFile=/etc/iplant/de/logging/terrain-logging.xml" "-javaagent:./opentelemetry-javaagent.jar" "-Dotel.resource.attributes=service.name=terrain"])
+  :jvm-opts ["-Dlogback.configurationFile=/etc/iplant/de/logging/terrain-logging.xml"
+             "-javaagent:./opentelemetry-javaagent.jar"
+             "-Dotel.resource.attributes=service.name=terrain"])
