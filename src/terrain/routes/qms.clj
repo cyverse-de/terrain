@@ -92,10 +92,10 @@
          :body [body schema/SubscriptionRequests]
          :return schema/BulkSubscriptionResponse
          (ok (handlers/add-subscriptions params body)))
-       
+
        (context "/:subscription-uuid" []
          :path-params [subscription-uuid :- schema/SubscriptionID]
-         
+
          (context "/addons" []
            (GET "/" []
              :middleware [require-authentication]
@@ -103,7 +103,7 @@
              :description schema/ListSubscriptionAddonsDescription
              :return schema/SubscriptionAddonListResponse
              (ok (n/list-subscription-addons subscription-uuid)))
-           
+
            (POST "/" []
              :middleware [require-authentication]
              :summary schema/AddSubscriptionAddonSummary
@@ -111,24 +111,24 @@
              :body [body schema/AddonIDBody]
              :return schema/SubscriptionAddonResponse
              (ok (n/add-subscription-addon subscription-uuid (:uuid body))))
-           
+
            (context "/:uuid" []
              :path-params [uuid :- schema/SubscriptionAddonID]
-             
+
              (GET "/" []
                :middleware [require-authentication]
                :summary schema/GetSubscriptionAddonSummary
                :description schema/GetSubscriptionAddonDescription
                :return schema/SubscriptionAddonResponse
                (ok (n/get-subscription-addon uuid)))
-           
+
              (PUT "/" []
                :middleware [require-authentication]
                :summary schema/UpdateSubscriptionAddonSummary
                :description schema/UpdateSubscriptionAddonDescription
                :body [body schema/UpdateSubscriptionAddon]
                (ok (n/update-subscription-addon (assoc body :uuid uuid))))
-             
+
              (DELETE "/" []
                :middleware [require-authentication]
                :summary schema/DeleteSubscriptionAddonSummary
@@ -151,7 +151,7 @@
          :description schema/ListAddonsDescription
          :return schema/AddonListResponse
          (ok (n/list-addons)))
-       
+
        (PUT "/" []
          :middleware [require-authentication]
          :summary schema/UpdateAddonSummary
@@ -159,7 +159,7 @@
          :body [body schema/UpdateAddon]
          :return schema/AddonResponse
          (ok (n/update-addon body)))
-       
+
        (DELETE "/:uuid" []
          :middleware [require-authentication]
          :summary schema/DeleteAddonSummary
@@ -216,7 +216,7 @@
      (context "/users" []
        (context "/:username" []
          :path-params [username :- schema/Username]
-         
+
          (context "/plan" []
            (GET "/" []
              :middleware [[require-service-account ["cyverse-subscription-updater"]]]
@@ -224,7 +224,7 @@
              :description schema/GetSubscriptionDescription
              :return schema/SubscriptionPlanResponse
              (ok (qms/subscription username)))
-           
+
            (PUT "/:plan-name" []
              :middleware [[require-service-account ["cyverse-subscription-updater"]]]
              :summary schema/UpdateSubscriptionSummary
@@ -232,7 +232,7 @@
              :path-params [plan-name :- schema/PlanName]
              :return schema/SuccessResponse
              (ok (qms/update-subscription username plan-name {:paid true}))))))
-     
+
      (context "/addons" []
        (GET "/" []
          :middleware [[require-service-account ["cyverse-subscription-updater"]]]
@@ -240,11 +240,11 @@
          :description schema/ListAddonsDescription
          :return schema/AddonListResponse
          (ok (n/list-addons))))
-     
+
      (context "/subscriptions" []
        (context "/:subscription-uuid" []
          :path-params [subscription-uuid :- schema/SubscriptionID]
-         
+
          (context "/addons" []
            (GET "/" []
              :middleware [[require-service-account ["cyverse-subscription-updater"]]]
@@ -252,7 +252,7 @@
              :description schema/ListSubscriptionAddonsDescription
              :return schema/SubscriptionAddonListResponse
              (ok (n/list-subscription-addons subscription-uuid)))
-           
+
            (POST "/" []
              :middleware [[require-service-account ["cyverse-subscription-updater"]]]
              :summary schema/AddSubscriptionAddonSummary
@@ -260,24 +260,24 @@
              :body [body schema/AddonIDBody]
              :return schema/SubscriptionAddonResponse
              (ok (n/add-subscription-addon subscription-uuid (:uuid body))))
-           
+
            (context "/:uuid" []
              :path-params [uuid :- schema/SubscriptionAddonID]
-             
+
              (GET "/" []
                :middleware [[require-service-account ["cyverse-subscription-updater"]]]
                :summary schema/GetSubscriptionAddonSummary
                :description schema/GetSubscriptionAddonDescription
                :return schema/SubscriptionAddonResponse
                (ok (n/get-subscription-addon uuid)))
-           
+
              (PUT "/" []
                :middleware [[require-service-account ["cyverse-subscription-updater"]]]
                :summary schema/UpdateSubscriptionAddonSummary
                :description schema/UpdateSubscriptionAddonDescription
                :body [body schema/UpdateSubscriptionAddon]
                (ok (n/update-subscription-addon (assoc body :uuid uuid))))
-             
+
              (DELETE "/" []
                :middleware [[require-service-account ["cyverse-subscription-updater"]]]
                :summary schema/DeleteSubscriptionAddonSummary
