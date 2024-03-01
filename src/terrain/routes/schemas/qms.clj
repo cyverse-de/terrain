@@ -1,6 +1,6 @@
 (ns terrain.routes.schemas.qms
   (:require [common-swagger-api.schema :refer [PagingParams describe]]
-            [schema.core :refer [defschema Any optional-key maybe enum]])
+            [schema.core :as s :refer [defschema Any optional-key maybe enum]])
   (:import [java.util UUID]))
 
 (def GetAllPlansSummary "Returns a list of all plans registered in QMS")
@@ -61,9 +61,10 @@
    :status                (describe String "The status of the response")})
 
 (defschema ResourceType
-  {:id   ResourceID
-   :name ResourceTypeName
-   :unit (describe String "The unit of the resource type")})
+  {:id         ResourceID
+   :name       ResourceTypeName
+   :unit       (describe String "The unit of the resource type")
+   :consumable (describe Boolean "True if using the resource consumes it permanently")})
 
 (defschema ResourceTypesResponse
   {:result (describe [ResourceType] "The list of resource types")
@@ -160,7 +161,9 @@
 (defschema SubscriptionRequest
   {(optional-key :username)  (describe String "The username to associate with the subscription")
    (optional-key :plan_name) (describe String "The name of the plan to associate with the subscription")
-   :paid                     (describe Boolean "True if the user paid for the subscription")})
+   :paid                     (describe Boolean "True if the user paid for the subscription")
+   (optional-key :periods)   (describe Integer "The number of subscription periods")
+   (optional-key :end_date)  (describe String "The end date of the subscription.")})
 
 (defschema SubscriptionRequests
   {(optional-key :subscriptions) (describe (maybe [SubscriptionRequest]) "The list of subscription requests")})
@@ -169,8 +172,11 @@
   {(optional-key :force)
    (describe String "True if the subscription should be created even if the user already has a higher level plan")})
 
+;; The :periods parameter uses s/Int so that we can get automatic coercion.
 (defschema AddSubscriptionParams
-  {:paid (describe Boolean "True if the user paid for the subscription")})
+  {:paid                    (describe Boolean "True if the user paid for the subscription")
+   (optional-key :periods)  (describe s/Int "The number of subscription periods")
+   (optional-key :end_date) (describe String "The end date of the subscription")})
 
 (defschema ListSubscriptionsParams
   (merge PagingParams
