@@ -229,9 +229,10 @@
              :middleware [[require-service-account ["cyverse-subscription-updater"]]]
              :summary schema/UpdateSubscriptionSummary
              :description schema/UpdateSubscriptionDescription
+             :query [params schema/ServiceAccountAddSubscriptionParams]
              :path-params [plan-name :- schema/PlanName]
              :return schema/SuccessResponse
-             (ok (qms/update-subscription username plan-name {:paid true}))))))
+             (ok (qms/update-subscription username plan-name (merge {:paid true} params)))))))
 
      (context "/addons" []
        (GET "/" []
