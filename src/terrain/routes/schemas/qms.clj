@@ -1,5 +1,5 @@
 (ns terrain.routes.schemas.qms
-  (:require [common-swagger-api.schema :refer [PagingParams describe]]
+  (:require [common-swagger-api.schema :refer [PagingParams describe ->optional-param]]
             [schema.core :as s :refer [defschema Any optional-key maybe enum]])
   (:import [java.util UUID]))
 
@@ -176,7 +176,10 @@
 (defschema AddSubscriptionParams
   {:paid                    (describe Boolean "True if the user paid for the subscription")
    (optional-key :periods)  (describe s/Int "The number of subscription periods")
-   (optional-key :end_date) (describe String "The end date of the subscription")})
+   (optional-key :end-date) (describe String "The end date of the subscription")})
+
+(defschema ServiceAccountAddSubscriptionParams
+  (->optional-param AddSubscriptionParams :paid))
 
 (defschema ListSubscriptionsParams
   (merge PagingParams
