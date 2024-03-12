@@ -88,6 +88,7 @@
    (instant-launch-routes)
    (secured-data-routes)
    (secured-filesystem-routes)
+   (secured-filesystem-metadata-routes)
    (secured-search-routes)
    (app-category-routes)
    (app-avu-routes)

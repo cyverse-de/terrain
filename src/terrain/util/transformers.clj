@@ -40,8 +40,10 @@
   "Generates a set of query parameters to pass to a remote service that requires
    the username of the authenticated user."
   ([]
-     (user-params {}))
+   (user-params {}))
   ([existing-params]
-     (assoc existing-params :user (:shortUsername current-user)))
+   (as-> (add-current-user-to-map {}) m
+         (select-keys m [:user])
+         (merge existing-params m)))
   ([existing-params param-keys]
-     (user-params (select-keys existing-params param-keys))))
+   (user-params (select-keys existing-params param-keys))))
