@@ -67,9 +67,11 @@ spec:
           requests:
             cpu: "320m"
             memory: "1Gi"
+            ephemeral-storage: "1Gi"
           limits:
             cpu: "3000m"
             memory: "3Gi"
+            ephemeral-storage: "1Gi"
         args:
           - --config
           - /etc/iplant/de/terrain.properties
