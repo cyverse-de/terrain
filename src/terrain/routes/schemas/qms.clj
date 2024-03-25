@@ -196,17 +196,20 @@
    :status                (describe String "The status of the request")})
 
 (defschema NATSResourceType
-  {(optional-key :uuid)  ResourceID
-   :name ResourceTypeName
-   :unit (describe String "The unit of the resource type")})
+  {(optional-key :uuid) ResourceID
+   :name                ResourceTypeName
+   :unit                (describe String "The unit of the resource type")
+   :consumable          (describe Boolean "True if using the resource consumes it permanently")})
 
 (defschema ResourceTypeForAddonUpdate
-  {:uuid (describe UUID "The UUID of the new resource type associated with the add-on")})
+  {:uuid       (describe UUID "The UUID of the new resource type associated with the add-on")
+   :consumable (describe Boolean "True if using the resource consumes it permanently")})
 
 (defschema ResourceTypeForAddonDeletion
-  {(optional-key :uuid) (describe (maybe String) "The UUID of the resource type associated with the add-on being deleted. Probably blank")
-   (optional-key :name) (describe (maybe String) "The name of the resource type associated with the add-on being deleted. Probably blank")
-   (optional-key :unit) (describe (maybe String) "The unit of the resource type assciated wiht the add-on being deleted. Probably blank")})
+  {(optional-key :uuid)       (describe (maybe String) "The UUID of the resource type associated with the add-on being deleted. Probably blank")
+   (optional-key :name)       (describe (maybe String) "The name of the resource type associated with the add-on being deleted. Probably blank")
+   (optional-key :unit)       (describe (maybe String) "The unit of the resource type assciated wiht the add-on being deleted. Probably blank")
+   (optional-key :consumable) (describe (maybe Boolean) "True if using the resource consumes it permanently. Probably blank")})
 
 (defschema AddOn
   {(optional-key :uuid) (describe UUID "The UUID for the add-on")

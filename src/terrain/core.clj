@@ -63,6 +63,7 @@
   []
   (load-configuration-from-file)
   (icat/configure-icat)
+  (nats-connect)
   (start-nrepl))
 
 (defn repl-init
