@@ -1453,11 +1453,10 @@
                       {:query-params (secured-params)
                        :as           :json}))))
 
-(defn update-agave-job-status
-  [job-id body params]
-  (:body (client/post (apps-url "callbacks" "agave-job" job-id)
+(defn update-tapis-job-status
+  [job-id body]
+  (:body (client/post (apps-url "callbacks" "tapis-job" job-id)
                       (disable-redirects
-                       {:query-params params
-                        :form-params  body
+                       {:form-params  body
                         :content-type :json
                         :as           :json}))))
