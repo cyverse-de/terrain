@@ -1,6 +1,7 @@
 (ns terrain.util.config
   (:use [slingshot.slingshot :only [throw+]])
-  (:require [async-tasks-client.core :as async-tasks-client]
+  (:require [clojure.string :as string]
+            [async-tasks-client.core :as async-tasks-client]
             [clojure-commons.config :as cc]
             [clojure-commons.error-codes :as ce]
             [metadata-client.core :as metadata-client]))
@@ -40,11 +41,15 @@
   [props config-valid configs]
   "terrain.cas.allowed-groups" ["core-services", "tito-admins", "tito-qa-admins", "dev"])
 
-(cc/defprop-str uid-domain
+(cc/defprop-str uid-domain-raw
   "The domain name to append to the user identifier to get the fully qualified
    user identifier."
   [props config-valid configs]
   "terrain.uid.domain")
+
+(defn uid-domain
+  []
+  (string/replace (uid-domain-raw) #"^@+" ""))
 
 (cc/defprop-optboolean admin-routes-enabled
   "Enables or disables the administration routes."
