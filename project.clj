@@ -24,7 +24,7 @@
                  [clj-time "0.15.2"]
                  [clojurewerkz/elastisch "3.0.1"]
                  [com.cemerick/url "0.1.1" :exclusions [com.cemerick/clojurescript.test]]
-                 [dire "0.5.4"]
+                 [org.cyverse/dire "0.5.6-SNAPSHOT"]
                  [me.raynes/fs "1.4.6" :exclusions [org.apache.commons/commons-compress]]
                  [medley "1.4.0"]
                  [metosin/ring-http-response "0.9.3"]

@@ -1,6 +1,5 @@
 (ns terrain.services.filesystem.stat
   (:use [clojure-commons.validators]
-        [clojure.string :as string]
         [clj-jargon.init :only [with-jargon]]
         [clj-jargon.item-info :only [exists? is-dir? stat]]
         [clj-jargon.item-ops :only [input-stream]]
@@ -8,6 +7,7 @@
         [clj-jargon.permissions :only [is-writeable? list-user-perms permission-for owns?]]
         [slingshot.slingshot :only [throw+]])
   (:require [cheshire.core :as json]
+            [clojure.string :as string]
             [clojure.tools.logging :as log]
             [clojure-commons.file-utils :as ft]
             [terrain.services.filesystem.validators :as validators]
