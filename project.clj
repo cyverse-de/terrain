@@ -29,7 +29,6 @@
                  [medley "1.4.0"]
                  [metosin/ring-http-response "0.9.3"]
                  [potemkin "0.4.7"]
-                 [proto-repl "0.3.1"]
                  [org.apache.tika/tika-core "2.9.2" :exclusions [org.slf4j/slf4j-api]]
                  [ring/ring-jetty-adapter "1.8.0"]
                  [slingshot "0.12.2"]
