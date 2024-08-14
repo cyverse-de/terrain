@@ -47,7 +47,6 @@
                  [com.impossibl.pgjdbc-ng/pgjdbc-ng "0.8.9"]
                  [org.cyverse/metadata-client "3.1.2"]
                  [org.cyverse/metadata-files "2.1.1"]
-                 [org.cyverse/otel "0.2.6"]
                  [org.cyverse/permissions-client "2.8.4"]
                  [org.cyverse/service-logging "2.8.4"]
                  [io.nats/jnats "2.20.0"]
@@ -64,8 +63,7 @@
             [jonase/eastwood "1.4.3"]
             [reifyhealth/lein-git-down "0.4.1"]]
   :profiles {:dev     {:dependencies [[clj-http-fake "1.0.4"]]
-                       :resource-paths ["conf/test" "test-resources"]
-                       :jvm-opts ["-Dotel.javaagent.enabled=false"]}
+                       :resource-paths ["conf/test" "test-resources"]}
              :uberjar {:aot :all}}
   :main ^:skip-aot terrain.core
   :ring {:handler terrain.core/dev-handler
@@ -78,6 +76,4 @@
                  ["sonatype-releases"
                   {:url "https://oss.sonatype.org/content/repositories/releases/"}]
                  ["public-github" {:url "git://github.com" :protocol :https}]]
-  :jvm-opts ["-Dlogback.configurationFile=/etc/iplant/de/logging/terrain-logging.xml"
-             "-javaagent:./opentelemetry-javaagent.jar"
-             "-Dotel.resource.attributes=service.name=terrain"])
+  :jvm-opts ["-Dlogback.configurationFile=/etc/iplant/de/logging/terrain-logging.xml"])
