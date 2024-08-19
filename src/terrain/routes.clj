@@ -60,6 +60,7 @@
   (:require [clojure.tools.logging :as log]
             [clojure-commons.exception :as cx]
             [compojure.route :as route]
+            [compojure.api.core :refer [route-middleware]]
             [service-logging.thread-context :as tc]
             [terrain.util :as util]
             [terrain.util.service :as service]
@@ -201,7 +202,7 @@
    (unsecured-notification-routes)))
 
 (def admin-handler
-  (middleware
+  (route-middleware
    [authenticate-current-user
     require-authentication
     wrap-user-info
@@ -211,14 +212,14 @@
    (admin-routes)))
 
 (def service-account-handler
-  (middleware
+  (route-middleware
     [authenticate-current-user
      wrap-user-info
      wrap-logging]
     (service-account-routes)))
 
 (def secured-routes-handler
-  (middleware
+  (route-middleware
    [authenticate-current-user
     require-authentication
     wrap-user-info
@@ -227,7 +228,7 @@
    (secured-routes)))
 
 (def optionally-authenticated-routes-handler
-  (middleware
+  (route-middleware
    [authenticate-current-user
     wrap-user-info
     wrap-logging
@@ -235,7 +236,7 @@
    (optionally-authenticated-routes)))
 
 (def secured-routes-no-context-handler
-  (middleware
+  (route-middleware
    [authenticate-current-user
     require-authentication
     wrap-user-info
@@ -244,7 +245,7 @@
    (secured-routes-no-context)))
 
 (def unsecured-routes-handler
-  (middleware
+  (route-middleware
    [wrap-logging]
    (unsecured-routes)))
 
@@ -338,7 +339,7 @@
                                      {:name "vice", :description "VICE Endpoints"}
                                      {:name "service-account-qms", :description "Service Account QMS Endpoints"}]
                :securityDefinitions security-definitions}})
-  (middleware
+  (route-middleware
    [[wrap-query-param-remover "ip-address" #{#"^/terrain/secured/bootstrap"
                                              #"^/terrain/secured/logout"}]
     wrap-query-params
