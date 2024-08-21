@@ -46,7 +46,7 @@
                  [org.cyverse/metadata-files "2.1.1"]
                  [org.cyverse/permissions-client "2.8.4"]
                  [org.cyverse/service-logging "2.8.4"]
-                 [io.nats/jnats "2.20.0"]
+                 [io.nats/jnats "2.20.1"]
                  [less-awful-ssl "1.0.6"]
                  [clojure.java-time "1.4.2"]
                  [com.appsflyer/pronto "3.0.0"]
