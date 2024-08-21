@@ -14,8 +14,6 @@
             :url "https://cyverse.org/license"}
   :manifest {"Git-Ref" ~(git-ref)}
   :uberjar-name "terrain-standalone.jar"
-  :middleware [lein-git-down.plugin/inject-properties]
-  :git-down {org.cyverse.de/cyverse-de-protobufs {:coordinates cyverse-de/p}}
   :dependencies [[org.clojure/clojure "1.11.4"]
                  [org.clojure/data.codec "0.2.0"]
                  [org.clojure/tools.nrepl "0.2.13"]
@@ -52,15 +50,14 @@
                  [less-awful-ssl "1.0.6"]
                  [clojure.java-time "1.4.2"]
                  [com.appsflyer/pronto "3.0.0"]
-                 [org.cyverse.de/cyverse-de-protobufs "2317731ae9fac1ecce3cedfb7ee168ba28305d73"]]
+                 [org.cyverse/cyverse-de-protobufs "0.0.2"]]
   :eastwood {:exclude-namespaces [terrain.util.jwt :test-paths]
              :linters [:wrong-arity :wrong-ns-form :wrong-pre-post :wrong-tag :misplaced-docstrings]}
   :plugins [[lein-ancient "0.7.0"]
             [lein-cljfmt "0.9.2"]
             [lein-ring "0.12.6"]
             [test2junit "1.4.4"]
-            [jonase/eastwood "1.4.3"]
-            [reifyhealth/lein-git-down "0.4.1"]]
+            [jonase/eastwood "1.4.3"]]
   :profiles {:dev     {:dependencies [[clj-http-fake "1.0.4"]]
                        :resource-paths ["conf/test" "test-resources"]}
              :uberjar {:aot :all}}
@@ -73,6 +70,5 @@
   :repositories [["cyverse-de"
                   {:url "https://raw.github.com/cyverse-de/mvn/master/releases"}]
                  ["sonatype-releases"
-                  {:url "https://oss.sonatype.org/content/repositories/releases/"}]
-                 ["public-github" {:url "git://github.com" :protocol :https}]]
+                  {:url "https://oss.sonatype.org/content/repositories/releases/"}]]
   :jvm-opts ["-Dlogback.configurationFile=/etc/iplant/de/logging/terrain-logging.xml"])
