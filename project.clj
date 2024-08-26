@@ -31,7 +31,7 @@
                  [ring/ring-jetty-adapter "1.8.0"]
                  [slingshot "0.12.2"]
                  [org.cyverse/async-tasks-client "0.0.5"]
-                 [org.cyverse/clj-icat-direct "2.9.6"]
+                 [org.cyverse/clj-icat-direct "2.9.7"]
                  [org.cyverse/clj-jargon "3.1.1"
                   :exclusions [org.bouncycastle/bcprov-jdk16]]
                  [org.cyverse/clojure-commons "3.0.9"]
