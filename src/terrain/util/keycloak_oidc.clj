@@ -4,8 +4,7 @@
             [clojure-commons.jwt :as jwt]
             [clojure-commons.response :as resp]
             [terrain.clients.keycloak :as kc]
-            [terrain.util.config :as config]
-            [otel.otel :as otel]))
+            [terrain.util.config :as config]))
 
 (defn- is-service-account?
   [{:keys [preferred_username]}]
@@ -55,10 +54,9 @@
 
 (defn- update-cert-cache
   []
-  (otel/with-span [s ["update-cert-cache"]]
-    (let [new-certs (filterv (comp (partial = "sig") :use) (kc/get-oidc-certs))]
-      (reset! cached-certs-time (System/currentTimeMillis))
-      (reset! cached-certs new-certs))))
+  (let [new-certs (filterv (comp (partial = "sig") :use) (kc/get-oidc-certs))]
+    (reset! cached-certs-time (System/currentTimeMillis))
+    (reset! cached-certs new-certs)))
 
 (defn- validate-with-cache
   [token]

@@ -1,10 +1,10 @@
-FROM clojure:openjdk-17-lein-alpine
+FROM clojure:temurin-22-lein-jammy
 
 WORKDIR /usr/src/app
 
-RUN apk upgrade apk-tools && \
-    apk upgrade && \
-    apk add --no-cache git
+RUN apt-get update && \
+    apt-get install -y git && \
+    rm -rf /var/lib/apt/lists/*
 
 CMD ["--help"]
 
@@ -16,9 +16,7 @@ RUN mkdir -p /etc/iplant/de/crypto && \
 
 COPY conf/main/logback.xml /usr/src/app/
 
-RUN ln -s "/opt/openjdk-17/bin/java" "/bin/terrain"
-
-ENV OTEL_TRACES_EXPORTER none
+RUN ln -s "/opt/java/openjdk/bin/java" "/bin/terrain"
 
 COPY . /usr/src/app
 RUN lein do clean, uberjar && \
@@ -31,7 +29,7 @@ ADD "https://uit.stanford.edu/sites/default/files/2023/10/11/incommon-rsa-ca2.pe
 RUN sed -i -E 's/\r\n?/\n/g' "/usr/local/share/ca-certificates/incommon-rsa-ca2.pem" && \
     update-ca-certificates
 
-ENTRYPOINT ["terrain", "-Dlogback.configurationFile=/etc/iplant/de/logging/terrain-logging.xml", "-javaagent:/usr/src/app/opentelemetry-javaagent.jar", "-Dotel.resource.attributes=service.name=terrain", "-cp", ".:terrain-standalone.jar", "terrain.core"]
+ENTRYPOINT ["terrain", "-Dlogback.configurationFile=/etc/iplant/de/logging/terrain-logging.xml", "-cp", ".:terrain-standalone.jar", "terrain.core"]
 
 ARG git_commit=unknown
 ARG version=unknown

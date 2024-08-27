@@ -1,6 +1,5 @@
 (ns terrain.services.filesystem.stat
   (:use [clojure-commons.validators]
-        [clojure.string :as string]
         [clj-jargon.init :only [with-jargon]]
         [clj-jargon.item-info :only [exists? is-dir? stat]]
         [clj-jargon.item-ops :only [input-stream]]
@@ -8,6 +7,7 @@
         [clj-jargon.permissions :only [is-writeable? list-user-perms permission-for owns?]]
         [slingshot.slingshot :only [throw+]])
   (:require [cheshire.core :as json]
+            [clojure.string :as string]
             [clojure.tools.logging :as log]
             [clojure-commons.file-utils :as ft]
             [terrain.services.filesystem.validators :as validators]
@@ -16,8 +16,7 @@
             [terrain.clients.data-info.raw :as data-raw]
             [terrain.util.config :as cfg]
             [terrain.services.filesystem.common-paths :as paths]
-            [terrain.services.filesystem.icat :as jargon]
-            [otel.otel :as otel])
+            [terrain.services.filesystem.icat :as jargon])
   (:import [clojure.lang IPersistentMap]
            [java.io InputStream]
            [org.apache.tika Tika]))
@@ -85,10 +84,9 @@
 
 (defn path-is-dir?
   [path]
-  (otel/with-span [s ["path-is-dir?" {:attributes {"irods.path" path}}]]
-    (with-jargon (jargon/jargon-cfg) [cm]
-      (validators/path-exists cm path)
-      (is-dir? cm path))))
+  (with-jargon (jargon/jargon-cfg) [cm]
+    (validators/path-exists cm path)
+    (is-dir? cm path)))
 
 (defn decorate-stat
   [cm user stat]
@@ -103,15 +101,13 @@
 
 (defn path-stat
   ([cm user path]
-   (otel/with-span [s ["path-stat [inner]" {:attributes {"irods.path" path}}]]
-     (let [path (ft/rm-last-slash path)]
-       (log/warn "[path-stat] user:" user "path:" path)
-       (validators/path-exists cm path)
-       (decorate-stat cm user (stat cm path)))))
+   (let [path (ft/rm-last-slash path)]
+     (log/warn "[path-stat] user:" user "path:" path)
+     (validators/path-exists cm path)
+     (decorate-stat cm user (stat cm path))))
   ([user path]
-   (otel/with-span [s ["path-stat" {:attributes {"irods.path" path}}]]
-     (with-jargon (jargon/jargon-cfg) [cm]
-       (path-stat cm user path)))))
+   (with-jargon (jargon/jargon-cfg) [cm]
+     (path-stat cm user path))))
 
 (defn- dir-stack
   "Obtains a stack of parent directories for a directory path."
@@ -125,13 +121,11 @@
 
 (defn can-create-dir?
   ([cm user path]
-   (otel/with-span [s ["can-create-dir? [inner]" {:attributes {"irods.path" path}}]]
-     ((every-pred (partial is-dir? cm) (partial is-writeable? cm user))
-      (log/spy :warn (deepest-extant-parent cm path)))))
+   ((every-pred (partial is-dir? cm) (partial is-writeable? cm user))
+    (log/spy :warn (deepest-extant-parent cm path))))
   ([user path]
-   (otel/with-span [s ["can-create-dir?" {:attributes {"irods.path" path}}]]
-     (with-jargon (jargon/jargon-cfg) [cm]
-       (can-create-dir? cm user path)))))
+   (with-jargon (jargon/jargon-cfg) [cm]
+     (can-create-dir? cm user path))))
 
 (defn do-stat
   [{user :user} body]

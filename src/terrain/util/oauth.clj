@@ -2,7 +2,6 @@
   (:use [slingshot.slingshot :only [try+]])
   (:require [clojure-commons.exception-util :as cx]
             [clojure-commons.response :as resp]
-            [otel.otel :as otel]
             [ring.util.http-response :as http-resp]
             [terrain.clients.oauth :as oauth]
             [terrain.util.config :as config]))
@@ -38,7 +37,6 @@
 
 (defn get-oauth-profile
   [token]
-  (otel/with-span [s ["get-oauth-profile" {:kind :client}]]
   (try+
    (doto (oauth/get-profile token)
      (validate-oauth-profile))
@@ -47,7 +45,7 @@
    (catch [:type :validation] _
      (cx/forbidden (.getMessage (:throwable &throw-context))))
    (catch Object _
-     (cx/internal-system-error "Received an unexpected exception.")))))
+     (cx/internal-system-error "Received an unexpected exception."))))
 
 (defn validate-oauth-token
   [handler token-fn]
