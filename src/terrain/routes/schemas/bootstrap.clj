@@ -49,4 +49,5 @@
    :session     UserSessionResponse
    :apps_info   AppsBootstrapResponse
    :data_info   DataInfoResponse
-   :preferences UserPreferencesResponse})
+   :preferences (conditional :error BootstrapServiceError
+                             :else Any)}) ;; I don't know why but UserPreferencesResponse isn't working
