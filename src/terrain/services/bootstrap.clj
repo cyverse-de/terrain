@@ -50,7 +50,10 @@
 (defn- get-user-prefs
   [username]
   (trap-bootstrap-request
-   #(prefs/user-prefs username)))
+   #(let [prefs (prefs/user-prefs username)]
+      (if (and (:error prefs) (:default_output_folder prefs)) ;; if we've got both, there's an error stored in preferences. remove it so schema validation works right
+        (dissoc prefs :error)
+        prefs))))
 
 (defn bootstrap
   "This service obtains information about and initializes the workspace for the authenticated user.

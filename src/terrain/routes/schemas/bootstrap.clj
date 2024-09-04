@@ -35,8 +35,7 @@
 
 (defschema UserPreferencesResponse
   (doc-only (conditional :error BootstrapServiceError
-                         :else Any)
-                         ;; :else user-prefs-schema/UserPreferencesResponse) ;; wasn't working for some reason
+                         :else user-prefs-schema/UserPreferencesResponse)
             user-prefs-schema/UserPreferencesResponseDocs))
 
 (defschema UserSessionResponse
@@ -49,5 +48,4 @@
    :session     UserSessionResponse
    :apps_info   AppsBootstrapResponse
    :data_info   DataInfoResponse
-   :preferences (conditional :error BootstrapServiceError
-                             :else Any)}) ;; I don't know why but UserPreferencesResponse isn't working
+   :preferences UserPreferencesResponse})
