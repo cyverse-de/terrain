@@ -1,7 +1,7 @@
 (ns terrain.routes.callbacks
   (:use [common-swagger-api.schema]
         [common-swagger-api.schema.analyses :only [AnalysisIdPathParam]]
-        [common-swagger-api.schema.callbacks :only [AgaveJobStatusUpdateParams AgaveJobStatusUpdate]]
+        [common-swagger-api.schema.callbacks :only [TapisJobStatusUpdate]]
         [ring.util.http-response :only [ok]]
         [terrain.util])
   (:require [terrain.clients.apps.raw :as apps]
@@ -11,15 +11,14 @@
   "Routes for making calls back into the DE web services."
   []
   (optional-routes
-   [config/app-routes-enabled]
+    [config/app-routes-enabled]
 
-   (context "/callbacks" []
-     :tags ["callbacks"]
+    (context "/callbacks" []
+             :tags ["callbacks"]
 
-     (POST "/agave-job/:job-id" []
-       :path-params [job-id :- AnalysisIdPathParam]
-       :body [body (describe AgaveJobStatusUpdate "The updated job status information.")]
-       :query [params AgaveJobStatusUpdateParams]
-       :summary "Update the status of an Agave analysis."
-       :description "The DE registers this endpoint as a callback when it submts jobs to Agave."
-       (ok (apps/update-agave-job-status job-id body params))))))
+             (POST "/tapis-job/:job-id" []
+                   :path-params [job-id :- AnalysisIdPathParam]
+                   :body [body (describe TapisJobStatusUpdate "The updated job status information.")]
+                   :summary "Update the status of a Tapis analysis."
+                   :description "The DE registers this endpoint as a callback when it submits jobs to Tapis."
+                   (ok (apps/update-tapis-job-status job-id body))))))
