@@ -16,12 +16,6 @@
        :description-file "docs/get-token.md"
        (oauth/get-token authorization))
 
-     (GET "/cas" [:as {{:strs [authorization]} :headers}]
-       :summary "Obtain OAuth Tokens"
-       :return AccessTokenResponse
-       :description-file "docs/get-token.md"
-       (oauth/get-cas-token authorization))
-
      (GET "/keycloak" [:as {{:strs [authorization]} :headers}]
        :summary "Obtain Keycloak OIDC Tokens"
        :return AccessTokenResponse

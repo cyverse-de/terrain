@@ -3,12 +3,10 @@
   (:require [clojure.string :as string]
             [clojure.tools.logging :as log]
             [clojure-commons.response :as resp]
-            [clojure-commons.exception :as cx]
             [clojure-commons.exception-util :as cxu]
             [terrain.clients.iplant-groups.subjects :as subjects]
             [terrain.util.config :as cfg]
             [terrain.util.jwt :as jwt]
-            [terrain.util.oauth :as oauth-util]
             [terrain.util.keycloak-oidc :as keycloak-oidc-util]))
 
 (def
@@ -163,13 +161,6 @@
   [[_ token]]
   (re-find #"^(?:[\p{Alnum}_-]+=*[.]){1,2}(?:[\p{Alnum}_-]+=*)$" token))
 
-(defn- get-cas-oauth-token
-  "Returns a non-nil value if we appear to have received a CAS OAuth token."
-  [request]
-  (when-let [header (get-authorization-header request)]
-    (when (and (is-bearer? header) (not (is-jwt? header)))
-      (second header))))
-
 (defn- get-keycloak-oidc-token
   "Returns a non-nil value if we appear to have received a Keycloak bearer token."
   [request]
@@ -191,11 +182,6 @@
   (-> (wrap-current-user handler user-from-wso2-jwt-claims)
       (jwt/validate-jwt-assertion get-wso2-jwt-assertion jwt/user-from-wso2-assertion)))
 
-(defn- wrap-cas-oauth
-  [handler]
-  (-> (wrap-current-user handler oauth-util/user-from-oauth-profile)
-      (oauth-util/validate-oauth-token get-cas-oauth-token)))
-
 (defn- wrap-keycloak-oidc
   [handler]
   (-> handler
@@ -213,7 +199,6 @@
   (wrap-auth-selection [[get-fake-auth           (wrap-fake-auth handler)]
                         [get-de-jwt-assertion    (wrap-de-jwt-auth handler)]
                         [get-wso2-jwt-assertion  (wrap-wso2-jwt-auth handler)]
-                        [get-cas-oauth-token     (wrap-cas-oauth handler)]
                         [get-keycloak-oidc-token (wrap-keycloak-oidc handler)]
                         [(constantly true)       handler]]))
 
@@ -224,7 +209,6 @@
    [[get-fake-auth           handler]
     [get-de-jwt-assertion    (jwt/validate-group-membership handler cfg/allowed-groups)]
     [get-wso2-jwt-assertion  (constantly (resp/forbidden "Admin not supported for WSO2."))]
-    [get-cas-oauth-token     (oauth-util/validate-group-membership handler cfg/allowed-groups)]
     [get-keycloak-oidc-token (keycloak-oidc-util/validate-group-membership handler cfg/allowed-groups)]
     [(constantly true)       (constantly (resp/unauthorized "Admin endpoints require authentication."))]]))
 

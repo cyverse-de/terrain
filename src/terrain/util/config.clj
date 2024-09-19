@@ -39,7 +39,7 @@
 (cc/defprop-optvec allowed-groups
   "The names of the groups that are permitted to access secured admin services."
   [props config-valid configs]
-  "terrain.cas.allowed-groups" ["core-services", "tito-admins", "tito-qa-admins", "dev"])
+  "terrain.authz.allowed-groups" ["core-services", "tito-admins", "tito-qa-admins", "dev"])
 
 (cc/defprop-str uid-domain-raw
   "The domain name to append to the user identifier to get the fully qualified
@@ -542,21 +542,6 @@
   "The base URL for accessing bag information"
   [props config-valid configs]
   "terrain.bags.host" "http://user-info/bags")
-
-(cc/defprop-optstr oauth-base-uri
-  "The base URI for the OAuth API endpoints."
-  [props config-valid configs]
-  "terrain.oauth.base-uri" "https://cas/oauth2.0")
-
-(cc/defprop-optstr oauth-client-id
-  "The client ID to use when authenticating to the OAuth server."
-  [props config-valid configs]
-  "terrain.oauth.client-id" "fake-client-id")
-
-(cc/defprop-optstr oauth-client-secret
-  "The client secret to use when authenticating to the OAuth server."
-  [props config-valid configs]
-  "terrain.oauth.client-secret" "notprod")
 
 (cc/defprop-optstr analyses-base-uri
   "The base URI for the analyses service."
