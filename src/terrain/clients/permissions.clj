@@ -1,6 +1,6 @@
 (ns terrain.clients.permissions
-  (:use [slingshot.slingshot :only [try+]])
   (:require [permissions-client.core :as c]
+            [slingshot.slingshot :refer [try+]]
             [terrain.util.config :as config]))
 
 (defn- get-client []

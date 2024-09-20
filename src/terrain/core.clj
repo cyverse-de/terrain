@@ -1,15 +1,15 @@
 (ns terrain.core
   (:gen-class)
-  (:use [clojure.java.io :only [file resource]]
-        [terrain.middleware :only [wrap-fake-user]])
-  (:require [terrain.util.config :as config]
-            [terrain.util.nats :as nats]
-            [clojure.tools.nrepl.server :as nrepl]
-            [me.raynes.fs :as fs]
-            [clj-http.client :as http]
-            [common-cli.core :as ccli]
-            [terrain.services.filesystem.icat :as icat]
+  (:require [clj-http.client :as http]
+            [clojure.java.io :refer [file resource]]
             [clojure.tools.logging :as log]
+            [clojure.tools.nrepl.server :as nrepl]
+            [common-cli.core :as ccli]
+            [me.raynes.fs :as fs]
+            [terrain.middleware :refer [wrap-fake-user]]
+            [terrain.services.filesystem.icat :as icat]
+            [terrain.util.config :as config]
+            [terrain.util.nats :as nats]
             [service-logging.thread-context :as tc]))
 
 (defn- start-nrepl

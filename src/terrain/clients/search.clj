@@ -1,8 +1,8 @@
 (ns terrain.clients.search
-  (:use [terrain.util.config :only [search-base-url]]
-        [terrain.util.transformers :only [secured-params]])
   (:require [clj-http.client :as http]
-            [cemerick.url :refer [url]]))
+            [cemerick.url :refer [url]]
+            [terrain.util.config :refer [search-base-url]]
+            [terrain.util.transformers :refer [secured-params]]))
 
 (defn do-data-search
   [body]

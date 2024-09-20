@@ -1,13 +1,18 @@
 (ns terrain.routes.apps.admin.reference-genomes
-  (:use [common-swagger-api.schema]
-        [common-swagger-api.schema.apps.reference-genomes
-         :only [ReferenceGenome
-                ReferenceGenomeIdParam]]
-        [ring.util.http-response :only [ok]]
-        [terrain.util :only [optional-routes]]
-        [terrain.util.config :as config])
-  (:require [common-swagger-api.schema.apps.admin.reference-genomes :as schema]
-            [terrain.clients.apps.raw :as apps]))
+  (:require [common-swagger-api.schema :refer [context POST DELETE PATCH]]
+            [common-swagger-api.schema.apps.admin.reference-genomes :as schema]
+            [common-swagger-api.schema.apps.reference-genomes
+             :refer [ReferenceGenome
+                     ReferenceGenomeIdParam]]
+            [ring.util.http-response :refer [ok]]
+            [terrain.clients.apps.raw :as apps]
+            [terrain.util :refer [optional-routes]]
+            [terrain.util.config :as config]))
+
+;; Declarations to avoid lint warnings for query and path parameter bindings.
+(declare body)
+(declare reference-genome-id)
+(declare params)
 
 (defn admin-reference-genomes-routes
   []

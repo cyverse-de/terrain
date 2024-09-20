@@ -1,6 +1,5 @@
 (ns terrain.middleware
-  (:require [clojure.string :as string]
-            [terrain.auth.user-attributes :as user-attributes]
+  (:require [terrain.auth.user-attributes :as user-attributes]
             [clojure-commons.response :as resp]
             [terrain.clients.apps.raw :as apps]
             [terrain.clients.data-usage-api :as dua]
