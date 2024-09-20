@@ -1,12 +1,7 @@
 (ns terrain.clients.app-exposer
-  (:use [kameleon.uuids :only [uuidify]])
   (:require [cemerick.url :as curl]
             [clj-http.client :as client]
             [terrain.util.config :as config]
-            [terrain.clients.apps.raw :as apps]
-            [ring.util.io :as ring-io]
-            [clojure.tools.logging :as log]
-            [clojure.java.io :as io]
             [terrain.auth.user-attributes :refer [current-user]]))
 
 (defn- augment-query
@@ -48,7 +43,7 @@
   (:body (client/post (app-exposer-url ["vice" "admin" "analyses" analysis-id "time-limit"] {} :no-user true) {:as :json})))
 
 (defn get-resources
-  "Calls app-exposer's GET /vice/listing endpoint, with filter as the query filter map. 
+  "Calls app-exposer's GET /vice/listing endpoint, with filter as the query filter map.
   Returns only results applicable to the user."
   [filter]
   (:body (client/get (app-exposer-url ["vice" "listing"] filter) {:as :json})))
@@ -211,8 +206,8 @@
       (client/delete {:as :json})
       (:body)))
 
-;;; For the (list-metadata) function, we bypass the query map handling built 
-;;; into (app-exposer-url) to use the one from clj-http because the former 
+;;; For the (list-metadata) function, we bypass the query map handling built
+;;; into (app-exposer-url) to use the one from clj-http because the former
 ;;; does not handle having an seq of values for an entry while the latter does.
 ;;; This isn't necessary for other calls, so the change was not made in the
 ;;; (app-exposer-url) function.

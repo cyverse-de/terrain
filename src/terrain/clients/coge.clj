@@ -1,13 +1,12 @@
 (ns terrain.clients.coge
-  (:use [clojure-commons.core :only [remove-nil-values]]
-        [terrain.auth.user-attributes :only [current-user]]
-        [terrain.clients.util :only [with-trap]]
-        [slingshot.slingshot :only [throw+ try+]])
   (:require [cemerick.url :as curl]
             [cheshire.core :as cheshire]
             [clj-http.client :as http]
             [clojure.tools.logging :as log]
-            [clojure-commons.error-codes :as ce]
+            [clojure-commons.core :refer [remove-nil-values]]
+            [slingshot.slingshot :refer [throw+]]
+            [terrain.auth.user-attributes :refer [current-user]]
+            [terrain.clients.util :refer [with-trap]]
             [terrain.util.config :as config]
             [terrain.util.jwt :as jwt]))
 
@@ -34,7 +33,7 @@
 
 (defn- export-fasta-request
   "Builds the request to export the FastA file for a genome into iRODS."
-  [user genome-id {:keys [notify overwrite destination]}]
+  [user genome-id {:keys [notify overwrite]}]
   (cheshire/encode
    {:type       export-fasta-job-type
     :parameters (remove-nil-values

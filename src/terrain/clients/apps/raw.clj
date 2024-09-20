@@ -1,10 +1,10 @@
 (ns terrain.clients.apps.raw
-  (:use [clojure-commons.core :only [remove-nil-values]]
-        [terrain.util :only [disable-redirects]]
-        [terrain.util.transformers :only [secured-params]])
   (:require [cemerick.url :as curl]
             [clj-http.client :as client]
-            [terrain.util.config :as config]))
+            [clojure-commons.core :refer [remove-nil-values]]
+            [terrain.util :refer [disable-redirects]]
+            [terrain.util.config :as config]
+            [terrain.util.transformers :refer [secured-params]]))
 
 (def apps-sort-params [:limit :offset :sort-field :sort-dir :app-type])
 (def base-search-params (conj apps-sort-params :search))

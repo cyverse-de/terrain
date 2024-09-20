@@ -1,0 +1,3 @@
+{:lint-as {slingshot.slingshot/try+ clojure.core/try}
+ :linters {:unresolved-var {:exclude [clojure-commons.error-codes
+                                      ring.util.http-response]}}}

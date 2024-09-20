@@ -1,9 +1,9 @@
 (ns terrain.auth.user-attributes
-  (:use [slingshot.slingshot :only [try+]])
   (:require [clojure.string :as string]
             [clojure.tools.logging :as log]
             [clojure-commons.response :as resp]
             [clojure-commons.exception-util :as cxu]
+            [slingshot.slingshot :refer [try+]]
             [terrain.clients.iplant-groups.subjects :as subjects]
             [terrain.util.config :as cfg]
             [terrain.util.jwt :as jwt]
@@ -74,7 +74,7 @@
       :commonName    (:description subject)})
    (catch [:status 404] _
      (cxu/internal-system-error (str "fake user " username " not found")))
-   (catch Object o
+   (catch Object _
      (cxu/internal-system-error (str "fake user lookup for username " username " failed")))))
 
 (defn fake-user-from-attributes
