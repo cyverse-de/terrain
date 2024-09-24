@@ -1,15 +1,18 @@
 (ns terrain.routes.comments
-  (:use [common-swagger-api.schema]
-        [ring.util.http-response :only [ok]]
-        [terrain.auth.user-attributes :only [require-authentication]]
-        [terrain.routes.schemas.comments]
-        [terrain.routes.schemas.filesystem])
   (:require [common-swagger-api.routes]                     ;; Required for :description-file
+            [common-swagger-api.schema :refer [context describe GET POST PATCH DELETE]]
             [common-swagger-api.schema.apps :as app-schema]
             [common-swagger-api.schema.metadata.comments :as comment-schema]
+            [ring.util.http-response :refer [ok]]
+            [terrain.auth.user-attributes :refer [require-authentication]]
+            [terrain.routes.schemas.comments :refer [RetractCommentQueryParams]]
+            [terrain.routes.schemas.filesystem :refer [DataIdPathParam]]
             [terrain.services.metadata.comments :as comments]
             [terrain.util :as util]
             [terrain.util.config :as config]))
+
+;; Declarations to eliminate lint warnings for path and query parameter bindings.
+(declare entry-id body comment-id retracted app-id commenter-id)
 
 (defn data-comment-routes
   []

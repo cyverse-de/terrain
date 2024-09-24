@@ -1,12 +1,15 @@
 (ns terrain.routes.favorites
-  (:use [clojure-commons.lcase-params :only [wrap-lcase-query-param-values]]
-        [common-swagger-api.schema :only [DELETE GET POST PUT context]]
-        [ring.util.http-response :only [ok]]
-        [terrain.routes.schemas.filesystem])
-  (:require [terrain.services.metadata.favorites :as fave]
+  (:require [clojure-commons.lcase-params :refer [wrap-lcase-query-param-values]]
+            [common-swagger-api.schema :refer [DELETE GET POST PUT context]]
+            [ring.util.http-response :refer [ok]]
+            [terrain.routes.schemas.filesystem
+             :refer [DataIdPathParam FavoriteListingParams RemoveFavoritesQueryParams UuidsToFilter FilteredUuids]]
+            [terrain.services.metadata.favorites :as fave]
             [terrain.util :as util]
             [terrain.util.config :as config]))
 
+;; Declarations to eliminate lint warnings for path and query parameter bindings.
+(declare entry-id params body)
 
 (defn secured-favorites-routes
   []

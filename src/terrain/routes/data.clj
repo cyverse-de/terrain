@@ -1,17 +1,20 @@
 (ns terrain.routes.data
-  (:use [common-swagger-api.schema]
-        [ring.util.http-response :only [ok]]
-        [terrain.services.sharing :only [share unshare]]
-        [terrain.auth.user-attributes]
-        [terrain.routes.schemas.filetypes]
-        [terrain.routes.schemas.filesystem]
-        [terrain.util]
-        [terrain.util.transformers :only [add-current-user-to-map]])
   (:require [common-swagger-api.routes]                     ;; Required for :description-file
+            [common-swagger-api.schema :refer [context describe POST GET DELETE]]
             [schema.core :as s]
-            [terrain.util.config :as config]
+            [ring.util.http-response :refer [ok]]
+            [terrain.auth.user-attributes :refer [require-authentication current-user]]
             [terrain.clients.data-info :as data]
-            [terrain.clients.saved-searches :as saved]))
+            [terrain.clients.saved-searches :as saved]
+            [terrain.routes.schemas.filesystem :refer [SharingRequest SharingResponse UnshareRequest UnshareResponse]]
+            [terrain.routes.schemas.filetypes :refer [FileType FileTypeReturn TypesList]]
+            [terrain.services.sharing :refer [share unshare]]
+            [terrain.util :refer [optional-routes]]
+            [terrain.util.config :as config]
+            [terrain.util.transformers :refer [add-current-user-to-map]]))
+
+;; Declarations to eliminate lint warnings for path and query parameter bindings.
+(declare body req)
 
 (defn secured-data-routes
   "The routes for data sharing endpoints."

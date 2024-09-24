@@ -3,7 +3,7 @@
             [terrain.clients.resource-usage-api :as rua]
             [terrain.auth.user-attributes :refer [current-user require-authentication]]
             [terrain.util :refer [optional-routes]]
-            [common-swagger-api.schema :refer [context GET POST DELETE]]
+            [common-swagger-api.schema :refer [context GET]]
             [terrain.routes.schemas.resource-usage-api :as schema]
             [ring.util.http-response :refer [ok]]))
 

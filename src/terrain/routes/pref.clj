@@ -1,8 +1,11 @@
 (ns terrain.routes.pref
-  (:use [common-swagger-api.schema]
-        [terrain.services.user-prefs]
-        [terrain.util])
-  (:require [terrain.util.config :as config]))
+  (:require [common-swagger-api.schema :refer [GET POST DELETE]]
+            [terrain.services.user-prefs :as prefs]
+            [terrain.util :refer [optional-routes]]
+            [terrain.util.config :as config]))
+
+;; Declarations to eliminate lint warnings for path and query parameter bindings.
+(declare body)
 
 (defn secured-pref-routes
   []
@@ -10,10 +13,10 @@
    [config/pref-routes-enabled]
 
    (GET "/preferences" []
-        (do-get-prefs))
+        (prefs/do-get-prefs))
 
    (POST "/preferences" [:as {body :body}]
-         (do-post-prefs (slurp body)))
+         (prefs/do-post-prefs (slurp body)))
 
    (DELETE "/preferences" []
-           (remove-prefs))))
+           (prefs/remove-prefs))))

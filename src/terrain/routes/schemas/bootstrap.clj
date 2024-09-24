@@ -1,14 +1,14 @@
 (ns terrain.routes.schemas.bootstrap
-  (:use [common-swagger-api.schema :only [describe doc-only]]
-        [schema.core
-         :only [conditional
-                defschema
-                optional-key
-                Any
-                Int]])
-  (:require [common-swagger-api.schema.apps.bootstrap :as apps-schema]
+  (:require [common-swagger-api.schema :refer [describe doc-only]]
+            [common-swagger-api.schema.apps.bootstrap :as apps-schema]
             [common-swagger-api.schema.data.navigation :as navigation-schema]
             [common-swagger-api.schema.sessions :as sessions-schema]
+            [schema.core
+             :refer [conditional
+                     defschema
+                     optional-key
+                     Any
+                     Int]]
             [terrain.routes.schemas.user-prefs :as user-prefs-schema]))
 
 (defschema UserInfo

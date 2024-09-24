@@ -1,11 +1,12 @@
 (ns terrain.routes.dashboard-aggregator
-  (:use [common-swagger-api.schema]
-        [ring.util.http-response :only [ok]]
-        [terrain.auth.user-attributes :only [current-user]]
-        [terrain.routes.schemas.dashboard-aggregator]
-        [terrain.util])
-  (:require [clojure.tools.logging :as log]
-            [terrain.clients.dashboard-aggregator :as dcl]))
+  (:require [common-swagger-api.schema :refer [context GET]]
+            [ring.util.http-response :refer [ok]]
+            [terrain.auth.user-attributes :refer [current-user]]
+            [terrain.clients.dashboard-aggregator :as dcl]
+            [terrain.routes.schemas.dashboard-aggregator :refer [DashboardRequestParams DashboardAggregatorResponse]]))
+
+;; Declarations to eliminate lint warnings for path and query parameter bindings.
+(declare params)
 
 (defn dashboard-aggregator-routes
   []

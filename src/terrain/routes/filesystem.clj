@@ -1,19 +1,18 @@
 (ns terrain.routes.filesystem
-  (:use [common-swagger-api.schema]
-        [medley.core :only [update-existing-in]]
-        [ring.util.http-response :only [ok]]
-        [terrain.auth.user-attributes :only [require-authentication current-user]]
-        [terrain.util :only [controller optional-routes]])
   (:require [clojure.string :as string]
+            [common-swagger-api.schema :refer [context GET POST DELETE]]
             [compojure.api.middleware :as mw]
+            [medley.core :refer [update-existing-in]]
+            [ring.util.http-response :refer [ok]]
+            [terrain.auth.user-attributes :refer [require-authentication current-user]]
             [terrain.clients.data-info :as data]
             [terrain.clients.metadata.raw :as meta-raw]
             [terrain.routes.schemas.filesystem :as fs-schema]
             [terrain.services.filesystem.directory :as dir]
             [terrain.services.filesystem.metadata :as meta]
             [terrain.services.filesystem.metadata-templates :as mt]
-            [terrain.services.filesystem.stat :as stat]
             [terrain.services.filesystem.updown :as ud]
+            [terrain.util :refer [controller optional-routes]]
             [terrain.util.config :as config]))
 
 (defn- wrap-fix-param [handler param f]
@@ -32,6 +31,9 @@
       (= v "id")           "path"
       (= v "lastmodified") "datemodified"
       :else                v)))
+
+;; Declarations to eliminate lint warnings for path and query parameter bindings.
+(declare req params user-info template-id attr-id data-id)
 
 (defn secured-filesystem-routes
   "The routes for file IO endpoints."

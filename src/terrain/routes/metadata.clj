@@ -1,33 +1,40 @@
 (ns terrain.routes.metadata
-  (:use [common-swagger-api.schema]
-        [common-swagger-api.schema.apps.permission
-         :only [AppPermissionListing
-                AppPermissionListingDocs
-                AppPermissionListingRequest
-                AppPermissionListingSummary
-                AppSharingDocs
-                AppSharingRequest
-                AppSharingResponse
-                AppSharingSummary
-                AppUnsharingDocs
-                AppUnsharingRequest
-                AppUnsharingResponse
-                AppUnsharingSummary
-                PermissionListerQueryParams]]
-        [common-swagger-api.schema.apps.rating]
-        [common-swagger-api.schema.integration-data :only [IntegrationData]]
-        [ring.util.http-response :only [ok]]
-        [terrain.auth.user-attributes :only [require-authentication]]
-        [terrain.routes.schemas.apps]
-        [terrain.services.metadata.apps :only [send-support-email]]
-        [terrain.util])
   (:require [common-swagger-api.routes]                     ;; Required for :description-file
+            [common-swagger-api.schema :refer [context GET POST DELETE PATCH PUT]]
             [common-swagger-api.schema.apps :as schema]
+            [common-swagger-api.schema.apps.permission
+             :refer [AppPermissionListing
+                     AppPermissionListingDocs
+                     AppPermissionListingRequest
+                     AppPermissionListingSummary
+                     AppSharingDocs
+                     AppSharingRequest
+                     AppSharingResponse
+                     AppSharingSummary
+                     AppUnsharingDocs
+                     AppUnsharingRequest
+                     AppUnsharingResponse
+                     AppUnsharingSummary
+                     PermissionListerQueryParams]]
+            [common-swagger-api.schema.apps.rating :refer [RatingRequest RatingResponse]]
+            [common-swagger-api.schema.integration-data :refer [IntegrationData]]
+            [ring.util.http-response :refer [ok]]
+            [terrain.auth.user-attributes :refer [require-authentication]]
             [terrain.clients.apps.raw :as apps]
             [terrain.clients.metadata :as metadata]
             [terrain.clients.metadata.raw :as metadata-client]
+            [terrain.routes.schemas.apps
+             :refer [AppSearchParams
+                     SupportEmailRequest
+                     SupportEmailSummary
+                     SupportEmailDescription]]
+            [terrain.services.metadata.apps :refer [send-support-email]]
             [terrain.util.config :as config]
+            [terrain.util :refer [optional-routes]]
             [terrain.util.service :as service]))
+
+;; Declarations to eliminate lint warnings for path and query parameter bindings.
+(declare params system-id body category-id request ontology-version root-iri community-id app-id integration-data-id)
 
 (defn admin-category-routes
   []

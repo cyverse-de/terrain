@@ -1,8 +1,11 @@
 (ns terrain.routes.misc
-  (:use [common-swagger-api.schema]
-        [ring.util.http-response])
-  (:require [clojure.string :as string])
+  (:require [clojure.string :as string]
+            [common-swagger-api.schema :refer [routes GET]]
+            [ring.util.http-response :refer [internal-server-error ok]])
   (:import [java.util UUID]))
+
+;; Declarations to eliminate lint warnings for path and query parameter bindings.
+(declare expecting req)
 
 (defn unsecured-misc-routes
   []

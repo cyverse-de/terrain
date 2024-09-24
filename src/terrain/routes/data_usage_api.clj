@@ -22,4 +22,3 @@
          :description schema/UserCurrentDataDescription
          :return schema/UserCurrentDataTotal
          (ok (dua/user-current-usage (:username current-user))))))))
-

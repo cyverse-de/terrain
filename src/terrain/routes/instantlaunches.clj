@@ -1,14 +1,16 @@
 (ns terrain.routes.instantlaunches
-  (:use [common-swagger-api.schema]
-        [ring.util.http-response :only [ok]]
-        [common-swagger-api.schema.quicklaunches :only [QuickLaunch]]
-        [terrain.routes.schemas.instantlaunches]
-        [common-swagger-api.schema.metadata :only [AvuList AvuListRequest SetAvuRequest]]
-        [terrain.auth.user-attributes :only [current-user require-authentication]]
-        [terrain.clients.app-exposer]
-        [terrain.util :only [optional-routes]])
-  (:require [terrain.util.config :as config]
-            [clojure.tools.logging :as log]))
+  (:require [common-swagger-api.schema :refer [context GET PUT POST DELETE]]
+            [common-swagger-api.schema.metadata :refer [AvuList AvuListRequest SetAvuRequest]]
+            [common-swagger-api.schema.quicklaunches :refer [QuickLaunch]]
+            [ring.util.http-response :refer [ok]]
+            [terrain.auth.user-attributes :refer [current-user require-authentication]]
+            [terrain.clients.app-exposer :as app-exposer]
+            [terrain.routes.schemas.instantlaunches :as instantlaunch-schema]
+            [terrain.util :refer [optional-routes]]
+            [terrain.util.config :as config]))
+
+;; Declarations to eliminate lint warnings for path and query parameter bindings.
+(declare query id body data)
 
 (defn instant-launch-routes
   []
@@ -23,57 +25,57 @@
 
          (GET "/latest" []
            :middleware  [require-authentication]
-           :summary LatestILMappingsDefaultsSummary
-           :description LatestILMappingsDefaultsDescription
-           :return DefaultInstantLaunchMapping
-           (ok (latest-instant-launch-mappings-defaults)))))
+           :summary instantlaunch-schema/LatestILMappingsDefaultsSummary
+           :description instantlaunch-schema/LatestILMappingsDefaultsDescription
+           :return instantlaunch-schema/DefaultInstantLaunchMapping
+           (ok (app-exposer/latest-instant-launch-mappings-defaults)))))
 
      (GET "/" []
        :middleware  [require-authentication]
-       :summary ListInstantLaunchesSummary
-       :description ListInstantLaunchesDescription
-       :return InstantLaunchList
-       (ok (get-instant-launch-list)))
+       :summary instantlaunch-schema/ListInstantLaunchesSummary
+       :description instantlaunch-schema/ListInstantLaunchesDescription
+       :return instantlaunch-schema/InstantLaunchList
+       (ok (app-exposer/get-instant-launch-list)))
 
      (GET "/full" []
        :middleware  [require-authentication]
-       :summary ListFullInstantLaunchesSummary
-       :description ListFullInstantLaunchesDescription
-       :return FullInstantLaunchList
-       (ok (get-full-instant-launch-list)))
+       :summary instantlaunch-schema/ListFullInstantLaunchesSummary
+       :description instantlaunch-schema/ListFullInstantLaunchesDescription
+       :return instantlaunch-schema/FullInstantLaunchList
+       (ok (app-exposer/get-full-instant-launch-list)))
 
      (GET "/metadata/full" []
-       :summary ListFullMetadataSummary
-       :description ListFullMetadataDescription
-       :query [query MetadataListingQueryMap]
-       :return FullInstantLaunchList
-       (ok (list-full-metadata query (or (:username current-user) "anonymous"))))
+       :summary instantlaunch-schema/ListFullMetadataSummary
+       :description instantlaunch-schema/ListFullMetadataDescription
+       :query [query instantlaunch-schema/MetadataListingQueryMap]
+       :return instantlaunch-schema/FullInstantLaunchList
+       (ok (app-exposer/list-full-metadata query (or (:username current-user) "anonymous"))))
 
      (context "/quicklaunches" []
        (context "/public" []
          (GET "/" []
            :middleware  [require-authentication]
-           :summary ListQuickLaunchesForPublicAppsSummary
-           :description ListQuickLaunchesForPublicAppsDescription
+           :summary instantlaunch-schema/ListQuickLaunchesForPublicAppsSummary
+           :description instantlaunch-schema/ListQuickLaunchesForPublicAppsDescription
            :return [QuickLaunch]
-           (ok (list-quicklaunches-for-public-apps)))))
+           (ok (app-exposer/list-quicklaunches-for-public-apps)))))
 
      (context "/:id" []
-       :path-params [id :- InstantLaunchIDParam]
+       :path-params [id :- instantlaunch-schema/InstantLaunchIDParam]
 
        (GET "/" []
          :middleware  [require-authentication]
-         :summary GetInstantLaunchSummary
-         :description GetInstantLaunchDescription
-         :return InstantLaunch
-         (ok (get-instant-launch id)))
+         :summary instantlaunch-schema/GetInstantLaunchSummary
+         :description instantlaunch-schema/GetInstantLaunchDescription
+         :return instantlaunch-schema/InstantLaunch
+         (ok (app-exposer/get-instant-launch id)))
 
        (GET "/full" []
          :middleware  [require-authentication]
-         :summary GetFullInstantLaunchSummary
-         :description GetFullInstantLaunchDescription
-         :return FullInstantLaunch
-         (ok (get-full-instant-launch id)))))))
+         :summary instantlaunch-schema/GetFullInstantLaunchSummary
+         :description instantlaunch-schema/GetFullInstantLaunchDescription
+         :return instantlaunch-schema/FullInstantLaunch
+         (ok (app-exposer/get-full-instant-launch id)))))))
 
 (defn admin-instant-launch-routes
   []
@@ -86,78 +88,78 @@
      (context "/mappings" []
        (context "/defaults" []
          (PUT "/latest" []
-           :summary AddLatestILMappingsDefaultsSummary
-           :description AddLatestILMappingsDefaultsDescription
-           :body [body InstantLaunchMapping]
-           :return InstantLaunchMapping
-           (ok (add-latest-instant-launch-mappings-defaults (:username current-user) body)))
+           :summary instantlaunch-schema/AddLatestILMappingsDefaultsSummary
+           :description instantlaunch-schema/AddLatestILMappingsDefaultsDescription
+           :body [body instantlaunch-schema/InstantLaunchMapping]
+           :return instantlaunch-schema/InstantLaunchMapping
+           (ok (app-exposer/add-latest-instant-launch-mappings-defaults (:username current-user) body)))
 
          (POST "/latest" []
-           :summary UpdateLatestILMappingsDefaultsSummary
-           :description UpdateLatestILMappingsDefaultsDescription
-           :body [body InstantLaunchMapping]
-           :return InstantLaunchMapping
-           (ok (update-latest-instant-launch-mappings-defaults (:username current-user) body)))
+           :summary instantlaunch-schema/UpdateLatestILMappingsDefaultsSummary
+           :description instantlaunch-schema/UpdateLatestILMappingsDefaultsDescription
+           :body [body instantlaunch-schema/InstantLaunchMapping]
+           :return instantlaunch-schema/InstantLaunchMapping
+           (ok (app-exposer/update-latest-instant-launch-mappings-defaults (:username current-user) body)))
 
          (DELETE "/latest" []
-           :summary DeleteLatestILMappingsDefaultsSummary
-           :description DeleteLatestILMappingsDefaultsDescription
-           (ok (delete-latest-instant-launch-mappings-defaults)))))
+           :summary instantlaunch-schema/DeleteLatestILMappingsDefaultsSummary
+           :description instantlaunch-schema/DeleteLatestILMappingsDefaultsDescription
+           (ok (app-exposer/delete-latest-instant-launch-mappings-defaults)))))
 
      (context "/metadata" []
        (GET "/" []
-         :summary ListMetadataSummary
-         :description ListMetadataDescription
-         :query [query MetadataListingQueryMap]
+         :summary instantlaunch-schema/ListMetadataSummary
+         :description instantlaunch-schema/ListMetadataDescription
+         :query [query instantlaunch-schema/MetadataListingQueryMap]
          :return AvuList
-         (ok (list-metadata query)))
+         (ok (app-exposer/list-metadata query)))
 
        (GET "/full" []
-         :summary ListFullMetadataSummary
-         :description ListFullMetadataDescription
-         :query [query MetadataListingQueryMap]
-         :return FullInstantLaunchList
-         (ok (list-full-metadata query (:username current-user)))))
+         :summary instantlaunch-schema/ListFullMetadataSummary
+         :description instantlaunch-schema/ListFullMetadataDescription
+         :query [query instantlaunch-schema/MetadataListingQueryMap]
+         :return instantlaunch-schema/FullInstantLaunchList
+         (ok (app-exposer/list-full-metadata query (:username current-user)))))
 
      (context "/:id" []
-       :path-params [id :- InstantLaunchIDParam]
+       :path-params [id :- instantlaunch-schema/InstantLaunchIDParam]
 
        (POST "/" []
-         :summary UpdateInstantLaunchSummary
-         :description UpdateInstantLaunchDescription
-         :body [body InstantLaunch]
-         :return InstantLaunch
-         (ok (update-instant-launch id body)))
+         :summary instantlaunch-schema/UpdateInstantLaunchSummary
+         :description instantlaunch-schema/UpdateInstantLaunchDescription
+         :body [body instantlaunch-schema/InstantLaunch]
+         :return instantlaunch-schema/InstantLaunch
+         (ok (app-exposer/update-instant-launch id body)))
 
        (DELETE "/" []
-         :summary DeleteInstantLaunchSummary
-         :description DeleteInstantLaunchDescription
-         (ok (delete-instant-launch id)))
+         :summary instantlaunch-schema/DeleteInstantLaunchSummary
+         :description instantlaunch-schema/DeleteInstantLaunchDescription
+         (ok (app-exposer/delete-instant-launch id)))
 
        (context "/metadata" []
          (GET "/" []
-           :summary GetMetadataSummary
-           :description GetMetadataDescription
+           :summary instantlaunch-schema/GetMetadataSummary
+           :description instantlaunch-schema/GetMetadataDescription
            :return AvuList
-           (ok (get-metadata id)))
+           (ok (app-exposer/get-metadata id)))
 
          (POST "/" []
-           :summary UpsertMetadataSummary
-           :description UpsertMetadataDescription
+           :summary instantlaunch-schema/UpsertMetadataSummary
+           :description instantlaunch-schema/UpsertMetadataDescription
            :body [data AvuListRequest]
            :return AvuList
-           (ok (upsert-metadata id data)))
+           (ok (app-exposer/upsert-metadata id data)))
 
          (PUT "/" []
-           :summary ResetMetadataSummary
-           :description ResetMetadataDescription
+           :summary instantlaunch-schema/ResetMetadataSummary
+           :description instantlaunch-schema/ResetMetadataDescription
            :body [data SetAvuRequest]
            :return AvuList
-           (ok (reset-metadata id data)))))
+           (ok (app-exposer/reset-metadata id data)))))
 
      (PUT "/" []
-       :summary AddInstantLaunchSummary
-       :description AddInstantLaunchDescription
-       :body [body InstantLaunch]
-       :return InstantLaunch
-       (ok (add-instant-launch (:username current-user) body))))))
+       :summary instantlaunch-schema/AddInstantLaunchSummary
+       :description instantlaunch-schema/AddInstantLaunchDescription
+       :body [body instantlaunch-schema/InstantLaunch]
+       :return instantlaunch-schema/InstantLaunch
+       (ok (app-exposer/add-instant-launch (:username current-user) body))))))
