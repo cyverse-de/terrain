@@ -1,5 +1,5 @@
 (ns terrain.routes.apps.versions
-  (:require [common-swagger-api.schema :refer :all]
+  (:require [common-swagger-api.schema :refer [context POST DELETE GET PATCH PUT]]
             [common-swagger-api.schema.apps :as schema]
             [common-swagger-api.schema.integration-data :as integration-schema]
             [ring.util.http-response :refer [ok]]
@@ -7,6 +7,9 @@
             [terrain.clients.apps.raw :as apps]
             [terrain.util :refer [optional-routes]]
             [terrain.util.config :as config]))
+
+;; Declarations to eliminate lint warnings for path and query parameter bindings.
+(declare system-id app-id version-id body)
 
 (defn app-version-routes
   []

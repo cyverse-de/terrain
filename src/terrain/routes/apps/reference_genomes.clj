@@ -7,8 +7,7 @@
             [terrain.util.config :as config]))
 
 ;; Declarations to eliminate lint warnings for path and query parameter bindings.
-(declare params)
-(declare reference-genome-id)
+(declare params reference-genome-id)
 
 (defn reference-genomes-routes
   []

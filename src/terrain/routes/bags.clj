@@ -1,12 +1,13 @@
 (ns terrain.routes.bags
-  (:use [common-swagger-api.schema]
-        [ring.util.http-response :only [ok]]
-        [terrain.routes.schemas.bags]
-        [terrain.auth.user-attributes :only [current-user]]
-        [terrain.services.bags]
-        [terrain.util :only [optional-routes]])
-  (:require [terrain.util.config :as config]
-            [clojure.tools.logging :as log]))
+  (:require [common-swagger-api.schema :refer [context HEAD GET PUT DELETE POST]]
+            [ring.util.http-response :refer [ok]]
+            [terrain.auth.user-attributes :refer [current-user]]
+            [terrain.routes.schemas.bags :as bags-schema]
+            [terrain.services.bags :as bags]
+            [terrain.util :refer [optional-routes]]
+            [terrain.util.config :as config]))
+
+(declare body bag-id)
 
 (defn bag-routes
   []
@@ -17,67 +18,67 @@
      :tags ["bags"]
 
      (HEAD "/" []
-       :summary     HasBagsSummary
-       :description HasBagsDescription
-       (has-bags (:username current-user))
+       :summary     bags-schema/HasBagsSummary
+       :description bags-schema/HasBagsDescription
+       (bags/has-bags (:username current-user))
        (ok))
 
      (GET "/" []
-       :summary     BagListSummary
-       :description BagListDescription
-       :return      BagList
-       (ok (get-bags (:username current-user))))
+       :summary     bags-schema/BagListSummary
+       :description bags-schema/BagListDescription
+       :return      bags-schema/BagList
+       (ok (bags/get-bags (:username current-user))))
 
      (PUT "/" []
-       :summary     AddBagSummary
-       :description AddBagDescription
-       :body        [body BagContents]
-       :return      AddBagResponse
-       (ok (add-bag (:username current-user) body)))
+       :summary     bags-schema/AddBagSummary
+       :description bags-schema/AddBagDescription
+       :body        [body bags-schema/BagContents]
+       :return      bags-schema/AddBagResponse
+       (ok (bags/add-bag (:username current-user) body)))
 
      (DELETE "/" []
-       :summary     DeleteAllBagsSummary
-       :description DeleteAllBagsDescription
-       (delete-all-bags (:username current-user))
+       :summary     bags-schema/DeleteAllBagsSummary
+       :description bags-schema/DeleteAllBagsDescription
+       (bags/delete-all-bags (:username current-user))
        (ok))
 
      (context "/default" []
 
        (GET "/" []
-         :summary     GetDefaultBagSummary
-         :description GetDefaultBagDescription
-         :return      Bag
-         (ok (get-default-bag (:username current-user))))
+         :summary     bags-schema/GetDefaultBagSummary
+         :description bags-schema/GetDefaultBagDescription
+         :return      bags-schema/Bag
+         (ok (bags/get-default-bag (:username current-user))))
 
        (POST "/" []
-         :summary     UpdateDefaultBagSummary
-         :description UpdateDefaultBagDescription
-         :body        [body BagContents]
-         :return      Bag
-         (ok (update-default-bag (:username current-user) body)))
+         :summary     bags-schema/UpdateDefaultBagSummary
+         :description bags-schema/UpdateDefaultBagDescription
+         :body        [body bags-schema/BagContents]
+         :return      bags-schema/Bag
+         (ok (bags/update-default-bag (:username current-user) body)))
 
        (DELETE "/" []
-         :summary     DeleteDefaultBagSummary
-         :description DeleteDefaultBagDescription
-         :return      Bag
-         (ok (delete-default-bag (:username current-user)))))
+         :summary     bags-schema/DeleteDefaultBagSummary
+         :description bags-schema/DeleteDefaultBagDescription
+         :return      bags-schema/Bag
+         (ok (bags/delete-default-bag (:username current-user)))))
 
      (context "/:bag-id" []
-       :path-params [bag-id :- BagIDPathParam]
+       :path-params [bag-id :- bags-schema/BagIDPathParam]
 
        (GET "/" []
-         :summary     GetBagSummary
-         :description GetBagDescription
-         (ok (get-bag (:username current-user) bag-id)))
+         :summary     bags-schema/GetBagSummary
+         :description bags-schema/GetBagDescription
+         (ok (bags/get-bag (:username current-user) bag-id)))
 
        (POST "/" []
-         :summary     UpdateBagSummary
-         :description UpdateBagDescription
-         :body        [body BagContents]
-         (ok (update-bag (:username current-user) bag-id body)))
+         :summary     bags-schema/UpdateBagSummary
+         :description bags-schema/UpdateBagDescription
+         :body        [body bags-schema/BagContents]
+         (ok (bags/update-bag (:username current-user) bag-id body)))
 
        (DELETE "/" []
-         :summary     DeleteBagSummary
-         :description DeleteBagDescription
-         (delete-bag (:username current-user) bag-id)
+         :summary     bags-schema/DeleteBagSummary
+         :description bags-schema/DeleteBagDescription
+         (bags/delete-bag (:username current-user) bag-id)
          (ok))))))

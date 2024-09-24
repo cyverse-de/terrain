@@ -18,12 +18,7 @@
             [terrain.util.config :as config]))
 
 ;; Variable declarations to prevent unresolved symbol warnings for compojure bindings from clj-kondo.
-(declare params)
-(declare body)
-(declare system-id)
-(declare app-id)
-(declare integration-data-id)
-(declare version-id)
+(declare params body system-id app-id integration-data-id version-id)
 
 (defn admin-apps-routes
   []

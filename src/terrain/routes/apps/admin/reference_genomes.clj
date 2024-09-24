@@ -10,9 +10,7 @@
             [terrain.util.config :as config]))
 
 ;; Declarations to avoid lint warnings for query and path parameter bindings.
-(declare body)
-(declare reference-genome-id)
-(declare params)
+(declare body reference-genome-id params)
 
 (defn admin-reference-genomes-routes
   []

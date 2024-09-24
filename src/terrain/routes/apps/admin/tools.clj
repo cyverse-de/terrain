@@ -3,8 +3,8 @@
             [common-swagger-api.schema :refer [context GET POST DELETE PATCH PUT]]
             [common-swagger-api.schema.apps.admin.apps :refer [ToolAdminAppListingResponses]]
             [common-swagger-api.schema.integration-data
-             :only [IntegrationData
-                    IntegrationDataIdPathParam]]
+             :refer [IntegrationData
+                     IntegrationDataIdPathParam]]
             [common-swagger-api.schema.tools :as schema]
             [common-swagger-api.schema.tools.admin :as admin-schema]
             [compojure.api.middleware :as middleware]
@@ -15,12 +15,7 @@
             [terrain.util.config :as config]))
 
 ;; Declarations to avoid lint warnings for path and query parameter bindings.
-(declare params)
-(declare body)
-(declare tool-id)
-(declare integration-data-id)
-(declare status-code-id)
-(declare request-id)
+(declare params body tool-id integration-data-id status-code-id request-id)
 
 (defn admin-tool-routes
   []

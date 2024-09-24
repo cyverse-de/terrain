@@ -1,16 +1,19 @@
 (ns terrain.routes.apps.metadata
-  (:use [common-swagger-api.schema]
-        [common-swagger-api.schema.apps :only [AppIdParam]]
-        [common-swagger-api.schema.metadata
-         :only [AvuList
-                AvuListRequest
-                SetAvuRequest]]
-        [ring.util.http-response :only [ok]]
-        [terrain.auth.user-attributes :only [require-authentication]]
-        [terrain.util :only [optional-routes]])
-  (:require [common-swagger-api.schema.apps.metadata :as schema]
+  (:require [common-swagger-api.schema :refer [context GET POST PUT]]
+            [common-swagger-api.schema.apps :refer [AppIdParam]]
+            [common-swagger-api.schema.apps.metadata :as schema]
+            [common-swagger-api.schema.metadata
+             :refer [AvuList
+                     AvuListRequest
+                     SetAvuRequest]]
+            [ring.util.http-response :refer [ok]]
+            [terrain.auth.user-attributes :refer [require-authentication]]
             [terrain.clients.apps.raw :as apps]
+            [terrain.util :refer [optional-routes]]
             [terrain.util.config :as config]))
+
+;; Declarations to eliminate lint warnings for path and query parameter bindings.
+(declare app-id body)
 
 (defn app-avu-routes
   []

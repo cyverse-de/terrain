@@ -29,17 +29,7 @@
   (:import [java.util UUID]))
 
 ;; Declarations to avoid unresolved symbol warnings from clj-kondo.
-(declare analysis-id)
-(declare app-id)
-(declare body)
-(declare params)
-(declare fave)
-(declare fave-id)
-(declare new)
-(declare user-default-id)
-(declare global-default-id)
-(declare quicklaunch)
-(declare ql-id)
+(declare analysis-id app-id body params global-default-id fave fave-id new user-default-id quicklaunch ql-id)
 
 (defn analysis-routes
   []

@@ -1,20 +1,22 @@
 (ns terrain.routes.apps.categories
-  (:use [common-swagger-api.schema]
-        [common-swagger-api.schema.apps :only [AppIdParam AppListing]]
-        [common-swagger-api.schema.apps.pipeline]
-        [common-swagger-api.schema.ontologies :only [OntologyClassIRIParam
-                                                     OntologyHierarchy
-                                                     OntologyHierarchyFilterParams
-                                                     OntologyHierarchyList]]
-        [ring.util.http-response :only [ok]]
-        [terrain.auth.user-attributes :only [require-authentication]]
-        [terrain.routes.schemas.categories]
-        [terrain.util :only [optional-routes]])
   (:require [common-swagger-api.routes]                     ;; for :description-file
+            [common-swagger-api.schema :refer [context GET]]
             [common-swagger-api.schema.apps :as apps-schema]
             [common-swagger-api.schema.apps.categories :as schema]
+            [common-swagger-api.schema.apps.pipeline]
+            [common-swagger-api.schema.ontologies :refer [OntologyClassIRIParam
+                                                          OntologyHierarchy
+                                                          OntologyHierarchyFilterParams
+                                                          OntologyHierarchyList]]
+            [ring.util.http-response :refer [ok]]
+            [terrain.auth.user-attributes :refer [require-authentication]]
             [terrain.clients.apps.raw :as apps]
+            [terrain.routes.schemas.categories :refer [AppListingPagingParams OntologyAppListingPagingParams]]
+            [terrain.util :refer [optional-routes]]
             [terrain.util.config :as config]))
+
+;; Declarations for path and query parameter bindings to avoid lint warnings.
+(declare params system-id category-id root-iri community-id)
 
 (defn app-category-routes
   []
@@ -79,7 +81,7 @@
         (GET "/apps" []
              :middleware [require-authentication]
              :query [params OntologyAppListingPagingParams]
-             :return AppListing
+             :return apps-schema/AppListing
              :summary schema/AppCategoryAppListingSummary
              :description schema/AppHierarchyAppListingDocs
              (ok (apps/get-hierarchy-app-listing root-iri params)))
@@ -87,7 +89,7 @@
         (GET "/unclassified" []
              :middleware [require-authentication]
              :query [params OntologyAppListingPagingParams]
-             :return AppListing
+             :return apps-schema/AppListing
              :summary schema/AppHierarchyUnclassifiedListingSummary
              :description schema/AppHierarchyUnclassifiedListingDocs
              (ok (apps/get-unclassified-app-listing root-iri params)))))))
@@ -105,7 +107,7 @@
            :middleware [require-authentication]
            :path-params [community-id :- schema/AppCommunityGroupNameParam]
            :query [params AppListingPagingParams]
-           :return AppListing
+           :return apps-schema/AppListing
            :summary schema/AppCommunityAppListingSummary
            :description schema/AppCommunityAppListingDocs
            (ok (apps/apps-in-community community-id))))))
