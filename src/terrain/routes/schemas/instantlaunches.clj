@@ -1,6 +1,6 @@
 (ns terrain.routes.schemas.instantlaunches
-  (:use [common-swagger-api.schema :only [describe NonBlankString]]
-        [schema.core :only [defschema Any Keyword optional-key]])
+  (:require [common-swagger-api.schema :refer [describe]]
+            [schema.core :refer [defschema Any Keyword optional-key]])
   (:import [java.util UUID]))
 
 (def InstantLaunchIDParam (describe String "The ID of the instant launch"))
@@ -89,6 +89,3 @@
   {(optional-key :attribute) (describe [String] "A list of attributes to filter metadata listings by")
    (optional-key :value)     (describe [String] "A list of values to filter metadata listing by")
    (optional-key :unit)      (describe [String] "A list of units to filter metadata listing by")})
-
-
-

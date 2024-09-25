@@ -1,12 +1,13 @@
 (ns terrain.routes.vice
-  (:use [common-swagger-api.schema]
-        [ring.util.http-response :only [ok]]
-        [terrain.auth.user-attributes :only [current-user]]
-        [terrain.services.user-info]
-        [terrain.util])
-  (:require [terrain.clients.app-exposer :as vice]
+  (:require [common-swagger-api.schema :refer [context GET POST]]
+            [ring.util.http-response :refer [ok]]
+            [terrain.clients.app-exposer :as vice]
             [terrain.routes.schemas.vice :as vice-schema]
+            [terrain.util :refer [optional-routes]]
             [terrain.util.config :as config]))
+
+;; Declarations to eliminate lint warnings for path and query parameter bindings.
+(declare params analysis-id host)
 
 (defn admin-vice-routes
   []
@@ -116,4 +117,3 @@
          :summary vice-schema/DescriptionSummary
          :description vice-schema/DescriptionDescription
          (ok (vice/get-description-by-host host)))))))
-

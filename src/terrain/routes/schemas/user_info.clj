@@ -1,7 +1,6 @@
 (ns terrain.routes.schemas.user-info
-  (:use [common-swagger-api.schema :only [describe
-                                          NonBlankString]])
-  (:require [common-swagger-api.schema.groups :as groups]
+  (:require [common-swagger-api.schema :refer [describe NonBlankString]]
+            [common-swagger-api.schema.groups :as groups]
             [common-swagger-api.schema.subjects :as subjects]
             [schema.core :as s]))
 

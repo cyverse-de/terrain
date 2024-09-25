@@ -1,30 +1,24 @@
 (ns terrain.routes.schemas.tags
-  (:use [clojure-commons.error-codes]
-        [common-swagger-api.schema :only [->optional-param
-                                          describe
-                                          ErrorResponse
-                                          NonBlankString
-                                          StandardUserQueryParams]]
-        [common-swagger-api.schema.metadata.tags])
-  (:require [schema.core :as s]))
+  (:require [common-swagger-api.schema.metadata.tags :as tags]
+            [schema.core :as s]))
 
-(s/defschema TagId {:id TagIdPathParam})
+(s/defschema TagId {:id tags/TagIdPathParam})
 
 (def PatchTagsResponses
   (merge {200 {:schema      nil
                :description "The tags were attached or detached from the file or folder"}
-          400 PatchTags400Response
-          404 PatchTags404Response}
-         TagDefaultErrorResponses))
+          400 tags/PatchTags400Response
+          404 tags/PatchTags404Response}
+         tags/TagDefaultErrorResponses))
 
 (def PostTagResponses
   (merge {200 {:schema      TagId
                :description "The tag was successfully created"}
-          400 PostTag400Response}
-         TagDefaultErrorResponses))
+          400 tags/PostTag400Response}
+         tags/TagDefaultErrorResponses))
 
 (def PatchTagResponses
   (merge {200 {:schema      nil
                :description "The tag was successfully updated"}
-          400 PostTag400Response}
-         TagDefaultErrorResponses))
+          400 tags/PostTag400Response}
+         tags/TagDefaultErrorResponses))

@@ -1,7 +1,7 @@
 (ns terrain.routes.schemas.user-prefs
-  (:use [common-swagger-api.schema :only [describe]]
-        [common-swagger-api.schema.stats :only [DataItemPathParam]]
-        [schema.core :only [defschema Any Keyword optional-key]]))
+  (:require [common-swagger-api.schema :refer [describe]]
+            [common-swagger-api.schema.stats :refer [DataItemPathParam]]
+            [schema.core :refer [defschema Any Keyword optional-key]]))
 
 (def default-output-dir-key :default_output_folder)
 

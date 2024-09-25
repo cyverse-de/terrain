@@ -1,6 +1,6 @@
 (ns terrain.routes.schemas.vice
-  (:use [common-swagger-api.schema :only [describe NonBlankString]]
-        [schema.core :only [defschema Any maybe optional-key]])
+  (:require [common-swagger-api.schema :refer [describe NonBlankString]]
+            [schema.core :refer [defschema Any maybe optional-key]])
   (:import [java.util UUID]))
 
 (def AnalysisID (describe UUID "The UUID assigned to the analysis"))

@@ -1,10 +1,14 @@
 (ns terrain.routes.webhooks
-  (:use [common-swagger-api.schema]
-        [ring.util.http-response :only [ok]]
-        [terrain.util])
-  (:require [common-swagger-api.schema.webhooks :as schema]
+  (:require [common-swagger-api.schema :refer [context GET PUT]]
+            [common-swagger-api.schema.webhooks :as schema]
+            [ring.util.http-response :refer [ok]]
             [terrain.clients.apps.raw :as apps-client]
+            [terrain.util :refer [optional-routes]]
             [terrain.util.config :as config]))
+
+;; Dedlarations to eliminate lint warnings for path and query parameter bindings.
+(declare body)
+
 (defn webhook-routes
   []
   (optional-routes

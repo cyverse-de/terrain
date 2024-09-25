@@ -1,6 +1,6 @@
 (ns terrain.routes.schemas.coge
-  (:use [common-swagger-api.schema :only [describe]]
-        [schema.core :only [defschema maybe optional-key]]))
+  (:require [common-swagger-api.schema :refer [describe]]
+            [schema.core :refer [defschema maybe optional-key]]))
 
 (def GenomeIdPathParam (describe Long "The genome ID"))
 

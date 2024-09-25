@@ -1,7 +1,7 @@
 (ns terrain.routes.schemas.filesystem
-  (:use [common-swagger-api.schema :only [describe NonBlankString transform-enum]]
-        [common-swagger-api.schema.filetypes :only [ValidInfoTypesEnum]])
-  (:require [common-swagger-api.schema.data :as data-schema]
+  (:require [common-swagger-api.schema :refer [describe NonBlankString transform-enum]]
+            [common-swagger-api.schema.data :as data-schema]
+            [common-swagger-api.schema.filetypes :refer [ValidInfoTypesEnum]]
             [common-swagger-api.schema.stats :as stats-schema]
             [common-swagger-api.schema.subjects :as subjects-schema]
             [schema.core :as s]
@@ -59,7 +59,7 @@
   {(s/optional-key :user)
    (describe NonBlankString "The username of the person to revoke permissions from. Mutually exclusive with subject.")
 
-   (s/optional-key :subject) 
+   (s/optional-key :subject)
    (describe subjects-schema/BaseSubject "The subject (user or group) to revoke permissions from. Mutually exclusive with user.")
 
    :paths

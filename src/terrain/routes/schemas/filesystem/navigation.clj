@@ -1,6 +1,6 @@
 (ns terrain.routes.schemas.filesystem.navigation
-  (:use [common-swagger-api.schema :only [describe NonBlankString]])
-  (:require [common-swagger-api.schema.data.navigation :as nav-schema]
+  (:require [common-swagger-api.schema :refer [describe NonBlankString]]
+            [common-swagger-api.schema.data.navigation :as nav-schema]
             [schema.core :as s]
             [schema-tools.core :as schema-tools]))
 

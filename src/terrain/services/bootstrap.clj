@@ -1,10 +1,9 @@
 (ns terrain.services.bootstrap
-  (:use
-    [slingshot.slingshot :only [try+]]
-    [terrain.auth.user-attributes :only [current-user]])
   (:require
     [clojure.tools.logging :as log]
     [clojure-commons.assertions :as assertions]
+    [slingshot.slingshot :refer [try+]]
+    [terrain.auth.user-attributes :refer [current-user]]
     [terrain.clients.apps.raw :as apps-client]
     [terrain.clients.data-info :as data-info-client]
     [terrain.services.user-prefs :as prefs]

@@ -39,7 +39,7 @@
 (defn add-collaborator-list-members [{user :shortUsername} name {:keys [members]}]
   (ipg/add-collaborator-list-members user name members))
 
-(defn- copy-collaborator-list-permissions [user group-id {:keys [results]}]
+(defn- copy-collaborator-list-permissions [_user group-id {:keys [results]}]
   (when-let [subjects (seq (for [result results :when (:success result)] (perms-subject-for result)))]
     (perms-client/copy-permissions "group" group-id subjects)))
 

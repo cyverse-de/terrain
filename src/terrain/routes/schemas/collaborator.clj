@@ -1,8 +1,8 @@
 (ns terrain.routes.schemas.collaborator
-  (:use [common-swagger-api.schema :only [describe NonBlankString]]
-        [schema.core :only [defschema optional-key]])
-  (:require [common-swagger-api.schema.groups :as group-schema]
-            [common-swagger-api.schema.subjects :as subject-schema]))
+  (:require [common-swagger-api.schema :refer [describe NonBlankString]]
+            [common-swagger-api.schema.groups :as group-schema]
+            [common-swagger-api.schema.subjects :as subject-schema]
+            [schema.core :refer [defschema optional-key]]))
 
 (defn group-member [group-descriptor member-descriptor]
   (assoc subject-schema/Subject

@@ -1,6 +1,6 @@
 (ns terrain.routes.schemas.qms
   (:require [common-swagger-api.schema :refer [PagingParams describe ->optional-param]]
-            [schema.core :as s :refer [defschema Any optional-key maybe enum]])
+            [schema.core :as s :refer [defschema Any optional-key maybe]])
   (:import [java.util UUID]))
 
 (def GetAllPlansSummary "Returns a list of all plans registered in QMS")
@@ -44,7 +44,7 @@
 
 (def PlanID (describe (maybe UUID) "The UUID assigned to a plan in QMS"))
 (def PlanName (describe String "The name of the plan"))
-(def PlanQuotaDefault (describe (maybe UUID) "The UUIID assigned to the plan quota default"))
+(def PlanQuotaDefaultId (describe (maybe UUID) "The UUIID assigned to the plan quota default"))
 (def QMSUserID (describe (maybe UUID) "The user's UUID assigned by QMS"))
 (def QuotaID (describe (maybe UUID) "The UUID for the quota in QMS"))
 (def ResourceID (describe (maybe UUID) "The UUID assigned to a resource type record"))
@@ -93,7 +93,7 @@
    (optional-key :username) (describe String "The user's username in QMS")})
 
 (defschema PlanQuotaDefault
-  {(optional-key :id)            PlanQuotaDefault
+  {(optional-key :id)            PlanQuotaDefaultId
    (optional-key :quota_value)   (describe Double "The quota's default value")
    (optional-key :resource_type) ResourceType})
 

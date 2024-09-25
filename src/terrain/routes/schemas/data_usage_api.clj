@@ -1,6 +1,6 @@
 (ns terrain.routes.schemas.data-usage-api
   (:require [common-swagger-api.schema :refer [describe]]
-            [schema.core :refer [defschema optional-key maybe]]))
+            [schema.core :refer [defschema]]))
 
 (def UserCurrentDataSummary "Get the most recent summary of a user's data usage")
 

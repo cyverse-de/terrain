@@ -1,6 +1,6 @@
 (ns terrain.routes.schemas.filetypes
-  (:use [common-swagger-api.schema :only [describe NonBlankString]])
-  (:require [common-swagger-api.schema.filetypes :as filetype-schema]
+  (:require [common-swagger-api.schema :refer [describe NonBlankString]]
+            [common-swagger-api.schema.filetypes :as filetype-schema]
             [schema.core :as s]))
 
 (s/defschema FileType

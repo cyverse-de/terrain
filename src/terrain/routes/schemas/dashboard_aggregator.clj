@@ -1,9 +1,8 @@
 (ns terrain.routes.schemas.dashboard-aggregator
-  (:use [common-swagger-api.schema :only [describe]]
-        [terrain.routes.schemas.instantlaunches :only [FullInstantLaunch]]
-        [schema.core :only [defschema Any maybe optional-key]])
-  (:require [common-swagger-api.schema.analyses.listing :as analyses-listing])
-  (:import [java.util UUID]))
+  (:require [common-swagger-api.schema :refer [describe]]
+            [common-swagger-api.schema.analyses.listing :as analyses-listing]
+            [terrain.routes.schemas.instantlaunches :refer [FullInstantLaunch]]
+            [schema.core :refer [defschema maybe optional-key]]))
 
 (defschema DashboardApp
   {:id

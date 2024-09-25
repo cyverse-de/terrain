@@ -1,14 +1,14 @@
 (ns terrain.services.fileio.controllers
-  (:use [clojure-commons.error-codes]
-        [slingshot.slingshot :only [throw+]])
-  (:require [terrain.services.fileio.actions :as actions]
+  (:require [cemerick.url :as url-parser]
+            [clojure-commons.error-codes :as ce]
             [clojure-commons.file-utils :as ft]
             [clojure.string :as string]
-            [cemerick.url :as url-parser]
             [ring.middleware.multipart-params :as multipart]
+            [slingshot.slingshot :refer [throw+]]
             [terrain.clients.data-info :as data]
-            [terrain.clients.data-info.raw :as data-raw])
-  (:import [java.io IOException ByteArrayInputStream]))
+            [terrain.clients.data-info.raw :as data-raw]
+            [terrain.services.fileio.actions :as actions])
+  (:import [java.io ByteArrayInputStream]))
 
 
 (defn download
@@ -50,11 +50,11 @@
   [address]
   (let [parsed-url (url-parser/url address)]
     (when-not (:protocol parsed-url)
-      (throw+ {:error_code ERR_INVALID_URL
+      (throw+ {:error_code ce/ERR_INVALID_URL
                :url        address}))
 
     (when-not (:host parsed-url)
-      (throw+ {:error_code ERR_INVALID_URL
+      (throw+ {:error_code ce/ERR_INVALID_URL
                :url        address}))
 
     (if-not (string/blank? (:path parsed-url))

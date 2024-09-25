@@ -1,13 +1,16 @@
 (ns terrain.routes.tags
-  (:use [common-swagger-api.schema]
-        [common-swagger-api.schema.metadata :only [TargetIdParam]]
-        [ring.util.http-response :only [ok]])
-  (:require [common-swagger-api.schema.metadata.tags :as schema]
+  (:require [common-swagger-api.schema :refer [context GET DELETE PATCH POST]]
+            [common-swagger-api.schema.metadata :refer [TargetIdParam]]
+            [common-swagger-api.schema.metadata.tags :as schema]
             [compojure.api.middleware :as middleware]
+            [ring.util.http-response :refer [ok]]
             [terrain.routes.schemas.tags :as ts]
             [terrain.services.metadata.tags :as tags]
             [terrain.util :as util]
             [terrain.util.config :as config]))
+
+;; Declarations to eliminate lint warnings for path and query parameter bindings.
+(declare entry-id params body tag-id)
 
 (defn secured-tag-routes
   []
