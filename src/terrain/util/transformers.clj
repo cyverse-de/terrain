@@ -1,7 +1,7 @@
 (ns terrain.util.transformers
-  (:use [terrain.auth.user-attributes]
-        [medley.core :only [remove-vals]])
-  (:require [clojure.string :as string]))
+  (:require [clojure.string :as string]
+            [medley.core :refer [remove-vals]]
+            [terrain.auth.user-attributes :refer [current-user]]))
 
 (defn- invalid-query-param-value?
   "Determines whether the argument represents a valid query parameter value."

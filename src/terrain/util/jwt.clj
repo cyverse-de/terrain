@@ -1,11 +1,9 @@
 (ns terrain.util.jwt
-  (:use [slingshot.slingshot :only [try+ throw+]])
-  (:require [clj-time.core :as time]
-            [clojure.string :as string]
+  (:require [clojure.string :as string]
             [clojure.tools.logging :as log]
-            [clojure-commons.error-codes :as ce]
             [clojure-commons.jwt :as jwt]
             [clojure-commons.response :as resp]
+            [slingshot.slingshot :refer [try+]]
             [terrain.util.config :as config]))
 
 (def ^:private jwt-generator
@@ -35,14 +33,6 @@
    :lastName      (:family-name jwt-user)
    :commonName    (or (:common-name jwt-user)
                       (str (:given-name jwt-user) " " (:family-name jwt-user)))})
-
-(defn user-from-wso2-assertion
-  [jwt]
-  {:user        (some-> (:http://wso2.org/claims/enduser jwt) (string/replace #"@.*" ""))
-   :email       (:http://wso2.org/claims/emailaddress jwt)
-   :given-name  (:http://wso2.org/claims/givenname jwt)
-   :family-name (:http://wso2.org/claims/lastname jwt)
-   :common-name (:http://wso2.org/claims/fullname jwt)})
 
 (defn terrain-user-from-jwt-claims
   ([jwt-claims]

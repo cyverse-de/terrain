@@ -1,11 +1,8 @@
 (ns terrain.services.metadata.favorites
   (:require [cheshire.core :as json]
-            [clojure.tools.logging :as log]
             [terrain.auth.user-attributes :as user]
             [terrain.clients.data-info :as data]
-            [terrain.clients.metadata.raw :as metadata]
-            [terrain.util.service :as svc]
-            [terrain.util.validators :as valid])
+            [terrain.clients.metadata.raw :as metadata])
   (:import [java.util UUID]))
 
 

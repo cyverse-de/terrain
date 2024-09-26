@@ -1,6 +1,6 @@
 (ns terrain.util.service
-  (:use [clojure.java.io :only [reader]])
-  (:require [cheshire.core :as cheshire]))
+  (:require [cheshire.core :as cheshire]
+            [clojure.java.io :refer [reader]]))
 
 (defn- error-body [e]
   (cheshire/encode {:reason (.getMessage e)}))
@@ -27,7 +27,7 @@
       (contains? (:headers e) "Content-Type")))
 
 (defn- terrain-response-from-response-map
-  [e status-code]
+  [e _status-code]
   (let [e (select-keys e [:headers :status :body])]
     (if-not (content-type-specified? e)
       (update-in e [:headers] assoc "Content-Type" default-content-type)

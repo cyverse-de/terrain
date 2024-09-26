@@ -1,14 +1,14 @@
 (ns terrain.services.permanent-id-requests
-  (:use [kameleon.uuids :only [uuidify]]
-        [slingshot.slingshot :only [try+ throw+]]
-        [terrain.auth.user-attributes :only [current-user]])
   (:require [cheshire.core :as json]
             [clj-time.core :as time]
             [clojure.data.xml :as xml]
             [clojure.string :as string]
             [clojure.tools.logging :as log]
             [clojure-commons.file-utils :as ft]
+            [kameleon.uuids :refer [uuidify]]
             [org.cyverse.metadata-files.datacite-4-2 :as datacite]
+            [slingshot.slingshot :refer [try+ throw+]]
+            [terrain.auth.user-attributes :refer [current-user]]
             [terrain.clients.async-tasks :as async-tasks-client]
             [terrain.clients.data-info :as data-info]
             [terrain.clients.data-info.raw :as data-info-client]
@@ -368,13 +368,13 @@ If this dataset accompanies a paper, please contact us with the DOI for that pap
        :unit  ""}]}))
 
 (defn- format-perm-id-req-response
-  [user path-info-for {:keys [target_id] :as response}]
+  [_user path-info-for {:keys [target_id] :as response}]
   (-> response
       (dissoc :target_id :target_type)
       (assoc :folder (path-info-for (keyword target_id)))))
 
 (defn- format-requested-by
-  [user {:keys [requested_by target_id] :as permanent-id-request}]
+  [user {:keys [requested_by _target_id] :as permanent-id-request}]
   (if-let [user-info (groups/lookup-subject user requested_by)]
     (assoc permanent-id-request :requested_by (groups/format-like-trellis user-info))
     permanent-id-request))

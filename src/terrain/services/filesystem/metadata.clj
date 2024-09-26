@@ -1,19 +1,10 @@
 (ns terrain.services.filesystem.metadata
-  (:use [clojure-commons.error-codes]
-        [clojure-commons.validators]
-        [terrain.services.filesystem.common-paths]
-        [terrain.services.filesystem.validators]
-        [kameleon.uuids :only [uuidify]]
-        [slingshot.slingshot :only [try+ throw+]])
-  (:require [clojure.string :as string]
-            [clojure-commons.file-utils :as ft]
-            [cheshire.core :as json]
+  (:require [clojure-commons.validators :refer [validate-map]]
             [dire.core :refer [with-pre-hook! with-post-hook!]]
-            [terrain.clients.metadata :as metadata]
+            [kameleon.uuids :refer [uuidify]]
             [terrain.clients.data-info :as data]
             [terrain.clients.data-info.raw :as data-raw]
-            [terrain.services.filesystem.validators :as validators]
-            [terrain.util.service :as service]))
+            [terrain.services.filesystem.common-paths :refer [log-call log-func]]))
 
 (defn do-metadata-get
   "Entrypoint for the API."

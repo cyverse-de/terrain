@@ -1,6 +1,7 @@
-{:lint-as {slingshot.slingshot/try+ clojure.core/try
-           common-swagger-api.schema/defapi clojure.core/def}
+{:lint-as {common-swagger-api.schema/defapi clojure.core/def
+           slingshot.slingshot/try+         clojure.core/try
+           pronto.core/defmapper            clojure.core/def}
  :linters {:clojure-lsp/unused-public-var {:exclude [terrain.routes/app-wrapper]}
-           :unresolved-var {:exclude [clojure-commons.error-codes
-                                      ring.util.http-response]}
-           :unresolved-symbol {:exclude [&throw-context]}}}
+           :unresolved-var                {:exclude [clojure-commons.error-codes
+                                                     ring.util.http-response]}
+           :unresolved-symbol             {:exclude [&throw-context]}}}

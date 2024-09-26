@@ -1,8 +1,8 @@
 (ns terrain.services.user-sessions
-  (:use [terrain.util.service]
-        [terrain.clients.user-sessions]
-        [terrain.auth.user-attributes])
-  (:require [clojure.tools.logging :as log]))
+  (:require [clojure.tools.logging :as log]
+            [terrain.auth.user-attributes :refer [current-user]]
+            [terrain.clients.user-sessions :refer [get-session set-session delete-session]]
+            [terrain.util.service :refer [success-response]]))
 
 (defn user-session
   ([]

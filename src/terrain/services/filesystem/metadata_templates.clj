@@ -1,7 +1,7 @@
 (ns terrain.services.filesystem.metadata-templates
-  (:use [terrain.services.filesystem.common-paths])
   (:require [dire.core :refer [with-pre-hook! with-post-hook!]]
-            [terrain.clients.metadata :as metadata]))
+            [terrain.clients.metadata :as metadata]
+            [terrain.services.filesystem.common-paths :refer [log-call log-func]]))
 
 (def user-id-ks [:created_by :modified_by])
 
@@ -88,7 +88,7 @@
   (add-metadata-template template))
 
 (with-pre-hook! #'do-metadata-template-add
-  (fn [body]
+  (fn [_body]
     (log-call "do-metadata-template-add")))
 
 (with-post-hook! #'do-metadata-template-add (log-func "do-metadata-template-add"))
@@ -98,7 +98,7 @@
   (update-metadata-template template-id template))
 
 (with-pre-hook! #'do-metadata-template-edit
-  (fn [template-id template]
+  (fn [_template-id _template]
     (log-call "do-metadata-template-edit")))
 
 (with-post-hook! #'do-metadata-template-edit (log-func "do-metadata-template-edit"))
@@ -109,7 +109,7 @@
   nil)
 
 (with-pre-hook! #'do-metadata-template-delete
-  (fn [template-id params]
+  (fn [_template-id _params]
     (log-call "do-metadata-template-delete")))
 
 (with-post-hook! #'do-metadata-template-delete (log-func "do-metadata-template-delete"))

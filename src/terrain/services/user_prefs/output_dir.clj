@@ -1,16 +1,17 @@
 (ns terrain.services.user-prefs.output-dir
-  (:use [terrain.auth.user-attributes :only [current-user]]
-        [terrain.routes.schemas.user-prefs :only [default-output-dir-key]])
-  (:require [clojure.string :as string]
+  (:require [clojure.set :as set]
+            [clojure.string :as string]
             [clojure.tools.logging :as log]
             [clojure-commons.file-utils :as ft]
+            [terrain.auth.user-attributes :refer [current-user]]
             [terrain.clients.data-info :as di]
+            [terrain.routes.schemas.user-prefs :refer [default-output-dir-key]]
             [terrain.util.config :as cfg]))
 
 (defn- convert-default-output-dir-keys
   [prefs]
-  (clojure.set/rename-keys prefs {:defaultOutputFolder    default-output-dir-key
-                                  :systemDefaultOutputDir :system_default_output_dir}))
+  (set/rename-keys prefs {:defaultOutputFolder    default-output-dir-key
+                          :systemDefaultOutputDir :system_default_output_dir}))
 
 (defn add-default-output-dir
   "Adds the default output directory to a set of user preferences."
@@ -32,7 +33,7 @@
 
 (defn- generate-default-output-dir
   "Generates a default output directory for the user and stores it in the preferences."
-  [user prefs]
+  [_user prefs]
   (add-default-output-dir prefs (di/gen-output-dir (system-default-output-dir))))
 
 (defn- add-system-default-output-dir
@@ -101,7 +102,7 @@
        (create-default-output-dir)))
 
 (defn process-incoming
-  [user prefs]
+  [_user prefs]
   (->> prefs
        (add-system-default-output-dir)
        (create-default-output-dir)))

@@ -1,17 +1,10 @@
 (ns terrain.util
   "Utility functions for defining services in Terrain. This namespace is used by terrain.core and
    several other top-level service definition namespaces."
-  (:use [common-swagger-api.schema :only [routes]]
-        [terrain.util.service]
-        [terrain.util.transformers]
-        [terrain.util.validators :only [parse-body]]))
-
-(defn as-vector
-  "Returns the given parameter inside a vector if it's not a vector already."
-  [p]
-  (cond (nil? p)    []
-        (vector? p) p
-        :else       [p]))
+  (:require [common-swagger-api.schema :refer [routes]]
+            [terrain.util.service :refer [success-response]]
+            [terrain.util.transformers :refer [add-current-user-to-map]]
+            [terrain.util.validators :refer [parse-body]]))
 
 (defn optional-routes
   "Creates a set of optionally defined routes."

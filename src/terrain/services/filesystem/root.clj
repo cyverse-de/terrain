@@ -1,7 +1,5 @@
 (ns terrain.services.filesystem.root
-  (:use [clojure-commons.validators])
   (:require [clojure-commons.json :as json]
-            [dire.core :refer [with-pre-hook! with-post-hook!]]
             [terrain.clients.data-info.raw :as data-raw]))
 
 (defn- format-roots
