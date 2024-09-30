@@ -1,8 +1,8 @@
 (ns terrain.clients.notifications.raw
-  (:use [terrain.util.transformers :only [secured-params]])
   (:require [cemerick.url :as curl]
             [clj-http.client :as client]
-            [terrain.util.config :as config]))
+            [terrain.util.config :as config]
+            [terrain.util.transformers :refer [secured-params]]))
 
 (def na-sort-params [:limit :offset :sortfield :sortdir])
 (def na-filter-params [:seen :filter])
@@ -128,7 +128,7 @@
                 :body         body}))
 
 (defn delete-all-system-messages
-  [params]
+  [_]
   (client/delete (na-url "system" "delete-all")
                  {:query-params (secured-params)
                   :as           :stream}))

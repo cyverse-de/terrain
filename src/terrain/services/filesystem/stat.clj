@@ -1,25 +1,27 @@
 (ns terrain.services.filesystem.stat
-  (:use [clojure-commons.validators]
-        [clj-jargon.init :only [with-jargon]]
-        [clj-jargon.item-info :only [exists? is-dir? stat]]
-        [clj-jargon.item-ops :only [input-stream]]
-        [clj-jargon.metadata :only [get-attribute]]
-        [clj-jargon.permissions :only [is-writeable? list-user-perms permission-for owns?]]
-        [slingshot.slingshot :only [throw+]])
   (:require [cheshire.core :as json]
+            [clj-icat-direct.icat :as icat]
+            [clj-jargon.init :refer [with-jargon]]
+            [clj-jargon.item-info :refer [exists? is-dir?]]
+            [clj-jargon.item-ops :refer [input-stream]]
+            [clj-jargon.metadata :refer [get-attribute]]
+            [clj-jargon.permissions :refer [is-writeable? list-user-perms permission-for owns?]]
             [clojure.string :as string]
             [clojure.tools.logging :as log]
             [clojure-commons.file-utils :as ft]
-            [terrain.services.filesystem.validators :as validators]
-            [terrain.services.filesystem.garnish.irods :as filetypes]
-            [clj-icat-direct.icat :as icat]
+            [slingshot.slingshot :refer [throw+]]
             [terrain.clients.data-info.raw :as data-raw]
-            [terrain.util.config :as cfg]
             [terrain.services.filesystem.common-paths :as paths]
-            [terrain.services.filesystem.icat :as jargon])
+            [terrain.services.filesystem.garnish.irods :as filetypes]
+            [terrain.services.filesystem.icat :as jargon]
+            [terrain.services.filesystem.validators :as validators]
+            [terrain.util.config :as cfg])
   (:import [clojure.lang IPersistentMap]
            [java.io InputStream]
            [org.apache.tika Tika]))
+
+;; Declarations to eliminate lint warnings for bindings in non-standard macros.
+(declare cm)
 
 (defn- count-shares
   [cm user path]
@@ -98,16 +100,6 @@
         (merge-type-info cm user path)
         (merge-shares cm user path)
         (merge-counts cm user path))))
-
-(defn path-stat
-  ([cm user path]
-   (let [path (ft/rm-last-slash path)]
-     (log/warn "[path-stat] user:" user "path:" path)
-     (validators/path-exists cm path)
-     (decorate-stat cm user (stat cm path))))
-  ([user path]
-   (with-jargon (jargon/jargon-cfg) [cm]
-     (path-stat cm user path))))
 
 (defn- dir-stack
   "Obtains a stack of parent directories for a directory path."

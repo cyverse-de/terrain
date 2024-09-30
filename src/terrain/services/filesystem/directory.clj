@@ -1,23 +1,19 @@
 (ns terrain.services.filesystem.directory
-  (:use [clojure-commons.core :only [remove-nil-values]]
-        [clojure-commons.validators]
-        [kameleon.uuids :only [uuidify]]
-        [slingshot.slingshot :only [try+ throw+]])
-  (:require [clojure.tools.logging :as log]
-            [clojure.string :as string]
-            [cheshire.core :as json]
+  (:require [cheshire.core :as json]
+            [clojure.tools.logging :as log]
+            [clojure-commons.core :refer [remove-nil-values]]
             [clojure-commons.file-utils :as ft]
+            [clojure-commons.validators :refer [validate-map]]
             [dire.core :refer [with-pre-hook! with-post-hook!]]
+            [kameleon.uuids :refer [uuidify]]
             [me.raynes.fs :as fs]
-            [clojure-commons.error-codes :as error]
+            [slingshot.slingshot :refer [try+]]
             [terrain.clients.data-info :as data]
             [terrain.clients.data-info.raw :as data-raw]
             [terrain.services.filesystem.stat :as st]
             [terrain.services.metadata.favorites :as favorites]
             [terrain.util.config :as cfg]
-            [terrain.util.validators :as duv]
-            [terrain.services.filesystem.common-paths :as paths]
-            [ring.util.http-response :as response]))
+            [terrain.services.filesystem.common-paths :as paths]))
 
 (defn- is-favorite?
   [favorite-ids id]
@@ -92,9 +88,9 @@
 
 (defn- top-level-listing
   [{user :user}]
-  (let [comm-f     (future (list-directories user (cfg/fs-community-data)))
-        share-f    (future (list-directories user (cfg/irods-home)))
-        home-f     (future (list-directories user (paths/user-home-dir user)))]
+  (let [comm-f  (future (list-directories user (cfg/fs-community-data)))
+        share-f (future (list-directories user (cfg/irods-home)))
+        home-f  (future (list-directories user (paths/user-home-dir user)))]
     {:roots [@home-f @comm-f @share-f]}))
 
 (defn- shared-with-me-listing?

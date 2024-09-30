@@ -1,5 +1,4 @@
 (ns terrain.services.user-info
-  (:use [terrain.util.service :only [success-response]])
   (:require [terrain.clients.iplant-groups :as ipg]
             [terrain.auth.user-attributes :as user]))
 

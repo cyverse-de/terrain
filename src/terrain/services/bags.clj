@@ -1,5 +1,4 @@
 (ns terrain.services.bags
-  (:use [terrain.util.service])
   (:require [terrain.clients.bags :as bags]))
 
 (defn has-bags

@@ -9,6 +9,9 @@
             [terrain.routes.schemas.qms :as schema]
             [ring.util.http-response :refer [ok]]))
 
+;; Declarations to eliminate lint warnings for path and query parameter bindings.
+(declare plan-id body params subscription-uuid uuid username resource-type plan-name)
+
 (defn qms-api-routes
   []
   (optional-routes

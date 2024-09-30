@@ -1,6 +1,6 @@
 (ns terrain.clients.util
-  (:use [slingshot.slingshot :only [throw+ try+]])
-  (:require [clojure-commons.error-codes :as ce]))
+  (:require [clojure-commons.error-codes :as ce]
+            [slingshot.slingshot :refer [try+]]))
 
 (defmacro with-trap
   [[handle-error] & body]

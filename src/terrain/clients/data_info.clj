@@ -1,7 +1,4 @@
 (ns terrain.clients.data-info
-  (:use [clojure-commons.core :only [remove-nil-values]]
-        [slingshot.slingshot :only [throw+ try+]]
-        [terrain.auth.user-attributes :only [current-user]])
   (:require [clj-http.client :as http]
             [clojure.string :as string]
             [clojure.tools.logging :as log]
@@ -10,32 +7,34 @@
             [cheshire.core :as json]
             [me.raynes.fs :as fs]
             [clj-icat-direct.icat :as db]
+            [clojure-commons.core :refer [remove-nil-values]]
             [clojure-commons.error-codes :as error]
             [clojure-commons.file-utils :as ft]
             [clojure-commons.assertions :as assertions]
+            [slingshot.slingshot :refer [throw+ try+]]
+            [terrain.auth.user-attributes :refer [current-user]]
             [terrain.clients.data-info.raw :as raw]
             [terrain.services.filesystem.common-paths :as cp]
             [terrain.services.filesystem.create :as cr]
             [terrain.services.filesystem.icat :as icat]
             [terrain.services.filesystem.sharing :as sharing]
             [terrain.services.filesystem.stat :as st]
-            [terrain.services.filesystem.users :as users]
             [terrain.services.filesystem.uuids :as uuids]
             [terrain.services.filesystem.validators :as validators]
             [terrain.util.config :as cfg])
   (:import [clojure.lang IPersistentMap ISeq Keyword]
            [java.util UUID]))
 
-(defn ^Boolean irods-running?
+(defn irods-running?
   "Determines whether or not iRODS is running."
-  []
+  ^Boolean []
   (-> (raw/request :get [] {:content-type :json})
       :body
       json/decode
       (get "iRODS")))
 
 
-(defn ^String user-home-folder
+(defn user-home-folder
   "Determines the home folder for the given user.
 
    Parameters:
@@ -43,11 +42,11 @@
 
    Returns:
      It returns the absolute path to the home folder."
-  [^String user]
+  ^String [^String user]
   (cp/user-home-dir user))
 
 
-(defn ^String user-base-paths
+(defn user-base-paths
   "Fetches the home and trash paths for the given user.
 
    Parameters:
@@ -55,7 +54,7 @@
 
    Returns:
      A map of the absolute paths to the home and trash folders."
-  [^String user]
+  ^String [^String user]
   (-> (raw/base-paths user)
       :body
       (json/decode true)))
@@ -195,12 +194,6 @@
   (let [path-uuid (uuid-for-path user source)]
     (raw/rename user path-uuid (ft/basename dest))))
 
-(defn- move-single
-  "Uses the data-info single-item directory change endpoint to move an item to a different directory."
-  [user source dest]
-  (let [path-uuid (uuid-for-path user source)]
-    (raw/move-single user path-uuid dest)))
-
 (defn move
   "Uses the data-info bulk mover endpoint to move items into a new directory."
   [{:keys [user]} {:keys [sources dest]}]
@@ -283,19 +276,7 @@
   [user data-id]
   (:body (raw/get-avus user data-id :as :json)))
 
-(defn ^ISeq list-user-groups
-  "retrieves a list of groups names a given user belongs to
-
-   Params:
-     user - the username of the user of interest
-
-   Returns:
-     It returns the list of group names."
-  [^String user]
-  (users/list-user-groups user))
-
-
-(defn ^IPersistentMap stat-by-uuid
+(defn stat-by-uuid
   "Resolves a stat info for the entity with a given UUID.
 
    Params:
@@ -304,14 +285,14 @@
 
    Returns:
      It returns a path-stat map containing an additional UUID field."
-  [^String user ^UUID uuid & {:keys [filter-include filter-exclude]}]
+  ^IPersistentMap [^String user ^UUID uuid & {:keys [filter-include filter-exclude]}]
   (-> (raw/collect-path-info user :ids [uuid] :filter-include filter-include :filter-exclude filter-exclude)
       :body
       json/decode
       (get-in ["ids" (str uuid)])
       walk/keywordize-keys))
 
-(defn ^ISeq stats-by-uuids
+(defn stats-by-uuids
   "Resolves the stat info for the entities with the given UUIDs. The results are not paged.
 
    Params:
@@ -327,7 +308,7 @@
 
    Returns:
      It returns a path-stat map containing an additional UUID field."
-  [user uuids params]
+  ^ISeq [user uuids params]
   (let [params (select-keys params [:ignore-missing :ignore-inaccessible :filter-include :filter-exclude])]
     (-> (http/post (raw/data-info-url "/path-info")
                    {:query-params (assoc params :user user)
@@ -337,7 +318,7 @@
         :body
         :ids)))
 
-(defn ^ISeq stats-by-uuids-paged
+(defn stats-by-uuids-paged
   "Resolves the stat info for the entities with the given UUIDs. The results are paged.
 
    Params:
@@ -353,10 +334,14 @@
 
    Returns:
      It returns a page of stat info maps."
+  ^ISeq
   [^String  user
    ^String  sort-field
    ^String  sort-order
    ^Integer limit
+
+
+
    ^Integer offset
    ^ISeq    uuids
    info-types]
@@ -373,7 +358,7 @@
      :total   (db/number-of-uuids-in-folder user (cfg/irods-zone) uuids info-types)}))
 
 
-(defn ^Boolean uuid-accessible?
+(defn uuid-accessible?
   "Indicates if a data item is readable by a given user.
 
    Parameters:
@@ -382,7 +367,7 @@
 
    Returns:
      It returns true if the user can access the data item, otherwise false"
-  [^String user ^UUID data-id]
+  ^Boolean [^String user ^UUID data-id]
   (uuids/uuid-accessible? user data-id))
 
 
@@ -397,7 +382,7 @@
     (throw+ {:error_code error/ERR_NOT_FOUND :uuid data-id})))
 
 
-(defn ^String resolve-data-type
+(defn resolve-data-type
   "Given filesystem id, it returns the type of data item it is, file or folder.
 
    Parameters:
@@ -405,11 +390,11 @@
 
    Returns:
      The type of the data item, `file` or `folder`"
-  [^UUID data-id]
+  ^String [^UUID data-id]
   (icat/resolve-data-type data-id))
 
 
-(defn ^IPersistentMap share
+(defn share
   "grants access to a list of data entities for a list of users by a user
 
    Params:
@@ -428,7 +413,7 @@
                     :path   - the path the user didn't get access to
                     :reason - the reason access wasn't granted
        :perm    - the permission that was granted"
-  [^String user ^ISeq share-withs ^ISeq fpaths ^String perm]
+  ^IPersistentMap [^String user ^ISeq share-withs ^ISeq fpaths ^String perm]
   (sharing/share user share-withs fpaths perm))
 
 
@@ -470,7 +455,7 @@
     (assertions/request-failure full-msg)))
 
 
-(defn ^String mk-data-path-url-path
+(defn mk-data-path-url-path
   "This function constructs the url path to the resource backing a given data item.
 
    Parameters:
@@ -478,7 +463,7 @@
 
    Returns:
      It returns the data-info URL path to the corresponding resource"
-  [^String path]
+  ^String [^String path]
   (let [nodes (fs/split path)
         nodes (if (= "/" (first nodes)) (next nodes) nodes)]
     (str "data/path/" (string/join "/" (map url/url-encode nodes)))))

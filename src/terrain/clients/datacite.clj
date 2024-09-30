@@ -1,9 +1,9 @@
 (ns terrain.clients.datacite
-  (:use [ring.util.http-response :only [charset]]
-        [slingshot.slingshot :only [try+ throw+]])
   (:require [cemerick.url :as curl]
             [clj-http.client :as http]
             [clojure.data.codec.base64 :as base64]
+            [ring.util.http-response :refer [charset]]
+            [slingshot.slingshot :refer [try+ throw+]]
             [terrain.util.config :as config]))
 
 (defn- auth-params
@@ -24,7 +24,7 @@
         (.getBytes "UTF-8")
         base64/decode
         (String. "UTF-8"))
-    (catch Object e
+    (catch Object _
       datacite-xml)))
 
 (defn- datacite-post
@@ -60,6 +60,6 @@
                  :error    "DOI not found in DataCite response."
                  :response response}))
       (update-in response [:data :attributes :xml] decode-datacite-xml))
-    (catch [:status 400] {:keys [body] :as bad-request}
+    (catch [:status 400] {:keys [body]}
       (throw+ {:type  :clojure-commons.exception/bad-request
                :error body}))))

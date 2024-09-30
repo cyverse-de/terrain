@@ -1,12 +1,10 @@
 (ns terrain.services.metadata.tags
-  (:use [kameleon.uuids :only [uuidify]])
-  (:require [cheshire.core :as json]
+  (:require [kameleon.uuids :refer [uuidify]]
             [terrain.auth.user-attributes :as user]
             [terrain.clients.data-info :as data]
             [terrain.clients.metadata.raw :as meta]
             [terrain.persistence.search :as search]
             [terrain.util.config :as config]
-            [terrain.util.service :as svc]
             [terrain.util.validators :as valid])
   (:import [java.io Reader]
            [java.util UUID]
@@ -31,7 +29,7 @@
    :targets      []})
 
 
-(defn ^IPersistentMap create-user-tag
+(defn create-user-tag
   "Creates a new user tag
 
    Parameters:
@@ -40,13 +38,13 @@
 
    Returns:
      It returns the response."
-  [^String body]
+  ^IPersistentMap [^String body]
   (let [tag (-> body meta/create-user-tag)]
     (search/index-tag (format-new-tag-doc tag))
     (select-keys tag [:id])))
 
 
-(defn ^IPersistentMap delete-user-tag
+(defn delete-user-tag
   "Deletes a user tag. This will detach it from all metadata.
 
    Parameters:
@@ -57,7 +55,7 @@
 
    Throws:
      ERR_NOT_FOUND - if the text isn't a UUID owned by the authenticated user."
-  [^UUID tag-id]
+  ^IPersistentMap [^UUID tag-id]
   (let [tag-id (valid/extract-uri-uuid tag-id)]
     (meta/delete-user-tag tag-id)
     (search/remove-tag tag-id)))
@@ -122,7 +120,7 @@
     (search/update-tag tag-id doc-updates)))
 
 
-(defn ^IPersistentMap update-user-tag
+(defn update-user-tag
   "updates the value and/or description of a tag.
 
    Parameters:
@@ -132,7 +130,7 @@
 
     Returns:
       It returns the response."
-  [^String tag-str ^Reader body]
+  ^IPersistentMap [^String tag-str ^Reader body]
   (let [tag-id  (uuidify tag-str)
         update  (meta/update-user-tag tag-id body)]
     (do-update-tag tag-id update)))

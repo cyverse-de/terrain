@@ -1,7 +1,7 @@
 (ns terrain.util.email
-  (:use [terrain.auth.user-attributes :only [current-user]])
   (:require [clj-http.client :as client]
             [clojure.string :as string]
+            [terrain.auth.user-attributes :refer [current-user]]
             [terrain.util.config :as config]))
 
 (defn send-email
@@ -19,7 +19,7 @@
 
 (defn send-tool-request-email
   "Sends the email message informing Core Services of a tool request."
-  [tool-req {:keys [firstname lastname email]}]
+  [tool-req {:keys [firstname lastname _email]}]
   (let [template-values {:username           (str firstname " " lastname)
                          :environment        (config/environment-name)
                          :toolrequestid      (:uuid tool-req)

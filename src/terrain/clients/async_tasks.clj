@@ -1,6 +1,5 @@
 (ns terrain.clients.async-tasks
   (:require [async-tasks-client.core :as async-tasks-client]
-            [clojure.string :as string]
             [terrain.util.config :as config]))
 
 (defn run-async-thread

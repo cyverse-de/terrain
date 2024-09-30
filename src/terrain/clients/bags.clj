@@ -1,9 +1,6 @@
 (ns terrain.clients.bags
-  (:use [clojure-commons.error-codes]
-        [slingshot.slingshot :only [try+ throw+]])
   (:require [clj-http.client :as http]
             [cemerick.url :refer [url]]
-            [clojure.tools.logging :as log]
             [terrain.util.config :as config]))
 
 (defn- bags-url
@@ -48,7 +45,6 @@
   nil)
 
 (defn get-default-bag
-  [username]
   [username]
   (:body (http/get (bags-url [username "default"]) {:as :json})))
 

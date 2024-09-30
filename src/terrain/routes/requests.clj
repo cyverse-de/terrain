@@ -1,12 +1,14 @@
 (ns terrain.routes.requests
-  (:use [common-swagger-api.schema]
-        [ring.util.http-response :only [ok]]
-        [schema.core :only [Any]]
-        [terrain.auth.user-attributes :only [current-user]]
-        [terrain.util :only [optional-routes]])
-  (:require [terrain.util.config :as config]
+  (:require [common-swagger-api.schema :refer [context GET POST PATCH]]
+            [ring.util.http-response :refer [ok]]
+            [terrain.auth.user-attributes :refer [current-user]]
+            [terrain.util.config :as config]
             [terrain.routes.schemas.requests :as schema]
-            [terrain.services.requests :as requests]))
+            [terrain.services.requests :as requests]
+            [terrain.util :refer [optional-routes]]))
+
+;; Declarations to eliminate lint warnings for path and query parameter bindings.
+(declare body request-id params)
 
 (defn request-routes
   "Routes for submitting administrative requests. The non-administrative routes have the request type in the path with

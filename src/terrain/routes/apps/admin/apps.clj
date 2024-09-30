@@ -1,21 +1,24 @@
 (ns terrain.routes.apps.admin.apps
-  (:use [common-swagger-api.schema]
-        [common-swagger-api.schema.apps.admin.categories
-         :only [AppCategorizationDocs
-                AppCategorizationRequest
-                AppCategorizationSummary]]
-        [common-swagger-api.schema.integration-data
-         :only [IntegrationData
-                IntegrationDataIdPathParam]]
-        [ring.util.http-response :only [ok]]
-        [terrain.routes.schemas.admin :only [AdminAppSearchParams]]
-        [terrain.util :only [optional-routes]])
   (:require [common-swagger-api.routes]                     ;; for :description-file
+            [common-swagger-api.schema :refer [context GET POST DELETE PATCH PUT]]
+            [common-swagger-api.schema.apps.admin.categories
+             :refer [AppCategorizationDocs
+                     AppCategorizationRequest
+                     AppCategorizationSummary]]
             [common-swagger-api.schema.apps :as apps-schema]
             [common-swagger-api.schema.apps.admin.apps :as schema]
             [common-swagger-api.schema.apps.permission :as permission-schema]
+            [common-swagger-api.schema.integration-data
+             :refer [IntegrationData
+                    IntegrationDataIdPathParam]]
+            [ring.util.http-response :refer [ok]]
             [terrain.clients.apps.raw :as apps]
+            [terrain.routes.schemas.admin :refer [AdminAppSearchParams]]
+            [terrain.util :refer [optional-routes]]
             [terrain.util.config :as config]))
+
+;; Variable declarations to prevent unresolved symbol warnings for compojure bindings from clj-kondo.
+(declare params body system-id app-id integration-data-id version-id)
 
 (defn admin-apps-routes
   []

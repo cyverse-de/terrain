@@ -1,6 +1,6 @@
 (ns terrain.routes.schemas.filesystem.tickets
-  (:use [common-swagger-api.schema :only [describe]])
-  (:require [common-swagger-api.schema.data.tickets :as schema]
+  (:require [common-swagger-api.schema :refer [describe]]
+            [common-swagger-api.schema.data.tickets :as schema]
             [schema.core :as s]
             [schema-tools.core :as st]))
 

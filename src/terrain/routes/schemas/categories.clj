@@ -1,8 +1,8 @@
 (ns terrain.routes.schemas.categories
-  (:use [common-swagger-api.schema]
-        [schema.core :only [defschema enum]])
-  (:require [common-swagger-api.schema.apps :as apps-schema]
-            [common-swagger-api.schema.apps.categories :as categories-schema]))
+  (:require [common-swagger-api.schema :refer [describe SortFieldOptionalKey SortFieldDocs]]
+            [common-swagger-api.schema.apps :as apps-schema]
+            [common-swagger-api.schema.apps.categories :as categories-schema]
+            [schema.core :refer [defschema enum]]))
 
 ;; Convert the keywords in AppListingValidSortFields to strings,
 ;; so that the correct param format is passed through to the apps service.

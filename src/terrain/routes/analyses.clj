@@ -1,32 +1,35 @@
 (ns terrain.routes.analyses
-  (:use [common-swagger-api.schema]
-        [common-swagger-api.schema.apps :only [AppIdParam AppJobView]]
-        [common-swagger-api.schema.quicklaunches
-         :only [QuickLaunch
-                NewQuickLaunch
-                UpdateQuickLaunch
-                QuickLaunchFavorite
-                NewQuickLaunchFavorite
-                QuickLaunchUserDefault
-                UpdateQuickLaunchUserDefault
-                NewQuickLaunchUserDefault
-                QuickLaunchGlobalDefault
-                UpdateQuickLaunchGlobalDefault
-                NewQuickLaunchGlobalDefault]]
-        [ring.util.http-response :only [ok]]
-        [terrain.auth.user-attributes :only [require-authentication]]
-        [terrain.util :only [optional-routes]])
   (:require [common-swagger-api.routes]                         ;; for :description-file
+            [common-swagger-api.schema.quicklaunches
+             :refer [QuickLaunch
+                    NewQuickLaunch
+                    UpdateQuickLaunch
+                    QuickLaunchFavorite
+                    NewQuickLaunchFavorite
+                    QuickLaunchUserDefault
+                    UpdateQuickLaunchUserDefault
+                    NewQuickLaunchUserDefault
+                    QuickLaunchGlobalDefault
+                    UpdateQuickLaunchGlobalDefault
+                    NewQuickLaunchGlobalDefault]]
+            [common-swagger-api.schema :refer [context describe GET POST PATCH DELETE]]
             [common-swagger-api.schema.analyses :as schema]
             [common-swagger-api.schema.analyses.listing :as listing-schema]
+            [common-swagger-api.schema.apps :refer [AppIdParam AppJobView]]
             [common-swagger-api.schema.apps.permission :as perms-schema]
+            [ring.util.http-response :refer [ok]]
             [schema.core :as s]
             [schema-tools.core :as st]
+            [terrain.auth.user-attributes :as user]
             [terrain.clients.analyses :as analyses]
             [terrain.clients.app-exposer :as app-exposer]
             [terrain.clients.apps.raw :as apps]
+            [terrain.util :refer [optional-routes]]
             [terrain.util.config :as config])
   (:import [java.util UUID]))
+
+;; Declarations to avoid unresolved symbol warnings from clj-kondo.
+(declare analysis-id app-id body params global-default-id fave fave-id new user-default-id quicklaunch ql-id)
 
 (defn analysis-routes
   []
@@ -201,7 +204,7 @@
     ;; Quick Launch Favorites
     (context "/favorites" []
       (GET "/" []
-        :middleware  [require-authentication]
+        :middleware  [user/require-authentication]
         :return      [QuickLaunchFavorite]
         :summary     "Get information about all favorited Quick Launches"
         :description "Get in information about all favorited Quick Launches by the
@@ -209,7 +212,7 @@
         (ok (analyses/get-all-quicklaunch-favorites)))
 
       (POST "/" []
-        :middleware  [require-authentication]
+        :middleware  [user/require-authentication]
         :body        [fave NewQuickLaunchFavorite]
         :return      QuickLaunchFavorite
         :summary     "Favorite a Quick Launch"
@@ -220,7 +223,7 @@
         :path-params [fave-id :- QuickLaunchFavoriteID]
 
         (GET "/" []
-          :middleware  [require-authentication]
+          :middleware  [user/require-authentication]
           :return      QuickLaunchFavorite
           :summary     "Get information for a favorited Quick Launch"
           :description "Get information for a favorited Quick Launch, including the
@@ -228,7 +231,7 @@
           (ok (analyses/get-quicklaunch-favorite fave-id)))
 
         (DELETE "/" []
-          :middleware  [require-authentication]
+          :middleware  [user/require-authentication]
           :return      DeletionResponse
           :summary     "Un-favorite a Quick Launch"
           :description "Un-favorite a Quick Launch for the logged in user. Does not
@@ -245,7 +248,7 @@
       ;; User Defaults
       (context "/user" []
         (GET "/" []
-          :middleware  [require-authentication]
+          :middleware  [user/require-authentication]
           :return      [QuickLaunchUserDefault]
           :summary     "Get information for all of the user-defined Quick Launch defaults
           for the logged in user"
@@ -255,7 +258,7 @@
           (ok (analyses/get-all-quicklaunch-user-defaults)))
 
         (POST "/" []
-          :middleware  [require-authentication]
+          :middleware  [user/require-authentication]
           :body        [new NewQuickLaunchUserDefault]
           :return      QuickLaunchUserDefault
           :summary     "Set a user-defined Quick Launch default"
@@ -267,7 +270,7 @@
           :path-params [user-default-id :- QuickLaunchUserDefaultID]
 
           (GET "/" []
-            :middleware  [require-authentication]
+            :middleware  [user/require-authentication]
             :return      QuickLaunchUserDefault
             :summary     "Get information for a user-defined Quick Launch default"
             :description "Get information for a user-defined Quick Launch default.
@@ -276,7 +279,7 @@
             (ok (analyses/get-quicklaunch-user-default user-default-id)))
 
           (PATCH "/" []
-            :middleware  [require-authentication]
+            :middleware  [user/require-authentication]
             :body        [update UpdateQuickLaunchUserDefault]
             :return      QuickLaunchUserDefault
             :summary     "Edit a user-defined Quick Launch default"
@@ -285,7 +288,7 @@
             (ok (analyses/update-quicklaunch-user-default user-default-id update)))
 
           (DELETE "/" []
-            :middleware [require-authentication]
+            :middleware [user/require-authentication]
             :return      DeletionResponse
             :summary     "Delete a user-defined Quick Launch default"
             :description "Delete a user-defined Quick Launch default. Does not delete
@@ -296,7 +299,7 @@
       (context "/global" []
 
         (GET "/" []
-          :middleware  [require-authentication]
+          :middleware  [user/require-authentication]
           :return      [QuickLaunchGlobalDefault]
           :summary     "Get information for all of the globally-defined Quick Launch
           defaults"
@@ -306,7 +309,7 @@
           (ok (analyses/get-all-quicklaunch-global-defaults)))
 
         (POST "/" []
-          :middleware  [require-authentication]
+          :middleware  [user/require-authentication]
           :body        [new NewQuickLaunchGlobalDefault]
           :return      QuickLaunchGlobalDefault
           :summary     "Set a globally-defined Quick Launch default"
@@ -317,7 +320,7 @@
           :path-params [global-default-id :- QuickLaunchGlobalDefaultID]
 
           (GET "/" []
-            :middleware  [require-authentication]
+            :middleware  [user/require-authentication]
             :return      QuickLaunchGlobalDefault
             :summary     "Get information for a globally-defined Quick Launch default"
             :description "Get information for a globally-defined Quick Launch default.
@@ -325,7 +328,7 @@
             (ok (analyses/get-quicklaunch-global-default global-default-id)))
 
           (PATCH "/" []
-            :middleware  [require-authentication]
+            :middleware  [user/require-authentication]
             :body        [update UpdateQuickLaunchGlobalDefault]
             :return      QuickLaunchGlobalDefault
             :summary     "Edit a globally-defined Quick Launch default"
@@ -334,21 +337,21 @@
             (ok (analyses/update-quicklaunch-global-default global-default-id update)))
 
           (DELETE "/" []
-            :middleware  [require-authentication]
+            :middleware  [user/require-authentication]
             :return      DeletionResponse
             :summary     "Delete a globally-defined Quick Launch default"
             :description "Delete a globally-defined Quick Launch default"
             (ok (analyses/delete-quicklaunch-global-default global-default-id))))))
 
     (GET "/" []
-      :middleware [require-authentication]
+      :middleware [user/require-authentication]
       :return [QuickLaunch]
       :summary "List Quick Launches created by the user"
       :description "List Quick Launches created by the user"
       (ok (analyses/get-all-quicklaunches)))
 
     (POST "/" []
-      :middleware  [require-authentication]
+      :middleware  [user/require-authentication]
       :body        [quicklaunch NewQuickLaunchForTerrain]
       :return      QuickLaunch
       :summary     "Adds a Quick Launch to the database"
@@ -361,7 +364,7 @@
       :path-params [ql-id :- QuickLaunchID]
 
       (GET "/app-info" []
-        :middleware  [require-authentication]
+        :middleware  [user/require-authentication]
         :return      AppJobView
         :summary     "Returns app launch info based on the Quick Launch"
         :description "Returns app launch info based on the Quick Launch. Uses
@@ -371,7 +374,7 @@
         (ok (analyses/get-quicklaunch-app-info ql-id)))
 
       (GET "/" []
-        :middleware  [require-authentication]
+        :middleware  [user/require-authentication]
         :summary     "Get Quick Launch information by its UUID."
         :description "Gets Quick Launch information, including the UUID, the name of
         the user that owns it, and the submission JSON"
@@ -379,7 +382,7 @@
         (ok (analyses/get-quicklaunch ql-id)))
 
       (PATCH "/" []
-        :middleware  [require-authentication]
+        :middleware  [user/require-authentication]
         :body        [quicklaunch UpdateQuickLaunch]
         :return      QuickLaunch
         :summary     "Modifies an existing Quick Launch"
@@ -388,7 +391,7 @@
         (ok (analyses/update-quicklaunch ql-id quicklaunch)))
 
       (DELETE "/" []
-        :middleware  [require-authentication]
+        :middleware  [user/require-authentication]
         :return      DeletionResponse
         :summary     "Deletes a Quick Launch"
         :description "Deletes a Quick Launch from the database. Will returns a success

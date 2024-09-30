@@ -1,23 +1,25 @@
 (ns terrain.services.filesystem.uuids
-  (:use [clj-jargon.metadata]
-        [clj-jargon.permissions]
-        [slingshot.slingshot :only [throw+]]
-        [terrain.services.filesystem.validators])
   (:require [clojure.tools.logging :as log]
             [clj-icat-direct.icat :as icat]
-            [terrain.services.filesystem.stat :as stat]
             [clj-jargon.init :as init]
+            [clj-jargon.metadata :refer [list-everything-with-attr-value]]
+            [clj-jargon.permissions :refer [is-readable?]]
             [clojure-commons.error-codes :as error]
-            [terrain.util.config :as cfg]
-            [terrain.services.filesystem.icat :as jargon])
+            [slingshot.slingshot :refer [throw+]]
+            [terrain.services.filesystem.icat :as jargon]
+            [terrain.services.filesystem.stat :as stat]
+            [terrain.services.filesystem.validators :refer [user-exists]]
+            [terrain.util.config :as cfg])
   (:import [java.util UUID]
            [clojure.lang IPersistentMap ISeq]))
 
+;; Declarations to eliminate lint warnings for bindings in non-standard macros.
+(declare cm)
 
 (def uuid-attr "ipc_UUID")
 
 
-(defn- ^IPersistentMap path-for-uuid
+(defn- path-for-uuid
   "Resolves a stat info for the entity with a given UUID.
 
    Params:
@@ -26,7 +28,7 @@
 
    Returns:
      It returns a path."
-  ([^IPersistentMap cm ^String user ^UUID uuid]
+  (^IPersistentMap [^IPersistentMap cm ^String _user ^UUID uuid]
    (let [results (list-everything-with-attr-value cm uuid-attr uuid)]
      (when (empty? results)
        (throw+ {:error_code error/ERR_DOES_NOT_EXIST :uuid uuid}))
@@ -36,26 +38,11 @@
        (throw+ {:error_code error/ERR_TOO_MANY_RESULTS
                 :count      (count results)
                 :uuid       uuid}))
-     (if (pos? (count results))
+     (when (pos? (count results))
        (first results))))
-  ([^String user ^UUID uuid]
+  (^IPersistentMap [^String user ^UUID uuid]
    (init/with-jargon (jargon/jargon-cfg) [cm]
      (path-for-uuid cm user uuid))))
-
-(defn ^IPersistentMap uuid-exists?
-  "Checks if a data item exists with a given UUID.
-
-   Params:
-     uuid - the UUID
-
-   Returns:
-     True if any data items were found with the given UUID, false otherwise."
-  ([^IPersistentMap cm ^UUID uuid]
-    (let [results (list-everything-with-attr-value cm uuid-attr uuid)]
-      (pos? (count results))))
-  ([^UUID uuid]
-    (init/with-jargon (jargon/jargon-cfg) [cm]
-      (uuid-exists? cm uuid))))
 
 (defn- fmt-stat
   [cm user data-item]
@@ -100,7 +87,7 @@
            (icat/paged-uuid-listing user zone sort-col sort-order limit offset uuids info-types)))))
 
 
-(defn ^Boolean uuid-accessible?
+(defn uuid-accessible?
   "Indicates if a data item is readable by a given user.
 
    Parameters:
@@ -109,7 +96,7 @@
 
    Returns:
      It returns true if the user can access the data item, otherwise false"
-  [^String user ^UUID data-id]
+  ^Boolean [^String user ^UUID data-id]
   (init/with-jargon (jargon/jargon-cfg) [cm]
     (let [data-path (path-for-uuid cm user (str data-id))]
       (and data-path (is-readable? cm user data-path)))))

@@ -1,9 +1,5 @@
 (ns terrain.services.metadata.apps
-  (:use [clojure.java.io :only [reader]]
-        [terrain.util.transformers :only [secured-params]]
-        [terrain.util.service :only [success-response]])
-  (:require [cheshire.core :as cheshire]
-            [clojure.string :as string]
+  (:require [clojure.string :as string]
             [terrain.clients.iplant-groups :as ipg]
             [terrain.clients.apps.raw :as apps-client]
             [terrain.clients.notifications :as dn]

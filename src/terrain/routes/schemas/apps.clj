@@ -1,7 +1,7 @@
 (ns terrain.routes.schemas.apps
-  (:use [common-swagger-api.schema]
-        [schema.core :only [Any defschema enum optional-key]])
-  (:require [common-swagger-api.schema.apps :as apps-schema]))
+  (:require [common-swagger-api.schema :refer [describe SortFieldDocs SortFieldOptionalKey]]
+            [common-swagger-api.schema.apps :as apps-schema]
+            [schema.core :refer [Any defschema enum optional-key]]))
 
 ;; Convert the keywords in AppSearchValidSortFields to strings,
 ;; so that the correct param format is passed through to the apps service.

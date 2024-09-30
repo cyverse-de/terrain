@@ -80,12 +80,6 @@
     (nats/request (cfg/add-subscription-addon-subject) AssociateByUUIDs r)
     (return-keys r [:subscription_addon])))
 
-(defn get-subscription-addon
-  [addon-uuid]
-  (as-> {:uuid (str addon-uuid)} r
-    (nats/request (cfg/get-subscription-addon-subject) ByUUID r)
-    (return-keys r [:subscription_addons])))
-
 (defn list-subscription-addons
   [uuid]
   (as-> {:uuid (str uuid)} r

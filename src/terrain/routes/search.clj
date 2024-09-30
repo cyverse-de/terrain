@@ -1,14 +1,16 @@
 (ns terrain.routes.search
   "the routing code for search-related URL resources"
-  (:use [clojure-commons.error-codes :only [missing-arg-response]]
-        [common-swagger-api.schema]
-        [ring.util.http-response :only [ok]]
-        [schema.core :only [Any]]
-        [terrain.routes.schemas.search])
-  (:require [terrain.clients.search :as c-search]
+  (:require [common-swagger-api.schema :refer [context GET POST]]
+            [ring.util.http-response :refer [ok]]
+            [schema.core :refer [Any]]
+            [terrain.clients.search :as c-search]
             [terrain.util :as util]
             [terrain.util.config :as config]
-            [terrain.middleware :as mw]))
+            [terrain.middleware :as mw]
+            [terrain.routes.schemas.search :refer [SearchRequest]]))
+
+;; Declarations to eliminate lint warnings for path and query parameter bindings.
+(declare body)
 
 (defn secured-search-routes
   "The routes for search-related endpoints."

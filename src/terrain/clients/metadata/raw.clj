@@ -1,11 +1,11 @@
 (ns terrain.clients.metadata.raw
-  (:use [clojure-commons.core :only [remove-nil-values]]
-        [terrain.util.transformers :only [user-params]])
   (:require [cemerick.url :as curl]
             [cheshire.core :as json]
             [clj-http.client :as http]
+            [clojure-commons.core :refer [remove-nil-values]]
             [metadata-client.core :as metadata-client]
-            [terrain.util.config :as config]))
+            [terrain.util.config :as config]
+            [terrain.util.transformers :refer [user-params]]))
 
 (defn- metadata-url
   [& components]

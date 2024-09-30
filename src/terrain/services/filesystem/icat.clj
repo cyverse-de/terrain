@@ -1,12 +1,14 @@
 (ns terrain.services.filesystem.icat
-  (:use [clj-icat-direct.icat :only [icat-db-spec setup-icat]])
-  (:require [terrain.util.config :as cfg]
-            [clojure.tools.logging :as log]
+  (:require [clojure.tools.logging :as log]
+            [clj-icat-direct.icat :refer [icat-db-spec setup-icat]]
             [clj-jargon.init :as init]
-            [clj-jargon.metadata :as meta])
+            [clj-jargon.metadata :as meta]
+            [terrain.util.config :as cfg])
   (:import [clojure.lang IPersistentMap]
            [java.util UUID]))
 
+;; Declarations to eliminate lint warnings for bindings in non-standard macros.
+(declare fs)
 
 (def jargon-cfg
   (memoize #(init/init (cfg/irods-host)
@@ -37,7 +39,7 @@
   (setup-icat (spec)))
 
 
-(defn ^String resolve-data-type
+(defn resolve-data-type
   "Given filesystem id, it returns the type of data item it is, file or folder.
 
    Parameters:
@@ -46,9 +48,9 @@
 
    Returns:
      The type of the data item, `file` or `folder`"
-  ([^IPersistentMap fs ^UUID data-id]
+  (^String [^IPersistentMap fs ^UUID data-id]
    (if (empty? (meta/list-collections-with-attr-value fs "ipc_UUID" data-id)) "file" "folder"))
 
-  ([^UUID data-id]
+  (^String [^UUID data-id]
    (init/with-jargon (jargon-cfg) [fs]
      (resolve-data-type fs data-id))))

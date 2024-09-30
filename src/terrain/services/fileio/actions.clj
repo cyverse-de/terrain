@@ -1,17 +1,15 @@
 (ns terrain.services.fileio.actions
-  (:use [clj-jargon.init :only [with-jargon]]
-        [terrain.util.service :only [success-response]]
-        [slingshot.slingshot :only [try+ throw+]])
   (:require [cemerick.url :as url]
+            [clj-jargon.init :refer [with-jargon]]
             [clojure-commons.file-utils :as ft]
             [clojure.tools.logging :as log]
             [terrain.services.filesystem.icat :as icat]
             [terrain.services.filesystem.validators :as validators]
             [terrain.services.filesystem.updown :as updown]
-            [terrain.services.metadata.internal-jobs :as internal-jobs])
-  (:import [java.io InputStream]
-           [clojure.lang IPersistentMap]))
+            [terrain.services.metadata.internal-jobs :as internal-jobs]))
 
+;; Declarations to eliminate lint warnings for the iRODS context map binding.
+(declare cm)
 
 (defn- url-encoded?
   [string-to-check]

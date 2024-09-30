@@ -1,6 +1,6 @@
 (ns terrain.routes.schemas.bags
-  (:use [common-swagger-api.schema :only [describe]]
-        [schema.core :only [defschema Any Keyword optional-key]])
+  (:require [common-swagger-api.schema :refer [describe]]
+            [schema.core :refer [defschema Any Keyword]])
   (:import [java.util UUID]))
 
 (def BagIDPathParam (describe String "The ID of the bag located in the path of the URL"))

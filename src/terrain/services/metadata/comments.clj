@@ -1,7 +1,7 @@
 (ns terrain.services.metadata.comments
-  (:use [slingshot.slingshot :only [try+ throw+]])
   (:require [clojure-commons.error-codes :as err]
             [clojure-commons.validators :as validators]
+            [slingshot.slingshot :refer [try+ throw+]]
             [terrain.auth.user-attributes :as user]
             [terrain.clients.data-info :as data]
             [terrain.clients.apps.raw :as apps]

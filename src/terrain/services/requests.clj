@@ -1,6 +1,6 @@
 (ns terrain.services.requests
-  (:use [potemkin :only [import-vars]])
   (:require [clojure-commons.exception-util :as cxu]
+            [potemkin :refer [import-vars]]
             [terrain.clients.analyses :as ac]
             [terrain.clients.requests :as rc]))
 
@@ -105,7 +105,7 @@
 (defn reject-vice-request
   "Rejects a request for VICE access by changing the user's limit for the number of concurrently running VICE
    analyses to zero."
-  [{username :requesting_user} message-body]
+  [{username :requesting_user} _message-body]
   (ac/set-concurrent-job-limit username 0))
 
 (def rejection-fns

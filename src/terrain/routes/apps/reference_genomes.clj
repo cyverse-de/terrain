@@ -1,10 +1,13 @@
 (ns terrain.routes.apps.reference-genomes
-  (:use [common-swagger-api.schema]
-        [ring.util.http-response :only [ok]]
-        [terrain.util :only [optional-routes]])
-  (:require [common-swagger-api.schema.apps.reference-genomes :as schema]
+  (:require [common-swagger-api.schema :refer [context GET]]
+            [common-swagger-api.schema.apps.reference-genomes :as schema]
+            [ring.util.http-response :refer [ok]]
             [terrain.clients.apps.raw :as apps]
+            [terrain.util :refer [optional-routes]]
             [terrain.util.config :as config]))
+
+;; Declarations to eliminate lint warnings for path and query parameter bindings.
+(declare params reference-genome-id)
 
 (defn reference-genomes-routes
   []

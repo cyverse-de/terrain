@@ -1,6 +1,6 @@
 (ns terrain.routes.schemas.search
-  (:use [common-swagger-api.schema :only [describe]])
-  (:require [schema.core :as s]))
+  (:require [common-swagger-api.schema :refer [describe]]
+            [schema.core :as s]))
 
 (def AnyDocs "At least one of the following must be true")
 (def AllDocs "All of the following must be true")
@@ -34,9 +34,9 @@
 
 (s/defschema SearchRequest
   {(s/optional-key :query) (describe Query "A querydsl-compatible JSON query inside a JSON object. Mutually exclusive with 'scroll_id'.")
-   (s/optional-key :size) (describe (s/both Long (s/pred pos? 'positive-integer?))
+   (s/optional-key :size) (describe (s/constrained Long pos? 'positive-integer?)
                                     "Limits the response to X number of results. Default is 10")
-   (s/optional-key :from) (describe (s/both Long (s/pred (partial <= 0) 'non-negative-integer?))
+   (s/optional-key :from) (describe (s/constrained Long (partial <= 0) 'non-negative-integer?)
                                     "Skips the first X number of results. Default is 0")
    (s/optional-key :sort) (describe [SearchSortParams]
                                     "Sorts the results based on a list of criteria")

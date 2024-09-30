@@ -1,8 +1,8 @@
 (ns terrain.util.keycloak-oidc
-  (:use [slingshot.slingshot :only [try+ throw+]])
   (:require [clojure.string :as string]
             [clojure-commons.jwt :as jwt]
             [clojure-commons.response :as resp]
+            [slingshot.slingshot :only [try+ throw+]]
             [terrain.clients.keycloak :as kc]
             [terrain.util.config :as config]))
 

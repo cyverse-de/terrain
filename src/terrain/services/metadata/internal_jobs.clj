@@ -1,7 +1,7 @@
 (ns terrain.services.metadata.internal-jobs
-  (:use [slingshot.slingshot :only [throw+]]
-        [terrain.auth.user-attributes :only [current-user]])
   (:require [clojure-commons.error-codes :as ce]
+            [slingshot.slingshot :refer [throw+]]
+            [terrain.auth.user-attributes :refer [current-user]]
             [terrain.clients.apps.raw :as apps]
             [terrain.clients.user-prefs :as prefs]
             [terrain.util.config :as config]))

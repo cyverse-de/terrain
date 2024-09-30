@@ -1,11 +1,13 @@
 (ns terrain.routes.notification
-  (:use [common-swagger-api.schema]
-        [terrain.util])
-  (:require [clojure.tools.logging :as log]
+  (:require [common-swagger-api.schema :refer [GET POST DELETE PUT]]
             [terrain.clients.notifications.raw :as rn]
             [terrain.clients.notifications :as cn]
+            [terrain.util :refer [optional-routes]]
             [terrain.util.config :as config]
             [terrain.util.service :as service]))
+
+;; Declarations to eliminate lint warnings for path and query parameter bindings.
+(declare params body uuid)
 
 (defn secured-notification-routes
   []

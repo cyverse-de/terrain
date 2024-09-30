@@ -1,12 +1,11 @@
 (ns terrain.services.filesystem.updown
-  (:use [clojure-commons.validators]
-        [terrain.services.filesystem.common-paths]
-        [slingshot.slingshot :only [throw+]])
   (:require [clojure.tools.logging :as log]
-            [dire.core :refer [with-pre-hook! with-post-hook!]]
             [clojure-commons.error-codes :as error]
-            [clojure-commons.file-utils :as ft]
-            [terrain.clients.data-info :as data]))
+            [clojure-commons.validators :refer [validate-map]]
+            [dire.core :refer [with-pre-hook! with-post-hook!]]
+            [slingshot.slingshot :refer [throw+]]
+            [terrain.clients.data-info :as data]
+            [terrain.services.filesystem.common-paths :refer [log-call log-func super-user?]]))
 
 
 (defn download-file-as-stream

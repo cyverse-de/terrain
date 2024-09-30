@@ -1,16 +1,19 @@
 (ns terrain.routes.apps.tools
-  (:use [common-swagger-api.schema]
-        [common-swagger-api.schema.apps :only [AppListing ToolAppListingResponses]]
-        [common-swagger-api.schema.integration-data :only [IntegrationData]]
-        [ring.util.http-response :only [ok]]
-        [terrain.util])
   (:require [common-swagger-api.routes]                     ;; for :description-file
+            [common-swagger-api.schema :refer [context GET POST DELETE PATCH]]
+            [common-swagger-api.schema.apps :refer [ToolAppListingResponses]]
             [common-swagger-api.schema.apps.permission :as perm-schema]
+            [common-swagger-api.schema.integration-data :refer [IntegrationData]]
             [common-swagger-api.schema.tools :as schema]
             [compojure.api.middleware :as middleware]
+            [ring.util.http-response :refer [ok]]
             [terrain.clients.apps.raw :as apps]
             [terrain.services.metadata.apps :as apps-services]
+            [terrain.util :refer [optional-routes]]
             [terrain.util.config :as config]))
+
+;; Declarations to eliminate lint warnings for path and query parameter bindings.
+(declare params body tool-id)
 
 (defn tool-routes
   []

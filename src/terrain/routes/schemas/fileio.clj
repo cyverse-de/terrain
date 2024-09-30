@@ -1,7 +1,7 @@
 (ns terrain.routes.schemas.fileio
-  (:use [common-swagger-api.schema :only [describe NonBlankString]]
-        [common-swagger-api.schema.stats :only [FileStat]])
-  (:require [ring.swagger.upload :as upload]
+  (:require [common-swagger-api.schema :refer [describe NonBlankString]]
+            [common-swagger-api.schema.stats :refer [FileStat]]
+            [ring.swagger.upload :as upload]
             [schema.core :as s]))
 
 (s/defschema FileDownloadQueryParams

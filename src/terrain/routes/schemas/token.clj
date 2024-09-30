@@ -1,6 +1,6 @@
 (ns terrain.routes.schemas.token
-  (:use [common-swagger-api.schema :only [describe]]
-        [schema.core :only [defschema optional-key]]))
+  (:require [common-swagger-api.schema :refer [describe]]
+            [schema.core :refer [defschema optional-key]]))
 
 (defschema AccessTokenResponse
   {:access_token

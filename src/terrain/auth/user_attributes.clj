@@ -1,14 +1,12 @@
 (ns terrain.auth.user-attributes
-  (:use [slingshot.slingshot :only [try+]])
   (:require [clojure.string :as string]
             [clojure.tools.logging :as log]
             [clojure-commons.response :as resp]
-            [clojure-commons.exception :as cx]
             [clojure-commons.exception-util :as cxu]
+            [slingshot.slingshot :refer [try+]]
             [terrain.clients.iplant-groups.subjects :as subjects]
             [terrain.util.config :as cfg]
             [terrain.util.jwt :as jwt]
-            [terrain.util.oauth :as oauth-util]
             [terrain.util.keycloak-oidc :as keycloak-oidc-util]))
 
 (def
@@ -57,11 +55,6 @@
   [{:keys [jwt-claims]}]
   (jwt/terrain-user-from-jwt-claims jwt-claims))
 
-(defn user-from-wso2-jwt-claims
-  "Creates a map of values from JWT claims stored int he request by WSO2."
-  [{:keys [jwt-claims]}]
-  (jwt/terrain-user-from-jwt-claims jwt-claims jwt/user-from-wso2-assertion))
-
 (defn lookup-user
   "Looks up the user with the given username."
   [username]
@@ -76,7 +69,7 @@
       :commonName    (:description subject)})
    (catch [:status 404] _
      (cxu/internal-system-error (str "fake user " username " not found")))
-   (catch Object o
+   (catch Object _
      (cxu/internal-system-error (str "fake user lookup for username " username " failed")))))
 
 (defn fake-user-from-attributes
@@ -139,13 +132,6 @@
   [request]
   (get (:headers request) "x-iplant-de-jwt"))
 
-(defn- get-wso2-jwt-assertion
-  "Extracts a JWT assertion from the request header used by WSO2, returning nil if none is
-   found."
-  [request]
-  (when-let [header-name (cfg/wso2-jwt-header)]
-    (get (:headers request) (string/lower-case header-name))))
-
 (defn- get-authorization-header
   "Extracts the authorization header from the reqeust if present and splits it into its components."
   [request]
@@ -163,13 +149,6 @@
   [[_ token]]
   (re-find #"^(?:[\p{Alnum}_-]+=*[.]){1,2}(?:[\p{Alnum}_-]+=*)$" token))
 
-(defn- get-cas-oauth-token
-  "Returns a non-nil value if we appear to have received a CAS OAuth token."
-  [request]
-  (when-let [header (get-authorization-header request)]
-    (when (and (is-bearer? header) (not (is-jwt? header)))
-      (second header))))
-
 (defn- get-keycloak-oidc-token
   "Returns a non-nil value if we appear to have received a Keycloak bearer token."
   [request]
@@ -185,16 +164,6 @@
   [handler]
   (-> (wrap-current-user handler user-from-de-jwt-claims)
       (jwt/validate-jwt-assertion get-de-jwt-assertion)))
-
-(defn- wrap-wso2-jwt-auth
-  [handler]
-  (-> (wrap-current-user handler user-from-wso2-jwt-claims)
-      (jwt/validate-jwt-assertion get-wso2-jwt-assertion jwt/user-from-wso2-assertion)))
-
-(defn- wrap-cas-oauth
-  [handler]
-  (-> (wrap-current-user handler oauth-util/user-from-oauth-profile)
-      (oauth-util/validate-oauth-token get-cas-oauth-token)))
 
 (defn- wrap-keycloak-oidc
   [handler]
@@ -212,8 +181,6 @@
   [handler]
   (wrap-auth-selection [[get-fake-auth           (wrap-fake-auth handler)]
                         [get-de-jwt-assertion    (wrap-de-jwt-auth handler)]
-                        [get-wso2-jwt-assertion  (wrap-wso2-jwt-auth handler)]
-                        [get-cas-oauth-token     (wrap-cas-oauth handler)]
                         [get-keycloak-oidc-token (wrap-keycloak-oidc handler)]
                         [(constantly true)       handler]]))
 
@@ -223,8 +190,6 @@
   (wrap-auth-selection
    [[get-fake-auth           handler]
     [get-de-jwt-assertion    (jwt/validate-group-membership handler cfg/allowed-groups)]
-    [get-wso2-jwt-assertion  (constantly (resp/forbidden "Admin not supported for WSO2."))]
-    [get-cas-oauth-token     (oauth-util/validate-group-membership handler cfg/allowed-groups)]
     [get-keycloak-oidc-token (keycloak-oidc-util/validate-group-membership handler cfg/allowed-groups)]
     [(constantly true)       (constantly (resp/unauthorized "Admin endpoints require authentication."))]]))
 

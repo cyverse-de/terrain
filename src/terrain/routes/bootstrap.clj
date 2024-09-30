@@ -1,12 +1,15 @@
 (ns terrain.routes.bootstrap
-  (:use [common-swagger-api.schema]
-        [ring.util.http-response :only [ok]]
-        [terrain.services.bootstrap :only [bootstrap]]
-        [terrain.util :only [optional-routes]])
-  (:require [common-swagger-api.schema.sessions :as sessions-schema]
+  (:require [common-swagger-api.schema :refer [context GET]]
+            [common-swagger-api.schema.sessions :as sessions-schema]
+            [ring.util.http-response :refer [ok]]
             [terrain.clients.apps.raw :as apps-client]
             [terrain.routes.schemas.bootstrap :as schema]
+            [terrain.services.bootstrap :refer [bootstrap]]
+            [terrain.util :refer [optional-routes]]
             [terrain.util.config :as config]))
+
+;; Declarations to eliminate lint warnings for path and query parameter bindings.
+(declare user-agent ip-address params)
 
 (defn secured-bootstrap-routes
   []

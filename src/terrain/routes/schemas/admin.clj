@@ -1,12 +1,12 @@
 (ns terrain.routes.schemas.admin
-  (:use [common-swagger-api.schema
-         :only [describe
-                NonBlankString
-                SortFieldDocs
-                SortFieldOptionalKey]]
-        [schema.core :only [defschema enum]])
-  (:require [common-swagger-api.schema.apps :as apps-schema]
-            [common-swagger-api.schema.apps.admin.apps :as admin-apps-schema]))
+  (:require [common-swagger-api.schema
+             :refer [describe
+                     NonBlankString
+                     SortFieldDocs
+                     SortFieldOptionalKey]]
+            [common-swagger-api.schema.apps :as apps-schema]
+            [common-swagger-api.schema.apps.admin.apps :as admin-apps-schema]
+            [schema.core :refer [defschema enum]]))
 
 ;; Convert Date params and keywords in enum values to strings,
 ;; so that the correct param formats are passed through to the apps service.

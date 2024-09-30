@@ -1,6 +1,6 @@
 (ns terrain.routes.schemas.permanent-id-requests
-  (:use [common-swagger-api.schema :only [describe transform-enum]])
-  (:require [common-swagger-api.schema.permanent-id-requests :as schema]
+  (:require [common-swagger-api.schema :refer [describe transform-enum]]
+            [common-swagger-api.schema.permanent-id-requests :as schema]
             [common-swagger-api.schema.stats :as stats-schema]
             [schema-tools.core :as st]
             [schema.core :as s])

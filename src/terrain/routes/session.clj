@@ -1,8 +1,11 @@
 (ns terrain.routes.session
-  (:use [common-swagger-api.schema]
-        [terrain.services.user-sessions]
-        [terrain.util])
-  (:require [terrain.util.config :as config]))
+  (:require [common-swagger-api.schema :refer [GET POST DELETE]]
+            [terrain.services.user-sessions :refer [user-session remove-session]]
+            [terrain.util :refer [optional-routes]]
+            [terrain.util.config :as config]))
+
+;; Declarations to eliminate lint warnings for path and query parameter bindings.
+(declare body)
 
 (defn secured-session-routes
   []

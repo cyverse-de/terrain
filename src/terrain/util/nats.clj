@@ -3,9 +3,8 @@
             [java-time.api :as jt]
             [cheshire.core :as json]
             [clojure.string :as string]
-            [pronto.core :as p]
-            [clojure.tools.logging :as log])
-  (:import [io.nats.client Nats Options$Builder] 
+            [pronto.core :as p])
+  (:import [io.nats.client Nats Options$Builder]
            [org.cyverse.de.protobufs
             AddAddonRequest
             NoParamsRequest

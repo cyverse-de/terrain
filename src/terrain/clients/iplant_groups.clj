@@ -1,12 +1,10 @@
 (ns terrain.clients.iplant-groups
-  (:use [slingshot.slingshot :only [try+]]
-        [medley.core :only [remove-vals]])
-  (:require [cemerick.url :as curl]
-            [clj-http.client :as http]
-            [clojure.string :as string]
+  (:require [clojure.string :as string]
             [clojure.tools.logging :as log]
             [clojure-commons.exception-util :as cxu]
             [cyverse-groups-client.core :as c]
+            [medley.core :refer [remove-vals]]
+            [slingshot.slingshot :refer [try+]]
             [terrain.clients.apps.raw :as apps-client]
             [terrain.clients.iplant-groups.subjects :as subjects]
             [terrain.clients.metadata.raw :as metadata-client]

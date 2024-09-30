@@ -1,6 +1,6 @@
 (ns terrain.services.coge
-  (:use [terrain.auth.user-attributes :only [current-user]])
   (:require [clojure-commons.file-utils :as ft]
+            [terrain.auth.user-attributes :refer [current-user]]
             [terrain.clients.coge :as coge]
             [terrain.clients.data-info :as data]
             [terrain.util.config :as config]))
@@ -9,7 +9,7 @@
   "Shares the given paths with the CoGe user so the genome viewer service can access them."
   [sharer paths]
   (let [share-withs [(config/coge-user)]
-        perms       :write]
+        perms       "write"]
     (data/share sharer share-withs paths perms)))
 
 (defn- coge-data-folder-path

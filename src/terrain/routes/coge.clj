@@ -1,11 +1,14 @@
 (ns terrain.routes.coge
-  (:use [common-swagger-api.schema]
-        [ring.util.http-response :only [ok]]
-        [terrain.routes.schemas.coge]
-        [terrain.services.coge]
-        [terrain.util.service]
-        [terrain.util])
-  (:require [terrain.util.config :as config]))
+  (:require [common-swagger-api.schema :refer [context GET POST]]
+            [ring.util.http-response :refer [ok]]
+            [terrain.routes.schemas.coge :as coge-schema]
+            [terrain.services.coge :as coge]
+            [terrain.util.config :as config]
+            [terrain.util :refer [optional-routes]]
+            [terrain.util.service]))
+
+;; Declarations to eliminate lint warnings for path and query parameter bindings.
+(declare params genome-id body)
 
 (defn coge-routes
   []
@@ -17,21 +20,21 @@
      (context "/genomes" []
        (GET "/" []
          :summary "Genome Search"
-         :query [params GenomeSearchParams]
-         :return GenomeSearchResponse
+         :query [params coge-schema/GenomeSearchParams]
+         :return coge-schema/GenomeSearchResponse
          :description "Searches the CoGe database for genomes matching a string."
-         (ok (search-genomes params)))
+         (ok (coge/search-genomes params)))
 
        (POST "/:genome-id/export-fasta" []
          :summary "Genome Export"
-         :path-params [genome-id :- GenomeIdPathParam]
-         :query [params GenomeExportParams]
-         :return GenomeExportResponse
+         :path-params [genome-id :- coge-schema/GenomeIdPathParam]
+         :query [params coge-schema/GenomeExportParams]
+         :return coge-schema/GenomeExportResponse
          :description "Exports CoGe sequence data to a FASTA file in the CyVerse data store"
-         (ok (export-fasta genome-id params)))
+         (ok (coge/export-fasta genome-id params)))
 
        (POST "/load" []
          :summary "View Genomes in CoGe"
-         :body [body GenomeLoadRequest]
-         :return GenomeLoadResponse
-         (ok (get-genome-viewer-url body)))))))
+         :body [body coge-schema/GenomeLoadRequest]
+         :return coge-schema/GenomeLoadResponse
+         (ok (coge/get-genome-viewer-url body)))))))

@@ -1,12 +1,11 @@
 (ns terrain.routes.admin
-  (:use [common-swagger-api.schema]
-        [ring.util.http-response :only [ok]]
-        [schema.core :only [Any]]
-        [terrain.util])
-  (:require [terrain.util.config :as config]
+  (:require [common-swagger-api.schema :refer [context GET]]
+            [ring.util.http-response :refer [ok]]
+            [schema.core :refer [Any]]
+            [terrain.util.config :as config]
             [terrain.routes.schemas.admin :as schemas]
             [terrain.services.admin :as admin]
-            [clojure.tools.logging :as log]))
+            [terrain.util :refer [optional-routes]]))
 
 (defn secured-admin-routes
   "The routes for the admin endpoints."

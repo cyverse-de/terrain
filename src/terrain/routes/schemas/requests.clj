@@ -1,7 +1,7 @@
 (ns terrain.routes.schemas.requests
-  (:use [common-swagger-api.schema :only [describe NonBlankString]]
-        [schema.core :only [Any defschema enum optional-key]])
-  (:require [schema-tools.core :as st])
+  (:require [common-swagger-api.schema :refer [describe NonBlankString]]
+            [schema.core :refer [Any defschema optional-key]]
+            [schema-tools.core :as st])
   (:import [java.util UUID]))
 
 (def RequestId (describe UUID "The request ID"))

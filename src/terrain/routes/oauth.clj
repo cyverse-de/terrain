@@ -1,7 +1,10 @@
 (ns terrain.routes.oauth
-  (:use [common-swagger-api.schema])
-  (:require [terrain.clients.apps.raw :as apps]
+  (:require [common-swagger-api.schema :refer [routes GET DELETE]]
+            [terrain.clients.apps.raw :as apps]
             [terrain.util.service :as service]))
+
+;; Declarations to eliminate lint warnings for path and query parameter bindings.
+(declare api-name params)
 
 (defn secured-oauth-routes
   "These routes are callback and general information routes for OAuth authorization codes. The callback needs to

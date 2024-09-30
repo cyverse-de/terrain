@@ -1,12 +1,14 @@
 (ns terrain.routes.user-info
-  (:use [common-swagger-api.schema]
-        [ring.util.http-response :only [ok]]
-        [terrain.routes.schemas.user-info]
-        [terrain.services.user-info]
-        [terrain.util]
-        [terrain.util.service :only [success-response]])
-  (:require [terrain.clients.iplant-groups :as ipg]
+  (:require [common-swagger-api.schema :refer [context doc-only GET]]
+            [ring.util.http-response :refer [ok]]
+            [terrain.clients.iplant-groups :as ipg]
+            [terrain.routes.schemas.user-info :as user-info-schema]
+            [terrain.services.user-info :refer [user-info]]
+            [terrain.util :refer [optional-routes]]
             [terrain.util.config :as config]))
+
+;; Declarations to eliminate lint warnings for path and query parameter bindings.
+(declare params username details)
 
 (defn secured-user-info-routes
   []
@@ -17,8 +19,8 @@
      :tags ["user-info"]
 
      (GET "/" []
-          :query [params UserInfoRequest]
-          :return (doc-only UserInfoResponse UserInfoResponseDocs)
+          :query [params user-info-schema/UserInfoRequest]
+          :return (doc-only user-info-schema/UserInfoResponse user-info-schema/UserInfoResponseDocs)
           :summary "Get user information"
           :description "Returns account information associated with each username or ID.  If the ID
           belongs to an individual user, information like first and last name, as well as institution and
@@ -34,9 +36,9 @@
    (context "/users" []
      :tags ["admin-user-info"]
      (GET "/:username/groups" []
-          :path-params [username :- UsernameParam]
-          :query [{:keys [details]} DetailsParam]
+          :path-params [username :- user-info-schema/UsernameParam]
+          :query [{:keys [details]} user-info-schema/DetailsParam]
           :summary "Get a user's groups"
           :description "Lists all groups to which a user belongs"
-          :return GroupListing
+          :return user-info-schema/GroupListing
           (ok (ipg/list-groups-for-user username details))))))

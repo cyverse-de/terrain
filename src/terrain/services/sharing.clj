@@ -1,10 +1,10 @@
 (ns terrain.services.sharing
-  (:use [clojure.walk]
-        [clojure.string :only [join]]
-        [slingshot.slingshot :only [try+]]
-        [clojure-commons.file-utils :only [basename]]
-        [terrain.auth.user-attributes])
   (:require [clojure.tools.logging :as log]
+            [clojure.string :refer [join]]
+            [clojure.walk :refer [walk]]
+            [clojure-commons.file-utils :refer [basename]]
+            [slingshot.slingshot :refer [try+]]
+            [terrain.auth.user-attributes :refer [current-user]]
             [terrain.clients.data-info :as data]
             [terrain.clients.notifications :as dn]))
 
@@ -26,16 +26,16 @@
   (let [paths       [(:path share)]
         sharer      (:shortUsername current-user)
         share-withs [user]
-        perm        (keyword (:permission share))]
+        perm        (:permission share)]
     (try+
-      (log/warn "share" paths "with" share-withs "by" sharer)
-      (data/share sharer share-withs paths perm)
-      (merge {:success true} share)
-      (catch map? e
-        (log/error "data-info error: " e)
-        (merge {:success false,
-                :error e}
-               share)))))
+     (log/warn "share" paths "with" share-withs "by" sharer)
+     (data/share sharer share-withs paths perm)
+     (merge {:success true} share)
+     (catch map? e
+       (log/error "data-info error: " e)
+       (merge {:success false,
+               :error e}
+              share)))))
 
 (defn- forward-data-info-unshare
   "Forwards a data-info unshare request."

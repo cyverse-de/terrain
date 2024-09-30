@@ -1,8 +1,8 @@
 (ns terrain.clients.data-info.raw
-  (:use [medley.core :only [remove-vals]])
   (:require [clojure.tools.logging :as log]
             [cemerick.url :as url]
             [me.raynes.fs :as fs]
+            [medley.core :refer [remove-vals]]
             [cheshire.core :as json]
             [clj-http.client :as http]
             [terrain.util.config :as cfg])

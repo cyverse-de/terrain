@@ -1,11 +1,13 @@
 (ns terrain.routes.settings
-  (:use [common-swagger-api.schema]
-        [ring.util.http-response :only [ok]]
-        [terrain.auth.user-attributes :only [current-user]]
-        [terrain.util :only [optional-routes]])
-  (:require [common-swagger-api.schema.analyses :as analyses-schema]
+  (:require [common-swagger-api.schema :refer [context GET PUT DELETE]]
+            [common-swagger-api.schema.analyses :as analyses-schema]
+            [ring.util.http-response :refer [ok]]
             [terrain.clients.analyses :as ac]
+            [terrain.util :refer [optional-routes]]
             [terrain.util.config :as config]))
+
+;; Declarations to eliminate lint warnings for path and query parameter bindings.
+(declare username body)
 
 (defn admin-setting-routes
   "Routes for administering settings."

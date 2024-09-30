@@ -1,13 +1,16 @@
 (ns terrain.routes.filesystem.tickets
-  (:use [common-swagger-api.schema]
-        [ring.util.http-response :only [ok]]
-        [terrain.routes.schemas.filesystem.tickets]
-        [terrain.util :only [optional-routes]]
-        [terrain.util.transformers :only [add-current-user-to-map]])
-  (:require [common-swagger-api.schema.data :as data-schema]
+  (:require [common-swagger-api.schema :refer [context POST]]
+            [common-swagger-api.schema.data :as data-schema]
             [common-swagger-api.schema.data.tickets :as schema]
+            [ring.util.http-response :refer [ok]]
             [terrain.clients.data-info :as data]
-            [terrain.util.config :as config]))
+            [terrain.routes.schemas.filesystem.tickets :refer [AddTicketQueryParams]]
+            [terrain.util :refer [optional-routes]]
+            [terrain.util.config :as config]
+            [terrain.util.transformers :refer [add-current-user-to-map]]))
+
+;; Declarations to eliminate lint warnings for path and query parameter bindings.
+(declare params paths body)
 
 ;; FIXME: The `coerce-public-param` middleware is only for backwards compatibility
 ;; and should be removed in the next version of the API

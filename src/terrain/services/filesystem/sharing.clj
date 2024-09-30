@@ -1,11 +1,8 @@
 (ns terrain.services.filesystem.sharing
-  (:use [clojure-commons.validators]
-        [clj-jargon.init :only [with-jargon]]
-        [clj-jargon.item-info :only [trash-base-dir is-dir?]]
-        [clj-jargon.metadata]
-        [clj-jargon.permissions]
-        [slingshot.slingshot :only [try+ throw+]])
-  (:require [clojure.tools.logging :as log]
+  (:require [clj-jargon.init :refer [with-jargon]]
+            [clj-jargon.item-info :refer [trash-base-dir is-dir?]]
+            [clj-jargon.permissions :as perms]
+            [clojure.tools.logging :as log]
             [clojure.string :as string]
             [clojure-commons.file-utils :as ft]
             [terrain.services.filesystem.common-paths :as paths]
@@ -13,11 +10,14 @@
             [terrain.services.filesystem.icat :as icat]
             [terrain.services.filesystem.validators :as validators]))
 
+;; Declarations to eliminate lint warnings for bindings in non-standard macros.
+(declare cm)
+
 (defn- shared?
   ([cm share-with fpath]
-     (:read (permissions cm share-with fpath)))
+     (:read (perms/permissions cm share-with fpath)))
   ([cm share-with fpath desired-perm]
-     (let [curr-perm (permission-for cm share-with fpath)]
+     (let [curr-perm (perms/permission-for cm share-with fpath)]
        (= curr-perm desired-perm))))
 
 (defn- skip-share
@@ -49,18 +49,18 @@
         trash-dir (trash-base-dir (:zone cm))
         base-dirs #{hdir trash-dir}]
     (log/warn fpath "is being shared with" share-with "by" user)
-    (process-parent-dirs (partial set-readable cm share-with true) #(not (base-dirs %)) fpath)
+    (perms/process-parent-dirs (partial perms/set-readable cm share-with true) #(not (base-dirs %)) fpath)
 
     (when (is-dir? cm fpath)
       (log/warn fpath "is a directory, setting the inherit bit.")
-      (set-inherits cm fpath))
+      (perms/set-inherits cm fpath))
 
-    (when-not (is-readable? cm share-with hdir)
+    (when-not (perms/is-readable? cm share-with hdir)
       (log/warn share-with "is being given read permissions on" hdir "by" user)
-      (set-permission cm share-with hdir :read false))
+      (perms/set-permission cm share-with hdir :read false))
 
     (log/warn share-with "is being given recursive permissions (" perm ") on" fpath)
-    (set-permission cm share-with fpath (keyword perm) true)
+    (perms/set-permission cm share-with fpath (keyword perm) true)
 
     {:user share-with :path fpath}))
 
@@ -83,8 +83,7 @@
 
     (let [keyfn      #(if (:skipped %) :skipped :succeeded)
           share-recs (group-by keyfn (share-paths cm user share-withs fpaths perm))
-          sharees    (map :user (:succeeded share-recs))
-          home-dir   (paths/user-home-dir user)]
+          sharees    (map :user (:succeeded share-recs))]
       {:user        sharees
        :path        fpaths
        :skipped     (map #(dissoc % :skipped) (:skipped share-recs))
@@ -93,15 +92,15 @@
 (defn- remove-inherit-bit?
   [cm user fpath]
   (empty? (remove (comp (conj (set (cfg/irods-admins)) user) :user)
-                  (list-user-perms cm fpath))))
+                  (perms/list-user-perms cm fpath))))
 
 (defn- unshare-dir
   "Removes the inherit bit from a directory if the directory is no longer shared with any accounts
    other than iRODS administrative accounts."
-  [cm user unshare-with fpath]
+  [cm user _unshare-with fpath]
   (when (remove-inherit-bit? cm user fpath)
     (log/warn "Removing inherit bit on" fpath)
-    (remove-inherits cm fpath)))
+    (perms/remove-inherits cm fpath)))
 
 (defn- unshare-path
   "Removes permissions for a user to access a path.  This consists of several steps:
@@ -117,16 +116,16 @@
   [cm user unshare-with fpath]
   (let [base-dirs #{(ft/rm-last-slash (paths/user-home-dir user)) (trash-base-dir (:zone cm))}]
     (log/warn "Removing permissions on" fpath "from" unshare-with "by" user)
-    (remove-permissions cm unshare-with fpath)
+    (perms/remove-permissions cm unshare-with fpath)
 
     (when (is-dir? cm fpath)
       (log/warn "Unsharing directory" fpath "from" unshare-with "by" user)
       (unshare-dir cm user unshare-with fpath))
 
     (log/warn "Removing read perms on parents of" fpath "from" unshare-with "by" user)
-    (process-parent-dirs
-     (partial set-readable cm unshare-with false)
-     #(and (not (base-dirs %)) (not (contains-accessible-obj? cm unshare-with %)))
+    (perms/process-parent-dirs
+     (partial perms/set-readable cm unshare-with false)
+     #(and (not (base-dirs %)) (not (perms/contains-accessible-obj? cm unshare-with %)))
      fpath)
     {:user unshare-with :path fpath}))
 
@@ -156,8 +155,7 @@
 
     (let [keyfn        #(if (:skipped %) :skipped :succeeded)
           unshare-recs (group-by keyfn (unshare-paths cm user unshare-withs fpaths))
-          unsharees    (map :user (:succeeded unshare-recs))
-          home-dir     (paths/user-home-dir user)]
+          unsharees    (map :user (:succeeded unshare-recs))]
       {:user unsharees
        :path fpaths
        :skipped (map #(dissoc % :skipped) (:skipped unshare-recs))})))
