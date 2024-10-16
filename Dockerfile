@@ -29,7 +29,7 @@ ADD "https://uit.stanford.edu/sites/default/files/2023/10/11/incommon-rsa-ca2.pe
 RUN sed -i -E 's/\r\n?/\n/g' "/usr/local/share/ca-certificates/incommon-rsa-ca2.pem" && \
     update-ca-certificates
 
-ENTRYPOINT ["terrain", "-Dlogback.configurationFile=/etc/iplant/de/logging/terrain-logging.xml", "-cp", ".:terrain-standalone.jar", "terrain.core"]
+ENTRYPOINT ["terrain", "-Dlogback.configurationFile=/usr/src/app/logback.xml", "-cp", ".:terrain-standalone.jar", "terrain.core"]
 
 ARG git_commit=unknown
 ARG version=unknown
