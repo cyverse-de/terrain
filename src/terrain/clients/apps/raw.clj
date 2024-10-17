@@ -170,6 +170,16 @@
                   :content-type :json
                   :as           :json}))))
 
+(defn set-app-versions-order
+  [system-id app-id update-request]
+  (:body
+    (client/put (apps-url "apps" system-id app-id "versions")
+                (disable-redirects
+                  {:query-params (secured-params)
+                   :form-params  update-request
+                   :content-type :json
+                   :as           :json}))))
+
 (defn preview-args
   [system-id app]
   (:body
