@@ -30,6 +30,14 @@
                    :description schema/AppVersionCreateDocs
                    (ok (apps/create-app-version system-id app-id body)))
 
+             (PUT "/" []
+                  :middleware [require-authentication]
+                  :body [body schema/AppVersionOrderRequest]
+                  :return schema/App
+                  :summary schema/AppVersionOrderSummary
+                  :description schema/AppVersionOrderDocs
+                  (ok (apps/set-app-versions-order system-id app-id body)))
+
              (context "/:version-id" []
                       :path-params [version-id :- schema/AppVersionIdParam]
 
