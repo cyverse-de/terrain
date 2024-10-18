@@ -75,7 +75,26 @@
          :summary instantlaunch-schema/GetFullInstantLaunchSummary
          :description instantlaunch-schema/GetFullInstantLaunchDescription
          :return instantlaunch-schema/FullInstantLaunch
-         (ok (app-exposer/get-full-instant-launch id)))))))
+         (ok (app-exposer/get-full-instant-launch id)))
+       
+       (POST "/" []
+         :summary instantlaunch-schema/UpdateInstantLaunchSummary
+         :description instantlaunch-schema/UpdateInstantLaunchDescription
+         :body [body instantlaunch-schema/InstantLaunch]
+         :return instantlaunch-schema/InstantLaunch
+         (ok (app-exposer/update-instant-launch (:username current-user) id body)))
+
+       (DELETE "/" []
+         :summary instantlaunch-schema/DeleteInstantLaunchSummary
+         :description instantlaunch-schema/DeleteInstantLaunchDescription
+         (ok (app-exposer/delete-instant-launch (:username current-user) id))))
+
+     (PUT "/" []
+       :summary instantlaunch-schema/AddInstantLaunchSummary
+       :description instantlaunch-schema/AddInstantLaunchDescription
+       :body [body instantlaunch-schema/InstantLaunch]
+       :return instantlaunch-schema/InstantLaunch
+       (ok (app-exposer/add-instant-launch (:username current-user) body))))))
 
 (defn admin-instant-launch-routes
   []
@@ -129,12 +148,12 @@
          :description instantlaunch-schema/UpdateInstantLaunchDescription
          :body [body instantlaunch-schema/InstantLaunch]
          :return instantlaunch-schema/InstantLaunch
-         (ok (app-exposer/update-instant-launch id body)))
+         (ok (app-exposer/admin-update-instant-launch id body)))
 
        (DELETE "/" []
          :summary instantlaunch-schema/DeleteInstantLaunchSummary
          :description instantlaunch-schema/DeleteInstantLaunchDescription
-         (ok (app-exposer/delete-instant-launch id)))
+         (ok (app-exposer/admin-delete-instant-launch id)))
 
        (context "/metadata" []
          (GET "/" []
@@ -162,4 +181,4 @@
        :description instantlaunch-schema/AddInstantLaunchDescription
        :body [body instantlaunch-schema/InstantLaunch]
        :return instantlaunch-schema/InstantLaunch
-       (ok (app-exposer/add-instant-launch (:username current-user) body))))))
+       (ok (app-exposer/admin-add-instant-launch (:username current-user) body))))))
