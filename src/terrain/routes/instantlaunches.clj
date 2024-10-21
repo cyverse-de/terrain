@@ -82,12 +82,12 @@
          :description instantlaunch-schema/UpdateInstantLaunchDescription
          :body [body instantlaunch-schema/InstantLaunch]
          :return instantlaunch-schema/InstantLaunch
-         (ok (app-exposer/update-instant-launch (:username current-user) id body)))
+         (ok (app-exposer/update-instant-launch id body)))
 
        (DELETE "/" []
          :summary instantlaunch-schema/DeleteInstantLaunchSummary
          :description instantlaunch-schema/DeleteInstantLaunchDescription
-         (ok (app-exposer/delete-instant-launch (:username current-user) id))))
+         (ok (app-exposer/delete-instant-launch id))))
 
      (PUT "/" []
        :summary instantlaunch-schema/AddInstantLaunchSummary
