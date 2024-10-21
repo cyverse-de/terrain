@@ -186,7 +186,7 @@
 
 (defn add-instant-launch
   [username il]
-  (-> (app-exposer-url ["instantlaunches/"] {} :no-user true)
+  (-> (app-exposer-url ["instantlaunches/"] {})
       (client/put {:content-type :json
                    :as           :json
                    :form-params  (update il :added_by #(or %1 username))})
@@ -194,7 +194,7 @@
 
 (defn update-instant-launch
   [id il]
-  (-> (app-exposer-url ["instantlaunches" id] {} :no-user true)
+  (-> (app-exposer-url ["instantlaunches" id] {})
       (client/post {:content-type :json
                     :as           :json
                     :form-params  il})
@@ -202,7 +202,29 @@
 
 (defn delete-instant-launch
   [id]
-  (-> (app-exposer-url ["instantlaunches" id] {} :no-user true)
+  (-> (app-exposer-url ["instantlaunches" id] {})
+      (client/delete {:as :json})
+      (:body)))
+
+(defn admin-add-instant-launch
+  [username il]
+  (-> (app-exposer-url ["instantlaunches" "admin/"] {} :no-user true)
+      (client/put {:content-type :json
+                   :as           :json
+                   :form-params  (update il :added_by #(or %1 username))})
+      (:body)))
+
+(defn admin-update-instant-launch
+  [id il]
+  (-> (app-exposer-url ["instantlaunches" "admin" id] {} :no-user true)
+      (client/post {:content-type :json
+                    :as           :json
+                    :form-params  il})
+      (:body)))
+
+(defn admin-delete-instant-launch
+  [id]
+  (-> (app-exposer-url ["instantlaunches" "admin" id] {} :no-user true)
       (client/delete {:as :json})
       (:body)))
 
@@ -233,7 +255,7 @@
 
 (defn upsert-metadata
   [id data]
-  (-> (app-exposer-url ["instantlaunches" id "metadata"] {})
+  (-> (app-exposer-url ["instantlaunches" "admin" id "metadata"] {})
       (client/post {:content-type :json
                     :as :json
                     :form-params data})
@@ -241,7 +263,7 @@
 
 (defn reset-metadata
   [id data]
-  (-> (app-exposer-url ["instantlaunches" id "metadata"] {})
+  (-> (app-exposer-url ["instantlaunches" "admin" id "metadata"] {})
       (client/put {:content-type :json
                    :as :json
                    :form-params data})
