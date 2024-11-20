@@ -32,11 +32,11 @@
   (let [user-data (http/get (keycloak-admin-url "users")
                             {:query-params {:username username
                                             :exact true}
-                             :headers {:authorization "Bearer " (get-token)}
+                             :headers {:authorization (str "Bearer " (get-token))}
                              :as :json})]
     ; the 'exact' query parameter doesn't seem to work on all keycloak versions, so we filter it
     (->> user-data
-         (filter (fn [user] (= (:username obj) username)))
+         (filter (fn [user] (= (:username user) username)))
          first)))
 
 ; https://www.keycloak.org/docs-api/26.0.5/rest-api/#_get_adminrealmsrealmusersuser_idsessions
@@ -46,5 +46,5 @@
   This will be a list of maps, which will include user ID, ip address, session ID, and clients at least."
   [user-id]
   (:body (http/get (keycloak-admin-url "users" user-id "sessions")
-                   {:headers {:authorization "Bearer " (get-token)}
+                   {:headers {:authorization (str "Bearer " (get-token))}
                     :as :json})))
