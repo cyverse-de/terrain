@@ -93,16 +93,23 @@
    (optional-key :username) (describe String "The user's username in QMS")})
 
 (defschema PlanQuotaDefault
-  {(optional-key :id)            PlanQuotaDefaultId
-   (optional-key :quota_value)   (describe Double "The quota's default value")
-   (optional-key :resource_type) ResourceType})
+  {(optional-key :id)             PlanQuotaDefaultId
+   (optional-key :quota_value)    (describe Double "The quota's default value")
+   (optional-key :resource_type)  ResourceType
+   (optional-key :effective_date) (describe String "The date and time the plan quota default becomes effective")})
+
+(defschema PlanRate
+  {(optional-key :id)             (describe String "The plan rate ID")
+   (optional-key :effective_date) (describe String "The date and time the plan rate becomes effective")
+   (optional-key :rate)           (describe Double "The rate associated with the plan")})
 
 (defschema Plan
   {(optional-key :id)                  PlanID
    (optional-key :uuid)                PlanID
    (optional-key :name)                (describe String "The name of the plan in QMS")
    (optional-key :description)         (describe String "The description of the plan")
-   (optional-key :plan_quota_defaults) (describe [PlanQuotaDefault] "The list of default values for the quotas")})
+   (optional-key :plan_quota_defaults) (describe [PlanQuotaDefault] "The list of default values for the quotas")
+   (optional-key :plan_rates)          (describe [PlanRate] "The list of plan rates")})
 
 (defschema PlanListResponse
   {(optional-key :result) (describe (maybe [Plan]) "The list of plans")
@@ -124,12 +131,13 @@
   {:quota (describe Double "The resource usage limit")})
 
 (defschema Subscription
-  {(optional-key :uuid)                   (describe (maybe UUID) "The UUID assigned to a user's plan")
+  {(optional-key :uuid)                 (describe (maybe UUID) "The UUID assigned to a user's plan")
    (optional-key :id)                   (describe (maybe UUID) "The UUID assigned to a user's plan")
    (optional-key :effective_start_date) (describe (maybe String) "The date the user's plan takes effect")
    (optional-key :effective_end_date)   (describe (maybe String) "The date the user's plan ends")
    (optional-key :user)                 QMSUser
    (optional-key :plan)                 Plan
+   (optional-key :plan_rate)            PlanRate
    (optional-key :quotas)               (describe (maybe [Quota]) "The list of quotas associated with the user's plan")
    (optional-key :usages)               (describe (maybe [Usage]) "The list of usages associated with the user's plan")
    (optional-key :paid)                 (describe (maybe Boolean) "True if the user paid for the subsciption")})
@@ -211,29 +219,37 @@
    (optional-key :unit)       (describe (maybe String) "The unit of the resource type assciated wiht the add-on being deleted. Probably blank")
    (optional-key :consumable) (describe (maybe Boolean) "True if using the resource consumes it permanently. Probably blank")})
 
+(defschema AddonRate
+  {(optional-key :uuid)           (describe UUID "The UUID for the add-on rate")
+   (optional-key :rate)           (describe Double "The rate charged for the add-on")
+   (optional-key :effective_date) (describe String "The date and time that the addon rate becomes effective")})
+
 (defschema AddOn
   {(optional-key :uuid) (describe UUID "The UUID for the add-on")
    :name                (describe String "The name of the add-on")
    :description         (describe String "The description of the add-on")
    :default_amount      (describe Double "The amount of the resource provided by the add-on")
    :default_paid        (describe Boolean "Whether the add-on needs to be paid for")
-   :resource_type       (describe NATSResourceType "The resource type the add-on provides more of")})
+   :resource_type       (describe NATSResourceType "The resource type the add-on provides more of")
+   :addon_rate          (describe [AddonRate] "The rates associated with the addon")})
 
 (defschema UpdateAddon
-  {:uuid                         (describe UUID "The UUID of the add-on being updated")
-  (optional-key :name)           (describe String "The new name for the add-on being updated")
-  (optional-key :description)    (describe String "The new description fopr the add-on being updated")
-  (optional-key :default_amount) (describe Double "The new amount provided by the add-on being updated")
-  (optional-key :default_paid)   (describe Boolean "Whether the add-on needs to be paid for")
-  (optional-key :resource_type)   ResourceTypeForAddonUpdate})
+  {:uuid                          (describe UUID "The UUID of the add-on being updated")
+   (optional-key :name)           (describe String "The new name for the add-on being updated")
+   (optional-key :description)    (describe String "The new description fopr the add-on being updated")
+   (optional-key :default_amount) (describe Double "The new amount provided by the add-on being updated")
+   (optional-key :default_paid)   (describe Boolean "Whether the add-on needs to be paid for")
+   (optional-key :resource_type)  ResourceTypeForAddonUpdate
+   (optional-key :addon_rates)    (describe [AddonRate] "The rates associated with the addon")})
 
 (defschema DeletedAddon
-  {:uuid (describe UUID "The UUID of the add-on that was deleted")
-  (optional-key :name)           (describe (maybe String) "The name of the deleted addon. Probably blank")
-  (optional-key :description)    (describe (maybe String) "The descriiption of the deleted addon. Probably blank")
-  (optional-key :default_amount) (describe (maybe Double) "The default amount of the deleted addon. Probably blank")
-  (optional-key :default_paid)   (describe (maybe Boolean) "Whether the add-on needs to be paid for. Probably blank")
-  (optional-key :resource_type)  (maybe ResourceTypeForAddonDeletion)})
+  {:uuid                          (describe UUID "The UUID of the add-on that was deleted")
+   (optional-key :name)           (describe (maybe String) "The name of the deleted addon. Probably blank")
+   (optional-key :description)    (describe (maybe String) "The descriiption of the deleted addon. Probably blank")
+   (optional-key :default_amount) (describe (maybe Double) "The default amount of the deleted addon. Probably blank")
+   (optional-key :default_paid)   (describe (maybe Boolean) "Whether the add-on needs to be paid for. Probably blank")
+   (optional-key :resource_type)  (maybe ResourceTypeForAddonDeletion)
+   (optional-key :addon_rates)    (describe [AddonRate] "The rates associated with the addon")})
 
 (defschema AddonResponse
   {:addon (describe AddOn "The returned add-on")})
@@ -249,7 +265,8 @@
    :addon               (describe AddOn "The add-on applied to the subscription")
    :subscription        (describe Subscription "The subscription the add-on was applied to")
    :amount              (describe Double "The amount of the resource type provided by the add-on that was actually applied to the subscription")
-   :paid                (describe Boolean "Whether the add-on needs/needed to be paid for")})
+   :paid                (describe Boolean "Whether the add-on needs/needed to be paid for")
+   :addon_rates         (describe AddonRate "The active rate for the addon when it was added to the subscription")})
 
 (defschema AddonIDBody
   {:uuid AddonID})
