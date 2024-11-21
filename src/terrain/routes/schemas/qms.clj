@@ -100,6 +100,7 @@
 
 (defschema PlanRate
   {(optional-key :id)             (describe String "The plan rate ID")
+   (optional-key :uuid)           (describe String "The plan rate ID")
    (optional-key :effective_date) (describe String "The date and time the plan rate becomes effective")
    (optional-key :rate)           (describe Double "The rate associated with the plan")})
 
@@ -231,7 +232,7 @@
    :default_amount      (describe Double "The amount of the resource provided by the add-on")
    :default_paid        (describe Boolean "Whether the add-on needs to be paid for")
    :resource_type       (describe NATSResourceType "The resource type the add-on provides more of")
-   :addon_rate          (describe [AddonRate] "The rates associated with the addon")})
+   :addon_rates         (describe [AddonRate] "The rates associated with the addon")})
 
 (defschema UpdateAddon
   {:uuid                          (describe UUID "The UUID of the add-on being updated")
@@ -266,7 +267,7 @@
    :subscription        (describe Subscription "The subscription the add-on was applied to")
    :amount              (describe Double "The amount of the resource type provided by the add-on that was actually applied to the subscription")
    :paid                (describe Boolean "Whether the add-on needs/needed to be paid for")
-   :addon_rates         (describe AddonRate "The active rate for the addon when it was added to the subscription")})
+   :addon_rate          (describe AddonRate "The active rate for the addon when it was added to the subscription")})
 
 (defschema AddonIDBody
   {:uuid AddonID})
