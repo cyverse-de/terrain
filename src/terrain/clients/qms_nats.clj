@@ -1,11 +1,9 @@
 (ns terrain.clients.qms-nats
-  (:require [terrain.util.nats :as nats]
-            [terrain.util.config :as cfg]
-            [slingshot.slingshot :refer [throw+]])
+  (:require [slingshot.slingshot :refer [throw+]]
+            [terrain.clients.qms.model :as model]
+            [terrain.util.nats :as nats]
+            [terrain.util.config :as cfg])
   (:import [org.cyverse.de.protobufs
-            AddAddonRequest
-            NoParamsRequest
-            UpdateAddonRequest
             ByUUID
             AssociateByUUIDs
             UpdateSubscriptionAddonRequest]))
@@ -32,12 +30,14 @@
 (defn- update-request
   [m]
   (let [assocer (partial select-assoc m)]
-    (merge {:addon (assoc m :uuid (str (:uuid m)))} (-> {}
-                                                        (assocer [:name]                :update_name           true)
-                                                        (assocer [:description]         :update_description    true)
-                                                        (assocer [:resource_type :uuid] :update_resource_type  true)
-                                                        (assocer [:default_amount]      :update_default_amount true)
-                                                        (assocer [:default_paid]        :update_default_paid   true)))))
+    (merge
+     {:addon (assoc m :uuid (str (:uuid m)))}
+     (-> {}
+         (assocer [:name]                :update_name           true)
+         (assocer [:description]         :update_description    true)
+         (assocer [:resource_type :uuid] :update_resource_type  true)
+         (assocer [:default_amount]      :update_default_amount true)
+         (assocer [:default_paid]        :update_default_paid   true)))))
 
 (defn- update-sub-addon-request
   [m]
@@ -51,55 +51,55 @@
   [addon]
   (as-> {:addon addon} r
     (assoc-in r [:addon :resource_type :uuid] (str (get-in r [:addon :resource_type :uuid])))
-    (nats/request (cfg/add-addon-subject) AddAddonRequest r)
+    (nats/request-json (cfg/add-addon-subject) (model/add-addon-request-from-map r))
     (return-keys r [:addon])))
 
 (defn list-addons
   []
-  (as-> {} r
-    (nats/request (cfg/list-addons-subject) NoParamsRequest r)
+  (as-> (model/new-no-params-request) r
+    (nats/request-json (cfg/list-addons-subject) r)
     (return-keys r [:addons])))
 
 (defn update-addon
   [addon]
   (as-> (update-request addon) r
     (assoc-in r [:addon :resource_type :uuid] (str (get-in r [:addon :resource_type :uuid])))
-    (nats/request (cfg/update-addon-subject) UpdateAddonRequest r)
+    (nats/request-json (cfg/update-addon-subject) (model/update-addon-request-from-map r))
     (return-keys r [:addon])))
 
 (defn delete-addon
   [uuid]
   (as-> {:uuid (str uuid)} r
-    (nats/request (cfg/delete-addon-subject) ByUUID r)
+    (nats/request-json (cfg/delete-addon-subject) (model/by-uuid-request-from-map r))
     (return-keys r [:addon])))
 
 (defn add-subscription-addon
   [parent-uuid child-uuid]
   (as-> {:parent_uuid (str parent-uuid)
          :child_uuid  (str child-uuid)} r
-    (nats/request (cfg/add-subscription-addon-subject) AssociateByUUIDs r)
+    (nats/request-json (cfg/add-subscription-addon-subject) (model/associate-by-uuids-from-map r))
     (return-keys r [:subscription_addon])))
 
 (defn list-subscription-addons
   [uuid]
   (as-> {:uuid (str uuid)} r
-    (nats/request (cfg/list-subscription-addons-subject) ByUUID r)
+    (nats/request-json (cfg/list-subscription-addons-subject) (model/by-uuid-request-from-map r))
     (return-keys r [:subscription_addons])))
 
 (defn update-subscription-addon
   [sub-addon]
   (as-> (update-sub-addon-request sub-addon) r
-    (nats/request (cfg/update-subscription-addon-subject) UpdateSubscriptionAddonRequest r)
+    (nats/request-json (cfg/update-subscription-addon-subject) (model/update-subscription-addon-request-from-map r))
     (return-keys r [:subscription_addon])))
 
 (defn delete-subscription-addon
   [uuid]
   (as-> {:uuid (str uuid)} r
-    (nats/request (cfg/delete-subscription-addon-subject) ByUUID r)
+    (nats/request-json (cfg/delete-subscription-addon-subject) (model/by-uuid-request-from-map r))
     (return-keys r [:subscription_addon])))
 
 (defn get-subscription-addon
   [uuid]
   (as-> {:uuid (str uuid)} r
-    (nats/request (cfg/get-subscription-addon-subject) ByUUID r)
+    (nats/request-json (cfg/get-subscription-addon-subject) (model/by-uuid-request-from-map r))
     (return-keys r [:subscription_addon])))

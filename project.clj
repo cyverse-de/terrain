@@ -50,7 +50,7 @@
                  [less-awful-ssl "1.0.6"]
                  [clojure.java-time "1.4.2"]
                  [com.appsflyer/pronto "3.0.0"]
-                 [org.cyverse/cyverse-de-protobufs "0.0.2"]]
+                 [org.cyverse/cyverse-de-protobufs "0.0.3-SNAPSHOT"]]
   :eastwood {:exclude-namespaces [terrain.util.jwt :test-paths]
              :linters [:wrong-arity :wrong-ns-form :wrong-pre-post :wrong-tag :misplaced-docstrings]}
   :plugins [[lein-ancient "0.7.0"]
