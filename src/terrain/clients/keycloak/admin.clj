@@ -28,23 +28,34 @@
   
   This will be a map including keys at least :username and :id, which should be
   what we need to make further requests"
-  [username]
-  (let [user-data (http/get (keycloak-admin-url "users")
-                            {:query-params {:username username
-                                            :exact true}
-                             :headers {:authorization (str "Bearer " (get-token))}
-                             :as :json})]
-    ; the 'exact' query parameter doesn't seem to work on all keycloak versions, so we filter it
-    (->> user-data
-         (filter (fn [user] (= (:username user) username)))
-         first)))
+  ([username]
+   (get-user username (get-token)))
+  ([username token]
+   (let [user-data (http/get (keycloak-admin-url "users")
+                             {:query-params {:username username
+                                             :exact true}
+                              :headers {:authorization (str "Bearer " token)}
+                              :as :json})]
+     ; the 'exact' query parameter doesn't seem to work on all keycloak versions, so we filter it
+     (->> user-data
+          (filter (fn [user] (= (:username user) username)))
+          first))))
 
 ; https://www.keycloak.org/docs-api/26.0.5/rest-api/#_get_adminrealmsrealmusersuser_idsessions
 (defn get-user-session
   "Obtains information about the user's current session from keycloak.
   
   This will be a list of maps, which will include user ID, ip address, session ID, and clients at least."
-  [user-id]
-  (:body (http/get (keycloak-admin-url "users" user-id "sessions")
-                   {:headers {:authorization (str "Bearer " (get-token))}
-                    :as :json})))
+  ([user-id]
+   (get-user-session user-id (get-token)))
+  ([user-id token]
+   (:body (http/get (keycloak-admin-url "users" user-id "sessions")
+                    {:headers {:authorization (str "Bearer " token)}
+                     :as :json}))))
+
+(defn get-user-session-by-username
+  "Same as `get-user-session`, but by username by way of a request to `get-user` first."
+  ([username]
+   (get-user-session-by-username username (get-token)))
+  ([username token]
+   (get-user-session (:id (get-user username token)) token)))
