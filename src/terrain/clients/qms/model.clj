@@ -42,6 +42,10 @@
       (.setEffectiveDate builder (time/protobuf-timestamp (:effective_date m))))
     (.build builder)))
 
+(defn addon-rates-from-maps
+  [ms]
+  (map addon-rate-from-map ms))
+
 (defn addon-from-map
   [m]
   (let [builder (Addon/newBuilder)]
@@ -56,9 +60,9 @@
     (when (contains? m :default_amount)
       (.setDefaultAmount builder (:default_amount m)))
     (when (contains? m :default_paid)
-      (.setDefaultPaaid builder (:default_paid m)))
+      (.setDefaultPaid builder (:default_paid m)))
     (when (contains? m :addon_rates)
-      (.setAddonRates builder (into-array AddonRate (map addon-rate-from-map (:addon-rates m)))))
+      (.addAllAddonRates builder (addon-rates-from-maps (:addon-rates m))))
     (.build builder)))
 
 (defn add-addon-request-from-map
