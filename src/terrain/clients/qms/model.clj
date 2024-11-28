@@ -133,6 +133,10 @@
       (.setEffectiveDate builder (time/protobuf-timestamp (:effective_date m))))
     (.build builder)))
 
+(defn quota-defaults-from-maps
+  [ms]
+  (map quota-default-from-map ms))
+
 (defn plan-rate-from-map
   [m]
   (let [builder (PlanRate/newBuilder)]
@@ -144,6 +148,10 @@
       (.setEffectiveDate builder (time/protobuf-timestamp (:effective_date m))))
     (.build builder)))
 
+(defn plan-rates-from-maps
+  [ms]
+  (map plan-rate-from-map ms))
+
 (defn plan-from-map
   [m]
   (let [builder (Plan/newBuilder)]
@@ -154,9 +162,9 @@
     (when (contains? m :description)
       (.setDescription builder (:description m)))
     (when (contains? m  :plan_quota_defaults)
-      (.setPlanQuotaDefaults (into-array QuotaDefault (map quota-default-from-map (:plan_quota_defaults m)))))
+      (.addAllPlanQuotaDefaults builder (quota-defaults-from-maps (:plan_quota_defaults m))))
     (when (contains? m :plan_rates)
-      (.setPlanRates builder (into-array PlanRate (map plan-rate-from-map (:plan_rates m)))))
+      (.addAllPlanRates builder (plan-rates-from-maps (:plan_rates m))))
     (.build builder)))
 
 (defn usage-from-map
@@ -171,14 +179,18 @@
     (when (contains? m :resource_type)
       (.setResourceType builder (resource-type-from-map (:resource_type m))))
     (when (contains? m :created_by)
-      (.setCreatedby builder (:created_by m)))
-    (when (contains? m :crated_at)
+      (.setCreatedBy builder (:created_by m)))
+    (when (contains? m :created_at)
       (.setCreatedAt builder (time/protobuf-timestamp (:created_at m))))
     (when (contains? m :last_modified_by)
       (.setLastModifiedBy builder (:last_modified_by m)))
     (when (contains? m :last_modified_at)
       (.setLastModifiedAt builder (time/protobuf-timestamp (:last_modified_at m))))
     (.build builder)))
+
+(defn usages-from-maps
+  [m]
+  (map usage-from-map (:usages m)))
 
 (defn subscription-from-map
   [m]
@@ -194,7 +206,7 @@
     (when (contains? m :plan)
       (.setPlan builder (plan-from-map (:plan m))))
     (when (contains? m :usages)
-      (.setUsages builder (into-array Usage (map usage-from-map (:usages m)))))
+      (.addAllUsages builder (usages-from-maps (:usages m))))
     (when (contains? m :paid)
       (.setPaid builder (:paid m)))
     (when (contains? m :plan_rate)
