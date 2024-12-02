@@ -14,7 +14,7 @@
   (str (apply curl/url (config/keycloak-admin-base-uri) "realms" "master" components)))
 
 (defn get-token
-  "Obtains authorization token data for the admin service account."
+  "Obtains authorization token data for the admin service account. You'll probably want the access_token field in the return value."
   []
   (:body (http/post (keycloak-admin-token-url "protocol" "openid-connect" "token")
                     {:form-params {:grant_type    "client_credentials"
@@ -29,7 +29,7 @@
   This will be a map including keys at least :username and :id, which should be
   what we need to make further requests"
   ([username]
-   (get-user username (get-token)))
+   (get-user username (:access_token (get-token))))
   ([username token]
    (let [user-data (http/get (keycloak-admin-url "users")
                              {:query-params {:username username
@@ -47,7 +47,7 @@
   
   This will be a list of maps, which will include user ID, ip address, session ID, and clients at least."
   ([user-id]
-   (get-user-session user-id (get-token)))
+   (get-user-session user-id (:access_token (get-token))))
   ([user-id token]
    (:body (http/get (keycloak-admin-url "users" user-id "sessions")
                     {:headers {:authorization (str "Bearer " token)}
@@ -56,6 +56,6 @@
 (defn get-user-session-by-username
   "Same as `get-user-session`, but by username by way of a request to `get-user` first."
   ([username]
-   (get-user-session-by-username username (get-token)))
+   (get-user-session-by-username username (:access_token (get-token))))
   ([username token]
    (get-user-session (:id (get-user username token)) token)))
