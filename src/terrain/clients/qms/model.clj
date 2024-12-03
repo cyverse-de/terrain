@@ -62,7 +62,7 @@
     (when (contains? m :default_paid)
       (.setDefaultPaid builder (:default_paid m)))
     (when (contains? m :addon_rates)
-      (.addAllAddonRates builder (addon-rates-from-maps (:addon-rates m))))
+      (.addAllAddonRates builder (addon-rates-from-maps (:addon_rates m))))
     (.build builder)))
 
 (defn add-addon-request-from-map

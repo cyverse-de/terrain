@@ -50,7 +50,8 @@
 
 (defn addon-rates-equal-maps
   [ms ars]
-  (every? true? (map addon-rate-equals-map ms ars)))
+  (and (= (count ms) (.size ars))
+       (every? true? (map addon-rate-equals-map ms ars))))
 
 (deftest test-addon-rate-from-map
   (doseq [{:keys [m desc]} addon-rate-test-cases]
@@ -171,7 +172,8 @@
 
 (defn quota-defaults-equal-maps
   [ms qds]
-  (every? true? (map quota-default-equals-map ms qds)))
+  (and (= (count ms) (.size qds))
+       (every? true? (map quota-default-equals-map ms qds))))
 
 (deftest test-quota-default-from-map
   (doseq [{:keys [m desc]} quota-default-test-cases]
@@ -243,7 +245,8 @@
 
 (defn usages-equal-maps
   [ms us]
-  (every? true? (map usage-equals-map ms us)))
+  (and (= (count ms) (.size us))
+       (every? true? (map usage-equals-map ms us))))
 
 (deftest test-usage-from-map
   (doseq [{:keys [m desc]} usage-test-cases]

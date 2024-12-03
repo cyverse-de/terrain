@@ -3,7 +3,8 @@
             [java-time.api :as jt]
             [cheshire.core :as json]
             [clojure.string :as string])
-  (:import [io.nats.client Nats Options$Builder]))
+  (:import [com.google.protobuf.util JsonFormat]
+           [io.nats.client Nats Options$Builder]))
 
 (defn- get-options [servers-str tls? crt-fpath key-fpath ca-fpath max-reconns reconn-wait]
   (let [ssl-ctx     (when tls? (ssl/ssl-context key-fpath crt-fpath ca-fpath))
@@ -38,7 +39,7 @@
 
 (defn- json-encode
   [o]
-  (json/generate-string o {:key-fn encode-key}))
+  (.print (JsonFormat/printer) o))
 
 (defn- json-decode-bytes
   [b]
