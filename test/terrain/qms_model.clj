@@ -1,5 +1,6 @@
 (ns terrain.qms-model
   (:require [clojure.test :refer [deftest is testing]]
+            [kameleon.uuids :refer [uuidify]]
             [terrain.clients.qms.model :as model]
             [terrain.util.time :as time]))
 
@@ -19,14 +20,14 @@
   (= (time/protobuf-timestamp m-date) pb-date))
 
 (deftestcases resource-type-test-cases
-  {:uuid       "45DD6319-219B-4EB1-A792-024AE323588E"
+  {:uuid       (uuidify "45DD6319-219B-4EB1-A792-024AE323588E")
    :name       "some.resource.type"
    :unit       "some.unit"
    :consumable true})
 
 (defn resource-type-equals-map
   [m rt]
-  (->> [(and (contains? m :uuid) (not= (:uuid m) (.getUuid rt)))
+  (->> [(and (contains? m :uuid) (not= (str (:uuid m)) (.getUuid rt)))
         (and (contains? m :name) (not= (:name m) (.getName rt)))
         (and (contains? m :unit) (not= (:unit m) (.getUnit rt)))
         (and (contains? m :consumable) (not= (:consumable m) (.getConsumable rt)))]
@@ -37,13 +38,13 @@
     (testing desc (is (resource-type-equals-map m (model/resource-type-from-map m))))))
 
 (deftestcases addon-rate-test-cases
-  {:uuid           "2D331892-992A-4895-9FA3-A5F4638099B2"
+  {:uuid           (uuidify "2D331892-992A-4895-9FA3-A5F4638099B2")
    :rate           123.45
    :effective_date "2024-11-22T14:33:00-07:00"})
 
 (defn addon-rate-equals-map
   [m ar]
-  (->> [(and (contains? m :uuid) (not= (:uuid m) (.getUuid ar)))
+  (->> [(and (contains? m :uuid) (not= (str (:uuid m)) (.getUuid ar)))
         (and (contains? m :rate) (not= (:rate m) (.getRate ar)))
         (and (contains? m :effective_date) (not (dates-equal (:effective_date m) (.getEffectiveDate ar))))]
        (every? false?)))
@@ -58,7 +59,7 @@
     (testing desc (is (addon-rate-equals-map m (model/addon-rate-from-map m))))))
 
 (deftestcases addon-test-cases
-  {:uuid           "C8EDAB3A-454B-4337-AD82-3AB5EF47B3B5"
+  {:uuid           (uuidify "C8EDAB3A-454B-4337-AD82-3AB5EF47B3B5")
    :name           "some-addon"
    :description    "Some Addon"
    :resource_type  (:m (first resource-type-test-cases))
@@ -68,7 +69,7 @@
 
 (defn addon-equals-map
   [m a]
-  (->> [(and (contains? m :uuid) (not= (:uuid m) (.getUuid a)))
+  (->> [(and (contains? m :uuid) (not= (str (:uuid m)) (.getUuid a)))
         (and (contains? m :name) (not= (:name m) (.getName a)))
         (and (contains? m :description)  (not= (:description m) (.getDescription a)))
         (and (contains? m :resource_type) (not= (model/resource-type-from-map (:resource_type m)) (.getResourceType a)))
@@ -118,11 +119,11 @@
     (testing desc (is (update-addon-request-equals-map m (model/update-addon-request-from-map m))))))
 
 (deftestcases by-uuid-request-test-cases
-  {:uuid "262EF59B-08DF-4794-B81C-6F8602C54392"})
+  {:uuid (uuidify "262EF59B-08DF-4794-B81C-6F8602C54392")})
 
 (defn by-uuid-request-equals-map
   [m bur]
-  (->> [(and (contains? m :uuid) (not= (:uuid m) (.getUuid bur)))]
+  (->> [(and (contains? m :uuid) (not= (str (:uuid m)) (.getUuid bur)))]
        (every? false?)))
 
 (deftest test-by-uuid-request-from-map
@@ -144,12 +145,12 @@
     (testing desc (is (associate-by-uuids-request-equals-map m (model/associate-by-uuids-from-map m))))))
 
 (deftestcases user-test-cases
-  {:uuid     "E90FC296-EE37-406D-BB1A-BACEBAA71679"
+  {:uuid     (uuidify "E90FC296-EE37-406D-BB1A-BACEBAA71679")
    :username "someuser"})
 
 (defn user-equals-map
   [m u]
-  (->> [(and (contains? m :uuid) (not= (:uuid m) (.getUuid u)))
+  (->> [(and (contains? m :uuid) (not= (str (:uuid m)) (.getUuid u)))
         (and (contains? m :username) (not= (:username m) (.getUsername u)))]))
 
 (deftest test-user-from-map
@@ -157,14 +158,14 @@
     (testing desc (is (user-equals-map m (model/user-from-map m))))))
 
 (deftestcases quota-default-test-cases
-  {:uuid           "3E6004AA-6637-4D99-A069-145258D5A136"
+  {:uuid           (uuidify "3E6004AA-6637-4D99-A069-145258D5A136")
    :quota_value    123.45
    :resource_type  (:m (first resource-type-test-cases))
    :effective_date "2024-11-27T15:20:00-07:00"})
 
 (defn quota-default-equals-map
   [m qd]
-  (->> [(and (contains? m :uuid) (not= (:uuid m) (.getUuid qd)))
+  (->> [(and (contains? m :uuid) (not= (str (:uuid m)) (.getUuid qd)))
         (and (contains? m :quota_value) (not= (:quota_value m) (.getQuotaValue qd)))
         (and (contains? m :resource_type) (not (resource-type-equals-map (:resource_type m) (.getResourceType qd))))
         (and (contains? m :effective_date) (not (dates-equal (:effective_date m) (.getEffectiveDate qd))))]
@@ -180,13 +181,13 @@
     (testing desc (is (quota-default-equals-map m (model/quota-default-from-map m))))))
 
 (deftestcases plan-rate-test-cases
-  {:uuid           "36F7C33A-2175-4C3E-812E-3CA5AC984988"
+  {:uuid           (uuidify "36F7C33A-2175-4C3E-812E-3CA5AC984988")
    :rate           123.45
    :effective_date "2024-11-27T15:37:00-07:00"})
 
 (defn plan-rate-equals-map
   [m pr]
-  (->> [(and (contains? m :uuid) (not= (:uuid m) (.getUuid pr)))
+  (->> [(and (contains? m :uuid) (not= (str (:uuid m)) (.getUuid pr)))
         (and (contains? m :quota_value) (not= (:quota_value m) (.getQuotaValue pr)))
         (and (contains? m :resource_type) (not (resource-type-equals-map (:resource_type m) (.getResourceType pr))))
         (and (contains? m :effective_date) (not (dates-equal (:effective_date m) (.getEffectiveDate pr))))]
@@ -201,7 +202,7 @@
     (testing desc (is (plan-rate-equals-map m (model/plan-rate-from-map m))))))
 
 (deftestcases plan-test-cases
-  {:uuid                "60D18DE6-796E-4F7A-932D-017986D1DF25"
+  {:uuid                (uuidify "60D18DE6-796E-4F7A-932D-017986D1DF25")
    :name                "Plan"
    :description         "The most generic plan imaginable"
    :plan_quota_defaults (map :m quota-default-test-cases)
@@ -209,7 +210,7 @@
 
 (defn plan-equals-map
   [m p]
-  (->> [(and (contains? m :uuid) (not= (:uuid m) (.getUuid p)))
+  (->> [(and (contains? m :uuid) (not= (str (:uuid m)) (.getUuid p)))
         (and (contains? m :name) (not= (:name m) (.getName p)))
         (and (contains? m :description) (not= (:description m) (.getDescription p)))
         (and (contains? m :plan_quota_defaults)
@@ -222,7 +223,7 @@
     (testing desc (is (plan-equals-map m (model/plan-from-map m))))))
 
 (deftestcases usage-test-cases
-  {:uuid             "DCF04FA0-C615-4C26-99ED-65D98AA37CC7"
+  {:uuid             (uuidify "DCF04FA0-C615-4C26-99ED-65D98AA37CC7")
    :usage            123.45
    :subscription_id  "D693F7B6-E0B9-4444-AA36-E2B62699F9B2"
    :resource_type    (:m (first resource-type-test-cases))
@@ -233,7 +234,7 @@
 
 (defn usage-equals-map
   [m u]
-  (->> [(and (contains? m :uuid) (not= (:uuid m) (.getUuid u)))
+  (->> [(and (contains? m :uuid) (not= (str (:uuid m)) (.getUuid u)))
         (and (contains? m :usage) (not= (:usage m) (.getUsage u)))
         (and (contains? m :subscription_id) (not= (:subscription_id m) (.getSubscriptionId u)))
         (and (contains? m :resource_type) (not (resource-type-equals-map (:resource_type m) (.getResourceType u))))
@@ -253,7 +254,7 @@
     (testing desc (is (usage-equals-map m (model/usage-from-map m))))))
 
 (deftestcases subscription-test-cases
-  {:uuid                 "BC7CAE34-D955-486E-910F-339BD3FB6A42"
+  {:uuid                 (uuidify "BC7CAE34-D955-486E-910F-339BD3FB6A42")
    :effective_start_date "2024-11-27T17:08:00-07:00"
    :effective_end_date   "2025-11-27T17:08:00-07:00"
    :user                 (:m (first user-test-cases))
@@ -264,7 +265,7 @@
 
 (defn subscription-equals-map
   [m s]
-  (->> [(and (contains? m :uuid) (not= (:uuid m) (.getUuid s)))
+  (->> [(and (contains? m :uuid) (not= (str (:uuid m)) (.getUuid s)))
         (and (contains? m :effective_start_date) (not (dates-equal (:effective_start_date m) (.getEffectiveStartDate s))))
         (and (contains? m :effective_end_date) (not (dates-equal (:effective_end_date m) (.getEffectiveStartDate s))))
         (and (contains? m :user) (not (user-equals-map (:user m) (.getUser s))))
@@ -279,7 +280,7 @@
     (testing desc (is (subscription-equals-map m (model/subscription-from-map m))))))
 
 (deftestcases subscription-addon-test-cases
-  {:uuid         "6D8EAC2D-B6F8-4851-8AC8-6C24A6939381"
+  {:uuid         (uuidify "6D8EAC2D-B6F8-4851-8AC8-6C24A6939381")
    :addon        (:m (first addon-test-cases))
    :subscription (:m (first subscription-test-cases))
    :amount       123.45
@@ -288,7 +289,7 @@
 
 (defn subscription-addon-equals-map
   [m sa]
-  (->> [(and (contains? m :uuid) (not= (:uuid m) (.getUuid sa)))
+  (->> [(and (contains? m :uuid) (not= (str (:uuid m)) (.getUuid sa)))
         (and (contains? m :addon) (not (addon-equals-map (:addon m) (.getAddon sa))))
         (and (contains? m :subscription) (not (subscription-equals-map (:subscription m) (.getSubscription sa))))
         (and (contains? m :amount) (not= (:amount m) (.getAmount sa)))

@@ -22,7 +22,7 @@
   [m]
   (let [builder (ResourceType/newBuilder)]
     (when (contains? m :uuid)
-      (.setUuid builder (:uuid m)))
+      (.setUuid builder (str (:uuid m))))
     (when (contains? m :name)
       (.setName builder (:name m)))
     (when (contains? m :unit)
@@ -35,7 +35,7 @@
   [m]
   (let [builder (AddonRate/newBuilder)]
     (when (contains? m :uuid)
-      (.setUuid builder (:uuid m)))
+      (.setUuid builder (str (:uuid m))))
     (when (contains? m :rate)
       (.setRate builder (:rate m)))
     (when (contains? m :effective_date)
@@ -50,7 +50,7 @@
   [m]
   (let [builder (Addon/newBuilder)]
     (when (contains? m :uuid)
-      (.setUuid builder (:uuid m)))
+      (.setUuid builder (str (:uuid m))))
     (when (contains? m :name)
       (.setName builder (:name m)))
     (when (contains? m :description)
@@ -99,7 +99,7 @@
   [m]
   (let [builder (ByUUID/newBuilder)]
     (when (contains? m :uuid)
-      (.setUuid builder (:uuid m)))
+      (.setUuid builder (str (:uuid m))))
     (.build builder)))
 
 (defn associate-by-uuids-from-map
@@ -115,7 +115,7 @@
   [m]
   (let [builder (QMSUser/newBuilder)]
     (when (contains? m :uuid)
-      (.setUuid builder (:uuid m)))
+      (.setUuid builder (str (:uuid m))))
     (when (contains? m :username)
       (.setUsername builder (:username m)))
     (.build builder)))
@@ -124,7 +124,7 @@
   [m]
   (let [builder (QuotaDefault/newBuilder)]
     (when (contains? m :uuid)
-      (.setUuid builder (:uuid m)))
+      (.setUuid builder (str (:uuid m))))
     (when (contains? m :quota_value)
       (.setQuotaValue builder (:quota_value m)))
     (when (contains? m :resource_type)
@@ -141,7 +141,7 @@
   [m]
   (let [builder (PlanRate/newBuilder)]
     (when (contains? m :uuid)
-      (.setUuid builder (:uuid m)))
+      (.setUuid builder (str (:uuid m))))
     (when (contains? m :rate)
       (.setRate builder (:rate m)))
     (when (contains? m :effective_date)
@@ -156,7 +156,7 @@
   [m]
   (let [builder (Plan/newBuilder)]
     (when (contains? m :uuid)
-      (.setUuid builder (:uuid m)))
+      (.setUuid builder (str (:uuid m))))
     (when (contains? m :name)
       (.setName builder (:name m)))
     (when (contains? m :description)
@@ -171,7 +171,7 @@
   [m]
   (let [builder (Usage/newBuilder)]
     (when (contains? m :uuid)
-      (.setUuid builder (:uuid m)))
+      (.setUuid builder (str (:uuid m))))
     (when (contains? m :usage)
       (.setUsage builder (:usage m)))
     (when (contains? m :subscription_id)
@@ -196,7 +196,7 @@
   [m]
   (let [builder (Subscription/newBuilder)]
     (when (contains? m :uuid)
-      (.setUuid builder (:uuid m)))
+      (.setUuid builder (str (:uuid m))))
     (when (contains? m :effective_start_date)
       (.setEffectiveStartDate builder (time/protobuf-timestamp (:effective_start_date m))))
     (when (contains? m :effective_end_date)
@@ -217,7 +217,7 @@
   [m]
   (let [builder (SubscriptionAddon/newBuilder)]
     (when (contains? m :uuid)
-      (.setUuid builder (:uuid m)))
+      (.setUuid builder (str (:uuid m))))
     (when (contains? m :addon)
       (.setAddon builder (addon-from-map (:addon m))))
     (when (contains? m :subscription)
