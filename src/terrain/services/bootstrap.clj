@@ -5,6 +5,7 @@
     [slingshot.slingshot :refer [try+]]
     [terrain.auth.user-attributes :refer [current-user]]
     [terrain.clients.apps.raw :as apps-client]
+    [terrain.clients.keycloak.admin :as kc-client]
     [terrain.clients.data-info :as data-info-client]
     [terrain.services.user-prefs :as prefs]
     [terrain.util.service :as service]))
@@ -33,9 +34,14 @@
       {:error (str (:throwable &throw-context))})))
 
 (defn- get-login-session
-  [ip-address user-agent]
+  [username]
   (trap-bootstrap-request
-   #(select-keys (apps-client/record-login ip-address user-agent) [:login_time :auth_redirect])))
+   #(let [kc-resp (kc-client/get-user-session-by-username username)
+          current-session (first kc-resp) ;; TODO: choose most recent start/access using our known client ID
+          ]
+      (select-keys (apps-client/record-login (:ipAddress current-session nil) 
+                                             (:id current-session nil)
+                                             (:start current-session nil)) [:login_time :auth_redirect]))))
 
 (defn- get-apps-info
   []
@@ -60,7 +66,7 @@
   [ip-address user-agent]
   (assertions/assert-valid user-agent "Missing or empty request parameter: user-agent")
   (let [{user :shortUsername :keys [email firstName lastName username]} current-user
-        login-session (future (get-login-session ip-address user-agent))
+        login-session (future (get-login-session username))
         apps-info     (future (get-apps-info))
         data-info     (future (get-user-data-info user))
         preferences   (future (get-user-prefs username))]
