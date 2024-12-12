@@ -1,6 +1,7 @@
 (ns terrain.clients.keycloak.admin
   (:require [cemerick.url :as curl]
             [clj-http.client :as http]
+            [clojure.tools.logging :as log]
             [terrain.util.config :as config]))
 
 (defn- keycloak-admin-url
@@ -16,6 +17,8 @@
 (defn get-token
   "Obtains authorization token data for the admin service account. You'll probably want the access_token field in the return value."
   []
+  (log/error "getting token from " (keycloak-admin-token-url "protocol" "openid-connect" "token"))
+  (log/error "id/secret " (config/keycloak-admin-client-id) " " (config/keycloak-admin-client-secret))
   (:body (http/post (keycloak-admin-token-url "protocol" "openid-connect" "token")
                     {:form-params {:grant_type    "client_credentials"
                                    :client_id     (config/keycloak-admin-client-id)
