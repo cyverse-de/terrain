@@ -20,7 +20,8 @@
   (log/error "getting token from " (keycloak-admin-token-url "protocol" "openid-connect" "token"))
   (log/error "id/secret " (config/keycloak-admin-client-id) " " (config/keycloak-admin-client-secret))
   (:body (http/post (keycloak-admin-token-url "protocol" "openid-connect" "token")
-                    {:form-params {:grant_type    "client_credentials"
+                    {:insecure?   true
+                     :form-params {:grant_type    "client_credentials"
                                    :client_id     (config/keycloak-admin-client-id)
                                    :client_secret (config/keycloak-admin-client-secret)}
                      :as          :json})))
@@ -35,7 +36,8 @@
    (get-user username (:access_token (get-token))))
   ([username token]
    (let [user-data (http/get (keycloak-admin-url "users")
-                             {:query-params {:username username
+                             {:insecure?    true
+                              :query-params {:username username
                                              :exact true}
                               :headers {:authorization (str "Bearer " token)}
                               :as :json})]
@@ -53,7 +55,8 @@
    (get-user-session user-id (:access_token (get-token))))
   ([user-id token]
    (:body (http/get (keycloak-admin-url "users" user-id "sessions")
-                    {:headers {:authorization (str "Bearer " token)}
+                    {:insecure? true
+                     :headers {:authorization (str "Bearer " token)}
                      :as :json}))))
 
 (defn get-user-session-by-username
