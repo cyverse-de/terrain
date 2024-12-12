@@ -2,6 +2,7 @@
   (:require [cemerick.url :as curl]
             [clj-http.client :as http]
             [clojure.tools.logging :as log]
+            [clojure.string :as string]
             [terrain.util.config :as config]))
 
 (defn- keycloak-admin-url
@@ -64,5 +65,5 @@
   ([username]
    (get-user-session-by-username username (:access_token (get-token))))
   ([username token]
-   (log/error "Getting user sessions for username " username)
-   (get-user-session (:id (get-user username token)) token)))
+   (log/error "Getting user sessions for username " (string/replace username #"@.*$" ""))
+   (get-user-session (:id (get-user (string/replace username #"@.*$" "") token)) token)))
