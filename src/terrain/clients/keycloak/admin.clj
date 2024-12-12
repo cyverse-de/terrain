@@ -17,8 +17,6 @@
 (defn get-token
   "Obtains authorization token data for the admin service account. You'll probably want the access_token field in the return value."
   []
-  (log/error "getting token from " (keycloak-admin-token-url "protocol" "openid-connect" "token"))
-  (log/error "id/secret " (config/keycloak-admin-client-id) " " (config/keycloak-admin-client-secret))
   (:body (http/post (keycloak-admin-token-url "protocol" "openid-connect" "token")
                     {:insecure?   true
                      :form-params {:grant_type    "client_credentials"
@@ -42,6 +40,7 @@
                               :headers {:authorization (str "Bearer " token)}
                               :as :json})]
      ; the 'exact' query parameter doesn't seem to work on all keycloak versions, so we filter it
+     (log/error "Got user data" user-data)
      (->> user-data
           (filter (fn [user] (= (:username user) username)))
           first))))
@@ -54,6 +53,7 @@
   ([user-id]
    (get-user-session user-id (:access_token (get-token))))
   ([user-id token]
+   (log/error "Getting user sessions for ID " user-id)
    (:body (http/get (keycloak-admin-url "users" user-id "sessions")
                     {:insecure? true
                      :headers {:authorization (str "Bearer " token)}
@@ -64,4 +64,5 @@
   ([username]
    (get-user-session-by-username username (:access_token (get-token))))
   ([username token]
+   (log/error "Getting user sessions for username " username)
    (get-user-session (:id (get-user username token)) token)))
