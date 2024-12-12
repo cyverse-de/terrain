@@ -700,7 +700,7 @@
 (cc/defprop-optstr keycloak-admin-base-uri
   "The base URI to use for administrative requests to Keycloak."
   [props config-valid configs]
-  "terrain.keycloak.admin-base-uri" "https://keycloaktest2.cyverse.org/auth/admin")
+  "terrain.keycloak.admin-base-uri" "https://keycloaktest2.cyverse.org/auth")
 
 (declare keycloak-admin-client-id)
 (cc/defprop-str keycloak-admin-client-id
