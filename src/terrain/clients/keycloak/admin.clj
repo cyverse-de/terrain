@@ -7,12 +7,12 @@
 (defn- keycloak-admin-url
   "Builds a Keycloak admin API URL with the given path components."
   [& components]
-  (str (apply curl/url (config/keycloak-admin-base-uri) "realms" (config/keycloak-realm) components)))
+  (str (apply curl/url (config/keycloak-admin-base-uri) "admin" "realms" (config/keycloak-realm) components)))
 
 (defn- keycloak-admin-token-url
   "Like keycloak-admin-url but for the 'master' realm to get a token to use with the API"
   [& components]
-  (str (apply curl/url (config/keycloak-base-uri) "realms" "master" components)))
+  (str (apply curl/url (config/keycloak-admin-base-uri) "realms" "master" components)))
 
 (defn get-token
   "Obtains authorization token data for the admin service account. You'll probably want the access_token field in the return value."
