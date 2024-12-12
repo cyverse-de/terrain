@@ -19,18 +19,18 @@
       response))))
 
 (defn- trap-bootstrap-request
-  [req]
+  [req & {:keys [extra-log-info]}]
   (try+
     (req)
     (catch #(not (nil? (:status %))) {:keys [status body] :as e}
-      (log/error e)
+      (log/error (:throwable &throw-context) e extra-log-info)
       {:status status
        :error  (decode-error-response body)})
     (catch map? e
-      (log/error e)
+      (log/error (:throwable &throw-context) e extra-log-info)
       {:error e})
     (catch Object _
-      (log/error (:throwable &throw-context) "bootstrap request failed")
+      (log/error (:throwable &throw-context) "bootstrap request failed" extra-log-info)
       {:error (str (:throwable &throw-context))})))
 
 (defn- get-login-session
@@ -41,16 +41,20 @@
           ]
       (select-keys (apps-client/record-login (:ipAddress current-session nil) 
                                              (:id current-session nil)
-                                             (:start current-session nil)) [:login_time :auth_redirect]))))
+                                             (:start current-session nil)) [:login_time :auth_redirect]))
+   {:extra-log-info "login session request"}))
 
 (defn- get-apps-info
   []
-  (trap-bootstrap-request #(apps-client/bootstrap)))
+  (trap-bootstrap-request
+    #(apps-client/bootstrap)
+    {:extra-log-info "apps bootstrap request"}))
 
 (defn- get-user-data-info
   [user]
   (trap-bootstrap-request
-   #(data-info-client/user-base-paths user)))
+   #(data-info-client/user-base-paths user)
+   {:extra-log-info "base paths request"}))
 
 (defn- get-user-prefs
   [username]
@@ -58,7 +62,8 @@
    #(let [prefs (prefs/user-prefs username)]
       (if (and (:error prefs) (:default_output_folder prefs)) ;; if we've got both, there's an error stored in preferences. remove it so schema validation works right
         (dissoc prefs :error)
-        prefs))))
+        prefs))
+   {:extra-log-info "user prefs request"}))
 
 (defn bootstrap
   "This service obtains information about and initializes the workspace for the authenticated user.
