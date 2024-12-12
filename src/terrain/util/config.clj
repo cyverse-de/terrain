@@ -696,6 +696,24 @@
   [props config-valid configs]
   "terrain.keycloak.client-secret")
 
+(declare keycloak-admin-base-uri)
+(cc/defprop-optstr keycloak-admin-base-uri
+  "The base URI to use for administrative requests to Keycloak."
+  [props config-valid configs]
+  "terrain.keycloak.admin-base-uri" "https://keycloaktest2.cyverse.org/auth/admin")
+
+(declare keycloak-admin-client-id)
+(cc/defprop-str keycloak-admin-client-id
+  "The Keycloak admin client ID to use."
+  [props config-valid configs]
+  "terrain.keycloak.admin-client-id")
+
+(declare keycloak-admin-client-secret)
+(cc/defprop-str keycloak-admin-client-secret
+  "The keycloak admin client secret to use."
+  [props config-valid configs]
+  "terrain.keycloak.admin-client-secret")
+
 (declare dashboard-aggregator-url)
 (cc/defprop-optstr dashboard-aggregator-url
   "The URL to the dashboard-aggregator service."

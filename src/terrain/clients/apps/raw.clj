@@ -1277,8 +1277,8 @@
                    :content-type :json}))))
 
 (defn record-login
-  [ip-address user-agent]
-  (let [params (remove-nil-values {:ip-address ip-address :user-agent user-agent})]
+  [ip-address session-id login-time]
+  (let [params (remove-nil-values {:ip-address ip-address :session-id session-id :login-time login-time})]
     (:body
      (client/post (apps-url "users" "login")
                   (disable-redirects
