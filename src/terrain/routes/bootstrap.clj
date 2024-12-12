@@ -25,13 +25,4 @@
            :summary "Bootstrap Service"
            :description "This service obtains information about and initializes the workspace for the authenticated user.
            It also records the fact that the user logged in."
-           (ok (bootstrap ip-address user-agent))))
-
-    (context "/logout" []
-      :tags ["bootstrap"]
-
-      (GET "/" []
-           :query [params sessions-schema/LogoutParams]
-           :summary sessions-schema/LogoutSummary
-           :description sessions-schema/LogoutDocs
-           (ok (apps-client/record-logout params))))))
+           (ok (bootstrap user-agent))))))

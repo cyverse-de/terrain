@@ -1285,14 +1285,6 @@
                    {:query-params (secured-params params)
                     :as           :json})))))
 
-(defn record-logout
-  [params]
-  (:body
-   (client/post (apps-url "users" "logout")
-                (disable-redirects
-                 {:query-params (secured-params params)
-                  :as           :json}))))
-
 (defn list-integration-data
   [params]
   (client/get (apps-url "admin" "integration-data")
