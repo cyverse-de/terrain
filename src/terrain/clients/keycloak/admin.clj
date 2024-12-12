@@ -18,8 +18,8 @@
   []
   (:body (http/post (keycloak-admin-token-url "protocol" "openid-connect" "token")
                     {:form-params {:grant_type    "client_credentials"
-                                   :client_id     (config/keycloak-client-id)
-                                   :client_secret (config/keycloak-client-secret)}
+                                   :client_id     (config/keycloak-admin-client-id)
+                                   :client_secret (config/keycloak-admin-client-secret)}
                      :as          :json})))
 
 ; https://www.keycloak.org/docs-api/26.0.5/rest-api/#_get_adminrealmsrealmusers
