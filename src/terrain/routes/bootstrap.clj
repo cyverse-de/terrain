@@ -8,9 +8,6 @@
             [terrain.util :refer [optional-routes]]
             [terrain.util.config :as config]))
 
-;; Declarations to eliminate lint warnings for path and query parameter bindings.
-(declare user-agent ip-address params)
-
 (defn secured-bootstrap-routes
   []
   (optional-routes
@@ -19,10 +16,9 @@
     (context "/bootstrap" []
       :tags ["bootstrap"]
 
-      (GET "/" [:as {{user-agent "user-agent"} :headers}]
-           :query [{:keys [ip-address]} sessions-schema/IPAddrParam]
+      (GET "/" []
            :return schema/TerrainBootstrapResponse
            :summary "Bootstrap Service"
            :description "This service obtains information about and initializes the workspace for the authenticated user.
            It also records the fact that the user logged in."
-           (ok (bootstrap user-agent))))))
+           (ok (bootstrap))))))

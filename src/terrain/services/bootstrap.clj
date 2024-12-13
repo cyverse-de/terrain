@@ -68,8 +68,7 @@
 (defn bootstrap
   "This service obtains information about and initializes the workspace for the authenticated user.
    It also records the fact that the user logged in."
-  [user-agent]
-  (assertions/assert-valid user-agent "Missing or empty request parameter: user-agent")
+  []
   (let [{user :shortUsername :keys [email firstName lastName username]} current-user
         login-session (future (get-login-session username))
         apps-info     (future (get-apps-info))
