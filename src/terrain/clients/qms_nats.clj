@@ -100,7 +100,3 @@
   (as-> {:uuid (str uuid)} r
     (nats/request-json (cfg/get-subscription-addon-subject) (model/by-uuid-request-from-map r))
     (return-keys r [:subscription_addon])))
-
-(let [printer (JsonFormat/printer)
-      npr     (model/new-no-params-request)]
-  (.print printer npr))
