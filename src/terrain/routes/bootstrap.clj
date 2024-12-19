@@ -27,6 +27,7 @@
       :tags ["bootstrap"]
       
       (GET "/" []
+           :query [params schema/LoginsParams]
            :return schema/LoginsResponse
            :summary "Logins Listing"
            :description "This endpoint lists information about recent logins by the authenticated user, for display purposes."

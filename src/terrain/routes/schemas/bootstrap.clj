@@ -50,6 +50,9 @@
    :data_info   DataInfoResponse
    :preferences UserPreferencesResponse})
 
+(defschema LoginsParams
+  {:limit (describe Integer "The number of results to return")})
+
 (defschema Login
   ;; NOTE: other schemas are inconsistent about hyphens vs. underscores
   ;; This schema uses underscores for both of these fields, which means that the
