@@ -211,8 +211,7 @@
    :consumable          (describe Boolean "True if using the resource consumes it permanently")})
 
 (defschema ResourceTypeForAddonUpdate
-  {:uuid       (describe UUID "The UUID of the new resource type associated with the add-on")
-   :consumable (describe Boolean "True if using the resource consumes it permanently")})
+  {:uuid (describe UUID "The UUID of the new resource type associated with the add-on")})
 
 (defschema ResourceTypeForAddonDeletion
   {(optional-key :uuid)       (describe (maybe String) "The UUID of the resource type associated with the add-on being deleted. Probably blank")
