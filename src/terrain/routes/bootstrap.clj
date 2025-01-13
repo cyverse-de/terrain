@@ -21,4 +21,14 @@
            :summary "Bootstrap Service"
            :description "This service obtains information about and initializes the workspace for the authenticated user.
            It also records the fact that the user logged in."
-           (ok (bootstrap))))))
+           (ok (bootstrap))))
+    
+    (context "/logins" []
+      :tags ["bootstrap"]
+      
+      (GET "/" []
+           :query [params schema/LoginsParams]
+           :return schema/LoginsResponse
+           :summary "Logins Listing"
+           :description "This endpoint lists information about recent logins by the authenticated user, for display purposes."
+           (ok (apps-client/list-logins (:limit params)))))))

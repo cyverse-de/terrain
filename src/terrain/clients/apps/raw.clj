@@ -1285,6 +1285,14 @@
                    {:query-params (secured-params params)
                     :as           :json})))))
 
+(defn list-logins
+  [limit]
+  (:body
+    (client/post (apps-url "users" "logins")
+                 (disable-redirects
+                   {:query-params (secured-params (remove-nil-values {:limit limit}))
+                    :as           :json}))))
+
 (defn list-integration-data
   [params]
   (client/get (apps-url "admin" "integration-data")

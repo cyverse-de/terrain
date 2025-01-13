@@ -49,3 +49,20 @@
    :apps_info   AppsBootstrapResponse
    :data_info   DataInfoResponse
    :preferences UserPreferencesResponse})
+
+(defschema LoginsParams
+  {:limit (describe Integer "The number of results to return")})
+
+(defschema Login
+  ;; NOTE: other schemas are inconsistent about hyphens vs. underscores
+  ;; This schema uses underscores for both of these fields, which means that the
+  ;; IP address is under a slightly different key in this case. I believe this is
+  ;; the only endpoint _response_ that includes an IP address, however.
+  {:login_time
+   (describe Long "Login time as milliseconds since the epoch")
+
+   (optional-key :ip_address)
+   (describe String "The IP address associated with the login, if available")})
+
+(defschema LoginsResponse
+  {:logins [Login]})
