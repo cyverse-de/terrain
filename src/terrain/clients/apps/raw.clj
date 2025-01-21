@@ -1288,7 +1288,7 @@
 (defn list-logins
   [limit]
   (:body
-    (client/post (apps-url "users" "logins")
+    (client/get (apps-url "users" "logins")
                  (disable-redirects
                    {:query-params (secured-params (remove-nil-values {:limit limit}))
                     :as           :json}))))
