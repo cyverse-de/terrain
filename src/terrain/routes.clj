@@ -118,6 +118,7 @@
    (app-pipeline-routes)
    (apps-routes)
    (app-version-routes)
+   (qms-api-routes)
    (misc-metadata-routes)))
 
 ; Add new secured routes to this function, not to (secured-routes).
@@ -143,7 +144,6 @@
    (vice-routes)
    (resource-usage-api-routes)
    (data-usage-api-routes)
-   (qms-api-routes)
    (route/not-found (service/unrecognized-path-response))))
 
 ; The old way of adding secured routes. Prepends /secured to the URL

@@ -22,14 +22,12 @@
 
      (context "/plans" []
        (GET "/" []
-         :middleware [require-authentication]
          :summary schema/GetAllPlansSummary
          :description schema/GetAllPlansDescription
          :return schema/PlanListResponse
          (ok (qms/list-all-plans)))
 
        (GET "/:plan-id" []
-         :middleware [require-authentication]
          :summary schema/GetPlanSummary
          :description schema/GetPlanDescription
          :path-params [plan-id :- schema/PlanID]
@@ -38,7 +36,6 @@
 
      (context "/resource-types" []
        (GET "/" []
-         :middleware [require-authentication]
          :summary schema/GetResourceTypesSummary
          :description schema/GetResourceTypesDescription
          :return schema/ResourceTypesResponse
