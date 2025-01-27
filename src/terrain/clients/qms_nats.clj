@@ -34,7 +34,8 @@
          (assocer [:description]         :update_description    true)
          (assocer [:resource_type :uuid] :update_resource_type  true)
          (assocer [:default_amount]      :update_default_amount true)
-         (assocer [:default_paid]        :update_default_paid   true)))))
+         (assocer [:default_paid]        :update_default_paid   true)
+         (assocer [:addon_rates]         :update_addon_rates    true)))))
 
 (defn- update-sub-addon-request
   [m]
