@@ -1,14 +1,14 @@
-apiVersion: skaffold/v4beta11
+apiVersion: skaffold/v1
 kind: Config
 metadata:
   name: terrain
-build:
-  artifacts:
-    - image: harbor.cyverse.org/de/terrain
-      platforms:
-        - "linux/amd64"
-      docker:
-        dockerfile: Dockerfile
-manifests:
-  rawYaml:
+deploy:
+  kubectl:
+    manifests:
     - k8s/terrain.yml
+build:
+  tagPolicy:
+    gitCommit: {}
+  artifacts:
+  - image: harbor.cyverse.org/de/terrain
+  local: {}
