@@ -13,7 +13,7 @@
 
 (defn download
   [{user :shortUsername} {:keys [path]}]
-  (actions/download user path))
+  (actions/download (or user "anonymous") path))
 
 (defn store-fn
   "Returns a function that can be used to forward a file upload request to the data-info service. The function
