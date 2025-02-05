@@ -105,6 +105,7 @@
    (quicklaunch-routes)
    (instant-launch-routes)
    (secured-data-routes)
+   (secured-fileio-routes)
    (secured-filesystem-routes)
    (secured-filesystem-metadata-routes)
    (secured-search-routes)
