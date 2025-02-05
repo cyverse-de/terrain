@@ -2,7 +2,7 @@
   (:require [common-swagger-api.schema :refer [context GET POST]]
             [common-swagger-api.schema.stats :as stats-schema]
             [ring.util.http-response :refer [ok]]
-            [terrain.auth.user-attributes :refer [current-user]]
+            [terrain.auth.user-attributes :refer [require-authentication current-user]]
             [terrain.routes.schemas.fileio :as fileio-schema]
             [terrain.services.fileio.controllers :as fio]
             [terrain.util :as util]
@@ -34,7 +34,7 @@
        :description "Uploads a file to the CyVerse Data Store."
        :query [params fileio-schema/FileUploadQueryParams]
        :multipart-params [file :- fileio-schema/DataStoreUpload]
-       :middleware [fio/wrap-file-upload mw/check-user-data-overages]
+       :middleware [require-authentication fio/wrap-file-upload mw/check-user-data-overages]
        :return stats-schema/FileStat
 
        ;; The upload is handled in the middleware. All that remains to be done is to return the response body.
@@ -44,7 +44,7 @@
        :summary "Upload a File from a URL"
        :description (str "Schedules a task to have the DE retrieve the contents of a new file in the data store from "
                          "an FTP, HTTP, or HTTPS URL.")
-       :middleware [mw/check-user-data-overages]
+       :middleware [require-authentication mw/check-user-data-overages]
        :body [body fileio-schema/UrlUploadRequestBody]
        :return fileio-schema/UrlUploadResponseBody
        (ok (fio/urlupload current-user body)))
@@ -53,7 +53,7 @@
        :summary "Save a File"
        :description (str "Overwrites the contents of a file in the Data Store. The file must exist already for this "
                          "endpoint to work. To save a new file, use the POST /terrain/secured/fileio/saveas endpoint.")
-       :middleware [mw/check-user-data-overages]
+       :middleware [require-authentication mw/check-user-data-overages]
        :body [body fileio-schema/FileSaveRequestBody]
        :return stats-schema/FileStat
        (ok (fio/save current-user body)))
@@ -62,7 +62,7 @@
        :summary "Save a New File"
        :description (str "Creates a new file in the data store. The file must not exist for this endpoint to work. "
                          "To overwrite an existing file, use the POST /terrain/secured/fileio/save endpoint.")
-       :middleware [mw/check-user-data-overages]
+       :middleware [require-authentication mw/check-user-data-overages]
        :body [body fileio-schema/FileSaveRequestBody]
        :return stats-schema/FileStat
        (ok (fio/saveas current-user body))))))

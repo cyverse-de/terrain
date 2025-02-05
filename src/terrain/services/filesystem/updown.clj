@@ -26,7 +26,7 @@
 
 (defn do-special-download
   [{user :user path :path :as params}]
-  (download-file-as-stream user path (attachment? params)))
+  (download-file-as-stream (or user "anonymous") path (attachment? params)))
 
 (with-pre-hook! #'do-special-download
   (fn [params]

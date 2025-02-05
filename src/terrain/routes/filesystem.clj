@@ -45,7 +45,6 @@
      :tags ["filesystem"]
 
      (GET "/display-download" [:as req]
-       :middleware [require-authentication]
        (controller req ud/do-special-download :params))
 
      (GET "/paged-directory" []
