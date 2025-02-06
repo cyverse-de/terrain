@@ -168,11 +168,12 @@
    (optional-key :status) (describe (maybe String) "The status of the request")})
 
 (defschema SubscriptionRequest
-  {(optional-key :username)  (describe String "The username to associate with the subscription")
-   (optional-key :plan_name) (describe String "The name of the plan to associate with the subscription")
-   :paid                     (describe Boolean "True if the user paid for the subscription")
-   (optional-key :periods)   (describe Integer "The number of subscription periods")
-   (optional-key :end_date)  (describe String "The end date of the subscription.")})
+  {(optional-key :username)   (describe String "The username to associate with the subscription")
+   (optional-key :plan_name)  (describe String "The name of the plan to associate with the subscription")
+   :paid                      (describe Boolean "True if the user paid for the subscription")
+   (optional-key :periods)    (describe Integer "The number of subscription periods")
+   (optional-key :start_date) (describe String "The start date of the subscription")
+   (optional-key :end_date)   (describe String "The end date of the subscription")})
 
 (defschema SubscriptionRequests
   {(optional-key :subscriptions) (describe (maybe [SubscriptionRequest]) "The list of subscription requests")})
@@ -183,9 +184,10 @@
 
 ;; The :periods parameter uses s/Int so that we can get automatic coercion.
 (defschema AddSubscriptionParams
-  {:paid                    (describe Boolean "True if the user paid for the subscription")
-   (optional-key :periods)  (describe s/Int "The number of subscription periods")
-   (optional-key :end-date) (describe String "The end date of the subscription")})
+  {:paid                      (describe Boolean "True if the user paid for the subscription")
+   (optional-key :periods)    (describe s/Int "The number of subscription periods")
+   (optional-key :start-date) (describe String "The start date of the subscription")
+   (optional-key :end-date)   (describe String "The end date of the subscription")})
 
 (defschema ServiceAccountAddSubscriptionParams
   (->optional-param AddSubscriptionParams :paid))
