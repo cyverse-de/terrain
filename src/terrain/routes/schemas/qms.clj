@@ -172,7 +172,7 @@
    (optional-key :plan_name)  (describe String "The name of the plan to associate with the subscription")
    :paid                      (describe Boolean "True if the user paid for the subscription")
    (optional-key :periods)    (describe Integer "The number of subscription periods")
-   (optional-key :start_date) (describe String "The start date of the subscfiption")
+   (optional-key :start_date) (describe String "The start date of the subscription")
    (optional-key :end_date)   (describe String "The end date of the subscription")})
 
 (defschema SubscriptionRequests
