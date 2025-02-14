@@ -23,6 +23,8 @@
 (def CreateSubscriptionsDescription "Creates multiple subscriptions in one request")
 (def ListSubscriptionsSummary "List Subscriptions")
 (def ListSubscriptionsDescription "Lists existing subscriptions")
+(def ListUserSubscriptionsSummary "List Subscriptions For User")
+(def ListUserSubscriptionsDescription "Lists subscriptions for a user, including future subscriptions.")
 (def AddAddonSummary "Adds an available addon")
 (def AddAddonDescription "Adds an available addon that can be applied to a user's subscription")
 (def ListAddonsSummary "Lists available add-ons")
@@ -196,6 +198,10 @@
   (merge PagingParams
          {(optional-key :search)
           (describe String "The username substring to search for in the listing")}))
+
+(defschema ListUserSubscriptionsParams
+  {(optional-key :include-expired) (describe Boolean "True if expired subscriptions shoudld be included in the listing.")
+   (optional-key :cutoff)          (describe String "The date and time to treat as the cutoff for expired subscriptions.")})
 
 (defschema SubscriptionListing
   {:subscriptions (describe [Subscription] "The subscription listing")
