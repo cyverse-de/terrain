@@ -63,6 +63,13 @@
         (http/get {:as :json})
         (:body))))
 
+(defn list-user-subscriptions
+  [username params]
+  (with-trap [default-error-handler]
+    (-> (qms-api ["v1" "users" username "subscriptions"] params)
+        (http/get {:as :json})
+        (:body))))
+
 (defn update-subscription-quota
   [username resource-type body]
   (with-trap [default-error-handler]
