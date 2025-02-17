@@ -35,3 +35,4 @@ terrain.properties
 .clj-kondo/*
 !.clj-kondo/config.edn
 .lsp
+**/.clj-kondo/**
