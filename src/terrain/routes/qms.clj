@@ -52,6 +52,14 @@
          :return schema/SubscriptionPlanResponse
          (ok (qms/subscription (:shortUsername current-user))))
 
+       (GET "/subscriptions" []
+         :middleware [require-authentication]
+         :summary schema/ListUserSubscriptionsSummary
+         :description schema/ListUserSubscriptionsDescription
+         :query [params schema/ListUserSubscriptionsParams]
+         :return schema/SubscriptionListingResponse
+         (ok (qms/list-user-subscriptions (:shortUsername current-user) params)))
+
        (GET "/usages" []
          :middleware [require-authentication]
          :summary schema/GetUserUsagesSummary
@@ -203,7 +211,15 @@
              :query [params schema/AddSubscriptionParams]
              :path-params [plan-name :- schema/PlanName]
              :return schema/SuccessResponse
-             (ok (qms/update-subscription username plan-name params)))))))))
+             (ok (qms/update-subscription username plan-name params))))
+
+         (GET "/subscriptions" []
+           :middleware [require-authentication]
+           :summary schema/ListUserSubscriptionsSummary
+           :description schema/ListUserSubscriptionsDescription
+           :query [params schema/ListUserSubscriptionsParams]
+           :return schema/SubscriptionListingResponse
+           (ok (qms/list-user-subscriptions username params))))))))
 
 (defn service-account-qms-api-routes
   []
@@ -232,7 +248,15 @@
              :query [params schema/ServiceAccountAddSubscriptionParams]
              :path-params [plan-name :- schema/PlanName]
              :return schema/SuccessResponse
-             (ok (qms/update-subscription username plan-name (merge {:paid true} params)))))))
+             (ok (qms/update-subscription username plan-name (merge {:paid true} params)))))
+
+         (GET "/subscriptions" []
+           :middleware [[require-service-account ["cyverse-subscription-updater"]]]
+           :summary schema/ListUserSubscriptionsSummary
+           :description schema/ListUserSubscriptionsDescription
+           :query [params schema/ListUserSubscriptionsParams]
+           :return schema/SubscriptionListingResponse
+           (ok (qms/list-user-subscriptions username params)))))
 
      (context "/addons" []
        (GET "/" []
