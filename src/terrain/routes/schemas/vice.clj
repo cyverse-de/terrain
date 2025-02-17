@@ -67,15 +67,16 @@
    (optional-key :terminated) (describe (maybe ContainerStateTerminated) "The terminated container state")})
 
 (defschema ContainerStatus
-  {:name                       (describe String "The name of the container")
-   :ready                      (describe Boolean "Whether or not the container is ready")
-   :restartCount               (describe Long "The number of times the container has restarted")
-   :state                      (describe ContainerState "The current state of the container")
-   :lastState                  (describe ContainerState "The previous state of the container")
-   :image                      (describe String "The image name used for the container")
-   :imageID                    (describe String "The image ID assocaited with the container")
-   (optional-key :containerID) (describe String "The ID associated with the container")
-   (optional-key :started)     (describe Boolean "Whether or not the container has started")})
+  {:name                        (describe String "The name of the container")
+   :ready                       (describe Boolean "Whether or not the container is ready")
+   :restartCount                (describe Long "The number of times the container has restarted")
+   :state                       (describe ContainerState "The current state of the container")
+   :lastState                   (describe ContainerState "The previous state of the container")
+   :image                       (describe String "The image name used for the container")
+   :imageID                     (describe String "The image ID assocaited with the container")
+   (optional-key :containerID)  (describe String "The ID associated with the container")
+   (optional-key :started)      (describe Boolean "Whether or not the container has started")
+   (optional-key :volumeMounts) (describe (maybe [Any]) "The volume mounts associated with the container")})
 
 (defschema Pod
   (merge
