@@ -16,6 +16,8 @@
   (str (apply curl/url (config/metadata-base-url) (map curl/url-encode components))))
 
 (def target-type-app "app")
+(def target-type-folder "folder")
+(def target-type-file "file")
 
 (defn resolve-data-type
   "Returns a type converted from the type field of a stat result to a type expected by the
@@ -69,12 +71,16 @@
 (def put-options post-options)
 
 (defn find-avus
-  [target-type attr value]
-  (metadata-client/find-avus (config/metadata-client)
-                             (:user (user-params))
-                             {:target-type target-type
-                              :attribute   attr
-                              :value       value}))
+  ([target-type attr value]
+   (find-avus target-type nil attr value nil))
+  ([target-type target-id attr value unit]
+   (metadata-client/find-avus (config/metadata-client)
+                              (:user (user-params))
+                              {:target-type target-type
+                               :target-id   target-id
+                               :attribute   attr
+                               :value       value
+                               :unit        unit})))
 
 (defn update-avus
   "Adds or updates Metadata AVUs on the given target item."
