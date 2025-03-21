@@ -2,29 +2,41 @@
   (:require [clj-http.client :as http]
             [cemerick.url :refer [url]]
             [cheshire.core :as json]
-            [clojure-commons.error-codes :as ce]
-            [slingshot.slingshot :refer [throw+]]
+            [clojure-commons.core :refer [remove-nil-values]]
             [terrain.util.config :as config]))
 
 (defn- user-info-url
   [& components]
   (str (apply url (config/user-info-base-url) components)))
 
-;; XXX error handling
 (defn list-all-alerts
   []
-  (let [resp (http/get (user-info-url "alerts" "all"))]
-    (json/parse-string (:body resp) true)))
+  (-> (user-info-url "alerts" "all")
+      (http/get {:as :json})
+      :body))
 
 (defn list-active-alerts
   []
-  (let [resp (http/get (user-info-url "alerts" "active"))]
-    (json/parse-string (:body resp) true)))
+  (-> (user-info-url "alerts" "active")
+      (http/get {:as :json})
+      :body))
 
 (defn add-alert
-  [some-args] ; start/end/alert text I guess, start being optional
-  nil)
+  ([end-date alert-text]
+   (add-alert nil end-date alert-text))
+  ([start-date end-date alert-text]
+   (-> (user-info-url "alerts")
+       (http/post {:content-type :json
+                   :body         (remove-nil-values
+                                   {:start_date start-date
+                                    :end_date   end-date
+                                    :alert      alert-text})})
+       :body)))
 
 (defn delete-alert
-  [some-args] ; only uses end date & alert
-  nil)
+  [end-date alert-text]
+  (-> (user-info-url "alerts")
+      (http/delete {:content-type :json
+                    :body         {:end_date   end-date
+                                   :alert      alert-text}})
+      :body))
