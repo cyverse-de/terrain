@@ -42,7 +42,7 @@
                  [org.cyverse/kameleon "3.0.10"
                   :exclusion [com.impossibl.pgjdbc-ng/pgjdbc-ng]]
                  [com.impossibl.pgjdbc-ng/pgjdbc-ng "0.8.9"]
-                 [org.cyverse/metadata-client "3.1.3-SNAPSHOT"]
+                 [org.cyverse/metadata-client "3.2.0"]
                  [org.cyverse/metadata-files "2.1.1"]
                  [org.cyverse/permissions-client "2.8.4"]
                  [org.cyverse/service-logging "2.8.4"]

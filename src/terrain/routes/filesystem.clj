@@ -128,7 +128,7 @@
           (config/metadata-routes-enabled))]
 
    (GET "/filesystem/metadata" [:as {:keys [user-info params] :as req}]
-        :query [{:keys [attribute value unit target-id]} metadata-schema/AvuSearchQueryParams]
+        :query [{:keys [attribute value unit target-id]} metadata-schema/AvuSearchParams]
         :return metadata-schema/AvuList
         :summary "List Metadata AVUs."
         :description "Lists Metadata AVUs matching parameters in the query string."
@@ -141,6 +141,17 @@
     (POST "/filesystem/metadata/csv-parser" [:as {:keys [user-info params] :as req}]
       :middleware [require-authentication]
       (meta/parse-metadata-csv-file user-info params))
+
+   (POST "/filesystem/metadata/search" []
+         :body [{:keys [attribute value unit target-id]} metadata-schema/AvuSearchParams]
+         :return metadata-schema/AvuList
+         :summary "List AVUs."
+         :description "Lists AVUs matching parameters in the request body."
+         (ok (meta-raw/search-avus [meta-raw/target-type-folder meta-raw/target-type-file]
+                                   target-id
+                                   attribute
+                                   value
+                                   unit)))
 
     (GET "/filesystem/metadata/templates" [:as req]
       (controller req mt/do-metadata-template-list))

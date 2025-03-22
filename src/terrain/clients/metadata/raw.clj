@@ -82,6 +82,16 @@
                                :value       value
                                :unit        unit})))
 
+(defn search-avus
+  [target-type target-id attr value unit]
+  (metadata-client/search-avus (config/metadata-client)
+                               (:user (user-params))
+                               {:target-type target-type
+                                :target-id   target-id
+                                :attribute   attr
+                                :value       value
+                                :unit        unit}))
+
 (defn update-avus
   "Adds or updates Metadata AVUs on the given target item."
   [target-type target-id avus-req]
