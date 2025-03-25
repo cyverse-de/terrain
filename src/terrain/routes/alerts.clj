@@ -1,5 +1,6 @@
 (ns terrain.routes.alerts
   (:require [terrain.clients.user-info :as user-info]
+            [terrain.routes.schemas.alerts :as alerts-schema]
             [common-swagger-api.schema :refer [routes context GET POST DELETE]]
             [ring.util.http-response :refer [ok]]))
 
@@ -22,10 +23,10 @@
       :tags ["notifications"]
 
       (POST "/" []
-            ;; body params for start/end/alert text
-        (ok))
+        :body [body alerts-schema/Alert]
+        (ok (user-info/add-alert (:start-date body) (:end-date body) (:alert-text body))))
 
       (DELETE "/" []
-              ;; body params for end/alert text to delete
-        (ok)))))
+        :body [body alerts-schema/Alert]
+        (ok (user-info/add-alert (:end-date body) (:alert-text body)))))))
 
