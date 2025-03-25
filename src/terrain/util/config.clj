@@ -636,6 +636,12 @@
   [props config-valid configs]
   "terrain.saved-searches.host" "http://user-info/searches")
 
+(declare user-info-base-url)
+(cc/defprop-optstr user-info-base-url
+  "The base URL of the user-info service"
+  [props config-valid configs]
+  "terrain.user-info.host" "http://user-info")
+
 (declare bags-base-url)
 (cc/defprop-optstr bags-base-url
   "The base URL for accessing bag information"
