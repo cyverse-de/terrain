@@ -1,6 +1,7 @@
 (ns terrain.routes.filesystem
   (:require [clojure.string :as string]
             [common-swagger-api.schema :refer [context GET POST DELETE]]
+            [common-swagger-api.schema.metadata :as metadata-schema]
             [compojure.api.middleware :as mw]
             [medley.core :refer [update-existing-in]]
             [ring.util.http-response :refer [ok]]
@@ -33,7 +34,7 @@
       :else                v)))
 
 ;; Declarations to eliminate lint warnings for path and query parameter bindings.
-(declare req params user-info template-id attr-id data-id)
+(declare req params user-info template-id attr-id data-id attribute value unit target-id)
 
 (defn secured-filesystem-routes
   "The routes for file IO endpoints."
@@ -126,9 +127,31 @@
    [#(and (config/filesystem-routes-enabled)
           (config/metadata-routes-enabled))]
 
+   (GET "/filesystem/metadata" [:as {:keys [user-info params] :as req}]
+        :query [{:keys [attribute value unit target-id]} metadata-schema/AvuSearchParams]
+        :return metadata-schema/AvuList
+        :summary "List Metadata AVUs."
+        :description "Lists Metadata AVUs matching parameters in the query string."
+        (ok (meta-raw/find-avus [meta-raw/target-type-folder meta-raw/target-type-file]
+                                target-id
+                                attribute
+                                value
+                                unit)))
+
     (POST "/filesystem/metadata/csv-parser" [:as {:keys [user-info params] :as req}]
       :middleware [require-authentication]
       (meta/parse-metadata-csv-file user-info params))
+
+   (POST "/filesystem/metadata/search" []
+         :body [{:keys [attribute value unit target-id]} metadata-schema/AvuSearchParams]
+         :return metadata-schema/AvuList
+         :summary "List AVUs."
+         :description "Lists AVUs matching parameters in the request body."
+         (ok (meta-raw/search-avus [meta-raw/target-type-folder meta-raw/target-type-file]
+                                   target-id
+                                   attribute
+                                   value
+                                   unit)))
 
     (GET "/filesystem/metadata/templates" [:as req]
       (controller req mt/do-metadata-template-list))
