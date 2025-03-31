@@ -28,5 +28,5 @@
 
       (DELETE "/" []
         :body [body alerts-schema/Alert]
-        (ok (user-info/add-alert (:end-date body) (:alert-text body)))))))
+        (ok (user-info/delete-alert (:end-date body) (:alert-text body)))))))
 

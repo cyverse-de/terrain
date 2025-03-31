@@ -27,16 +27,16 @@
   ([start-date end-date alert-text]
    (-> (user-info-url "alerts")
        (http/post {:content-type :json
-                   :body         (remove-nil-values
+                   :body         (json/encode (remove-nil-values
                                    {:start_date start-date
                                     :end_date   end-date
-                                    :alert      alert-text})})
+                                    :alert      alert-text}))})
        :body)))
 
 (defn delete-alert
   [end-date alert-text]
   (-> (user-info-url "alerts")
       (http/delete {:content-type :json
-                    :body         {:end_date   end-date
-                                   :alert      alert-text}})
+                    :body         (json/encode {:end_date   end-date
+                                                :alert      alert-text})})
       :body))
