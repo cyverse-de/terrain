@@ -13,6 +13,7 @@
             [terrain.auth.user-attributes :as user-attributes]
             [terrain.middleware :refer [wrap-context-path-adder wrap-create-workspace wrap-query-param-remover]]
             [terrain.routes.admin :refer [secured-admin-routes]]
+            [terrain.routes.alerts :refer [alerts-routes admin-alerts-routes]]
             [terrain.routes.analyses :refer [analysis-routes quicklaunch-routes]]
             [terrain.routes.apps.admin.apps :refer [admin-apps-routes]]
             [terrain.routes.apps.admin.reference-genomes :refer [admin-reference-genomes-routes]]
@@ -109,6 +110,7 @@
    (secured-filesystem-routes)
    (secured-filesystem-metadata-routes)
    (secured-search-routes)
+   (alerts-routes)
    (app-category-routes)
    (app-avu-routes)
    (app-comment-routes)
@@ -179,6 +181,7 @@
    (secured-admin-routes)
    (admin-data-comment-routes)
    (admin-category-routes)
+   (admin-alerts-routes)
    (admin-apps-routes)
    (admin-app-avu-routes)
    (admin-app-comment-routes)
@@ -333,6 +336,7 @@
                                      {:name "fileio", :description "File Input/Output Endpoints"}
                                      {:name "filesystem", :description "Filesystem Endpoints"}
                                      {:name "instant-launches", :description "Instant Launch Endpoints"}
+                                     {:name "notifications", :description "Notifications and related Endpoints"}
                                      {:name "permanent-id-requests", :description "Permanent ID Request Endpoints"}
                                      {:name "qms", :description "Quota Management Service Endpoints"}
                                      {:name "reference-genomes", :description "Reference Genome Endpoints"}
