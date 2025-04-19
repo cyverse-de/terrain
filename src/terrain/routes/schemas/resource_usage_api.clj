@@ -115,6 +115,26 @@
    :resource_type    (describe ResourceType "The resource type of the usage")
    :last_modified_at (describe (maybe String) "The time that the usage record was last modified")})
 
+(defschema AddonRate
+  {:id             (describe UUID "The UUID for the add-on rate")
+   :rate           (describe Double "The rate charged for the add-on")
+   :effective_date (describe String "The date and time that the addon rate becomes effective")})
+
+(defschema AddOn
+  {:id             (describe UUID "The UUID for the add-on")
+   :name           (describe String "The name of the add-on")
+   :description    (describe String "The description of the add-on")
+   :default_amount (describe Double "The amount of the resource provided by the add-on")
+   :default_paid   (describe Boolean "Whether the add-on needs to be paid for")
+   :resource_type  (describe ResourceType "The resource type the add-on provides more of")})
+
+(defschema SubscriptionAddon
+  {:id         (describe UUID "The UUID for the subscribed add-on")
+   :addon      (describe AddOn "The add-on applied to the subscription")
+   :amount     (describe Double "The amount of the resource type provided by the add-on that was actually applied to the subscription")
+   :paid       (describe Boolean "Whether the add-on needs/needed to be paid for")
+   :addon_rate (describe AddonRate "The active rate for the addon when it was added to the subscription")})
+
 (defschema Subscription
   {:id                   (describe String "The user plan's UUID")
    :effective_start_date (describe String "The date the user's plan takes effect")
@@ -122,6 +142,7 @@
    :plan                 (describe Plan "The type of plan the user has")
    :quotas               (describe [Quota] "The list of quotas that the user has with their plan")
    :usages               (describe [Usage] "The list of usages associated with the subscription")
+   :addons               (describe [SubscriptionAddon] "The user's subscription add-ons")
    :users                (describe QMSUser "User information from the quota management system")})
 
 (defschema ResourceSummary

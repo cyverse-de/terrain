@@ -271,7 +271,7 @@
 (defschema SubscriptionAddon
   {(optional-key :uuid) (describe UUID "The UUID for the subscribed add-on")
    :addon               (describe AddOn "The add-on applied to the subscription")
-   :subscription        (describe Subscription "The subscription the add-on was applied to")
+   :subscription_id     (describe UUID "The UUID for the subscription the add-on was applied to")
    :amount              (describe Double "The amount of the resource type provided by the add-on that was actually applied to the subscription")
    :paid                (describe Boolean "Whether the add-on needs/needed to be paid for")
    :addon_rate          (describe AddonRate "The active rate for the addon when it was added to the subscription")})
