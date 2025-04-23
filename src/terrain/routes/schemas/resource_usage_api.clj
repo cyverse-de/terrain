@@ -1,79 +1,11 @@
 (ns terrain.routes.schemas.resource-usage-api
   (:require [common-swagger-api.schema :refer [describe]]
-            [schema.core :refer [defschema optional-key maybe]]
+            [schema.core :refer [defschema maybe]]
             [terrain.routes.schemas.data-usage-api :refer [UserCurrentDataTotal]])
   (:import [java.util UUID]))
 
-(def CurrentTotalSummary "Get the current CPU hours total for the user")
-(def CurrentTotalDescription "Uses the current date to select a CPU hours total record for the logged-in user")
-(def AllTotalsSummary "Get all of the CPU hours totals for the user")
-(def AllTotalsDescription "Returns all of the CPU hours total records from the database regardless of the date range")
-(def AddHoursSummary "Asynchronously adds hours to the current CPU hours total")
-(def AddHoursDescription "Asynchronously adds the hours passed to the current total CPU hours for the user")
-(def SubtractHoursSummary "Asynchronously subtracts hours from the current CPU hours total")
-(def SubtractHoursDescription "Asynchronously subtracts the hours passed in from the current total CPU hours for the user")
-(def ResetHoursSummary "Asynchronously resets the current CPU hours total")
-(def ResetHoursDescription "Asynchronously resets the logged-in user's current CPU hours total to the value passed in")
-(def ListWorkersSummary "List registered workers")
-(def ListWorkersDescription "Lists all registered workers, which are services in the DE backend")
-(def GetWorkerSummary "Get worker info")
-(def GetWorkerDescription "Gets information about a single worker by their UUID")
-(def UpdateWorkerSummary "Update worker")
-(def UpdateWorkerDescription "Updates a worker's state. Be very careful doing this. Only use this if things are broken")
-(def DeleteWorkerSummary "Delete worker")
-(def DeleteWorkerDescription "Deletes a worker from the system. Be very careful doing this. Only use this if things are broken")
-(def AllUsersCurrentCPUTotalSummary "Lists the current CPU hours totals for all users")
-(def AllUsersCurrentCPUTotalDescription "Lists the current CPU hours totals for all users in the system")
-(def AllUsersAllCPUTotalsSummary "List all CPU hours totals for all users")
-(def AllUsersAllCPUTotalsDescription "Lists all of the CPU hours totals for every single user in the system")
-(def ListEventsSummary "List all events")
-(def ListEventsDescription "List all events in the system for all users")
-(def ListUserEventsSummary "List events for a user")
-(def ListUserEventsDescription "List all fo the events in the system for a single user")
-(def GetEventSummary "Get info about a single event")
-(def GetEventDescription "Returns information about a single event in the system")
-(def UpdateEventSummary "Update an event")
-(def UpdateEventDescription "Updates a single event in the system")
-(def DeleteEventSummary "Deletes an event")
-(def DeleteEventDescription "Deletes a single event in the system")
 (def ResourceSummarySummary "A summary of a user's resource usage")
 (def ResourceSummaryDescription "A summary of a user's resource usage, including CPU hours, data usage, jobs run, and current plan")
-
-(def WorkerID (describe UUID "The UUID assigned to a worker"))
-(def EventID (describe UUID "The UUID assigned to an event"))
-(def CPUHoursTotalID (describe UUID "The assigned to the record containing the CPU hours total"))
-(def HoursNumber (describe Long "The number of CPU hours"))
-(def Username (describe String "A username in the system"))
-
-(defschema Worker
-  {:id                      WorkerID
-   :name                    (describe String "The name of the worker")
-   :added_on                (describe String "When the worker was added to the system. Automatically set by the system")
-   :active                  (describe Boolean "Whether the worker is available for processing items. Set by the worker")
-   :activation_expires_on   (describe (maybe String) "When the worker's activation expires")
-   :deactivated_on          (describe (maybe String) "When the worker was deactivated. Automatically set by the system")
-   :activated_on            (describe (maybe String) "When the worker was activated. Automatically set by the system")
-   :getting_work            (describe Boolean "Whether the worker is claiming an event. Set by the worker")
-   :getting_work_expires_on (describe (maybe String) "When the worker must stop trying to claim an event. Automatically set by the system")
-   :getting_work_on         (describe (maybe String) "When the worker started claiming an event. Automatically set by the system")
-   :working                 (describe Boolean "Whether the worker is processing a event. Set by the worker")
-   :working_on              (describe (maybe String) "When the worker began processing the event")
-   :last_modified           (describe String "When the worker's record in the database was last modified")})
-
-(defschema UpdateWorker
-  (into {}
-        (for [keyval (select-keys
-                      Worker
-                      [:name
-                       :active
-                       :activation_expires_on
-                       :deactivated_on
-                       :getting_work
-                       :getting_work_on
-                       :getting_work_expires_on
-                       :working
-                       :working_on])]
-          [(optional-key (key keyval)) (val keyval)])))
 
 (defschema CPUHoursTotal
   {:id              (describe String "The UUID assigned to the total")
@@ -89,78 +21,64 @@
    :message    (describe String "The error message")
    :error_code (describe Integer "The HTTP status code that was generated by the error")})
 
-(defschema Plan
+(defschema PlanSummary
   {:id          (describe String "The UUID of the plan")
    :name        (describe String "The name of the plan")
    :description (describe String "The description of the plan")})
 
-(defschema QMSUser
+(defschema QMSUserSummary
   {:id       (describe String "The UUID QMS assigned the user")
    :username (describe String "The user's username in QMS, probably the same as in the DE")})
 
-(defschema ResourceType
+(defschema ResourceTypeSummary
   {:id                 (describe String "The UUID for the resource type")
    :name               (describe String "The name of the resource type")
    :description        (describe String "The description of the resource type")})
 
-(defschema Quota
+(defschema QuotaSummary
   {:id               (describe String "The UUID assigned to the quota")
    :quota            (describe (maybe Double) "The quota's value")
-   :resource_type    (describe ResourceType "The resource type of the quota")
+   :resource_type    (describe ResourceTypeSummary "The resource type of the quota")
    :last_modified_at (describe (maybe String) "The time that the quota was last modified")})
 
-(defschema Usage
+(defschema UsageSummary
   {:id               (describe String "The UUID assigned to the usage")
    :usage            (describe (maybe Double) "The usage value")
-   :resource_type    (describe ResourceType "The resource type of the usage")
+   :resource_type    (describe ResourceTypeSummary "The resource type of the usage")
    :last_modified_at (describe (maybe String) "The time that the usage record was last modified")})
 
-(defschema Subscription
+(defschema AddonRateSummary
+  {:id             (describe UUID "The UUID for the add-on rate")
+   :rate           (describe Double "The rate charged for the add-on")
+   :effective_date (describe String "The date and time that the addon rate becomes effective")})
+
+(defschema AddOnSummary
+  {:id             (describe UUID "The UUID for the add-on")
+   :name           (describe String "The name of the add-on")
+   :description    (describe String "The description of the add-on")
+   :default_amount (describe Double "The amount of the resource provided by the add-on")
+   :default_paid   (describe Boolean "Whether the add-on needs to be paid for")
+   :resource_type  (describe ResourceTypeSummary "The resource type the add-on provides more of")})
+
+(defschema SubscriptionAddonSummary
+  {:id         (describe UUID "The UUID for the subscribed add-on")
+   :addon      (describe AddOnSummary "The add-on applied to the subscription")
+   :amount     (describe Double "The amount of the resource type provided by the add-on that was actually applied to the subscription")
+   :paid       (describe Boolean "Whether the add-on needs/needed to be paid for")
+   :addon_rate (describe AddonRateSummary "The active rate for the addon when it was added to the subscription")})
+
+(defschema SubscriptionSummary
   {:id                   (describe String "The user plan's UUID")
    :effective_start_date (describe String "The date the user's plan takes effect")
    :effective_end_date   (describe String "The date the user's plan ends")
-   :plan                 (describe Plan "The type of plan the user has")
-   :quotas               (describe [Quota] "The list of quotas that the user has with their plan")
-   :usages               (describe [Usage] "The list of usages associated with the subscription")
-   :users                (describe QMSUser "User information from the quota management system")})
+   :plan                 (describe PlanSummary "The type of plan the user has")
+   :quotas               (describe [QuotaSummary] "The list of quotas that the user has with their plan")
+   :usages               (describe [UsageSummary] "The list of usages associated with the subscription")
+   :addons               (describe [SubscriptionAddonSummary] "The user's subscription add-ons")
+   :users                (describe QMSUserSummary "User information from the quota management system")})
 
 (defschema ResourceSummary
   {:cpu_usage     (describe CPUHoursTotal "The object containing the CPU hours total")
    :data_usage    (describe UserCurrentDataTotal "The object containing the data usage total")
-   :subscription  (describe Subscription "The user's subscription")
+   :subscription  (describe SubscriptionSummary "The user's subscription")
    :errors        (describe [APIError] "The list of errors generated during summary creation")})
-
-(defschema Event
-  {:id                      EventID
-   :record_date             (describe String "The date the event was added to the system")
-   :effective_date          (describe String "The date the event is effective")
-   :event_type              (describe String "The type of event")
-   :value                   (describe String "The value associated with the event. How it's used is determined by the event type")
-   :created_by              (describe UUID "The UUID of the user that created the event")
-   :claimed                 (describe Boolean "Whether the event has been claimed by a worker")
-   :claimed_by              (describe (maybe UUID) "The UUID of the worker that claimed the event")
-   :claim_expires_on        (describe (maybe String) "The date the worker's claim expires")
-   :claimed_on              (describe (maybe String) "The date the worker claimed the event")
-   :processed               (describe Boolean "Whether the event has been worked on by a worker")
-   :processing              (describe Boolean "Whether a worker is currently processing the event")
-   :processed_on            (describe (maybe String) "The date the worker finished processing the event")
-   :max_processing_attempts (describe Integer "The number of times any worker can try to process the event")
-   :attempts                (describe Integer "The number of times any worker has tried to process the event")
-   :last_modified           (describe String "The last time the record was modified in the system")})
-
-(defschema UpdateEvent
-  (into {}
-        (for [keyval (select-keys Event [:record_date
-                                         :effective_date
-                                         :event_type
-                                         :value
-                                         :created_by
-                                         :claimed
-                                         :claimed_by
-                                         :claim_expires_on
-                                         :claimed_on
-                                         :processed
-                                         :processing
-                                         :max_processing_attempts
-                                         :attempts])]
-          [(optional-key (key keyval)) (val keyval)])))
