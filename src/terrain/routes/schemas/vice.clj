@@ -1,6 +1,7 @@
 (ns terrain.routes.schemas.vice
   (:require [common-swagger-api.schema :refer [describe NonBlankString]]
-            [schema.core :refer [defschema Any maybe optional-key]])
+            [schema.core :refer [defschema Any maybe optional-key]]
+            [schema.core :as s])
   (:import [java.util UUID]))
 
 (def AnalysisID (describe UUID "The UUID assigned to the analysis"))
@@ -76,7 +77,8 @@
    :imageID                     (describe String "The image ID assocaited with the container")
    (optional-key :containerID)  (describe String "The ID associated with the container")
    (optional-key :started)      (describe Boolean "Whether or not the container has started")
-   (optional-key :volumeMounts) (describe (maybe [Any]) "The volume mounts associated with the container")})
+   (optional-key :volumeMounts) (describe (maybe [Any]) "The volume mounts associated with the container")
+   s/Keyword                    s/Any})
 
 (defschema Pod
   (merge
