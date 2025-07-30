@@ -18,18 +18,15 @@ spec:
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-              - key: de-app
-                operator: In
-                values:
-                - terrain
-            topologyKey: kubernetes.io/hostname
+            - labelSelector:
+                matchExpressions:
+                  - key: de-app
+                    operator: In
+                    values:
+                      - terrain
+              topologyKey: kubernetes.io/hostname
       restartPolicy: Always
       volumes:
-        - name: localtime
-          hostPath:
-            path: /etc/localtime
         - name: timezone
           configMap:
             name: timezone
@@ -61,86 +58,85 @@ spec:
           secret:
             secretName: nats-services-creds
       containers:
-      - name: terrain
-        image: harbor.cyverse.org/de/terrain
-        resources:
-          requests:
-            cpu: "320m"
-            memory: "1Gi"
-            ephemeral-storage: "1Gi"
-          limits:
-            cpu: "3000m"
-            memory: "3Gi"
-            ephemeral-storage: "1Gi"
-        args:
-          - --config
-          - /etc/iplant/de/terrain.properties
-        volumeMounts:
-          - name: signing-keys
-            mountPath: /etc/iplant/crypto/signing_key
-            readOnly: true
-          - name: accepted-keys
-            mountPath: /etc/iplant/crypto/accepted_keys
-            readOnly: true
-          - name: localtime
-            mountPath: /etc/localtime
-            readOnly: true
-          - name: timezone
-            mountPath: /etc/timezone
-            subPath: timezone
-          - name: service-configs
-            mountPath: /etc/iplant/de
-            readOnly: true
-          - name: nats-client-tls-pkcs8
-            mountPath: /etc/nats/tls/pkcs8
-            readOnly: true
-          - name: nats-client-tls
-            mountPath: /etc/nats/tls
-            readOnly: true
-          - name: nats-services-creds
-            mountPath: /etc/nats/creds
-            readOnly: true
-        env:
-          - name: JAVA_TOOL_OPTIONS
-            valueFrom:
-              configMapKeyRef:
-                name: java-tool-options
-                key: high
-          - name: OTEL_TRACES_EXPORTER
-            valueFrom:
-              secretKeyRef:
-                name: configs
-                key: OTEL_TRACES_EXPORTER
-          - name: OTEL_EXPORTER_JAEGER_ENDPOINT
-            valueFrom:
-              secretKeyRef:
-                name: configs
-                key: OTEL_EXPORTER_JAEGER_ENDPOINT
-        ports:
-          - name: listen-port
-            containerPort: 60000
-        livenessProbe:
-          httpGet:
-            path: /
-            port: 60000
-          initialDelaySeconds: 60
-          periodSeconds: 20
-          timeoutSeconds: 10
-        startupProbe:
-          httpGet:
-            path: /
-            port: 60000
-          initialDelaySeconds: 60
-          periodSeconds: 20
-          timeoutSeconds: 10
-          failureThreshold: 30
-        readinessProbe:
-          httpGet:
-            path: /
-            port: 60000
-          initialDelaySeconds: 60
-          periodSeconds: 20
-          timeoutSeconds: 10
+        - name: terrain
+          image: harbor.cyverse.org/de/terrain
+          resources:
+            requests:
+              cpu: "320m"
+              memory: "1Gi"
+              ephemeral-storage: "1Gi"
+            limits:
+              cpu: "3000m"
+              memory: "3Gi"
+              ephemeral-storage: "1Gi"
+          args:
+            - --config
+            - /etc/iplant/de/terrain.properties
+          volumeMounts:
+            - name: signing-keys
+              mountPath: /etc/iplant/crypto/signing_key
+              readOnly: true
+            - name: accepted-keys
+              mountPath: /etc/iplant/crypto/accepted_keys
+              readOnly: true
+            - name: service-configs
+              mountPath: /etc/iplant/de
+              readOnly: true
+            - name: nats-client-tls-pkcs8
+              mountPath: /etc/nats/tls/pkcs8
+              readOnly: true
+            - name: nats-client-tls
+              mountPath: /etc/nats/tls
+              readOnly: true
+            - name: nats-services-creds
+              mountPath: /etc/nats/creds
+              readOnly: true
+          env:
+            - name: TZ
+              valueFrom:
+                configMapKeyRef:
+                  name: timezone
+                  key: timezone
+            - name: JAVA_TOOL_OPTIONS
+              valueFrom:
+                configMapKeyRef:
+                  name: java-tool-options
+                  key: high
+            - name: OTEL_TRACES_EXPORTER
+              valueFrom:
+                secretKeyRef:
+                  name: configs
+                  key: OTEL_TRACES_EXPORTER
+            - name: OTEL_EXPORTER_JAEGER_ENDPOINT
+              valueFrom:
+                secretKeyRef:
+                  name: configs
+                  key: OTEL_EXPORTER_JAEGER_ENDPOINT
+          ports:
+            - name: listen-port
+              containerPort: 60000
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 60000
+            initialDelaySeconds: 60
+            periodSeconds: 20
+            timeoutSeconds: 10
+          startupProbe:
+            httpGet:
+              path: /
+              port: 60000
+            initialDelaySeconds: 60
+            periodSeconds: 20
+            timeoutSeconds: 10
+            failureThreshold: 30
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 60000
+            initialDelaySeconds: 60
+            periodSeconds: 20
+            timeoutSeconds: 10
 ---
 apiVersion: v1
 kind: Service
