@@ -7,6 +7,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Terrain is the primary REST API gateway for the CyVerse Discovery Environment. It's a Clojure application that validates
 user authentication and coordinates calls to other web services.
 
+## Code Formatting
+
+- Please follow the [clojure community style guidelines][1] when generating new code.
+- Please try to avoid repeated code when possible.
+- Please try to keep line lenghts to 120 characters or fewer for readability.
+
 ## Common Development Commands
 
 ### Build and Run
@@ -109,3 +115,5 @@ Each integration typically follows the pattern:
 3. Service layer orchestrates calls to one or more clients
 4. Clients make HTTP requests to external services
 5. Responses are transformed and returned to caller
+
+[1]: https://guide.clojure.style/
