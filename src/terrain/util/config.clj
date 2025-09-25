@@ -1,10 +1,11 @@
 (ns terrain.util.config
-  (:require [clojure.string :as string]
-            [async-tasks-client.core :as async-tasks-client]
-            [clojure-commons.config :as cc]
-            [clojure-commons.error-codes :as ce]
-            [metadata-client.core :as metadata-client]
-            [slingshot.slingshot :refer [throw+]]))
+  (:require
+   [async-tasks-client.core :as async-tasks-client]
+   [clojure-commons.config :as cc]
+   [clojure-commons.error-codes :as ce]
+   [clojure.string :as string]
+   [metadata-client.core :as metadata-client]
+   [slingshot.slingshot :refer [throw+]]))
 
 (def de-system-id "de")
 (def docs-uri "/docs")
@@ -168,6 +169,12 @@
   "Enables or disables data-usage-api endpoints."
   [props config-valid configs]
   "terrain.routes.data-usage-api" true)
+
+(declare email-api-routes-enabled)
+(cc/defprop-optboolean email-api-routes-enabled
+  "Enables or disables email-api routes."
+  [props config-valid configs]
+  "terrain.routes.email-api" true)
 
 (declare iplant-email-base-url)
 (cc/defprop-optstr iplant-email-base-url

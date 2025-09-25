@@ -1,89 +1,98 @@
 (ns terrain.routes
-  (:require [cheshire.core :as cheshire]
-            [clojure-commons.lcase-params :refer [wrap-lcase-params]]
-            [clojure-commons.query-params :refer [wrap-query-params]]
-            [clojure.tools.logging :as log]
-            [clojure-commons.exception :as cx]
-            [common-swagger-api.schema :as schema]
-            [compojure.route :as route]
-            [compojure.api.core :refer [route-middleware]]
-            [ring.middleware.keyword-params :refer [wrap-keyword-params]]
-            [service-logging.thread-context :as tc]
-            [service-logging.middleware :refer [wrap-logging clean-context]]
-            [terrain.auth.user-attributes :as user-attributes]
-            [terrain.middleware :refer [wrap-context-path-adder wrap-create-workspace wrap-query-param-remover]]
-            [terrain.routes.admin :refer [secured-admin-routes]]
-            [terrain.routes.alerts :refer [alerts-routes admin-alerts-routes]]
-            [terrain.routes.analyses :refer [analysis-routes quicklaunch-routes]]
-            [terrain.routes.apps.admin.apps :refer [admin-apps-routes]]
-            [terrain.routes.apps.admin.reference-genomes :refer [admin-reference-genomes-routes]]
-            [terrain.routes.apps.admin.tools :refer [admin-tool-request-routes admin-tool-routes]]
-            [terrain.routes.apps.categories :refer [app-category-routes app-community-routes app-ontology-routes]]
-            [terrain.routes.apps.communities :refer [app-community-tag-routes]]
-            [terrain.routes.apps.elements :refer [app-elements-routes]]
-            [terrain.routes.apps.metadata :refer [app-avu-routes]]
-            [terrain.routes.apps.pipelines :refer [app-pipeline-routes]]
-            [terrain.routes.apps.reference-genomes :refer [reference-genomes-routes]]
-            [terrain.routes.apps.tools :refer [tool-request-routes tool-routes]]
-            [terrain.routes.apps.versions :refer [app-version-routes]]
-            [terrain.routes.bags :refer [bag-routes]]
-            [terrain.routes.bootstrap :refer [secured-bootstrap-routes]]
-            [terrain.routes.callbacks :refer [callback-routes]]
-            [terrain.routes.dashboard-aggregator :refer [dashboard-aggregator-routes]]
-            [terrain.routes.data :refer [secured-data-routes]]
-            [terrain.routes.fileio :refer [secured-fileio-routes]]
-            [terrain.routes.filesystem :refer [admin-filesystem-metadata-routes
-                                               secured-filesystem-metadata-routes
-                                               secured-filesystem-routes]]
-            [terrain.routes.filesystem.exists :refer [filesystem-existence-routes]]
-            [terrain.routes.filesystem.navigation :refer [filesystem-navigation-routes]]
-            [terrain.routes.filesystem.stats :refer [filesystem-stat-routes]]
-            [terrain.routes.filesystem.tickets :refer [filesystem-ticket-routes]]
-            [terrain.routes.groups :refer [admin-groups-routes]]
-            [terrain.routes.instantlaunches :refer [admin-instant-launch-routes instant-launch-routes]]
-            [terrain.routes.metadata :refer [admin-app-avu-routes
-                                             admin-app-community-routes
-                                             admin-category-routes
-                                             admin-integration-data-routes
-                                             admin-ontology-routes
-                                             admin-workspace-routes
-                                             apps-routes
-                                             misc-metadata-routes]]
-            [terrain.routes.misc :refer [unsecured-misc-routes]]
-            [terrain.routes.notification :refer [admin-notification-routes
-                                                 secured-notification-routes
-                                                 unsecured-notification-routes]]
-            [terrain.routes.permanent-id-requests :refer [admin-permanent-id-request-routes permanent-id-request-routes]]
-            [terrain.routes.pref :refer [secured-pref-routes]]
-            [terrain.routes.resource-usage-api :refer [resource-usage-api-routes]]
-            [terrain.routes.data-usage-api :refer [data-usage-api-routes]]
-            [terrain.routes.session :refer [secured-session-routes]]
-            [terrain.routes.user-info :refer [admin-user-info-routes secured-user-info-routes]]
-            [terrain.routes.collaborator :refer [admin-community-routes
-                                                 collaborator-list-routes
-                                                 community-routes
-                                                 subject-routes
-                                                 team-routes]]
-            [terrain.routes.search :refer [secured-search-routes]]
-            [terrain.routes.coge :refer [coge-routes]]
-            [terrain.routes.oauth :refer [oauth-admin-routes oauth-routes secured-oauth-routes]]
-            [terrain.routes.favorites :refer [secured-favorites-routes]]
-            [terrain.routes.tags :refer [secured-tag-routes]]
-            [terrain.routes.token :refer [admin-token-routes token-routes]]
-            [terrain.routes.webhooks :refer [webhook-routes]]
-            [terrain.routes.comments :refer [admin-app-comment-routes
-                                             admin-comment-routes
-                                             admin-data-comment-routes
-                                             app-comment-routes
-                                             data-comment-routes]]
-            [terrain.routes.qms :refer [admin-qms-api-routes qms-api-routes service-account-qms-api-routes]]
-            [terrain.routes.requests :refer [admin-request-routes admin-request-type-routes request-routes]]
-            [terrain.routes.settings :refer [admin-setting-routes]]
-            [terrain.routes.vice :refer [admin-vice-routes vice-routes]]
-            [terrain.util :as util]
-            [terrain.util.transformers :as transform]
-            [terrain.util.service :as service]
-            [terrain.util.config :as config]))
+  (:require
+   [cheshire.core :as cheshire]
+   [clojure-commons.exception :as cx]
+   [clojure-commons.lcase-params :refer [wrap-lcase-params]]
+   [clojure-commons.query-params :refer [wrap-query-params]]
+   [clojure.tools.logging :as log]
+   [common-swagger-api.schema :as schema]
+   [compojure.api.core :refer [route-middleware]]
+   [compojure.route :as route]
+   [ring.middleware.keyword-params :refer [wrap-keyword-params]]
+   [service-logging.middleware :refer [clean-context wrap-logging]]
+   [service-logging.thread-context :as tc]
+   [terrain.auth.user-attributes :as user-attributes]
+   [terrain.middleware :refer [wrap-context-path-adder wrap-create-workspace
+                               wrap-query-param-remover]]
+   [terrain.routes.admin :refer [secured-admin-routes]]
+   [terrain.routes.alerts :refer [admin-alerts-routes alerts-routes]]
+   [terrain.routes.analyses :refer [analysis-routes quicklaunch-routes]]
+   [terrain.routes.apps.admin.apps :refer [admin-apps-routes]]
+   [terrain.routes.apps.admin.reference-genomes :refer [admin-reference-genomes-routes]]
+   [terrain.routes.apps.admin.tools :refer [admin-tool-request-routes
+                                            admin-tool-routes]]
+   [terrain.routes.apps.categories :refer [app-category-routes
+                                           app-community-routes
+                                           app-ontology-routes]]
+   [terrain.routes.apps.communities :refer [app-community-tag-routes]]
+   [terrain.routes.apps.elements :refer [app-elements-routes]]
+   [terrain.routes.apps.metadata :refer [app-avu-routes]]
+   [terrain.routes.apps.pipelines :refer [app-pipeline-routes]]
+   [terrain.routes.apps.reference-genomes :refer [reference-genomes-routes]]
+   [terrain.routes.apps.tools :refer [tool-request-routes tool-routes]]
+   [terrain.routes.apps.versions :refer [app-version-routes]]
+   [terrain.routes.bags :refer [bag-routes]]
+   [terrain.routes.bootstrap :refer [secured-bootstrap-routes]]
+   [terrain.routes.callbacks :refer [callback-routes]]
+   [terrain.routes.coge :refer [coge-routes]]
+   [terrain.routes.collaborator :refer [admin-community-routes
+                                        collaborator-list-routes
+                                        community-routes subject-routes
+                                        team-routes]]
+   [terrain.routes.comments :refer [admin-app-comment-routes
+                                    admin-comment-routes
+                                    admin-data-comment-routes
+                                    app-comment-routes data-comment-routes]]
+   [terrain.routes.dashboard-aggregator :refer [dashboard-aggregator-routes]]
+   [terrain.routes.data :refer [secured-data-routes]]
+   [terrain.routes.data-usage-api :refer [data-usage-api-routes]]
+   [terrain.routes.email :refer [service-account-email-routes]]
+   [terrain.routes.favorites :refer [secured-favorites-routes]]
+   [terrain.routes.fileio :refer [secured-fileio-routes]]
+   [terrain.routes.filesystem :refer [admin-filesystem-metadata-routes
+                                      secured-filesystem-metadata-routes
+                                      secured-filesystem-routes]]
+   [terrain.routes.filesystem.exists :refer [filesystem-existence-routes]]
+   [terrain.routes.filesystem.navigation :refer [filesystem-navigation-routes]]
+   [terrain.routes.filesystem.stats :refer [filesystem-stat-routes]]
+   [terrain.routes.filesystem.tickets :refer [filesystem-ticket-routes]]
+   [terrain.routes.groups :refer [admin-groups-routes]]
+   [terrain.routes.instantlaunches :refer [admin-instant-launch-routes
+                                           instant-launch-routes]]
+   [terrain.routes.metadata :refer [admin-app-avu-routes
+                                    admin-app-community-routes
+                                    admin-category-routes
+                                    admin-integration-data-routes
+                                    admin-ontology-routes
+                                    admin-workspace-routes apps-routes
+                                    misc-metadata-routes]]
+   [terrain.routes.misc :refer [unsecured-misc-routes]]
+   [terrain.routes.notification :refer [admin-notification-routes
+                                        secured-notification-routes
+                                        unsecured-notification-routes]]
+   [terrain.routes.oauth :refer [oauth-admin-routes oauth-routes
+                                 secured-oauth-routes]]
+   [terrain.routes.permanent-id-requests :refer [admin-permanent-id-request-routes
+                                                 permanent-id-request-routes]]
+   [terrain.routes.pref :refer [secured-pref-routes]]
+   [terrain.routes.qms :refer [admin-qms-api-routes qms-api-routes
+                               service-account-qms-api-routes]]
+   [terrain.routes.requests :refer [admin-request-routes
+                                    admin-request-type-routes request-routes]]
+   [terrain.routes.resource-usage-api :refer [resource-usage-api-routes]]
+   [terrain.routes.search :refer [secured-search-routes]]
+   [terrain.routes.session :refer [secured-session-routes]]
+   [terrain.routes.settings :refer [admin-setting-routes]]
+   [terrain.routes.tags :refer [secured-tag-routes]]
+   [terrain.routes.token :refer [admin-token-routes token-routes]]
+   [terrain.routes.user-info :refer [admin-user-info-routes
+                                     secured-user-info-routes]]
+   [terrain.routes.vice :refer [admin-vice-routes vice-routes]]
+   [terrain.routes.webhooks :refer [webhook-routes]]
+   [terrain.util :as util]
+   [terrain.util.config :as config]
+   [terrain.util.service :as service]
+   [terrain.util.transformers :as transform]))
 
 (defn- wrap-user-info
   [handler]
@@ -212,6 +221,7 @@
   []
   (util/flagged-routes
    (service-account-qms-api-routes)
+   (service-account-email-routes)
    (route/not-found (service/unrecognized-path-response))))
 
 (defn unsecured-routes
@@ -352,6 +362,7 @@
                                      {:name "user-info", :description "User Information Endpoints"}
                                      {:name "webhooks", :description "Webhook Endpoints"}
                                      {:name "vice", :description "VICE Endpoints"}
+                                     {:name "service-account-email" :description "Service Account Email Endpoints"}
                                      {:name "service-account-qms", :description "Service Account QMS Endpoints"}]
                :securityDefinitions security-definitions}})
   (route-middleware
