@@ -2,6 +2,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: terrain
+  labels:
+    app: cyverse-de
+    de-app: terrain
 spec:
   replicas: 2
   selector:
@@ -13,6 +16,7 @@ spec:
   template:
     metadata:
       labels:
+        app: cyverse-de
         de-app: terrain
     spec:
       affinity:
@@ -136,6 +140,9 @@ apiVersion: v1
 kind: Service
 metadata:
   name: terrain
+  labels:
+    app: cyverse-de
+    de-app: terrain
 spec:
   selector:
     de-app: terrain

@@ -1,8 +1,9 @@
 (ns terrain.util.email
-  (:require [clj-http.client :as client]
-            [clojure.string :as string]
-            [terrain.auth.user-attributes :refer [current-user]]
-            [terrain.util.config :as config]))
+  (:require
+   [clj-http.client :as client]
+   [clojure.string :as string]
+   [terrain.auth.user-attributes :refer [current-user]]
+   [terrain.util.config :as config]))
 
 (defn send-email
   "Sends an e-mail message via the iPlant e-mail service."
