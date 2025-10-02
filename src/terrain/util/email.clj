@@ -7,11 +7,13 @@
 
 (defn send-email
   "Sends an e-mail message via the iPlant e-mail service."
-  [& {:keys [to from-addr from-name subject template values]}]
+  [& {:keys [to cc bcc from-addr from-name subject template values]}]
   (client/post
    (config/iplant-email-base-url)
    {:content-type :json
     :form-params  {:to        to
+                   :cc        cc
+                   :bcc       bcc
                    :from-addr from-addr
                    :from-name from-name
                    :subject   subject
