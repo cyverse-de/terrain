@@ -18,4 +18,4 @@
    :from_name          (s/describe s/NonBlankString "The name of the message sender")
    :subject            (s/describe s/NonBlankString "The message subject")
    :template           (s/describe s/NonBlankString "The name of the email template to use")
-   :values             (s/describe {Keyword s/NonBlankString} "The values to plug into the email template")})
+   :values             (s/describe {Keyword s/ANY} "The values to plug into the email template")})
