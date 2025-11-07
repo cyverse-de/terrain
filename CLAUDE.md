@@ -116,4 +116,10 @@ Each integration typically follows the pattern:
 4. Clients make HTTP requests to external services
 5. Responses are transformed and returned to caller
 
+### Error Handling
+- Terrain has middleware that automatically catches HTTP status code errors from client calls
+- In most cases, there is **no need to explicitly catch and handle HTTP errors** (404, 500, etc.) in client functions
+- The middleware will handle these errors and return appropriate responses to the API caller
+- Only add explicit error handling when you need custom error messages or special error recovery logic
+
 [1]: https://guide.clojure.style/
