@@ -1,11 +1,15 @@
 (ns terrain.routes.user-info
-  (:require [common-swagger-api.schema :refer [context doc-only GET]]
-            [ring.util.http-response :refer [ok]]
-            [terrain.clients.iplant-groups :as ipg]
-            [terrain.routes.schemas.user-info :as user-info-schema]
-            [terrain.services.user-info :refer [user-info]]
-            [terrain.util :refer [optional-routes]]
-            [terrain.util.config :as config]))
+  (:require
+   [common-swagger-api.schema :refer [context doc-only GET]]
+   [ring.util.http-response :refer [ok]]
+   [schema-tools.core :as st]
+   [terrain.auth.user-attributes :refer [require-service-account]]
+   [terrain.clients.iplant-groups :as ipg]
+   [terrain.clients.portal-conductor :as pc]
+   [terrain.routes.schemas.user-info :as user-info-schema]
+   [terrain.services.user-info :refer [user-info]]
+   [terrain.util :refer [optional-routes]]
+   [terrain.util.config :as config]))
 
 ;; Declarations to eliminate lint warnings for path and query parameter bindings.
 (declare params username details)
@@ -42,3 +46,21 @@
           :description "Lists all groups to which a user belongs"
           :return user-info-schema/GroupListing
           (ok (ipg/list-groups-for-user username details))))))
+
+(defn service-account-user-info-routes
+  []
+  (optional-routes
+   [config/user-info-routes-enabled]
+
+   (context "/users" []
+     :tags ["service-account-user-info"]
+
+     (context "/:username" []
+       :path-params [username :- user-info-schema/UsernameParam]
+
+       (GET "/" []
+            :middleware [[require-service-account ["cyverse-ldap-reader"]]]
+            :summary "Get user information"
+            :description "Looks up information for a single username in LDAP"
+            :return user-info-schema/UserDetails
+            (ok (st/select-schema (pc/get-user-details username) user-info-schema/UserDetails)))))))

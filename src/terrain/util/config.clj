@@ -829,6 +829,23 @@
   [props config-valid configs]
   "terrain.nats.subjects.subscription.addons.get" "cyverse.qms.user.plan.addons.get")
 
+(declare portal-conductor-base-url)
+(cc/defprop-optstr portal-conductor-base-url
+  "The base URL for the portal-conductor service."
+  [props config-valid configs]
+  "terrain.portal-conductor.base-url" "https://portal-conductor")
+
+(declare portal-conductor-username)
+(cc/defprop-optstr portal-conductor-username
+  "The admin username for the portal-conductor service."
+  [props config-valid configs]
+  "terrain.portal-conductor.username" "admin")
+
+(declare portal-conductor-password)
+(cc/defprop-optstr portal-conductor-password
+  "The admin password for the portal-conductor service."
+  [props config-valid configs]
+  "terrain.portal-conductor.password" "admin")
 
 (def async-tasks-client
   (memoize #(async-tasks-client/new-async-tasks-client (async-tasks-base-url))))

@@ -86,7 +86,8 @@
    [terrain.routes.tags :refer [secured-tag-routes]]
    [terrain.routes.token :refer [admin-token-routes token-routes]]
    [terrain.routes.user-info :refer [admin-user-info-routes
-                                     secured-user-info-routes]]
+                                     secured-user-info-routes
+                                     service-account-user-info-routes]]
    [terrain.routes.vice :refer [admin-vice-routes vice-routes]]
    [terrain.routes.webhooks :refer [webhook-routes]]
    [terrain.util :as util]
@@ -222,6 +223,7 @@
   (util/flagged-routes
    (service-account-qms-api-routes)
    (service-account-email-routes)
+   (service-account-user-info-routes)
    (route/not-found (service/unrecognized-path-response))))
 
 (defn unsecured-routes
@@ -363,7 +365,8 @@
                                      {:name "webhooks", :description "Webhook Endpoints"}
                                      {:name "vice", :description "VICE Endpoints"}
                                      {:name "service-account-email" :description "Service Account Email Endpoints"}
-                                     {:name "service-account-qms", :description "Service Account QMS Endpoints"}]
+                                     {:name "service-account-qms", :description "Service Account QMS Endpoints"}
+                                     {:name "service-account-user-info", :description "Service Account User Info Endpoints"}]
                :securityDefinitions security-definitions}})
   (route-middleware
    [[wrap-query-param-remover "ip-address" #{#"^/terrain/secured/bootstrap"
