@@ -2,6 +2,7 @@
   (:require
    [common-swagger-api.schema :refer [context doc-only GET]]
    [ring.util.http-response :refer [ok]]
+   [schema-tools.core :as st]
    [terrain.auth.user-attributes :refer [require-service-account]]
    [terrain.clients.iplant-groups :as ipg]
    [terrain.clients.portal-conductor :as pc]
@@ -62,4 +63,4 @@
             :summary "Get user information"
             :description "Looks up information for a single username in LDAP"
             :return user-info-schema/UserDetails
-            (ok (pc/get-user-details username)))))))
+            (ok (st/select-schema (pc/get-user-details username) user-info-schema/UserDetails)))))))

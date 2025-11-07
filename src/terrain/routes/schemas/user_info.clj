@@ -27,5 +27,5 @@
    :surname      (describe NonBlankString "The user's surname.")
    :common_name  (describe NonBlankString "The user's full name.")
    :email        (describe NonBlankString "The user's primary email address.")
-   :organization (describe NonBlankString "The name of the user's organization.")
-   :department   (describe NonBlankString "The name of the user's department.")})
+   :organization (describe String "The name of the user's organization.")
+   :department   (describe String "The name of the user's department.")})
