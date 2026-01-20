@@ -14,10 +14,10 @@
             :url "https://cyverse.org/license"}
   :manifest {"Git-Ref" ~(git-ref)}
   :uberjar-name "terrain-standalone.jar"
-  :dependencies [[org.clojure/clojure "1.12.1"]
-                 [org.clojure/data.codec "0.2.0"]
+  :dependencies [[org.clojure/clojure "1.12.4"]
+                 [org.clojure/data.codec "0.2.1"]
                  [org.clojure/tools.nrepl "0.2.13"]
-                 [cheshire "6.0.0"]
+                 [cheshire "6.1.0"]
                  [clj-http "3.13.1"]
                  [clj-time "0.15.2"]
                  [clojurewerkz/elastisch "3.0.1"]
@@ -27,8 +27,8 @@
                  [medley "1.4.0"]
                  [metosin/ring-http-response "0.9.5"]
                  [potemkin "0.4.8"]
-                 [org.apache.tika/tika-core "3.2.2" :exclusions [org.slf4j/slf4j-api]]
-                 [ring/ring-jetty-adapter "1.14.2"]
+                 [org.apache.tika/tika-core "3.2.3" :exclusions [org.slf4j/slf4j-api]]
+                 [ring/ring-jetty-adapter "1.15.3"]
                  [slingshot "0.12.2"]
                  [org.cyverse/async-tasks-client "0.0.5"]
                  [org.cyverse/clj-icat-direct "2.9.7"]
@@ -46,7 +46,7 @@
                  [org.cyverse/metadata-files "2.1.1"]
                  [org.cyverse/permissions-client "2.8.4"]
                  [org.cyverse/service-logging "2.8.5"]
-                 [io.nats/jnats "2.21.5"]
+                 [io.nats/jnats "2.25.1"]
                  [less-awful-ssl "1.0.7"]
                  [clojure.java-time "1.4.3"]
                  [com.appsflyer/pronto "3.0.0"]
