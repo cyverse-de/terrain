@@ -4,7 +4,7 @@
 
 (defn send-email
   [body]
-  (-> (select-keys body [:to :cc :bcc :subject :template :values])
+  (-> (select-keys body [:to :cc :bcc :subject :template :values :attachments])
       (assoc :from-addr (:from_addr body)
              :from-name (:from_name body))
       email/send-email)

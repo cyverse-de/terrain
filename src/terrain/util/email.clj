@@ -7,18 +7,19 @@
 
 (defn send-email
   "Sends an e-mail message via the iPlant e-mail service."
-  [& {:keys [to cc bcc from-addr from-name subject template values]}]
+  [& {:keys [to cc bcc from-addr from-name subject template values attachments]}]
   (client/post
    (config/iplant-email-base-url)
    {:content-type :json
-    :form-params  {:to        to
-                   :cc        cc
-                   :bcc       bcc
-                   :from-addr from-addr
-                   :from-name from-name
-                   :subject   subject
-                   :template  template
-                   :values    values}}))
+    :form-params  {:to          to
+                   :cc          cc
+                   :bcc         bcc
+                   :from-addr   from-addr
+                   :from-name   from-name
+                   :subject     subject
+                   :template    template
+                   :values      values
+                   :attachments attachments}}))
 
 (defn send-tool-request-email
   "Sends the email message informing Core Services of a tool request."
