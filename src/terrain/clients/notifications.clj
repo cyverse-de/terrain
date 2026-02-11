@@ -1,11 +1,11 @@
 (ns terrain.clients.notifications
-  (:require [cheshire.core :as cheshire]
-            [clj-http.client :as client]
-            [clojure.tools.logging :as log]
-            [clojure-commons.client :refer [build-url-with-query]]
-            [terrain.clients.notifications.raw :as raw]
-            [terrain.util.config :refer [notifications-base-url]]
-            [terrain.util.transformers :refer [add-current-user-to-map]]))
+  (:require
+   [cheshire.core :as cheshire]
+   [clj-http.client :as client]
+   [clojure-commons.client :refer [build-url-with-query]]
+   [clojure.tools.logging :as log]
+   [terrain.util.config :refer [notifications-base-url]]
+   [terrain.util.transformers :refer [add-current-user-to-map]]))
 
 (defn notificationagent-url
   "Builds a URL that can be used to connect to the notification agent."
@@ -109,7 +109,3 @@
                                        :email_address (:email user)
                                        :contents      nil
                                        :team_name     team-name}}))
-
-(defn mark-all-notifications-seen
-  []
-  (raw/mark-all-notifications-seen (cheshire/encode (add-current-user-to-map {}))))

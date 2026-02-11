@@ -18,25 +18,25 @@
   [params]
   (client/get (na-url "messages")
               {:query-params (secured-params params na-message-params)
-               :as           :stream}))
+               :as           :json}))
 
 (defn get-unseen-messages
   [params]
   (client/get (na-url "unseen-messages")
               {:query-params (secured-params params na-message-params)
-               :as           :stream}))
+               :as           :json}))
 
 (defn count-messages
   [params]
   (client/get (na-url "count-messages")
               {:query-params (secured-params params na-filter-params)
-               :as           :stream}))
+               :as           :json}))
 
 (defn delete-notifications
   [body]
   (client/post (na-url "delete")
                {:query-params (secured-params)
-                :as           :stream
+                :as           :json
                 :content-type :json
                 :body         body}))
 
@@ -44,13 +44,13 @@
   [params]
   (client/delete (na-url "delete-all")
                  {:query-params (secured-params params delete-matching-message-params)
-                  :as           :stream}))
+                  :as           :json}))
 
 (defn mark-notifications-seen
   [body]
   (client/post (na-url "seen")
                {:query-params (secured-params)
-                :as           :stream
+                :as           :json
                 :content-type :json
                 :body         body}))
 
@@ -58,6 +58,6 @@
   [body]
   (client/post (na-url "mark-all-seen")
                {:query-params (secured-params)
-                :as           :stream
+                :as           :json
                 :content-type :json
                 :body         body}))
