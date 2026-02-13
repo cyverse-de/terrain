@@ -1,18 +1,8 @@
-(use '[clojure.java.shell :only (sh)])
-(require '[clojure.string :as string])
-
-(defn git-ref
-  []
-  (or (System/getenv "GIT_COMMIT")
-      (string/trim (:out (sh "git" "rev-parse" "HEAD")))
-      ""))
-
 (defproject org.cyverse/terrain "3.0.0-SNAPSHOT"
   :description "Discovery Environment API gateway/API services catch-all project"
   :url "https://github.com/cyverse-de/terrain"
   :license {:name "BSD Standard License"
             :url "https://cyverse.org/license"}
-  :manifest {"Git-Ref" ~(git-ref)}
   :uberjar-name "terrain-standalone.jar"
   :dependencies [[org.clojure/clojure "1.12.4"]
                  [org.clojure/data.codec "0.2.1"]
@@ -38,7 +28,7 @@
                  [org.cyverse/cyverse-groups-client "0.1.9"]
                  [org.cyverse/common-cfg "2.8.3"]
                  [org.cyverse/common-cli "2.8.2"]
-                 [org.cyverse/common-swagger-api "3.4.14"]
+                 [org.cyverse/common-swagger-api "3.4.15-SNAPSHOT"]
                  [org.cyverse/kameleon "3.0.10"
                   :exclusion [com.impossibl.pgjdbc-ng/pgjdbc-ng]]
                  [com.impossibl.pgjdbc-ng/pgjdbc-ng "0.8.9"]

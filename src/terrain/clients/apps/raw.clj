@@ -962,45 +962,51 @@
 
 (defn get-oauth-access-token
   [api-name params]
-  (client/get (apps-url "oauth" "access-code" api-name)
-              (disable-redirects
-               {:query-params (secured-params params [:code :state])
-                :as           :stream})))
+  (:body
+   (client/get (apps-url "oauth" "access-code" api-name)
+               (disable-redirects
+                {:query-params (secured-params params [:code :state])
+                 :as           :json}))))
 
 (defn get-oauth-token-info
   [api-name]
-  (client/get (apps-url "oauth" "token-info" api-name)
-              (disable-redirects
-               {:query-params (secured-params)
-                :as           :stream})))
+  (:body
+   (client/get (apps-url "oauth" "token-info" api-name)
+               (disable-redirects
+                {:query-params (secured-params)
+                 :as           :json}))))
 
 (defn delete-oauth-token-info
   [api-name]
-  (client/delete (apps-url "oauth" "token-info" api-name)
-                 (disable-redirects
-                  {:query-params (secured-params)
-                   :as           :stream})))
+  (:body
+   (client/delete (apps-url "oauth" "token-info" api-name)
+                  (disable-redirects
+                   {:query-params (secured-params)
+                    :as           :json}))))
 
 (defn get-oauth-redirect-uris
   []
-  (client/get (apps-url "oauth" "redirect-uris")
-              (disable-redirects
-               {:query-params (secured-params)
-                :as           :stream})))
+  (:body
+   (client/get (apps-url "oauth" "redirect-uris")
+               (disable-redirects
+                {:query-params (secured-params)
+                 :as           :json}))))
 
 (defn get-admin-oauth-token-info
   [api-name params]
-  (client/get (apps-url "admin" "oauth" "token-info" api-name)
-              (disable-redirects
-               {:query-params (secured-params params [:proxy-user])
-                :as           :stream})))
+  (:body
+   (client/get (apps-url "admin" "oauth" "token-info" api-name)
+               (disable-redirects
+                {:query-params (secured-params params [:proxy-user])
+                 :as           :json}))))
 
 (defn delete-admin-oauth-token-info
   [api-name params]
-  (client/delete (apps-url "admin" "oauth" "token-info" api-name)
-                 (disable-redirects
-                  {:query-params (secured-params params [:proxy-user])
-                   :as           :stream})))
+  (:body
+   (client/delete (apps-url "admin" "oauth" "token-info" api-name)
+                  (disable-redirects
+                   {:query-params (secured-params params [:proxy-user])
+                    :as           :json}))))
 
 (defn admin-delete-tool-request-status-code
   [status-code-id]
