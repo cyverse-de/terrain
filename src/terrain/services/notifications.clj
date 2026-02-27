@@ -50,4 +50,4 @@
 (defn mark-all-notifications-seen
   "Marks all notifications as seen for the authenticated user."
   []
-  (:body (rn/mark-all-notifications-seen (json/encode (add-current-user-to-map {})))))
+  (:body (rn/mark-all-notifications-seen (encode-body {}))))
