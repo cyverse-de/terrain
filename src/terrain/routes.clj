@@ -67,9 +67,7 @@
                                     admin-workspace-routes apps-routes
                                     misc-metadata-routes]]
    [terrain.routes.misc :refer [unsecured-misc-routes]]
-   [terrain.routes.notification :refer [admin-notification-routes
-                                        secured-notification-routes
-                                        unsecured-notification-routes]]
+   [terrain.routes.notification :refer [secured-notification-routes]]
    [terrain.routes.oauth :refer [oauth-admin-routes oauth-routes
                                  secured-oauth-routes]]
    [terrain.routes.permanent-id-requests :refer [admin-permanent-id-request-routes
@@ -201,7 +199,6 @@
    (admin-filesystem-metadata-routes)
    (admin-groups-routes)
    (admin-instant-launch-routes)
-   (admin-notification-routes)
    (admin-ontology-routes)
    (admin-reference-genomes-routes)
    (admin-tool-routes)
@@ -232,8 +229,7 @@
    (admin-token-routes)
    (callback-routes)
    (token-routes)
-   (unsecured-misc-routes)
-   (unsecured-notification-routes)))
+   (unsecured-misc-routes)))
 
 (def admin-handler
   (route-middleware

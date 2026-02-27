@@ -1,10 +1,11 @@
 (ns terrain.routes.notification
-  (:require [common-swagger-api.schema :refer [GET POST DELETE PUT]]
-            [terrain.clients.notifications.raw :as rn]
-            [terrain.clients.notifications :as cn]
-            [terrain.util :refer [optional-routes]]
-            [terrain.util.config :as config]
-            [terrain.util.service :as service]))
+  (:require
+   [common-swagger-api.schema :refer [context DELETE GET POST]]
+   [ring.util.http-response :refer [ok]]
+   [terrain.routes.schemas.notifications :as schema]
+   [terrain.services.notifications :as notifications]
+   [terrain.util :refer [optional-routes]]
+   [terrain.util.config :as config]))
 
 ;; Declarations to eliminate lint warnings for path and query parameter bindings.
 (declare params body uuid)
@@ -14,85 +15,55 @@
   (optional-routes
    [config/notification-routes-enabled]
 
-   (GET "/notifications/messages" [:as {:keys [params]}]
-        (service/success-response (rn/get-messages params)))
+   (context "/notifications" []
+     :tags ["notifications"]
 
-   (GET "/notifications/unseen-messages" [:as {:keys [params]}]
-        (service/success-response (rn/get-unseen-messages params)))
+     (GET "/messages" []
+       :query [params schema/NotificationPagingParams]
+       :summary schema/GetMessagesSummary
+       :description schema/GetMessagesDescription
+       :return schema/NotificationListing
+       (ok (notifications/get-messages params)))
 
-   (GET "/notifications/last-ten-messages" []
-        (service/success-response (cn/last-ten-messages)))
+     (GET "/unseen-messages" []
+       :query [params schema/NotificationPagingParams]
+       :summary schema/GetUnseenMessagesSummary
+       :description schema/GetUnseenMessagesDescription
+       :return schema/NotificationListing
+       (ok (notifications/get-unseen-messages params)))
 
-   (GET "/notifications/count-messages" [:as {:keys [params]}]
-        (service/success-response (rn/count-messages params)))
+     (GET "/last-ten-messages" []
+       :summary schema/GetLastTenMessagesSummary
+       :description schema/GetLastTenMessagesDescription
+       :return schema/NotificationListing
+       (ok (notifications/last-ten-messages)))
 
-   (POST "/notifications/delete" [:as {:keys [body]}]
-         (service/success-response (rn/delete-notifications body)))
+     (GET "/count-messages" []
+       :query [params schema/MessageCountParams]
+       :summary schema/CountMessagesSummary
+       :description schema/CountMessagesDescription
+       :return schema/MessageCountResponse
+       (ok (notifications/count-messages params)))
 
-   (DELETE "/notifications/delete-all" [:as {:keys [params]}]
-           (service/success-response (rn/delete-all-notifications params)))
+     (POST "/delete" []
+       :body [body schema/NotificationUUIDList]
+       :summary schema/DeleteNotificationsSummary
+       :description schema/DeleteNotificationsDescription
+       (ok (notifications/delete-notifications body)))
 
-   (POST "/notifications/seen" [:as {:keys [body]}]
-         (service/success-response (rn/mark-notifications-seen body)))
+     (DELETE "/delete-all" []
+       :query [params schema/DeleteMatchingMessagesParams]
+       :summary schema/DeleteAllNotificationsSummary
+       :description schema/DeleteAllNotificationsDescription
+       (ok (notifications/delete-all-notifications params)))
 
-   (POST "/notifications/mark-all-seen" []
-         (service/success-response (cn/mark-all-notifications-seen)))
+     (POST "/seen" []
+       :body [body schema/NotificationUUIDList]
+       :summary schema/MarkSeenSummary
+       :description schema/MarkSeenDescription
+       (ok (notifications/mark-notifications-seen body)))
 
-   (GET "/notifications/system/messages" []
-        (service/success-response (rn/get-system-messages)))
-
-   (GET "/notifications/system/new-messages" []
-        (service/success-response (rn/get-new-system-messages)))
-
-   (GET "/notifications/system/unseen-messages" []
-        (service/success-response (rn/get-unseen-system-messages)))
-
-   (POST "/notifications/system/received" [:as {:keys [body]}]
-         (service/success-response (rn/mark-system-messages-received body)))
-
-   (POST "/notifications/system/mark-all-received" [:as {:keys [body]}]
-         (service/success-response (rn/mark-all-system-messages-received body)))
-
-   (POST "/notifications/system/seen" [:as {:keys [body]}]
-         (service/success-response (rn/mark-system-messages-seen body)))
-
-   (POST "/notifications/system/mark-all-seen" [:as {:keys [body]}]
-         (service/success-response (rn/mark-all-system-messages-seen body)))
-
-   (POST "/notifications/system/delete" [:as {:keys [body]}]
-         (service/success-response (rn/delete-system-messages body)))
-
-   (DELETE "/notifications/system/delete-all" [:as {:keys [params]}]
-           (service/success-response (rn/delete-all-system-messages params)))))
-
-(defn admin-notification-routes
-  []
-  (optional-routes
-    [#(and (config/admin-routes-enabled)
-           (config/notification-routes-enabled))]
-
-    (PUT "/notifications/system" [:as {:keys [body]}]
-         (service/success-response (rn/admin-add-system-message body)))
-
-    (GET "/notifications/system" [:as {:keys [params]}]
-         (service/success-response (rn/admin-list-system-messages params)))
-
-    (GET "/notifications/system/:uuid" [uuid]
-         (service/success-response (rn/admin-get-system-message uuid)))
-
-    (POST "/notifications/system/:uuid" [uuid :as {:keys [body]}]
-          (service/success-response (rn/admin-update-system-message uuid body)))
-
-    (DELETE "/notifications/system/:uuid" [uuid]
-            (service/success-response (rn/admin-delete-system-message uuid)))
-
-    (GET "/notifications/system-types" []
-         (service/success-response (rn/admin-list-system-types)))))
-
-(defn unsecured-notification-routes
-  []
-  (optional-routes
-   [config/notification-routes-enabled]
-
-   (POST "/send-notification" [:as {:keys [body]}]
-         (service/success-response (rn/send-notification body)))))
+     (POST "/mark-all-seen" []
+       :summary schema/MarkAllSeenSummary
+       :description schema/MarkAllSeenDescription
+       (ok (notifications/mark-all-notifications-seen))))))
