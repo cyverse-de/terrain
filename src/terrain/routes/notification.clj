@@ -1,5 +1,7 @@
 (ns terrain.routes.notification
   (:require
+   [clojure-commons.lcase-params :refer [wrap-lcase-query-param-values]]
+   [clojure-commons.query-params :refer [wrap-rename-params]]
    [common-swagger-api.schema :refer [context DELETE GET POST]]
    [ring.util.http-response :refer [ok]]
    [terrain.routes.schemas.notifications :as schema]
@@ -22,13 +24,17 @@
        :query [params schema/NotificationPagingParams]
        :summary schema/GetMessagesSummary
        :description schema/GetMessagesDescription
+       :middleware [[wrap-rename-params {:sortfield :sort-field :sortdir :sort-dir}]
+                    [wrap-lcase-query-param-values #{:sort-field :sort-dir}]]
        :return schema/NotificationListing
        (ok (notifications/get-messages params)))
 
      (GET "/unseen-messages" []
-       :query [params schema/NotificationPagingParams]
+       :query [params  schema/NotificationPagingParams]
        :summary schema/GetUnseenMessagesSummary
        :description schema/GetUnseenMessagesDescription
+       :middleware [[wrap-rename-params {:sortfield :sort-field :sortdir :sort-dir}]
+                    [wrap-lcase-query-param-values #{:sort-field :sort-dir}]]
        :return schema/NotificationListing
        (ok (notifications/get-unseen-messages params)))
 

@@ -14,7 +14,7 @@
                  [com.cemerick/url "0.1.1" :exclusions [com.cemerick/clojurescript.test]]
                  [org.cyverse/dire "0.5.6"]
                  [me.raynes/fs "1.4.6" :exclusions [org.apache.commons/commons-compress]]
-                 [medley "1.4.0"]
+                 [dev.weavejester/medley "1.9.0"]
                  [metosin/ring-http-response "0.9.5"]
                  [potemkin "0.4.8"]
                  [org.apache.tika/tika-core "3.2.3" :exclusions [org.slf4j/slf4j-api]]
@@ -24,7 +24,7 @@
                  [org.cyverse/clj-icat-direct "2.9.7"]
                  [org.cyverse/clj-jargon "3.1.4"
                   :exclusions [org.bouncycastle/bcprov-jdk16]]
-                 [org.cyverse/clojure-commons "3.0.11"]
+                 [org.cyverse/clojure-commons "3.0.12"]
                  [org.cyverse/cyverse-groups-client "0.1.9"]
                  [org.cyverse/common-cfg "2.8.3"]
                  [org.cyverse/common-cli "2.8.2"]

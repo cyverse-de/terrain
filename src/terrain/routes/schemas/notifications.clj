@@ -15,7 +15,7 @@
          {SortFieldOptionalKey
           (describe String "The field to sort results by. Defaults to timestamp.")
 
-          (s/optional-key :sortdir)
+          (s/optional-key :sort-dir)
           (describe (s/enum "asc" "desc") "The sort direction. Defaults to desc.")
 
           (s/optional-key :filter)
