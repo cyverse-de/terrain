@@ -420,4 +420,5 @@
 (def Host (describe String "The hostname/subdomain of a VICE analysis"))
 
 (defschema URLReady
-  {:ready (describe Boolean "Whether or not the analysis is ready to be accessed.")})
+  {:ready                          (describe Boolean "Whether or not the analysis is ready to be accessed.")
+   (optional-key :access_url)      (describe (maybe String) "The access URL for the analysis, if ready.")})
