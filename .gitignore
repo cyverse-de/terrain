@@ -26,6 +26,7 @@
 .env
 .vagrant/
 *.swp
+build.json
 build.xml
 test2junit
 Dockerfile.local
