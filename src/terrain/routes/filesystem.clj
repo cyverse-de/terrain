@@ -1,26 +1,30 @@
 (ns terrain.routes.filesystem
-  (:require [clojure.string :as string]
-            [common-swagger-api.schema :refer [context GET POST DELETE]]
-            [common-swagger-api.schema.metadata :as metadata-schema]
-            [compojure.api.middleware :as mw]
-            [medley.core :refer [update-existing-in]]
-            [ring.util.http-response :refer [ok]]
-            [terrain.auth.user-attributes :refer [require-authentication current-user]]
-            [terrain.clients.data-info :as data]
-            [terrain.clients.metadata.raw :as meta-raw]
-            [terrain.routes.schemas.filesystem :as fs-schema]
-            [terrain.services.filesystem.directory :as dir]
-            [terrain.services.filesystem.metadata :as meta]
-            [terrain.services.filesystem.metadata-templates :as mt]
-            [terrain.services.filesystem.updown :as ud]
-            [terrain.util :refer [controller optional-routes]]
-            [terrain.util.config :as config]))
+  (:require
+   [clojure.pprint]
+   [clojure.string :as string]
+   [common-swagger-api.schema :refer [context DELETE GET POST]]
+   [common-swagger-api.schema.metadata :as metadata-schema]
+   [compojure.api.middleware :as mw]
+   [medley.core :refer [update-existing-in]]
+   [ring.util.http-response :refer [ok]]
+   [terrain.auth.user-attributes :refer [current-user require-authentication]]
+   [terrain.clients.data-info :as data]
+   [terrain.clients.metadata.raw :as meta-raw]
+   [terrain.routes.schemas.filesystem :as fs-schema]
+   [terrain.services.filesystem.directory :as dir]
+   [terrain.services.filesystem.metadata :as meta]
+   [terrain.services.filesystem.metadata-templates :as mt]
+   [terrain.services.filesystem.updown :as ud]
+   [terrain.util :refer [controller optional-routes]]
+   [terrain.util.config :as config]))
 
 (defn- wrap-fix-param [handler param f]
   (if-let [keyword-param (keyword param)]
     (fn [req]
       (as-> req req
         (update-existing-in req [:params keyword-param] f)
+        (update-existing-in req [:query-params keyword-param] f)
+        (update-existing-in req [:params (name keyword-param)] f)
         (update-existing-in req [:query-params (name keyword-param)] f)
         (handler req)))
     (throw (Exception. (str "Invalid parameter: " param)))))
