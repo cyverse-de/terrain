@@ -1,6 +1,5 @@
 (ns terrain.routes.filesystem
   (:require
-   [clojure.pprint]
    [clojure.string :as string]
    [common-swagger-api.schema :refer [context DELETE GET POST]]
    [common-swagger-api.schema.metadata :as metadata-schema]
