@@ -12,7 +12,9 @@
    :terrain.email.support-email-src      "support-email-src@example.org"
    :terrain.permanent-id.target-base-url "http://perm-id-target-base-url"
    :terrain.keycloak.client-id           "keycloak-client-id"
-   :terrain.keycloak.client-secret       "keycloak-client-secret"})
+   :terrain.keycloak.client-secret       "keycloak-client-secret"
+   :terrain.keycloak.admin-client-id     "keycloak-admin-client-id"
+   :terrain.keycloak.admin-client-secret "keycloak-admin-client-secret"})
 
 (defn with-test-config
   "Runs a series of tests after loading the test configuration defined by `test-config` above. This fixture should
