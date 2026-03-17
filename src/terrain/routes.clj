@@ -20,7 +20,7 @@
    [terrain.routes.apps.admin.apps :refer [admin-apps-routes]]
    [terrain.routes.apps.admin.reference-genomes :refer [admin-reference-genomes-routes]]
    [terrain.routes.apps.admin.tools :refer [admin-tool-request-routes
-                                            admin-tool-routes]]
+                                             admin-tool-routes]]
    [terrain.routes.apps.categories :refer [app-category-routes
                                            app-community-routes
                                            app-ontology-routes]]
@@ -29,7 +29,7 @@
    [terrain.routes.apps.metadata :refer [app-avu-routes]]
    [terrain.routes.apps.pipelines :refer [app-pipeline-routes]]
    [terrain.routes.apps.reference-genomes :refer [reference-genomes-routes]]
-   [terrain.routes.apps.tools :refer [tool-request-routes tool-routes]]
+   [terrain.routes.apps.tools :refer [gpu-models-routes tool-request-routes tool-routes]]
    [terrain.routes.apps.versions :refer [app-version-routes]]
    [terrain.routes.bags :refer [bag-routes]]
    [terrain.routes.bootstrap :refer [secured-bootstrap-routes]]
@@ -145,6 +145,7 @@
    (team-routes)
    (subject-routes)
    (reference-genomes-routes)
+   (gpu-models-routes)
    (tool-routes)
    (tool-request-routes)
    (permanent-id-request-routes)
@@ -317,8 +318,8 @@
                                      {:name "admin-resource-usage", :description "Resource Usage Administration Endpoints"}
                                      {:name "admin-settings", :description "Admin Setting Endpoints"}
                                      {:name "admin-token", :description "Admin OAuth Tokens"}
-                                     {:name "admin-tools", :description "Admin Tool Endpoints"}
-                                     {:name "admin-tool-requests", :description "Admin Tool Request Endpoints"}
+                                      {:name "admin-tools", :description "Admin Tool Endpoints"}
+                                       {:name "admin-tool-requests", :description "Admin Tool Request Endpoints"}
                                      {:name "admin-user-info", :description "User Info Administration Endpoints"}
                                      {:name "admin-vice", :description "VICE Administration Endpoints"}
                                      {:name "analyses", :description "Analysis Endpoints"}
@@ -354,8 +355,9 @@
                                      {:name "support", :description "Support Endpoints"}
                                      {:name "tags", :description "Tag Endpoints"}
                                      {:name "teams", :description "Team Endpoints"}
-                                     {:name "tools", :description "Tool Endpoints"}
-                                     {:name "tool-requests", :description "Tool Request Endpoints"}
+                                      {:name "tools", :description "Tool Endpoints"}
+                                      {:name "gpu-models", :description "GPU Model Configuration Endpoints"}
+                                      {:name "tool-requests", :description "Tool Request Endpoints"}
                                      {:name "token", :description "OAuth Tokens"}
                                      {:name "user-info", :description "User Information Endpoints"}
                                      {:name "webhooks", :description "Webhook Endpoints"}

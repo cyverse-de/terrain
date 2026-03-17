@@ -126,3 +126,16 @@
            :summary schema/ToolInstallRequestStatusCodeListingSummary
            :description schema/ToolInstallRequestStatusCodeListingDocs
            (ok (apps/list-tool-request-status-codes params))))))
+
+(defn gpu-models-routes
+  []
+  (optional-routes
+    [config/app-routes-enabled]
+
+    (context "/tools/gpu-models" []
+      :tags ["gpu-models"]
+
+      (GET "/" []
+           :summary "List Valid GPU Models"
+           :description "Returns the list of valid GPU model names that can be configured for tools."
+           (ok (apps/list-gpu-models))))))
