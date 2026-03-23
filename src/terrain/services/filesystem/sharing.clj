@@ -15,10 +15,10 @@
 
 (defn- shared?
   ([cm share-with fpath]
-     (:read (perms/permissions cm share-with fpath)))
+   (:read (perms/permissions cm share-with fpath)))
   ([cm share-with fpath desired-perm]
-     (let [curr-perm (perms/permission-for cm share-with fpath)]
-       (= curr-perm desired-perm))))
+   (let [curr-perm (perms/permission-for cm share-with fpath)]
+     (= curr-perm desired-perm))))
 
 (defn- skip-share
   [user path reason]

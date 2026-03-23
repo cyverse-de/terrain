@@ -10,10 +10,10 @@
 (defn notificationagent-url
   "Builds a URL that can be used to connect to the notification agent."
   ([relative-url]
-     (notificationagent-url relative-url {}))
+   (notificationagent-url relative-url {}))
   ([relative-url query]
-     (build-url-with-query (notifications-base-url)
-                           (add-current-user-to-map query) relative-url)))
+   (build-url-with-query (notifications-base-url)
+                         (add-current-user-to-map query) relative-url)))
 
 (def last-ten-messages-params
   {:limit      10

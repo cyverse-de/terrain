@@ -10,7 +10,7 @@
             [common-swagger-api.schema.apps.permission :as permission-schema]
             [common-swagger-api.schema.integration-data
              :refer [IntegrationData
-                    IntegrationDataIdPathParam]]
+                     IntegrationDataIdPathParam]]
             [ring.util.http-response :refer [ok]]
             [terrain.clients.apps.raw :as apps]
             [terrain.routes.schemas.admin :refer [AdminAppSearchParams]]
@@ -50,18 +50,18 @@
        (ok (apps/list-app-publication-requests params)))
 
      (POST "/sharing" []
-           :body [body permission-schema/AppSharingRequest]
-           :return permission-schema/AppSharingResponse
-           :summary permission-schema/AppSharingSummary
-           :description permission-schema/AppSharingDocs
-           (ok (apps/admin-share body)))
+       :body [body permission-schema/AppSharingRequest]
+       :return permission-schema/AppSharingResponse
+       :summary permission-schema/AppSharingSummary
+       :description permission-schema/AppSharingDocs
+       (ok (apps/admin-share body)))
 
      (POST "/unsharing" []
-           :body [body permission-schema/AppUnsharingRequest]
-           :return permission-schema/AppUnsharingResponse
-           :summary permission-schema/AppUnsharingSummary
-           :description permission-schema/AppUnsharingDocs
-           (ok (apps/admin-unshare body)))
+       :body [body permission-schema/AppUnsharingRequest]
+       :return permission-schema/AppUnsharingResponse
+       :summary permission-schema/AppUnsharingSummary
+       :description permission-schema/AppUnsharingDocs
+       (ok (apps/admin-unshare body)))
 
      (POST "/shredder" []
        :body [body apps-schema/AppDeletionRequest]
@@ -131,44 +131,44 @@
          (ok (apps/admin-publish-app system-id app-id body)))
 
        (context "/versions/:version-id" []
-                :path-params [version-id :- apps-schema/AppVersionIdParam]
+         :path-params [version-id :- apps-schema/AppVersionIdParam]
 
-                (PATCH "/" []
-                       :body [body schema/AdminAppPatchRequest]
-                       :return schema/AdminAppDetails
-                       :summary schema/AdminAppVersionPatchSummary
-                       :description-file "docs/apps/admin/app-label-update.md"
-                       (ok (apps/admin-update-app-version system-id
-                                                          app-id
-                                                          version-id
-                                                          body)))
+         (PATCH "/" []
+           :body [body schema/AdminAppPatchRequest]
+           :return schema/AdminAppDetails
+           :summary schema/AdminAppVersionPatchSummary
+           :description-file "docs/apps/admin/app-label-update.md"
+           (ok (apps/admin-update-app-version system-id
+                                              app-id
+                                              version-id
+                                              body)))
 
-                (GET "/details" []
-                     :return schema/AdminAppDetails
-                     :summary schema/AppVersionDetailsSummary
-                     :description schema/AppVersionDetailsDocs
-                     (ok (apps/get-admin-app-version-details system-id app-id version-id)))
+         (GET "/details" []
+           :return schema/AdminAppDetails
+           :summary schema/AppVersionDetailsSummary
+           :description schema/AppVersionDetailsDocs
+           (ok (apps/get-admin-app-version-details system-id app-id version-id)))
 
-                (PATCH "/documentation" []
-                       :body [body apps-schema/AppDocumentationRequest]
-                       :return apps-schema/AppDocumentation
-                       :summary schema/AppVersionDocumentationUpdateSummary
-                       :description schema/AppVersionDocumentationUpdateDocs
-                       (ok (apps/admin-edit-app-version-docs system-id app-id version-id body)))
+         (PATCH "/documentation" []
+           :body [body apps-schema/AppDocumentationRequest]
+           :return apps-schema/AppDocumentation
+           :summary schema/AppVersionDocumentationUpdateSummary
+           :description schema/AppVersionDocumentationUpdateDocs
+           (ok (apps/admin-edit-app-version-docs system-id app-id version-id body)))
 
-                (POST "/documentation" []
-                      :body [body apps-schema/AppDocumentationRequest]
-                      :return apps-schema/AppDocumentation
-                      :summary schema/AppVersionDocumentationAddSummary
-                      :description schema/AppVersionDocumentationAddDocs
-                      (ok (apps/admin-add-app-version-docs system-id app-id version-id body)))
+         (POST "/documentation" []
+           :body [body apps-schema/AppDocumentationRequest]
+           :return apps-schema/AppDocumentation
+           :summary schema/AppVersionDocumentationAddSummary
+           :description schema/AppVersionDocumentationAddDocs
+           (ok (apps/admin-add-app-version-docs system-id app-id version-id body)))
 
-                (PUT "/integration-data/:integration-data-id" []
-                     :path-params [integration-data-id :- IntegrationDataIdPathParam]
-                     :return IntegrationData
-                     :summary schema/AppVersionIntegrationDataUpdateSummary
-                     :description schema/AppVersionIntegrationDataUpdateDocs
-                     (ok (apps/update-app-version-integration-data system-id
-                                                                   app-id
-                                                                   version-id
-                                                                   integration-data-id))))))))
+         (PUT "/integration-data/:integration-data-id" []
+           :path-params [integration-data-id :- IntegrationDataIdPathParam]
+           :return IntegrationData
+           :summary schema/AppVersionIntegrationDataUpdateSummary
+           :description schema/AppVersionIntegrationDataUpdateDocs
+           (ok (apps/update-app-version-integration-data system-id
+                                                         app-id
+                                                         version-id
+                                                         integration-data-id))))))))

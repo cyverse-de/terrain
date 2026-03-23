@@ -19,7 +19,7 @@
           :badName    (describe Boolean "Flag indicating whether the folder should be disabled/avoided in the client UI")
           :isFavorite (describe Boolean "Flag indicating whether the folder is marked as a favorite by the user")
           (s/optional-key :folders)
-                      (describe [(s/recursive #'FolderListing)] "Subdirectories of this directory")}))
+          (describe [(s/recursive #'FolderListing)] "Subdirectories of this directory")}))
 
 (s/defschema DirectoryResponse
   ((comp schema-tools/optional-keys merge)

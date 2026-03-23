@@ -173,12 +173,12 @@
 (defn set-app-versions-order
   [system-id app-id update-request]
   (:body
-    (client/put (apps-url "apps" system-id app-id "versions")
-                (disable-redirects
-                  {:query-params (secured-params)
-                   :form-params  update-request
-                   :content-type :json
-                   :as           :json}))))
+   (client/put (apps-url "apps" system-id app-id "versions")
+               (disable-redirects
+                {:query-params (secured-params)
+                 :form-params  update-request
+                 :content-type :json
+                 :as           :json}))))
 
 (defn preview-args
   [system-id app]
@@ -1302,10 +1302,10 @@
 (defn list-logins
   [limit]
   (:body
-    (client/get (apps-url "users" "logins")
-                 (disable-redirects
-                   {:query-params (secured-params (remove-nil-values {:limit limit}))
-                    :as           :json}))))
+   (client/get (apps-url "users" "logins")
+               (disable-redirects
+                {:query-params (secured-params (remove-nil-values {:limit limit}))
+                 :as           :json}))))
 
 (defn list-integration-data
   [params]

@@ -33,7 +33,6 @@
       json/decode
       (get "iRODS")))
 
-
 (defn user-home-folder
   "Determines the home folder for the given user.
 
@@ -44,7 +43,6 @@
      It returns the absolute path to the home folder."
   ^String [^String user]
   (cp/user-home-dir user))
-
 
 (defn user-base-paths
   "Fetches the home and trash paths for the given user.
@@ -58,7 +56,6 @@
   (-> (raw/base-paths user)
       :body
       (json/decode true)))
-
 
 (defn uuid-for-path
   [^String user ^String path]
@@ -271,7 +268,6 @@
    (cons (string/replace path #"/+$" "")
          (map #(string/replace % #"^/+|/+$" "") components))))
 
-
 (defn get-metadata-json
   [user data-id]
   (:body (raw/get-avus user data-id :as :json)))
@@ -340,8 +336,6 @@
    ^String  sort-order
    ^Integer limit
 
-
-
    ^Integer offset
    ^ISeq    uuids
    info-types]
@@ -357,7 +351,6 @@
      :folders (filter #(= (:type %) :dir) page)
      :total   (db/number-of-uuids-in-folder user (cfg/irods-zone) uuids info-types)}))
 
-
 (defn uuid-accessible?
   "Indicates if a data item is readable by a given user.
 
@@ -370,7 +363,6 @@
   ^Boolean [^String user ^UUID data-id]
   (uuids/uuid-accessible? user data-id))
 
-
 (defn validate-uuid-accessible
   "Throws an exception if the given data item is not accessible to the given user.
 
@@ -380,7 +372,6 @@
   [^String user ^UUID data-id]
   (when-not (uuid-accessible? user data-id)
     (throw+ {:error_code error/ERR_NOT_FOUND :uuid data-id})))
-
 
 (defn resolve-data-type
   "Given filesystem id, it returns the type of data item it is, file or folder.
@@ -392,7 +383,6 @@
      The type of the data item, `file` or `folder`"
   ^String [^UUID data-id]
   (icat/resolve-data-type data-id))
-
 
 (defn share
   "grants access to a list of data entities for a list of users by a user
@@ -416,7 +406,6 @@
   ^IPersistentMap [^String user ^ISeq share-withs ^ISeq fpaths ^String perm]
   (sharing/share user share-withs fpaths perm))
 
-
 (defn unshare
   "Params:
      user          - the username of the user removing access
@@ -435,11 +424,9 @@
   [^String user ^ISeq unshare-withs ^ISeq fpaths]
   (sharing/unshare user unshare-withs fpaths))
 
-
 (defn- fmt-method
   [method]
   (string/upper-case (name method)))
-
 
 (defn- handle-service-error
   [method url msg]
@@ -447,13 +434,11 @@
     (log/error full-msg)
     (assertions/request-failure full-msg)))
 
-
 (defn- handle-client-error
   [method url err msg]
   (let [full-msg (str "interal error related to usage of " method " " url ": " msg)]
     (log/error err full-msg)
     (assertions/request-failure full-msg)))
-
 
 (defn mk-data-path-url-path
   "This function constructs the url path to the resource backing a given data item.
@@ -467,7 +452,6 @@
   (let [nodes (fs/split path)
         nodes (if (= "/" (first nodes)) (next nodes) nodes)]
     (str "data/path/" (string/join "/" (map url/url-encode nodes)))))
-
 
 (defn respond-with-default-error
   "This function generates the default responses for errors returned from a data-info request.
@@ -504,14 +488,12 @@
       503 (handle-service-error method url "temporarily unavailable")
       (handle-client-error method url err "unexpected response code"))))
 
-
 (defn- handle-error
   [method url err handlers]
   (let [status (:status err)]
     (if-let [handler ((keyword (str status)) handlers)]
       (handler method url err)
       (respond-with-default-error status method url err))))
-
 
 (defn trapped-request
   "This function makes an HTTP request to the data-info service. It uses clj-http to make the
@@ -541,7 +523,6 @@
      (catch #(not (nil? (:status %))) err
        (handle-error method url err error-handlers)))))
 
-
 (defn- data-path-url
   "Returns the URL for the path to a data item in the data store."
   [path]
@@ -551,7 +532,6 @@
        (map url/url-encode)
        (apply url/url (cfg/data-info-base-url) "data" "path")
        str))
-
 
 (defn list-folder-contents
   "Obtains a directory listing for a folder path."

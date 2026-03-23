@@ -5,14 +5,12 @@
             [terrain.clients.metadata.raw :as metadata])
   (:import [java.util UUID]))
 
-
 (defn- format-favorites
   [favs]
   (letfn [(mk-fav [entry] (assoc entry :isFavorite true))]
     (assoc favs
-      :files   (map mk-fav (:files favs))
-      :folders (map mk-fav (:folders favs)))))
-
+           :files   (map mk-fav (:files favs))
+           :folders (map mk-fav (:folders favs)))))
 
 (defn- user-col->api-col
   [col]
@@ -44,7 +42,6 @@
     (data/validate-uuid-accessible user data-id)
     (metadata/add-favorite data-id (data/resolve-data-type data-id))))
 
-
 (defn remove-favorite
   "This function unmarks a given data item as a favorite of the authenticated user.
 
@@ -54,7 +51,6 @@
   [data-id]
   (metadata/remove-favorite data-id))
 
-
 (defn remove-selected-favorites
   "Unmarks all of the users favorites with the given entity type.
 
@@ -62,7 +58,6 @@
      entity-type: a case-insensitive-string containing {file|folder|any}"
   [{:keys [entity-type]}]
   (metadata/remove-selected-favorites (name (or entity-type :any))))
-
 
 (defn- ids-txt->uuids-set
   [ids-txt]
@@ -75,7 +70,6 @@
 (defn- extract-favorite-uuids-set
   [response]
   (-> response :body slurp parse-filesystem-ids ids-txt->uuids-set))
-
 
 (defn list-favorite-data-with-stat
   "Returns a listing of a user's favorite data, including stat information about it. This endpoint
@@ -106,7 +100,6 @@
     (->> (data/stats-by-uuids-paged user col ord limit offset uuids info-type)
          format-favorites
          (hash-map :filesystem))))
-
 
 (defn filter-favorites
   "Forwards a list of UUIDs for data items to the metadata service favorites filter

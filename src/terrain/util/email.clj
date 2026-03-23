@@ -29,21 +29,21 @@
                          :toolrequestid      (:uuid tool-req)
                          :toolrequestdetails tool-req}]
     (send-email
-      :to        (config/tool-request-dest-addr)
-      :from-addr (config/tool-request-src-addr)
-      :subject   "New Tool Request"
-      :template  "tool_request"
-      :values    template-values)))
+     :to        (config/tool-request-dest-addr)
+     :from-addr (config/tool-request-src-addr)
+     :subject   "New Tool Request"
+     :template  "tool_request"
+     :values    template-values)))
 
 (defn- send-permanent-id-request
   "Sends a Permanent ID Request email message to data curators."
   [subject template template-values]
   (send-email
-    :to        (config/permanent-id-request-dest-addr)
-    :from-addr (config/permanent-id-request-src-addr)
-    :subject   subject
-    :template  template
-    :values    template-values))
+   :to        (config/permanent-id-request-dest-addr)
+   :from-addr (config/permanent-id-request-src-addr)
+   :subject   subject
+   :template  template
+   :values    template-values))
 
 (defn send-permanent-id-request-new
   "Sends an email message informing data curators of a new Permanent ID Request."
@@ -54,23 +54,23 @@
                          :request_type request-type
                          :path         path}]
     (send-permanent-id-request
-      "New Permanent ID Request"
-      "permanent_id_request"
-      template-values)))
+     "New Permanent ID Request"
+     "permanent_id_request"
+     template-values)))
 
 (defn send-permanent-id-request-data-move-error
   "Sends an email message informing data curators that a Permanent ID Request data folder could not be moved to the
    commons repo folder."
   [path dest-path {:keys [commonName shortUsername]} error-msg]
   (send-permanent-id-request
-    "Could not move Permanent ID Request data folder"
-    "permanent_id_request_move_error"
-    {:username      shortUsername
-     :user          commonName
-     :environment   (config/environment-name)
-     :path          path
-     :dest          dest-path
-     :error_message error-msg}))
+   "Could not move Permanent ID Request data folder"
+   "permanent_id_request_move_error"
+   {:username      shortUsername
+    :user          commonName
+    :environment   (config/environment-name)
+    :path          path
+    :dest          dest-path
+    :error_message error-msg}))
 
 (defn send-permanent-id-request-complete
   "Sends an email message informing data curators of a Permanent ID Request completion."
@@ -81,9 +81,9 @@
                          :path         path
                          :api_response api-response}]
     (send-permanent-id-request
-      "Permanent ID Request Complete"
-      "permanent_id_request_complete"
-      template-values)))
+     "Permanent ID Request Complete"
+     "permanent_id_request_complete"
+     template-values)))
 
 (defn send-permanent-id-request-complete-for-user
   "Sends an email message informing the requesting user of a Permanent ID Request completion."
@@ -93,11 +93,11 @@
                          :doi  doi}
         subject         (str request-type " Permanent ID Request Complete")]
     (send-email
-      :to        email
-      :from-addr (config/permanent-id-request-src-addr)
-      :subject   subject
-      :template  "permanent_id_request_completion_user"
-      :values    template-values)))
+     :to        email
+     :from-addr (config/permanent-id-request-src-addr)
+     :subject   subject
+     :template  "permanent_id_request_completion_user"
+     :values    template-values)))
 
 (defn send-permanent-id-request-submitted
   "Sends an email message to the user requesting a new Permanent ID Request."
@@ -108,11 +108,11 @@
                          :path         path}
         subject         (str request-type " Permanent ID Request Submitted")]
     (send-email
-      :to        email
-      :from-addr (config/permanent-id-request-src-addr)
-      :subject   subject
-      :template  "permanent_id_request_submitted"
-      :values    template-values)))
+     :to        email
+     :from-addr (config/permanent-id-request-src-addr)
+     :subject   subject
+     :template  "permanent_id_request_submitted"
+     :values    template-values)))
 
 (defn format-field
   "Formats a single field in a support email."

@@ -10,7 +10,6 @@
             [terrain.services.fileio.actions :as actions])
   (:import [java.io ByteArrayInputStream]))
 
-
 (defn download
   [{user :shortUsername} {:keys [path]}]
   (actions/download (or user "anonymous") path))

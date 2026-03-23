@@ -131,87 +131,87 @@
           (config/metadata-routes-enabled))]
 
    (GET "/filesystem/metadata" [:as {:keys [user-info params] :as req}]
-        :query [{:keys [attribute value unit target-id]} metadata-schema/AvuSearchParams]
-        :return metadata-schema/AvuList
-        :summary "List Metadata AVUs."
-        :description "Lists Metadata AVUs matching parameters in the query string."
-        (ok (meta-raw/find-avus [meta-raw/target-type-folder meta-raw/target-type-file]
-                                target-id
-                                attribute
-                                value
-                                unit)))
+     :query [{:keys [attribute value unit target-id]} metadata-schema/AvuSearchParams]
+     :return metadata-schema/AvuList
+     :summary "List Metadata AVUs."
+     :description "Lists Metadata AVUs matching parameters in the query string."
+     (ok (meta-raw/find-avus [meta-raw/target-type-folder meta-raw/target-type-file]
+                             target-id
+                             attribute
+                             value
+                             unit)))
 
-    (POST "/filesystem/metadata/csv-parser" [:as {:keys [user-info params] :as req}]
-      :middleware [require-authentication]
-      (meta/parse-metadata-csv-file user-info params))
+   (POST "/filesystem/metadata/csv-parser" [:as {:keys [user-info params] :as req}]
+     :middleware [require-authentication]
+     (meta/parse-metadata-csv-file user-info params))
 
    (POST "/filesystem/metadata/search" []
-         :body [{:keys [attribute value unit target-id]} metadata-schema/AvuSearchParams]
-         :return metadata-schema/AvuList
-         :summary "List AVUs."
-         :description "Lists AVUs matching parameters in the request body."
-         (ok (meta-raw/search-avus [meta-raw/target-type-folder meta-raw/target-type-file]
-                                   target-id
-                                   attribute
-                                   value
-                                   unit)))
+     :body [{:keys [attribute value unit target-id]} metadata-schema/AvuSearchParams]
+     :return metadata-schema/AvuList
+     :summary "List AVUs."
+     :description "Lists AVUs matching parameters in the request body."
+     (ok (meta-raw/search-avus [meta-raw/target-type-folder meta-raw/target-type-file]
+                               target-id
+                               attribute
+                               value
+                               unit)))
 
-    (GET "/filesystem/metadata/templates" [:as req]
-      (controller req mt/do-metadata-template-list))
+   (GET "/filesystem/metadata/templates" [:as req]
+     (controller req mt/do-metadata-template-list))
 
-    (GET "/filesystem/metadata/template/:template-id" [template-id :as req]
-      (controller req mt/do-metadata-template-view template-id))
+   (GET "/filesystem/metadata/template/:template-id" [template-id :as req]
+     (controller req mt/do-metadata-template-view template-id))
 
-    (GET "/filesystem/metadata/template/:template-id/blank-csv" [template-id :as req]
-      :middleware [require-authentication]
-      (controller req meta-raw/get-template-csv template-id))
+   (GET "/filesystem/metadata/template/:template-id/blank-csv" [template-id :as req]
+     :middleware [require-authentication]
+     (controller req meta-raw/get-template-csv template-id))
 
-    (GET "/filesystem/metadata/template/:template-id/guide-csv" [template-id :as req]
-      :middleware [require-authentication]
-      (controller req meta-raw/get-template-guide template-id))
+   (GET "/filesystem/metadata/template/:template-id/guide-csv" [template-id :as req]
+     :middleware [require-authentication]
+     (controller req meta-raw/get-template-guide template-id))
 
-    (GET "/filesystem/metadata/template/:template-id/zip-csv" [template-id :as req]
-      :middleware [require-authentication]
-      (controller req meta-raw/get-template-zip template-id))
+   (GET "/filesystem/metadata/template/:template-id/zip-csv" [template-id :as req]
+     :middleware [require-authentication]
+     (controller req meta-raw/get-template-zip template-id))
 
-    (GET "/filesystem/metadata/template/attr/:attr-id" [attr-id :as req]
-      (controller req mt/do-metadata-attribute-view attr-id))
+   (GET "/filesystem/metadata/template/attr/:attr-id" [attr-id :as req]
+     (controller req mt/do-metadata-attribute-view attr-id))
 
-    (GET "/filesystem/:data-id/metadata" [data-id :as req]
-      (controller req meta/do-metadata-get :params data-id))
+   (GET "/filesystem/:data-id/metadata" [data-id :as req]
+     (controller req meta/do-metadata-get :params data-id))
 
-    (POST "/filesystem/:data-id/metadata" [data-id :as req]
-      :middleware [require-authentication]
-      (controller req meta/do-metadata-set data-id :params :body))
+   (POST "/filesystem/:data-id/metadata" [data-id :as req]
+     :middleware [require-authentication]
+     (controller req meta/do-metadata-set data-id :params :body))
 
-    (POST "/filesystem/:data-id/metadata/copy" [data-id :as req]
-      :middleware [require-authentication]
-      (controller req meta/do-metadata-copy :params data-id :body))
+   (POST "/filesystem/:data-id/metadata/copy" [data-id :as req]
+     :middleware [require-authentication]
+     (controller req meta/do-metadata-copy :params data-id :body))
 
-    (POST "/filesystem/:data-id/metadata/save" [data-id :as req]
-      :middleware [require-authentication]
-      (controller req meta/do-metadata-save data-id :params :body))
+   (POST "/filesystem/:data-id/metadata/save" [data-id :as req]
+     :middleware [require-authentication]
+     (controller req meta/do-metadata-save data-id :params :body))
 
-    (POST "/filesystem/:data-id/ore/save" [data-id :as req]
-      :middleware [require-authentication]
-      (controller req meta/do-ore-save data-id :params))))
+   (POST "/filesystem/:data-id/ore/save" [data-id :as req]
+     :middleware [require-authentication]
+     (controller req meta/do-ore-save data-id :params))))
 
 (defn admin-filesystem-metadata-routes
   "The admin routes for file metadata endpoints."
   []
   (optional-routes
-    [#(and (config/admin-routes-enabled)
-           (config/filesystem-routes-enabled)
-           (config/metadata-routes-enabled))]
+   [#(and (config/admin-routes-enabled)
+          (config/filesystem-routes-enabled)
+          (config/metadata-routes-enabled))]
 
-    (GET "/filesystem/metadata/templates" [:as req]
-      (controller req mt/do-metadata-template-admin-list))
+   (GET "/filesystem/metadata/templates" [:as req]
+     (controller req mt/do-metadata-template-admin-list))
 
-    (POST "/filesystem/metadata/templates" [:as req]
-      (controller req mt/do-metadata-template-add :body))
+   (POST "/filesystem/metadata/templates" [:as req]
+     (controller req mt/do-metadata-template-add :body))
 
-    (POST "/filesystem/metadata/templates/:template-id" [template-id :as req]
-      (controller req mt/do-metadata-template-edit template-id :body))
+   (POST "/filesystem/metadata/templates/:template-id" [template-id :as req]
+     (controller req mt/do-metadata-template-edit template-id :body))
 
-    (DELETE "/filesystem/metadata/templates/:template-id" [template-id :as req]
-      (controller req mt/do-metadata-template-delete template-id :params))))
+   (DELETE "/filesystem/metadata/templates/:template-id" [template-id :as req]
+     (controller req mt/do-metadata-template-delete template-id :params))))

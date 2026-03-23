@@ -18,11 +18,11 @@
    (s/optional-key :all)  (describe [(s/recursive #'Clause)] AllDocs)
    (s/optional-key :none) (describe [(s/recursive #'Clause)] NoneDocs)
    (s/optional-key :type) (describe ClauseTypeEnum (str
-                                    "A string containing the clause type. If the `type` key is used,
+                                                    "A string containing the clause type. If the `type` key is used,
                                     the `args` key should also be used. Documentation on the clause types
                                     can be found via the " SearchDocLink " endpoint"))
    (s/optional-key :args) (describe s/Any (str
-                                    "A set of arguments that further refine the clause terms. The `args`
+                                           "A set of arguments that further refine the clause terms. The `args`
                                     key should only be used alongside a corresponding `type` key.
                                     Documentation on the corresponding args for each clause can be found
                                     via the " SearchDocLink " endpoint"))})
@@ -41,6 +41,6 @@
    (s/optional-key :sort) (describe [SearchSortParams]
                                     "Sorts the results based on a list of criteria")
    (s/optional-key :scroll) (describe String
-                                    "Sets a scroll timeout for this search. Required if scroll_id is present.")
+                                      "Sets a scroll timeout for this search. Required if scroll_id is present.")
    (s/optional-key :scroll_id) (describe String
-                                    "Gets the next set of results for a given scroll ID. Mutually exclusive with 'query'.")})
+                                         "Gets the next set of results for a given scroll ID. Mutually exclusive with 'query'.")})

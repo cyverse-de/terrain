@@ -68,16 +68,16 @@
    Otherwise, the value is preserved and is wrapped in a response map."
   [e status-code]
   (cond
-   (response-map? e)           (terrain-response-from-response-map e status-code)
-   (map? e)                    (terrain-response-from-map e status-code)
-   (error-resp? e status-code) (terrain-response-from-exception e status-code)
-   :else                       (default-terrain-response e status-code)))
+    (response-map? e)           (terrain-response-from-response-map e status-code)
+    (map? e)                    (terrain-response-from-map e status-code)
+    (error-resp? e status-code) (terrain-response-from-exception e status-code)
+    :else                       (default-terrain-response e status-code)))
 
 (defn success-response
   ([]
-     (success-response nil))
+   (success-response nil))
   ([retval]
-    (terrain-response retval 200)))
+   (terrain-response retval 200)))
 
 (defn unrecognized-path-response
   "Builds the response to send for an unrecognized service path."

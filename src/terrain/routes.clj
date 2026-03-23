@@ -244,10 +244,10 @@
 
 (def service-account-handler
   (route-middleware
-    [user-attributes/authenticate-current-user
-     wrap-user-info
-     wrap-logging]
-    (service-account-routes)))
+   [user-attributes/authenticate-current-user
+    wrap-user-info
+    wrap-logging]
+   (service-account-routes)))
 
 (def secured-routes-handler
   (route-middleware

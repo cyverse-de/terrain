@@ -76,7 +76,7 @@
          :description instantlaunch-schema/GetFullInstantLaunchDescription
          :return instantlaunch-schema/FullInstantLaunch
          (ok (app-exposer/get-full-instant-launch id)))
-       
+
        (POST "/" []
          :summary instantlaunch-schema/UpdateInstantLaunchSummary
          :description instantlaunch-schema/UpdateInstantLaunchDescription

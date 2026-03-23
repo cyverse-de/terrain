@@ -15,30 +15,30 @@
 (defn admin-reference-genomes-routes
   []
   (optional-routes
-    [#(and (config/admin-routes-enabled)
-           (config/app-routes-enabled))]
+   [#(and (config/admin-routes-enabled)
+          (config/app-routes-enabled))]
 
-    (context "/reference-genomes" []
-      :tags ["admin-reference-genomes"]
+   (context "/reference-genomes" []
+     :tags ["admin-reference-genomes"]
 
-      (POST "/" []
-            :body [body schema/ReferenceGenomeAddRequest]
-            :return ReferenceGenome
-            :summary schema/ReferenceGenomeAddSummary
-            :description schema/ReferenceGenomeAddDocs
-            (ok (apps/admin-add-reference-genome body)))
+     (POST "/" []
+       :body [body schema/ReferenceGenomeAddRequest]
+       :return ReferenceGenome
+       :summary schema/ReferenceGenomeAddSummary
+       :description schema/ReferenceGenomeAddDocs
+       (ok (apps/admin-add-reference-genome body)))
 
-      (DELETE "/:reference-genome-id" []
-              :path-params [reference-genome-id :- ReferenceGenomeIdParam]
-              :query [params schema/ReferenceGenomeDeletionParams]
-              :summary schema/ReferenceGenomeDeleteSummary
-              :description schema/ReferenceGenomeDeleteDocs
-              (ok (apps/admin-delete-reference-genome reference-genome-id params)))
+     (DELETE "/:reference-genome-id" []
+       :path-params [reference-genome-id :- ReferenceGenomeIdParam]
+       :query [params schema/ReferenceGenomeDeletionParams]
+       :summary schema/ReferenceGenomeDeleteSummary
+       :description schema/ReferenceGenomeDeleteDocs
+       (ok (apps/admin-delete-reference-genome reference-genome-id params)))
 
-      (PATCH "/:reference-genome-id" []
-             :path-params [reference-genome-id :- ReferenceGenomeIdParam]
-             :body [body schema/ReferenceGenomeUpdateRequest]
-             :return ReferenceGenome
-             :summary schema/ReferenceGenomeUpdateSummary
-             :description schema/ReferenceGenomeUpdateDocs
-             (ok (apps/admin-update-reference-genome body reference-genome-id))))))
+     (PATCH "/:reference-genome-id" []
+       :path-params [reference-genome-id :- ReferenceGenomeIdParam]
+       :body [body schema/ReferenceGenomeUpdateRequest]
+       :return ReferenceGenome
+       :summary schema/ReferenceGenomeUpdateSummary
+       :description schema/ReferenceGenomeUpdateDocs
+       (ok (apps/admin-update-reference-genome body reference-genome-id))))))

@@ -7,26 +7,25 @@
 (defn alerts-routes
   []
   (routes
-    (context "/alerts" []
-      :tags ["notifications"]
+   (context "/alerts" []
+     :tags ["notifications"]
 
-      (GET "/all" []
-        (ok (user-info/list-all-alerts)))
+     (GET "/all" []
+       (ok (user-info/list-all-alerts)))
 
-      (GET "/active" []
-        (ok (user-info/list-active-alerts))))))
+     (GET "/active" []
+       (ok (user-info/list-active-alerts))))))
 
 (defn admin-alerts-routes
   []
   (routes
-    (context "/alerts" []
-      :tags ["notifications"]
+   (context "/alerts" []
+     :tags ["notifications"]
 
-      (POST "/" []
-        :body [body alerts-schema/Alert]
-        (ok (user-info/add-alert (:start-date body) (:end-date body) (:alert-text body))))
+     (POST "/" []
+       :body [body alerts-schema/Alert]
+       (ok (user-info/add-alert (:start-date body) (:end-date body) (:alert-text body))))
 
-      (DELETE "/" []
-        :body [body alerts-schema/Alert]
-        (ok (user-info/delete-alert (:end-date body) (:alert-text body)))))))
-
+     (DELETE "/" []
+       :body [body alerts-schema/Alert]
+       (ok (user-info/delete-alert (:end-date body) (:alert-text body)))))))

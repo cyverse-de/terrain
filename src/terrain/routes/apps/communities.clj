@@ -18,24 +18,24 @@
 (defn app-community-tag-routes
   []
   (optional-routes
-    [#(and (config/app-routes-enabled)
-           (config/metadata-routes-enabled))]
+   [#(and (config/app-routes-enabled)
+          (config/metadata-routes-enabled))]
 
-    (context "/apps/:app-id/communities" []
-      :tags ["app-community-tags"]
-      :path-params [app-id :- AppIdParam]
+   (context "/apps/:app-id/communities" []
+     :tags ["app-community-tags"]
+     :path-params [app-id :- AppIdParam]
 
-      (DELETE "/" []
-              :middleware [require-authentication]
-              :body [body AppCategoryMetadataDeleteRequest]
-              :summary schema/AppCommunityMetadataDeleteSummary
-              :description schema/AppCommunityMetadataDeleteDocs
-              (ok (apps/remove-app-from-communities app-id body)))
+     (DELETE "/" []
+       :middleware [require-authentication]
+       :body [body AppCategoryMetadataDeleteRequest]
+       :summary schema/AppCommunityMetadataDeleteSummary
+       :description schema/AppCommunityMetadataDeleteDocs
+       (ok (apps/remove-app-from-communities app-id body)))
 
-      (POST "/" []
-            :middleware [require-authentication]
-            :body [body AppCategoryMetadataAddRequest]
-            :return AvuList
-            :summary schema/AppCommunityMetadataAddSummary
-            :description schema/AppCommunityMetadataAddDocs
-            (ok (apps/update-app-communities app-id body))))))
+     (POST "/" []
+       :middleware [require-authentication]
+       :body [body AppCategoryMetadataAddRequest]
+       :return AvuList
+       :summary schema/AppCommunityMetadataAddSummary
+       :description schema/AppCommunityMetadataAddDocs
+       (ok (apps/update-app-communities app-id body))))))

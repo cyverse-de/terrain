@@ -23,7 +23,7 @@
 (def ^:private status-code-completion "Completion")
 (def ^:private status-code-failed "Failed")
 (def ^:private completion-comment-fmt
-"The DOI Permanent ID has been created for
+  "The DOI Permanent ID has been created for
 %s
 
 The dataset is available via its landing page at https://doi.org/%s.
@@ -119,9 +119,9 @@ If this dataset accompanies a paper, please contact us with the DOI for that pap
   [{:keys [paths]} staging-dest src-folder]
   (let [path-exists? (get paths (keyword staging-dest))]
     (when (and path-exists? (not= staging-dest src-folder))
-    (throw+ {:type :clojure-commons.exception/exists
-             :error "A folder with this name has already been submitted for a Permanent ID request."
-             :path staging-dest}))))
+      (throw+ {:type :clojure-commons.exception/exists
+               :error "A folder with this name has already been submitted for a Permanent ID request."
+               :path staging-dest}))))
 
 (defn- validate-publish-dest-available
   [{:keys [paths]} publish-dest src-folder]
@@ -158,10 +158,10 @@ If this dataset accompanies a paper, please contact us with the DOI for that pap
   "Submits the request to the metadata create-permanent-id-request endpoint."
   [type folder-id target-type path]
   (metadata/create-permanent-id-request
-    {:type          type
-     :target_id     folder-id
-     :target_type   target-type
-     :original_path path}))
+   {:type          type
+    :target_id     folder-id
+    :target_type   target-type
+    :original_path path}))
 
 (defn- create-publish-dir
   "Creates the Permanent ID Requests publish directory, if it doesn't already exist."
@@ -195,40 +195,39 @@ If this dataset accompanies a paper, please contact us with the DOI for that pap
      (email/send-permanent-id-request-data-move-error path dest-path requesting-user (:body e (str e)))
      nil)))
 
-
 (defn- async-move-poller
   [requesting-user {:keys [id path]} dest-path async-task-id post-move-fn]
   (try+
-    (log/info "Waiting for async move to complete for" id path)
+   (log/info "Waiting for async move to complete for" id path)
 
-    (loop [sleep-seconds 1]
-      (Thread/sleep (* sleep-seconds 1000))
+   (loop [sleep-seconds 1]
+     (Thread/sleep (* sleep-seconds 1000))
 
-      (let [{:keys [statuses end_date]} (async-tasks-client/get-by-id async-task-id)
-            last-status (-> statuses last :status)]
-        (when (and end_date (not= last-status "completed"))
-          (log/warn "Async folder move not completed successfully:" last-status))
+     (let [{:keys [statuses end_date]} (async-tasks-client/get-by-id async-task-id)
+           last-status (-> statuses last :status)]
+       (when (and end_date (not= last-status "completed"))
+         (log/warn "Async folder move not completed successfully:" last-status))
 
-        (if end_date
+       (if end_date
           ;; Async move completed.
-          (post-move-fn (:path (data-info/stat-by-uuid (config/irods-user)
-                                                       id
-                                                       :filter-include "path")))
+         (post-move-fn (:path (data-info/stat-by-uuid (config/irods-user)
+                                                      id
+                                                      :filter-include "path")))
           ;; Else keep waiting for up to wait-seconds-max.
           ;; Since the sleep seconds are doubled each time,
           ;; then this thread has already been waiting
           ;; ((sleep-seconds * 2) - 1) number of seconds.
-          (if (< (dec (* sleep-seconds 2)) (config/permanent-id-async-move-wait-seconds-max))
-            (recur (* sleep-seconds 2))
-            (throw+ (str "Async move took too long to complete successfully. Last status: "
-                         last-status))))))
+         (if (< (dec (* sleep-seconds 2)) (config/permanent-id-async-move-wait-seconds-max))
+           (recur (* sleep-seconds 2))
+           (throw+ (str "Async move took too long to complete successfully. Last status: "
+                        last-status))))))
 
-    (catch Object e
-      (log/error e)
-      (email/send-permanent-id-request-data-move-error path
-                                                       dest-path
-                                                       requesting-user
-                                                       (:body e (str e))))))
+   (catch Object e
+     (log/error e)
+     (email/send-permanent-id-request-data-move-error path
+                                                      dest-path
+                                                      requesting-user
+                                                      (:body e (str e))))))
 
 (defn- move-data-item-to-staging
   [{:keys [shortUsername] :as requesting-user} {:keys [path] :as folder}]
@@ -297,17 +296,17 @@ If this dataset accompanies a paper, please contact us with the DOI for that pap
   (log/debug "sending permanent_id_request notification to" user ":" subject)
   (try
     (notifications/send-notification
-      {:type "permanent_id_request"
-       :user user
-       :subject subject
-       :email true
-       :email_template "blank"
-       :payload {:email_address email
-                 :contents      contents
-                 :uuid          request-id}})
+     {:type "permanent_id_request"
+      :user user
+      :subject subject
+      :email true
+      :email_template "blank"
+      :payload {:email_address email
+                :contents      contents
+                :uuid          request-id}})
     (catch Exception e
       (log/error e
-        "Could not send permanent_id_request (" request-id ") notification to" user ":" subject))))
+                 "Could not send permanent_id_request (" request-id ") notification to" user ":" subject))))
 
 (defn- send-update-notification
   [{:keys [id type folder history] {:keys [username email]} :requested_by}]
@@ -410,11 +409,11 @@ If this dataset accompanies a paper, please contact us with the DOI for that pap
         {request-id :id :as response}  (submit-permanent-id-request type folder-id target-type path)
         staged-path                    (stage-data-item current-user folder)]
     (send-notification
-      user
-      (:email current-user)
-      (str type " Request Submitted for " (ft/basename path))
-      nil
-      request-id)
+     user
+     (:email current-user)
+     (str type " Request Submitted for " (ft/basename path))
+     nil
+     request-id)
     (email/send-permanent-id-request-new type staged-path current-user)
     (email/send-permanent-id-request-submitted type staged-path current-user)
     (format-permanent-id-request-details user response)))
@@ -453,27 +452,27 @@ If this dataset accompanies a paper, please contact us with the DOI for that pap
   [user {request-id :id :keys [folder type requested_by] :as request}]
   (validate-request-for-completion request)
   (try+
-    (let [folder          (validate-publish-dest folder)
-          folder-id       (uuidify (:id folder))
-          metadata        (data-info/get-metadata-json user folder-id)
-          avus            (format-avus metadata)
-          target-url      (format-metadata-target-url (:path folder))
-          datacite-xml    (parse-valid-datacite-metadata type avus)
-          doi-response    (datacite-client/create-doi datacite-xml target-url)
-          identifier      (get-in doi-response [:data :id])
-          publish-avus    (format-publish-avus avus identifier type)
-          publish-path    (publish-data-item current-user folder)]
-      (email/send-permanent-id-request-complete type
-                                                identifier
-                                                publish-path
-                                                (json/encode doi-response {:pretty true}))
-      (email/send-permanent-id-request-complete-for-user type identifier publish-path requested_by)
-      (publish-metadata folder publish-avus)
-      [identifier publish-path])
-    (catch Object e
-      (log/error e)
-      (update-permanent-id-request request-id {:status status-code-failed})
-      (throw+ e))))
+   (let [folder          (validate-publish-dest folder)
+         folder-id       (uuidify (:id folder))
+         metadata        (data-info/get-metadata-json user folder-id)
+         avus            (format-avus metadata)
+         target-url      (format-metadata-target-url (:path folder))
+         datacite-xml    (parse-valid-datacite-metadata type avus)
+         doi-response    (datacite-client/create-doi datacite-xml target-url)
+         identifier      (get-in doi-response [:data :id])
+         publish-avus    (format-publish-avus avus identifier type)
+         publish-path    (publish-data-item current-user folder)]
+     (email/send-permanent-id-request-complete type
+                                               identifier
+                                               publish-path
+                                               (json/encode doi-response {:pretty true}))
+     (email/send-permanent-id-request-complete-for-user type identifier publish-path requested_by)
+     (publish-metadata folder publish-avus)
+     [identifier publish-path])
+   (catch Object e
+     (log/error e)
+     (update-permanent-id-request request-id {:status status-code-failed})
+     (throw+ e))))
 
 (defn create-permanent-id
   [request-id]

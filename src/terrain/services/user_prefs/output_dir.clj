@@ -40,8 +40,8 @@
   "Adds system default output directory to the preferences that are passed in."
   [prefs]
   (assoc prefs
-    :system_default_output_dir {:id   (system-default-output-dir)
-                                :path (system-default-output-dir)}))
+         :system_default_output_dir {:id   (system-default-output-dir)
+                                     :path (system-default-output-dir)}))
 
 (defn- sysdefoutdir
   [prefs]

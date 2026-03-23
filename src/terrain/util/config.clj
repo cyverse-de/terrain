@@ -278,9 +278,7 @@
   [props config-valid configs app-routes-enabled]
   "terrain.jex.base-url" "http://jex-adapter")
 
-
 ;;;iRODS connection information
-
 
 (declare irods-home)
 (cc/defprop-optstr irods-home

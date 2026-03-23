@@ -10,13 +10,11 @@
            [java.util UUID]
            [clojure.lang IPersistentMap]))
 
-
 (defn- update-tags-targets
   [response]
   (letfn [(fmt-tgt ([tgt] (update tgt :id uuidify)))]
     (doseq [{:keys [id targets]} (:tags response)]
       (search/update-tag-targets (uuidify id) (map fmt-tgt targets)))))
-
 
 (defn- format-new-tag-doc
   [db-tag]
@@ -27,7 +25,6 @@
    :dateCreated  (:created_on db-tag)
    :dateModified (:modified_on db-tag)
    :targets      []})
-
 
 (defn create-user-tag
   "Creates a new user tag
@@ -42,7 +39,6 @@
   (let [tag (-> body meta/create-user-tag)]
     (search/index-tag (format-new-tag-doc tag))
     (select-keys tag [:id])))
-
 
 (defn delete-user-tag
   "Deletes a user tag. This will detach it from all metadata.
@@ -60,7 +56,6 @@
     (meta/delete-user-tag tag-id)
     (search/remove-tag tag-id)))
 
-
 (defn handle-patch-file-tags
   "Adds or removes tags to a filesystem entry.
 
@@ -74,20 +69,17 @@
         user     (:shortUsername user/current-user)]
     (data/validate-uuid-accessible user entry-id)
     (update-tags-targets
-      (meta/update-attached-tags entry-id (data/resolve-data-type entry-id) params body))))
-
+     (meta/update-attached-tags entry-id (data/resolve-data-type entry-id) params body))))
 
 (defn list-all-attached-tags
   "Lists all of the tags attached to any filesystem entry by the authenticated user."
   []
   (meta/list-all-attached-tags))
 
-
 (defn remove-all-attached-tags
   "Removes all of the tags attached to any filesystem entry by the authenticated user."
   []
   (meta/remove-all-attached-tags))
-
 
 (defn list-attached-tags
   "Lists the tags attached to a filesystem entry.
@@ -100,7 +92,6 @@
     (data/validate-uuid-accessible user entry-id)
     (meta/list-attached-tags entry-id)))
 
-
 (defn suggest-tags
   "Given a tag value fragment, this function will return a list tags whose values contain that
    fragment.
@@ -111,14 +102,12 @@
   [contains limit]
   (meta/get-tags-by-value contains limit))
 
-
 (defn- do-update-tag
   [tag-id tag-rec]
   (let [doc-updates {:value        (:value tag-rec)
                      :description  (:description tag-rec)
                      :dateModified (:modified_on tag-rec)}]
     (search/update-tag tag-id doc-updates)))
-
 
 (defn update-user-tag
   "updates the value and/or description of a tag.
@@ -135,12 +124,10 @@
         update  (meta/update-user-tag tag-id body)]
     (do-update-tag tag-id update)))
 
-
 (defn list-user-tags
   "Lists all tags that were created by the authenticated user."
   []
   (meta/list-user-tags))
-
 
 (defn delete-all-user-tags
   "Deletes all tags that were created by the authenticated user."

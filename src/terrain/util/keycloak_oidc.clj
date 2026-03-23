@@ -41,8 +41,8 @@
   "Verifies that all required claims are present in a JWT."
   [jwt]
   (let [req-claims (if (is-service-account? jwt)
-                       required-service-account-claims
-                       required-claims)
+                     required-service-account-claims
+                     required-claims)
         missing (into [] (filter (comp nil? jwt) req-claims))]
     (when (seq missing)
       (throw+ (ex-info (str "Missing required JWT claims: " missing)
@@ -64,9 +64,9 @@
            (number? @cached-certs-time)
            (< (- (System/currentTimeMillis) @cached-certs-time) cache-ttl)) ;; (now - cached-time) < cache-ttl
     (try+
-      (jwt/jwk-validate @cached-certs token)
-      (catch Object _
-        (jwt/jwk-validate (update-cert-cache) token)))
+     (jwt/jwk-validate @cached-certs token)
+     (catch Object _
+       (jwt/jwk-validate (update-cert-cache) token)))
     (jwt/jwk-validate (update-cert-cache) token)))
 
 (defn validate-token

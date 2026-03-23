@@ -6,7 +6,7 @@
 
 (defn group-member [group-descriptor member-descriptor]
   (assoc subject-schema/Subject
-    :display_name (describe NonBlankString (str "The displayable " group-descriptor " " member-descriptor " name"))))
+         :display_name (describe NonBlankString (str "The displayable " group-descriptor " " member-descriptor " name"))))
 
 (defn group-members [group-descriptor member-descriptor member-descriptor-plural]
   {:members (describe [(group-member group-descriptor member-descriptor)]
@@ -70,8 +70,8 @@
 (defschema TeamListing (group-schema/group-list-with-detail "team" "teams"))
 (defschema AddTeamRequest
   (assoc (select-keys (group-schema/base-group "team") [:name (optional-key :description)])
-    (optional-key :public_privileges)
-    (describe [group-schema/ValidGroupPrivileges] "Team privileges granted to all DE users")))
+         (optional-key :public_privileges)
+         (describe [group-schema/ValidGroupPrivileges] "Team privileges granted to all DE users")))
 (defschema Team (group-schema/group "team"))
 (defschema UpdateTeamRequest (select-keys (group-schema/group-update "team") (map optional-key [:name :description])))
 (defschema TeamStub (group-schema/group-stub "team"))
@@ -86,8 +86,8 @@
 
 (defschema CommunityListingEntry
   (assoc (group-schema/group-with-detail "community")
-    :member     (describe Boolean "True if the authenticated user belongs to the community")
-    :privileges (describe [NonBlankString] "The privileges the authenticated user has for the community")))
+         :member     (describe Boolean "True if the authenticated user belongs to the community")
+         :privileges (describe [NonBlankString] "The privileges the authenticated user has for the community")))
 
 (defschema CommunityListing
   {:groups (describe [CommunityListingEntry] "The list of communities in the result set")})
@@ -125,7 +125,7 @@
 
 (defschema SubjectListEntry
   (assoc subject-schema/Subject
-    :display_name (describe NonBlankString "The displayable subject name")))
+         :display_name (describe NonBlankString "The displayable subject name")))
 
 (defschema SubjectList
   {:subjects (describe [SubjectListEntry] "The list of subjects in the result set")})

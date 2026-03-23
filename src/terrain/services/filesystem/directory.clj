@@ -46,7 +46,6 @@
     (or  (contains? fpaths path-to-check)
          (not (paths/valid-path? path-to-check)))))
 
-
 (defn- fmt-folder
   [user favorite-ids {:keys [id
                              path
@@ -65,7 +64,6 @@
                       (is-bad? user (fs/base-name path)))
    :hasSubDirs    true})
 
-
 (defn- fmt-dir-resp
   [{:keys [id folders] :as data-resp} user]
   (let [favorite-ids (->> folders
@@ -73,18 +71,16 @@
                           (concat [id])
                           (lookup-favorite-ids user))]
     (assoc (fmt-folder user favorite-ids data-resp)
-      :folders (map (partial fmt-folder user favorite-ids) folders))))
-
+           :folders (map (partial fmt-folder user favorite-ids) folders))))
 
 (defn- list-directories
   "Lists the directories contained under path."
   [user path]
-    (-> (data-raw/list-directories user path)
+  (-> (data-raw/list-directories user path)
       :body
       (json/decode true)
       :folder
       (fmt-dir-resp user)))
-
 
 (defn- top-level-listing
   [{user :user}]
@@ -96,7 +92,6 @@
 (defn- shared-with-me-listing?
   [path]
   (= (ft/add-trailing-slash path) (ft/add-trailing-slash (cfg/irods-home))))
-
 
 (defn do-directory
   [{:keys [user path] :or {path nil} :as params}]
@@ -117,7 +112,6 @@
 
 (with-post-hook! #'do-directory (paths/log-func "do-directory"))
 
-
 (defn- format-data-item
   [user favorite-ids data-item]
   (let [id   (:id data-item)
@@ -133,19 +127,17 @@
      :date-modified (:dateModified data-item)
      :file-size     (:size data-item)}))
 
-
 (defn- format-page
   [user {:keys [id files folders total totalBad] :as page}]
   (let [file-ids (map :id files)
         folder-ids (map :id folders)
         favorite-ids (lookup-favorite-ids user (concat file-ids folder-ids [id]))]
     (assoc (format-data-item user favorite-ids page)
-      :hasSubDirs true
-      :files      (map (partial format-data-item user favorite-ids) files)
-      :folders    (map (partial format-data-item user favorite-ids) folders)
-      :total      total
-      :totalBad   totalBad)))
-
+           :hasSubDirs true
+           :files      (map (partial format-data-item user favorite-ids) files)
+           :folders    (map (partial format-data-item user favorite-ids) folders)
+           :total      total
+           :totalBad   totalBad)))
 
 (defn- fix-paged-listing-params
   [user params]
