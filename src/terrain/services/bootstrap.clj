@@ -39,7 +39,7 @@
    #(let [kc-resp (kc-client/get-user-session-by-username username)
           current-session (first kc-resp) ;; TODO: choose most recent start/access using our known client ID
           ]
-      (select-keys (apps-client/record-login (:ipAddress current-session nil) 
+      (select-keys (apps-client/record-login (:ipAddress current-session nil)
                                              (:id current-session nil)
                                              (:start current-session nil)) [:login_time :auth_redirect]))
    {:extra-log-info "login session request"}))

@@ -22,10 +22,10 @@
            :description "This service obtains information about and initializes the workspace for the authenticated user.
            It also records the fact that the user logged in."
            (ok (bootstrap))))
-    
+
     (context "/logins" []
       :tags ["bootstrap"]
-      
+
       (GET "/" []
            :query [params schema/LoginsParams]
            :return sessions-schema/ListLoginsResponse

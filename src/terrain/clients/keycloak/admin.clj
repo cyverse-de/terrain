@@ -28,7 +28,7 @@
 ; https://www.keycloak.org/docs-api/26.0.5/rest-api/#_get_adminrealmsrealmusers
 (defn get-user
   "Obtains user information from keycloak
-  
+
   This will be a map including keys at least :username and :id, which should be
   what we need to make further requests"
   ([username]
@@ -49,7 +49,7 @@
 ; https://www.keycloak.org/docs-api/26.0.5/rest-api/#_get_adminrealmsrealmusersuser_idsessions
 (defn get-user-session
   "Obtains information about the user's current session from keycloak.
-  
+
   This will be a list of maps, which will include user ID, ip address, session ID, and clients at least."
   ([user-id]
    (get-user-session user-id (:access_token (get-token))))
