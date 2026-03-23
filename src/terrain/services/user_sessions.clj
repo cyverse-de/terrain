@@ -6,13 +6,13 @@
 
 (defn user-session
   ([]
-     (let [user (:username current-user)]
-       (log/debug "Getting user session for" user)
-       (success-response (get-session user))))
+   (let [user (:username current-user)]
+     (log/debug "Getting user session for" user)
+     (success-response (get-session user))))
   ([session]
-     (let [user (:username current-user)]
-       (log/debug "Setting user session for" user)
-       (success-response (set-session user session)))))
+   (let [user (:username current-user)]
+     (log/debug "Setting user session for" user)
+     (success-response (set-session user session)))))
 
 (defn remove-session
   []

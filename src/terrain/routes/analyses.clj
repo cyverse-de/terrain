@@ -2,16 +2,16 @@
   (:require [common-swagger-api.routes]                         ;; for :description-file
             [common-swagger-api.schema.quicklaunches
              :refer [QuickLaunch
-                    NewQuickLaunch
-                    UpdateQuickLaunch
-                    QuickLaunchFavorite
-                    NewQuickLaunchFavorite
-                    QuickLaunchUserDefault
-                    UpdateQuickLaunchUserDefault
-                    NewQuickLaunchUserDefault
-                    QuickLaunchGlobalDefault
-                    UpdateQuickLaunchGlobalDefault
-                    NewQuickLaunchGlobalDefault]]
+                     NewQuickLaunch
+                     UpdateQuickLaunch
+                     QuickLaunchFavorite
+                     NewQuickLaunchFavorite
+                     QuickLaunchUserDefault
+                     UpdateQuickLaunchUserDefault
+                     NewQuickLaunchUserDefault
+                     QuickLaunchGlobalDefault
+                     UpdateQuickLaunchGlobalDefault
+                     NewQuickLaunchGlobalDefault]]
             [common-swagger-api.schema :refer [context describe GET POST PATCH DELETE]]
             [common-swagger-api.schema.analyses :as schema]
             [common-swagger-api.schema.analyses.listing :as listing-schema]
@@ -239,9 +239,7 @@
           favorite of the user"
           (ok (analyses/delete-quicklaunch-favorite fave-id)))))
 
-
-    ;; Quick Launch Defaults
-
+;; Quick Launch Defaults
 
     (context "/defaults" []
 

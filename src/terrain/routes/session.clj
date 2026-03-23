@@ -13,10 +13,10 @@
    [config/session-routes-enabled]
 
    (GET "/sessions" []
-        (user-session))
+     (user-session))
 
    (POST "/sessions" [:as {body :body}]
-         (user-session (slurp body)))
+     (user-session (slurp body)))
 
    (DELETE "/sessions" []
-           (remove-session))))
+     (remove-session))))

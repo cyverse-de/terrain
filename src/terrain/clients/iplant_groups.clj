@@ -60,13 +60,13 @@
   "Uses iplant-groups's subject lookup by ID endpoint to retrieve user details."
   [user short-username]
   (try+
-    (subjects/lookup-subject user short-username)
-    (catch [:status 404] _
-      (log/warn (str "no user info found for username '" short-username "'"))
-      nil)
-    (catch Object _
-      (log/error (:throwable &throw-context) "user lookup for '" short-username "' failed")
-      nil)))
+   (subjects/lookup-subject user short-username)
+   (catch [:status 404] _
+     (log/warn (str "no user info found for username '" short-username "'"))
+     nil)
+   (catch Object _
+     (log/error (:throwable &throw-context) "user lookup for '" short-username "' failed")
+     nil)))
 
 (defn lookup-subject-add-empty
   "Uses iplant-groups's subject lookup by ID endpoint to retrieve user details, returning an empty user info block if
@@ -92,8 +92,8 @@
   (let [regex (build-group-name-prefix-regex client user)]
     (vec (for [subject (remove grouper-admin-user? subjects)]
            (assoc subject
-             :display_name (:name subject)
-             :name         (string/replace (:name subject) regex ""))))))
+                  :display_name (:name subject)
+                  :name         (string/replace (:name subject) regex ""))))))
 
 (defn find-subjects
   [user search]
@@ -269,8 +269,8 @@
 
 (defn- format-community [memberships privileges-for team]
   (assoc team
-    :member     (contains? memberships (:name team))
-    :privileges (vec (get privileges-for (:name team) []))))
+         :member     (contains? memberships (:name team))
+         :privileges (vec (get privileges-for (:name team) []))))
 
 (defn get-communities [user {:keys [member] :as params}]
   (let [team-listing   (get-teams* group-type-communities user params)

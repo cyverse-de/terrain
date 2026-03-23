@@ -7,18 +7,16 @@
             [terrain.clients.data-info :as data]
             [terrain.services.filesystem.common-paths :refer [log-call log-func super-user?]]))
 
-
 (defn download-file-as-stream
   [user file attachment]
   (let [url-path         (data/mk-data-path-url-path file)
         req-map          {:query-params {:user user :attachment attachment} :as :stream}
         handle-not-found (fn [_ _ _] (throw+ {:error_code error/ERR_NOT_FOUND :path file}))]
     (data/trapped-request :get url-path req-map
-      :403 handle-not-found
-      :404 handle-not-found
-      :410 handle-not-found
-      :414 handle-not-found)))
-
+                          :403 handle-not-found
+                          :404 handle-not-found
+                          :410 handle-not-found
+                          :414 handle-not-found)))
 
 (defn- attachment?
   [params]

@@ -5,7 +5,7 @@
 
 (s/defschema FileType
   (assoc filetype-schema/FileType
-    :path (describe NonBlankString "The iRODS path to the file")))
+         :path (describe NonBlankString "The iRODS path to the file")))
 
 (def FileTypeReturn filetype-schema/FileTypeReturn)
 (def TypesList filetype-schema/TypesList)

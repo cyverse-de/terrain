@@ -183,8 +183,8 @@
 
 (def PathMatchType
   (describe
-    (s/enum :Exact :PathPrefix :RegularExpression)
-    "The method used to compare the path match value to the path"))
+   (s/enum :Exact :PathPrefix :RegularExpression)
+   "The method used to compare the path match value to the path"))
 
 (defschema HTTPPathMatch
   {:type  (describe PathMatchType "Defines how to match against the path value")
@@ -208,16 +208,16 @@
 
 (def HTTPRouteFilterType
   (describe
-    (s/enum
-      :RequestHeaderModifier
-      :ResponseHeaderModifier
-      :RequestRedirect
-      :URLRewrite
-      :RequestMirror
-      :CORS
-      :ExternalAuth
-      :ExtensionRef)
-    "The type of filter to apply to HTTP requests"))
+   (s/enum
+    :RequestHeaderModifier
+    :ResponseHeaderModifier
+    :RequestRedirect
+    :URLRewrite
+    :RequestMirror
+    :CORS
+    :ExternalAuth
+    :ExtensionRef)
+   "The type of filter to apply to HTTP requests"))
 
 (defschema HTTPHeader
   {:name  (describe HTTPHeaderName "The name of the HTTP header")

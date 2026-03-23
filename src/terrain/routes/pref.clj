@@ -13,10 +13,10 @@
    [config/pref-routes-enabled]
 
    (GET "/preferences" []
-        (prefs/do-get-prefs))
+     (prefs/do-get-prefs))
 
    (POST "/preferences" [:as {body :body}]
-         (prefs/do-post-prefs (slurp body)))
+     (prefs/do-post-prefs (slurp body)))
 
    (DELETE "/preferences" []
-           (prefs/remove-prefs))))
+     (prefs/remove-prefs))))

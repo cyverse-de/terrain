@@ -18,26 +18,24 @@
                        (cfg/irods-home)
                        (cfg/irods-zone)
                        (cfg/irods-resc)
-               :max-retries (cfg/irods-max-retries)
-               :retry-sleep (cfg/irods-retry-sleep)
-               :use-trash   (cfg/irods-use-trash))))
-
+                       :max-retries (cfg/irods-max-retries)
+                       :retry-sleep (cfg/irods-retry-sleep)
+                       :use-trash   (cfg/irods-use-trash))))
 
 (defn- spec
   []
   (icat-db-spec
-    (cfg/icat-host)
-    (cfg/icat-user)
-    (cfg/icat-password)
-    :port (cfg/icat-port)
-    :db   (cfg/icat-db)))
+   (cfg/icat-host)
+   (cfg/icat-user)
+   (cfg/icat-password)
+   :port (cfg/icat-port)
+   :db   (cfg/icat-db)))
 
 (defn configure-icat
   "Configures the connection pool to the ICAT database."
   []
   (log/warn "[ICAT] set up ICAT connection.")
   (setup-icat (spec)))
-
 
 (defn resolve-data-type
   "Given filesystem id, it returns the type of data item it is, file or folder.

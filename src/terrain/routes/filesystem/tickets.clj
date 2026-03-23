@@ -31,31 +31,31 @@
   []
 
   (optional-routes
-    [config/filesystem-routes-enabled]
+   [config/filesystem-routes-enabled]
 
-    (context
-      "/filesystem" []
-      :tags ["filesystem"]
+   (context
+     "/filesystem" []
+     :tags ["filesystem"]
 
-      (POST "/tickets" []
-            :middleware [coerce-public-param]
-            :query [params AddTicketQueryParams]
-            :body [{:keys [paths]} data-schema/Paths]
-            :responses schema/AddTicketResponses
-            :summary schema/AddTicketSummary
-            :description schema/AddTicketDocs
-            (ok (data/add-tickets (add-current-user-to-map {}) paths params)))
+     (POST "/tickets" []
+       :middleware [coerce-public-param]
+       :query [params AddTicketQueryParams]
+       :body [{:keys [paths]} data-schema/Paths]
+       :responses schema/AddTicketResponses
+       :summary schema/AddTicketSummary
+       :description schema/AddTicketDocs
+       (ok (data/add-tickets (add-current-user-to-map {}) paths params)))
 
-      (POST "/delete-tickets" []
-            :body [body schema/Tickets]
-            :responses schema/DeleteTicketResponses
-            :summary schema/DeleteTicketSummary
-            :description schema/DeleteTicketDocs
-            (ok (data/delete-tickets (add-current-user-to-map {}) body)))
+     (POST "/delete-tickets" []
+       :body [body schema/Tickets]
+       :responses schema/DeleteTicketResponses
+       :summary schema/DeleteTicketSummary
+       :description schema/DeleteTicketDocs
+       (ok (data/delete-tickets (add-current-user-to-map {}) body)))
 
-      (POST "/list-tickets" []
-            :body [body data-schema/Paths]
-            :responses schema/ListTicketResponses
-            :summary schema/ListTicketSummary
-            :description schema/ListTicketDocs
-            (ok (data/list-tickets (add-current-user-to-map {}) body))))))
+     (POST "/list-tickets" []
+       :body [body data-schema/Paths]
+       :responses schema/ListTicketResponses
+       :summary schema/ListTicketSummary
+       :description schema/ListTicketDocs
+       (ok (data/list-tickets (add-current-user-to-map {}) body))))))

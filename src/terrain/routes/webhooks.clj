@@ -12,32 +12,32 @@
 (defn webhook-routes
   []
   (optional-routes
-    [config/app-routes-enabled]
+   [config/app-routes-enabled]
 
-    (context "/webhooks" []
-       :tags ["webhooks"]
+   (context "/webhooks" []
+     :tags ["webhooks"]
 
-       (GET "/" []
-            :return schema/WebhookList
-            :summary schema/GetWebhooksSummary
-            :description schema/GetWebhooksDesc
-            (ok (apps-client/get-webhooks)))
+     (GET "/" []
+       :return schema/WebhookList
+       :summary schema/GetWebhooksSummary
+       :description schema/GetWebhooksDesc
+       (ok (apps-client/get-webhooks)))
 
-       (PUT "/" []
-            :body [body schema/WebhookList]
-            :return schema/WebhookList
-            :summary schema/PutWebhooksSummary
-            :description schema/PutWebhooksDesc
-            (ok (apps-client/save-webhooks body)))
+     (PUT "/" []
+       :body [body schema/WebhookList]
+       :return schema/WebhookList
+       :summary schema/PutWebhooksSummary
+       :description schema/PutWebhooksDesc
+       (ok (apps-client/save-webhooks body)))
 
-       (GET "/topics" []
-            :return schema/TopicList
-            :summary schema/GetWebhooksTopicSummary
-            :description schema/GetWebhooksTopicDesc
-            (ok (apps-client/get-webhook-topics)))
+     (GET "/topics" []
+       :return schema/TopicList
+       :summary schema/GetWebhooksTopicSummary
+       :description schema/GetWebhooksTopicDesc
+       (ok (apps-client/get-webhook-topics)))
 
-       (GET "/types" []
-            :return schema/WebhookTypeList
-            :summary schema/GetWebhookTypesSummary
-            :description schema/GetWebhookTypesDesc
-            (ok (apps-client/get-webhook-types))))))
+     (GET "/types" []
+       :return schema/WebhookTypeList
+       :summary schema/GetWebhookTypesSummary
+       :description schema/GetWebhookTypesDesc
+       (ok (apps-client/get-webhook-types))))))

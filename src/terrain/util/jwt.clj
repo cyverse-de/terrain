@@ -36,9 +36,9 @@
 
 (defn terrain-user-from-jwt-claims
   ([jwt-claims]
-     (terrain-user-from-jwt-claims jwt-claims jwt/user-from-default-assertion))
+   (terrain-user-from-jwt-claims jwt-claims jwt/user-from-default-assertion))
   ([jwt-claims user-extraction-fn]
-     (terrain-user-from-jwt-user (user-extraction-fn jwt-claims))))
+   (terrain-user-from-jwt-user (user-extraction-fn jwt-claims))))
 
 (defn generate-jwt
   [user]
@@ -46,12 +46,12 @@
 
 (defn add-auth-header
   ([user]
-     (add-auth-header user {}))
+   (add-auth-header user {}))
   ([user headers]
-     (add-auth-header user headers :X-Iplant-De-Jwt))
+   (add-auth-header user headers :X-Iplant-De-Jwt))
   ([user headers header-name]
-     (assoc headers
-       header-name (generate-jwt user))))
+   (assoc headers
+          header-name (generate-jwt user))))
 
 (defn validate-group-membership
   [handler allowed-groups-fn]
@@ -74,15 +74,15 @@
 
 (defn validate-jwt-assertion
   ([handler assertion-fn]
-     (validate-jwt-assertion handler assertion-fn jwt/user-from-default-assertion))
+   (validate-jwt-assertion handler assertion-fn jwt/user-from-default-assertion))
   ([handler assertion-fn user-extraction-fn]
-     (fn [request]
-       (try+
-        (if-let [assertion (assertion-fn request)]
-          (let [claims ((jwt-validator) assertion)]
-            (validate-claims claims user-extraction-fn)
-            (log/info "user authenticated using a legacy JWT assertion")
-            (handler (assoc request :jwt-claims claims)))
-          (resp/unauthorized "Custom JWT header not found."))
-        (catch [:type :validation] _
-          (resp/forbidden (.getMessage (:throwable &throw-context))))))))
+   (fn [request]
+     (try+
+      (if-let [assertion (assertion-fn request)]
+        (let [claims ((jwt-validator) assertion)]
+          (validate-claims claims user-extraction-fn)
+          (log/info "user authenticated using a legacy JWT assertion")
+          (handler (assoc request :jwt-claims claims)))
+        (resp/unauthorized "Custom JWT header not found."))
+      (catch [:type :validation] _
+        (resp/forbidden (.getMessage (:throwable &throw-context))))))))

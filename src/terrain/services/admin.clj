@@ -6,12 +6,10 @@
             [clj-http.client :as client]
             [terrain.clients.data-info :as data]))
 
-
 (defn config
   "Returns JSON containing Terrain's configuration, passwords filtered out."
   []
   (config/masked-config))
-
 
 (defn- check-irods?
   "Returns true if the iRODS settings should be checked."
@@ -90,7 +88,6 @@
       (log/error (ce/format-exception e))
       false)))
 
-
 (defn- status-irods
   [overall-status]
   (if (check-irods?)
@@ -123,8 +120,8 @@
   "Returns JSON containing the Terrain's status."
   []
   (-> {}
-    (status-irods)
-    (status-jex)
-    (status-apps)
-    (status-notificationagent)
-    (status-datacite)))
+      (status-irods)
+      (status-jex)
+      (status-apps)
+      (status-notificationagent)
+      (status-datacite)))

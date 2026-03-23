@@ -40,14 +40,14 @@
 (defn user-prefs
   "Retrieves or saves the user's preferences."
   ([user]
-     (let [prefs (cup/get-prefs user)]
-       (get-user-prefs user prefs)))
+   (let [prefs (cup/get-prefs user)]
+     (get-user-prefs user prefs)))
   ([user req-prefs-string]
-     (let [prefs (if-not (map? req-prefs-string)
-                   (cheshire/decode req-prefs-string true)
-                   req-prefs-string)]
-       (validate-user-prefs prefs)
-       (set-user-prefs user prefs))))
+   (let [prefs (if-not (map? req-prefs-string)
+                 (cheshire/decode req-prefs-string true)
+                 req-prefs-string)]
+     (validate-user-prefs prefs)
+     (set-user-prefs user prefs))))
 
 (defn remove-prefs
   "Deletes the preferences for the current user."

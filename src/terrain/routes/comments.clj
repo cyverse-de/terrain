@@ -17,97 +17,97 @@
 (defn data-comment-routes
   []
   (util/optional-routes
-    [#(and (config/filesystem-routes-enabled) (config/metadata-routes-enabled))]
+   [#(and (config/filesystem-routes-enabled) (config/metadata-routes-enabled))]
 
-    (context "/filesystem/entry/:entry-id/comments" []
-      :path-params [entry-id :- DataIdPathParam]
-      :tags ["filesystem"]
+   (context "/filesystem/entry/:entry-id/comments" []
+     :path-params [entry-id :- DataIdPathParam]
+     :tags ["filesystem"]
 
-      (GET "/" []
-        :summary "Get File or Folder Comments"
-        :return comment-schema/CommentList
-        :description "Lists all of the comments associated with a file or folder in the data store."
-        (ok (comments/list-data-comments entry-id)))
+     (GET "/" []
+       :summary "Get File or Folder Comments"
+       :return comment-schema/CommentList
+       :description "Lists all of the comments associated with a file or folder in the data store."
+       (ok (comments/list-data-comments entry-id)))
 
-      (POST "/" []
-        :summary "Add a File or Folder Comment"
-        :body [body (describe comment-schema/CommentRequest "The comment to add")]
-        :return comment-schema/CommentResponse
-        :description "Adds a comment to the file or folder with the given ID."
-        (ok (comments/add-data-comment entry-id body)))
+     (POST "/" []
+       :summary "Add a File or Folder Comment"
+       :body [body (describe comment-schema/CommentRequest "The comment to add")]
+       :return comment-schema/CommentResponse
+       :description "Adds a comment to the file or folder with the given ID."
+       (ok (comments/add-data-comment entry-id body)))
 
-      (PATCH "/:comment-id" []
-        :summary "Retract or Readmit a File or Folder Comment"
-        :path-params [comment-id :- comment-schema/CommentIdPathParam]
-        :query [{:keys [retracted]} RetractCommentQueryParams]
-        :description-file "docs/patch-data-entry-comment.md"
-        (comments/update-data-retract-status entry-id comment-id retracted)
-        (ok)))))
+     (PATCH "/:comment-id" []
+       :summary "Retract or Readmit a File or Folder Comment"
+       :path-params [comment-id :- comment-schema/CommentIdPathParam]
+       :query [{:keys [retracted]} RetractCommentQueryParams]
+       :description-file "docs/patch-data-entry-comment.md"
+       (comments/update-data-retract-status entry-id comment-id retracted)
+       (ok)))))
 
 (defn admin-data-comment-routes
   []
   (util/optional-routes
-    [#(and (config/filesystem-routes-enabled) (config/metadata-routes-enabled))]
+   [#(and (config/filesystem-routes-enabled) (config/metadata-routes-enabled))]
 
-    (context "/filsystem/entry/:entry-id/comments" []
-      :path-params [entry-id :- DataIdPathParam]
-      :tags ["admin-filesystem"]
+   (context "/filsystem/entry/:entry-id/comments" []
+     :path-params [entry-id :- DataIdPathParam]
+     :tags ["admin-filesystem"]
 
-      (DELETE "/:comment-id" []
-        :summary "Delete a File or Folder Comment"
-        :path-params [comment-id :- comment-schema/CommentIdPathParam]
-        :description "Allows an administrator to delete a file or folder comment."
-        (comments/delete-data-comment entry-id comment-id)
-        (ok)))))
+     (DELETE "/:comment-id" []
+       :summary "Delete a File or Folder Comment"
+       :path-params [comment-id :- comment-schema/CommentIdPathParam]
+       :description "Allows an administrator to delete a file or folder comment."
+       (comments/delete-data-comment entry-id comment-id)
+       (ok)))))
 
 (defn app-comment-routes
   []
   (util/optional-routes
-    [#(and (config/app-routes-enabled) (config/metadata-routes-enabled))]
+   [#(and (config/app-routes-enabled) (config/metadata-routes-enabled))]
 
-    (context "/apps/:app-id/comments" []
-      :path-params [app-id :- app-schema/AppIdParam]
-      :tags ["apps"]
+   (context "/apps/:app-id/comments" []
+     :path-params [app-id :- app-schema/AppIdParam]
+     :tags ["apps"]
 
-      (GET "/" []
-        :middleware [require-authentication]
-        :summary "Get App Comments"
-        :return comment-schema/CommentList
-        :description "Lists all of the comments associated with an app."
-        (ok (comments/list-app-comments app-id)))
+     (GET "/" []
+       :middleware [require-authentication]
+       :summary "Get App Comments"
+       :return comment-schema/CommentList
+       :description "Lists all of the comments associated with an app."
+       (ok (comments/list-app-comments app-id)))
 
-      (POST "/" []
-        :middleware [require-authentication]
-        :summary "Add an App Comment"
-        :body [body (describe comment-schema/CommentRequest "The comment to add")]
-        :return comment-schema/CommentResponse
-        :description "Adds a comment to the app with the given ID."
-        (ok (comments/add-app-comment app-id body)))
+     (POST "/" []
+       :middleware [require-authentication]
+       :summary "Add an App Comment"
+       :body [body (describe comment-schema/CommentRequest "The comment to add")]
+       :return comment-schema/CommentResponse
+       :description "Adds a comment to the app with the given ID."
+       (ok (comments/add-app-comment app-id body)))
 
-      (PATCH "/:comment-id" []
-        :middleware [require-authentication]
-        :summary "Retract or Readmit an App Comment"
-        :path-params [comment-id :- comment-schema/CommentIdPathParam]
-        :query [{:keys [retracted]} RetractCommentQueryParams]
-        :description-file "docs/patch-app-comment.md"
-        (comments/update-app-retract-status app-id comment-id retracted)
-        (ok)))))
+     (PATCH "/:comment-id" []
+       :middleware [require-authentication]
+       :summary "Retract or Readmit an App Comment"
+       :path-params [comment-id :- comment-schema/CommentIdPathParam]
+       :query [{:keys [retracted]} RetractCommentQueryParams]
+       :description-file "docs/patch-app-comment.md"
+       (comments/update-app-retract-status app-id comment-id retracted)
+       (ok)))))
 
 (defn admin-app-comment-routes
   []
   (util/optional-routes
-    [#(and (config/app-routes-enabled) (config/metadata-routes-enabled))]
+   [#(and (config/app-routes-enabled) (config/metadata-routes-enabled))]
 
-    (context "/apps/:app-id/comments" []
-      :path-params [app-id :- app-schema/AppIdParam]
-      :tags ["admin-apps"]
+   (context "/apps/:app-id/comments" []
+     :path-params [app-id :- app-schema/AppIdParam]
+     :tags ["admin-apps"]
 
-      (DELETE "/:comment-id" []
-        :summary "Delete an App Comment"
-        :path-params [comment-id :- comment-schema/CommentIdPathParam]
-        :description "Allows an administrator to delete an app comment."
-        (comments/delete-app-comment app-id comment-id)
-        (ok)))))
+     (DELETE "/:comment-id" []
+       :summary "Delete an App Comment"
+       :path-params [comment-id :- comment-schema/CommentIdPathParam]
+       :description "Allows an administrator to delete an app comment."
+       (comments/delete-app-comment app-id comment-id)
+       (ok)))))
 
 (defn admin-comment-routes
   []
