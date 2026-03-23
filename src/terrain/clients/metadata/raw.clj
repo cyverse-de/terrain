@@ -25,8 +25,8 @@
   [type]
   (let [type (name type)]
     (if (= type "dir")
-    "folder"
-    type)))
+      "folder"
+      type)))
 
 (defn get-options
   ([]
@@ -143,17 +143,17 @@
 (defn admin-update-data-retract-status
   [target-id comment-id retracted]
   (http/patch (metadata-url "admin" "filesystem" "data" target-id "comments" comment-id)
-    (post-options nil {:retracted retracted})))
+              (post-options nil {:retracted retracted})))
 
 (defn admin-update-app-retract-status
   [target-id comment-id retracted]
   (http/patch (metadata-url "admin" "apps" target-id "comments" comment-id)
-    (post-options nil {:retracted retracted})))
+              (post-options nil {:retracted retracted})))
 
 (defn delete-data-comment
   [target-id comment-id]
   (http/delete (metadata-url "admin" "filesystem" "data" target-id "comments" comment-id)
-    (delete-options)))
+               (delete-options)))
 
 (defn delete-app-comment
   [target-id comment-id]
@@ -195,9 +195,9 @@
 (defn update-attached-tags
   [target-id data-type params body]
   (:body (http/patch (metadata-url "filesystem" "data" target-id "tags")
-              (json-post-options body
-                                 {:data-type data-type
-                                  :type (:type params)}))))
+                     (json-post-options body
+                                        {:data-type data-type
+                                         :type (:type params)}))))
 
 (defn get-tags-by-value
   [contains limit]

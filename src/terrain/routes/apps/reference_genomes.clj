@@ -12,21 +12,21 @@
 (defn reference-genomes-routes
   []
   (optional-routes
-    [config/app-routes-enabled]
+   [config/app-routes-enabled]
 
-    (context "/reference-genomes" []
-      :tags ["reference-genomes"]
+   (context "/reference-genomes" []
+     :tags ["reference-genomes"]
 
-      (GET "/" []
-           :query [params schema/ReferenceGenomeListingParams]
-           :return schema/ReferenceGenomesList
-           :summary schema/ReferenceGenomeListingSummary
-           :description schema/ReferenceGenomeListingDocs
-           (ok (apps/list-reference-genomes params)))
+     (GET "/" []
+       :query [params schema/ReferenceGenomeListingParams]
+       :return schema/ReferenceGenomesList
+       :summary schema/ReferenceGenomeListingSummary
+       :description schema/ReferenceGenomeListingDocs
+       (ok (apps/list-reference-genomes params)))
 
-      (GET "/:reference-genome-id" []
-           :path-params [reference-genome-id :- schema/ReferenceGenomeIdParam]
-           :return schema/ReferenceGenome
-           :summary schema/ReferenceGenomeDetailsSummary
-           :description schema/ReferenceGenomeDetailsDocs
-           (ok (apps/get-reference-genome reference-genome-id))))))
+     (GET "/:reference-genome-id" []
+       :path-params [reference-genome-id :- schema/ReferenceGenomeIdParam]
+       :return schema/ReferenceGenome
+       :summary schema/ReferenceGenomeDetailsSummary
+       :description schema/ReferenceGenomeDetailsDocs
+       (ok (apps/get-reference-genome reference-genome-id))))))

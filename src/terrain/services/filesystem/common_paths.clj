@@ -5,7 +5,6 @@
             [terrain.util.config :as cfg]
             [terrain.util.validators :as valid]))
 
-
 (defn trace-log
   [trace-type func-name namespace params]
   (let [log-ns (str "trace." namespace)
@@ -37,7 +36,6 @@
 (defn user-home-dir
   [user]
   (ft/path-join "/" (cfg/irods-zone) "home" user))
-
 
 (defn valid-path? [path-to-check] (valid/good-string? path-to-check))
 

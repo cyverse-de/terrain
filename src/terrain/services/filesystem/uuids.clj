@@ -18,7 +18,6 @@
 
 (def uuid-attr "ipc_UUID")
 
-
 (defn- path-for-uuid
   "Resolves a stat info for the entity with a given UUID.
 
@@ -55,7 +54,7 @@
           :type          (case (:type data-item)
                            "collection" :dir
                            "dataobject" :file)}
-      (stat/decorate-stat cm user))))
+         (stat/decorate-stat cm user))))
 
 (defn paths-for-uuids-paged
   "Resolves the stat info for the entities with the given UUIDs. The results are paged.
@@ -85,7 +84,6 @@
       (user-exists cm user)
       (map (partial fmt-stat cm user)
            (icat/paged-uuid-listing user zone sort-col sort-order limit offset uuids info-types)))))
-
 
 (defn uuid-accessible?
   "Indicates if a data item is readable by a given user.

@@ -43,15 +43,15 @@
   (let [unsharer      (:shortUsername current-user)
         unshare-withs [user]]
     (try+
-      (log/warn "unshare" path "from" user "by" unsharer)
-      (data/unshare unsharer unshare-withs (vector path))
-      {:success true
-       :path path}
-      (catch map? e
-        (log/error "data-info error: " e)
-        {:success false,
-         :error e
-         :path path}))))
+     (log/warn "unshare" path "from" user "by" unsharer)
+     (data/unshare unsharer unshare-withs (vector path))
+     {:success true
+      :path path}
+     (catch map? e
+       (log/error "data-info error: " e)
+       {:success false,
+        :error e
+        :path path}))))
 
 (defn- send-sharing-notification
   "Sends an (un)sharing notification."
@@ -92,19 +92,19 @@
                                    file-list)
                               sharee-summary)]
     (send-sharing-notification
-      sharer
-      sharer-summary
-      sharer-notification
-      "share"
-      path-list
-      (str "unable to send share notification to " sharer " for " sharee))
+     sharer
+     sharer-summary
+     sharer-notification
+     "share"
+     path-list
+     (str "unable to send share notification to " sharer " for " sharee))
     (send-sharing-notification
-      sharee
-      sharee-summary
-      sharee-notification
-      "share"
-      path-list
-      (str "unable to send share notification from " sharer " to " sharee))))
+     sharee
+     sharee-summary
+     sharee-notification
+     "share"
+     path-list
+     (str "unable to send share notification from " sharer " to " sharee))))
 
 (defn- send-share-err-notification
   "Sends a share error notification to the current user."
@@ -121,12 +121,12 @@
                             file-list)
                        subject)]
     (send-sharing-notification
-      (:shortUsername current-user)
-      subject
-      notification
-      "share"
-      path-list
-      (str "unable to send share error notification for " sharee))))
+     (:shortUsername current-user)
+     subject
+     notification
+     "share"
+     path-list
+     (str "unable to send share error notification for " sharee))))
 
 (defn- send-unshare-notifications
   "Sends an unshare notification to only the current user."
@@ -143,12 +143,12 @@
                             file-list)
                        subject)]
     (send-sharing-notification
-      (:shortUsername current-user)
-      subject
-      notification
-      "unshare"
-      path-list
-      (str "unable to send unshare notification for " unsharee))))
+     (:shortUsername current-user)
+     subject
+     notification
+     "unshare"
+     path-list
+     (str "unable to send unshare notification for " unsharee))))
 
 (defn- send-unshare-err-notification
   "Sends an unshare error notification to the current user."
@@ -165,12 +165,12 @@
                             file-list)
                        subject)]
     (send-sharing-notification
-      (:shortUsername current-user)
-      subject
-      notification
-      "unshare"
-      path-list
-      (str "unable to send unshare error notification for " unsharee))))
+     (:shortUsername current-user)
+     subject
+     notification
+     "unshare"
+     path-list
+     (str "unable to send unshare error notification for " unsharee))))
 
 (defn- get-user-from-subject
   [subject]

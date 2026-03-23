@@ -12,15 +12,15 @@
 (defn service-account-email-routes
   []
   (optional-routes
-    [config/email-api-routes-enabled]
+   [config/email-api-routes-enabled]
 
-    (context "/email" []
-      :tags ["service-account-email"]
+   (context "/email" []
+     :tags ["service-account-email"]
 
-      (POST "/" []
-        :middleware [[require-service-account ["cyverse-emailer"]]]
-        :summary s/SendEmailSummary
-        :description s/SendEmailDescription
-        :body [body s/SendEmailRequestBody]
-        :return s/SendEmailResponse
-        (ok (email-service/send-email body))))))
+     (POST "/" []
+       :middleware [[require-service-account ["cyverse-emailer"]]]
+       :summary s/SendEmailSummary
+       :description s/SendEmailDescription
+       :body [body s/SendEmailRequestBody]
+       :return s/SendEmailResponse
+       (ok (email-service/send-email body))))))

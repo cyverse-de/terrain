@@ -66,18 +66,18 @@
 
 (defn- mk-req-map
   ([]
-    {:content-type :json})
+   {:content-type :json})
   ([user]
-    (add-user (mk-req-map) user))
+   (add-user (mk-req-map) user))
   ([user item]
-    (-> (if (= (type item) String)
-          (add-body (mk-req-map) item)
-          (add-extra-params {} item))
-        (add-user user)))
+   (-> (if (= (type item) String)
+         (add-body (mk-req-map) item)
+         (add-extra-params {} item))
+       (add-user user)))
   ([user body extra-params]
-    (-> (add-user (mk-req-map) user)
-        (add-body body)
-        (add-extra-params extra-params))))
+   (-> (add-user (mk-req-map) user)
+       (add-body body)
+       (add-extra-params extra-params))))
 
 ;; NAVIGATION
 
@@ -110,17 +110,17 @@
   [user path-uuid position chunk-size]
   (request :get ["data" path-uuid "chunks"]
            (mk-req-map user
-                  {:position position
-                   :size chunk-size})))
+                       {:position position
+                        :size chunk-size})))
 
 (defn read-tabular-chunk
   "Uses the data-info read-tabular-chunk endpoint."
   [user path-uuid separator page chunk-size]
   (request :get ["data" path-uuid "chunks-tabular"]
            (mk-req-map user
-                  {:separator separator
-                   :page page
-                   :size chunk-size})))
+                       {:separator separator
+                        :page page
+                        :size chunk-size})))
 
 (defn manifest
   "Uses the data-info manifest endpoint."
@@ -190,10 +190,10 @@
 ;; DELETION
 
 (defn delete-paths
-    "Uses the data-info deleter endpoint to delete many paths."
-    [user paths]
-    (request :post ["deleter"]
-             (mk-req-map user (json/encode {:paths paths}))))
+  "Uses the data-info deleter endpoint to delete many paths."
+  [user paths]
+  (request :post ["deleter"]
+           (mk-req-map user (json/encode {:paths paths}))))
 
 (defn delete-data-item
   "Uses the data-info delete by data ID endpoint to delete a single data item."
@@ -202,23 +202,23 @@
            (mk-req-map user)))
 
 (defn delete-contents
-    "Uses the data-info delete-children endpoint to delete the contents of a directory."
-    [user path-uuid]
-    (request :delete ["data" path-uuid "children"]
-             (mk-req-map user)))
+  "Uses the data-info delete-children endpoint to delete the contents of a directory."
+  [user path-uuid]
+  (request :delete ["data" path-uuid "children"]
+           (mk-req-map user)))
 
 (defn delete-trash
-    "Uses the data-info trash endpoint to empty the trash of a user."
-    [user]
-    (request :delete ["trash"] (mk-req-map user)))
+  "Uses the data-info trash endpoint to empty the trash of a user."
+  [user]
+  (request :delete ["trash"] (mk-req-map user)))
 
 (defn restore-files
-    "Uses the data-info restorer endpoint to restore many or all paths."
-    ([user]
-     (restore-files user []))
-    ([user paths]
-     (request :post ["restorer"]
-              (mk-req-map user (json/encode {:paths paths})))))
+  "Uses the data-info restorer endpoint to restore many or all paths."
+  ([user]
+   (restore-files user []))
+  ([user paths]
+   (request :post ["restorer"]
+            (mk-req-map user (json/encode {:paths paths})))))
 
 ;; METADATA
 

@@ -14,14 +14,14 @@
   "Routes for making calls back into the DE web services."
   []
   (optional-routes
-    [config/app-routes-enabled]
+   [config/app-routes-enabled]
 
-    (context "/callbacks" []
-             :tags ["callbacks"]
+   (context "/callbacks" []
+     :tags ["callbacks"]
 
-             (POST "/tapis-job/:job-id" []
-                   :path-params [job-id :- AnalysisIdPathParam]
-                   :body [body (describe TapisJobStatusUpdate "The updated job status information.")]
-                   :summary "Update the status of a Tapis analysis."
-                   :description "The DE registers this endpoint as a callback when it submits jobs to Tapis."
-                   (ok (apps/update-tapis-job-status job-id body))))))
+     (POST "/tapis-job/:job-id" []
+       :path-params [job-id :- AnalysisIdPathParam]
+       :body [body (describe TapisJobStatusUpdate "The updated job status information.")]
+       :summary "Update the status of a Tapis analysis."
+       :description "The DE registers this endpoint as a callback when it submits jobs to Tapis."
+       (ok (apps/update-tapis-job-status job-id body))))))

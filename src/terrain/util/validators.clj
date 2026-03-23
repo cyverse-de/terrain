@@ -32,7 +32,6 @@
      (UUID/fromString uuid-txt)
      (catch IllegalArgumentException _ (throw+ {:error_code ce/ERR_NOT_FOUND})))))
 
-
 (defn good-string?
   "Checks that a string doesn't contain any problematic characters.
 

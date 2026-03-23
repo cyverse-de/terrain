@@ -19,5 +19,5 @@
       :summary "Get data for the dashboard"
       :description "Returns data for populating the dashboard view."
       (ok (if current-user
-        (dcl/get-dashboard-data (:username current-user) params)
-        (dcl/get-dashboard-data params))))))
+            (dcl/get-dashboard-data (:username current-user) params)
+            (dcl/get-dashboard-data params))))))

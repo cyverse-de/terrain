@@ -17,20 +17,20 @@
   []
 
   (optional-routes
-    [config/filesystem-routes-enabled]
+   [config/filesystem-routes-enabled]
 
-    (context "/filesystem" []
-      :tags ["filesystem"]
+   (context "/filesystem" []
+     :tags ["filesystem"]
 
-      (GET "/root" []
-           :responses terrain-nav-schema/RootResponses
-           :summary schema/NavigationRootSummary
-           :description schema/NavigationRootDocs
-           (ok (root/do-root-listing (add-current-user-to-map {}))))
+     (GET "/root" []
+       :responses terrain-nav-schema/RootResponses
+       :summary schema/NavigationRootSummary
+       :description schema/NavigationRootDocs
+       (ok (root/do-root-listing (add-current-user-to-map {}))))
 
-      (GET "/directory" [:as {:keys [params]}]
-           :query [params terrain-nav-schema/DirectoryQueryParams]
-           :responses terrain-nav-schema/DirectoryResponses
-           :summary schema/NavigationSummary
-           :description schema/NavigationDocs
-           (ok (dir/do-directory (add-current-user-to-map params)))))))
+     (GET "/directory" [:as {:keys [params]}]
+       :query [params terrain-nav-schema/DirectoryQueryParams]
+       :responses terrain-nav-schema/DirectoryResponses
+       :summary schema/NavigationSummary
+       :description schema/NavigationDocs
+       (ok (dir/do-directory (add-current-user-to-map params)))))))

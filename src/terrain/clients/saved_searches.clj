@@ -58,17 +58,17 @@
   [user]
   (let [resp (http/delete (saved-searches-url user))]
     (cond
-     (= (:status resp) 404)
-     (throw+ {:error_code ce/ERR_NOT_A_USER :user user})
+      (= (:status resp) 404)
+      (throw+ {:error_code ce/ERR_NOT_A_USER :user user})
 
-     (= (:status resp) 400)
-     (throw+ {:error_code ce/ERR_BAD_REQUEST :user user})
+      (= (:status resp) 400)
+      (throw+ {:error_code ce/ERR_BAD_REQUEST :user user})
 
-     (= (:status resp) 500)
-     (throw+ {:error_code ce/ERR_UNCHECKED_EXCEPTION :msg "Error thrown by the saved-searches service"})
+      (= (:status resp) 500)
+      (throw+ {:error_code ce/ERR_UNCHECKED_EXCEPTION :msg "Error thrown by the saved-searches service"})
 
-     (not (<= 200 (:status resp) 299))
-     (throw+ {:error_code ce/ERR_UNCHECKED_EXCEPTION :msg "Unknown error thrown by the saved-searches service"})
+      (not (<= 200 (:status resp) 299))
+      (throw+ {:error_code ce/ERR_UNCHECKED_EXCEPTION :msg "Unknown error thrown by the saved-searches service"})
 
-     :else
-     nil)))
+      :else
+      nil)))

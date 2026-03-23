@@ -20,12 +20,12 @@
 (defn- decode-datacite-xml
   [datacite-xml]
   (try+
-    (-> datacite-xml
-        (.getBytes "UTF-8")
-        base64/decode
-        (String. "UTF-8"))
-    (catch Object _
-      datacite-xml)))
+   (-> datacite-xml
+       (.getBytes "UTF-8")
+       base64/decode
+       (String. "UTF-8"))
+   (catch Object _
+     datacite-xml)))
 
 (defn- datacite-post
   "Posts a request to the DataCite API and returns its response."
@@ -51,15 +51,15 @@
    https://support.datacite.org/docs/api-create-dois"
   [datacite-xml target-url]
   (try+
-    (let [response (datacite-post
-                     (format-datacite-publish-request datacite-xml
-                                                      target-url)
-                     "dois")]
-      (when-not (and (map? response) (get-in response [:data :id]))
-        (throw+ {:type     :clojure-commons.exception/request-failed
-                 :error    "DOI not found in DataCite response."
-                 :response response}))
-      (update-in response [:data :attributes :xml] decode-datacite-xml))
-    (catch [:status 400] {:keys [body]}
-      (throw+ {:type  :clojure-commons.exception/bad-request
-               :error body}))))
+   (let [response (datacite-post
+                   (format-datacite-publish-request datacite-xml
+                                                    target-url)
+                   "dois")]
+     (when-not (and (map? response) (get-in response [:data :id]))
+       (throw+ {:type     :clojure-commons.exception/request-failed
+                :error    "DOI not found in DataCite response."
+                :response response}))
+     (update-in response [:data :attributes :xml] decode-datacite-xml))
+   (catch [:status 400] {:keys [body]}
+     (throw+ {:type  :clojure-commons.exception/bad-request
+              :error body}))))

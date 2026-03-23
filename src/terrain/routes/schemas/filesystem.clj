@@ -19,11 +19,11 @@
 
 (s/defschema PathShareResponse
   (assoc PathShareRequest
-    :success
-    (describe Boolean "`true` if the file or folder was shared successfully")
+         :success
+         (describe Boolean "`true` if the file or folder was shared successfully")
 
-    (s/optional-key :error)
-    (describe s/Any "Additional information about the error if the file or folder was not shared successfully")))
+         (s/optional-key :error)
+         (describe s/Any "Additional information about the error if the file or folder was not shared successfully")))
 
 (s/defschema UserShareRequest
   {(s/optional-key :user)
@@ -37,7 +37,7 @@
 
 (s/defschema UserShareResponse
   (assoc (dissoc UserShareRequest :paths)
-    :sharing (describe [PathShareResponse] "Responses to indicate whether or not each path was shared successfully")))
+         :sharing (describe [PathShareResponse] "Responses to indicate whether or not each path was shared successfully")))
 
 (s/defschema SharingRequest
   {:sharing (describe [UserShareRequest] "The sharing requests to process")})
@@ -67,8 +67,8 @@
 
 (s/defschema UserUnshareResponse
   (assoc (dissoc UserUnshareRequest :paths)
-    :unshare
-    (describe [PathUnshareResponse] "Responses to indicate whether or not each path was unshared successfully")))
+         :unshare
+         (describe [PathUnshareResponse] "Responses to indicate whether or not each path was unshared successfully")))
 
 (s/defschema UnshareRequest
   {:unshare (describe [UserUnshareRequest] "The unsharing requests to process")})
@@ -97,11 +97,11 @@
 
 (s/defschema DirStatInfo
   (assoc stats-schema/DirStatInfo
-    :isFavorite (describe Boolean "True if this folder is marked as a favorite")))
+         :isFavorite (describe Boolean "True if this folder is marked as a favorite")))
 
 (s/defschema FileStatInfo
   (assoc (dissoc stats-schema/FileStatInfo :infoType :md5)
-    :isFavorite (describe Boolean "True if this file is marked as a favorite")))
+         :isFavorite (describe Boolean "True if this file is marked as a favorite")))
 
 (s/defschema FavoriteListing
   {:files   (describe [FileStatInfo] "The files in the favorite listing")

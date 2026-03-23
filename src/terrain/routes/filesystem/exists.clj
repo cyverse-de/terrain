@@ -15,14 +15,14 @@
   []
 
   (optional-routes
-    [config/filesystem-routes-enabled]
+   [config/filesystem-routes-enabled]
 
-    (context "/filesystem" []
-      :tags ["filesystem"]
+   (context "/filesystem" []
+     :tags ["filesystem"]
 
-      (POST "/exists" []
-            :body [{:keys [paths]} schema/ExistenceRequest]
-            :responses schema/ExistenceResponses
-            :summary schema/ExistenceSummary
-            :description schema/ExistenceDocs
-            (ok (data/check-existence (:shortUsername current-user) paths))))))
+     (POST "/exists" []
+       :body [{:keys [paths]} schema/ExistenceRequest]
+       :responses schema/ExistenceResponses
+       :summary schema/ExistenceSummary
+       :description schema/ExistenceDocs
+       (ok (data/check-existence (:shortUsername current-user) paths))))))
