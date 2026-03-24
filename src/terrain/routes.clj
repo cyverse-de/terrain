@@ -29,7 +29,7 @@
    [terrain.routes.apps.metadata :refer [app-avu-routes]]
    [terrain.routes.apps.pipelines :refer [app-pipeline-routes]]
    [terrain.routes.apps.reference-genomes :refer [reference-genomes-routes]]
-   [terrain.routes.apps.tools :refer [tool-request-routes tool-routes]]
+   [terrain.routes.apps.tools :refer [gpu-models-routes tool-request-routes tool-routes]]
    [terrain.routes.apps.versions :refer [app-version-routes]]
    [terrain.routes.bags :refer [bag-routes]]
    [terrain.routes.bootstrap :refer [secured-bootstrap-routes]]
@@ -145,6 +145,7 @@
    (team-routes)
    (subject-routes)
    (reference-genomes-routes)
+   (gpu-models-routes)
    (tool-routes)
    (tool-request-routes)
    (permanent-id-request-routes)
@@ -355,6 +356,7 @@
                                      {:name "tags", :description "Tag Endpoints"}
                                      {:name "teams", :description "Team Endpoints"}
                                      {:name "tools", :description "Tool Endpoints"}
+                                     {:name "gpu-models", :description "GPU Model Configuration Endpoints"}
                                      {:name "tool-requests", :description "Tool Request Endpoints"}
                                      {:name "token", :description "OAuth Tokens"}
                                      {:name "user-info", :description "User Information Endpoints"}

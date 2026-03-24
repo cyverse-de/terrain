@@ -1164,6 +1164,14 @@
                 {:query-params (secured-params params)
                  :as           :json}))))
 
+(defn list-gpu-models
+  []
+  (:body
+   (client/get (apps-url "tools" "gpu-models")
+               (disable-redirects
+                {:query-params (secured-params)
+                 :as           :json}))))
+
 (defn create-private-tool
   [body]
   (:body
