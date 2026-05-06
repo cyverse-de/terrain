@@ -274,3 +274,42 @@
   (-> (app-exposer-url ["instantlaunches" "quicklaunches" "public"] {})
       (client/get {:as :json})
       (:body)))
+
+(defn admin-list-operators
+  "Calls app-exposer's GET /vice/admin/operators endpoint."
+  []
+  (-> (app-exposer-url ["vice" "admin" "operators"] {} :no-user true)
+      (client/get {:as :json})
+      (:body)))
+
+(defn admin-create-operator
+  "Calls app-exposer's POST /vice/admin/operators endpoint to register a new operator."
+  [body]
+  (-> (app-exposer-url ["vice" "admin" "operators"] {} :no-user true)
+      (client/post {:content-type :json
+                    :as           :json
+                    :form-params  body})
+      (:body)))
+
+(defn admin-get-operator-capacities
+  "Calls app-exposer's GET /vice/admin/operators/capacities endpoint."
+  []
+  (-> (app-exposer-url ["vice" "admin" "operators" "capacities"] {} :no-user true)
+      (client/get {:as :json})
+      (:body)))
+
+(defn admin-update-operator
+  "Calls app-exposer's PATCH /vice/admin/operators/id/{id} endpoint with a partial update body."
+  [id body]
+  (-> (app-exposer-url ["vice" "admin" "operators" "id" id] {} :no-user true)
+      (client/patch {:content-type :json
+                     :as           :json
+                     :form-params  body})
+      (:body)))
+
+(defn admin-delete-operator
+  "Calls app-exposer's DELETE /vice/admin/operators/id/{id} endpoint."
+  [id]
+  (-> (app-exposer-url ["vice" "admin" "operators" "id" id] {} :no-user true)
+      (client/delete {:as :json})
+      (:body)))
