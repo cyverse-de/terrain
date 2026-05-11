@@ -1,5 +1,5 @@
 (ns terrain.routes.vice
-  (:require [common-swagger-api.schema :refer [context GET POST]]
+  (:require [common-swagger-api.schema :refer [context GET POST PATCH DELETE]]
             [ring.util.http-response :refer [ok]]
             [terrain.clients.app-exposer :as vice]
             [terrain.routes.schemas.vice :as vice-schema]
@@ -7,7 +7,7 @@
             [terrain.util.config :as config]))
 
 ;; Declarations to eliminate lint warnings for path and query parameter bindings.
-(declare params analysis-id host)
+(declare params analysis-id host id)
 
 (defn admin-vice-routes
   []
@@ -72,6 +72,43 @@
            :summary "Get external UUID"
            :description "Returns the external UUID associated with the analysis. VICE analyses only have a single external UUID"
            (ok (vice/admin-external-id analysis-id)))))
+
+     (context "/operators" []
+       :tags ["admin-vice-operators"]
+
+       (GET "/" []
+         :return vice-schema/OperatorAdminSummaryList
+         :summary "List registered operators"
+         :description "Returns id, name, URL, tls_skip_verify, and priority for all operators in the database."
+         (ok (vice/admin-list-operators)))
+
+       (POST "/" []
+         :body [body vice-schema/OperatorConfig]
+         :return vice-schema/OperatorAdminSummary
+         :summary "Register a new operator"
+         :description "Adds a new operator to the database and returns the persisted row, including its server-assigned UUID."
+         (ok (vice/admin-create-operator body)))
+
+       (GET "/capacities" []
+         :return vice-schema/OperatorCapacityList
+         :summary "Get live operator capacities"
+         :description "Queries each configured operator's capacity endpoint in parallel and returns the results."
+         (ok (vice/admin-get-operator-capacities)))
+
+       (context "/id/:id" []
+         :path-params [id :- vice-schema/OperatorIDParam]
+
+         (PATCH "/" []
+           :body [body vice-schema/UpdateOperatorRequest]
+           :return vice-schema/OperatorAdminSummary
+           :summary "Update an operator"
+           :description "Partial update of an operator identified by UUID. Only fields supplied in the body are changed."
+           (ok (vice/admin-update-operator id body)))
+
+         (DELETE "/" []
+           :summary "Delete an operator"
+           :description "Removes the operator with the given UUID. Idempotent. Fails if jobs still reference the operator."
+           (ok (vice/admin-delete-operator id)))))
 
      (context "/:host" []
        :path-params [host :- vice-schema/Host]

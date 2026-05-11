@@ -2,7 +2,8 @@
   (:require
    [common-swagger-api.schema :refer [describe NonBlankString]]
    [schema.core :refer [Any defschema maybe optional-key]]
-   [schema.core :as s])
+   [schema.core :as s]
+   [schema-tools.core :as st])
   (:import
    [java.util UUID]))
 
@@ -421,3 +422,40 @@
 
 (defschema URLReady
   {:ready (describe Boolean "Whether or not the analysis is ready to be accessed.")})
+
+(defschema OperatorConfig
+  {:name            (describe NonBlankString "The operator's display name")
+   :url             (describe NonBlankString "HTTP(S) base URL of the operator")
+   :tls_skip_verify (describe Boolean "Skip TLS verification for the operator's URL")
+   :priority        (describe Long "Scheduling priority; lower runs first")})
+
+(defschema OperatorAdminSummary
+  (merge
+   {:id (describe UUID "Server-assigned UUID of the operator")}
+   OperatorConfig))
+
+(defschema OperatorAdminSummaryList
+  (describe [OperatorAdminSummary] "Registered operators"))
+
+(defschema UpdateOperatorRequest
+  (st/optional-keys-schema OperatorConfig))
+
+(defschema OperatorCapacityInfo
+  {:maxAnalyses              (describe Long "Maximum concurrent analyses")
+   :runningAnalyses          (describe Long "Currently running analyses")
+   :availableSlots           (describe Long "Free slots; -1 = unlimited, 0 = at capacity")
+   :allocatableCPU           (describe Long "Allocatable CPU in millicores")
+   :allocatableMemory        (describe Long "Allocatable memory in bytes")
+   :usedCPU                  (describe Long "Used CPU in millicores")
+   :usedMemory               (describe Long "Used memory in bytes")
+   (optional-key :gpuVendor) (describe String "GPU vendor (\"nvidia\", \"amd\", or empty)")})
+
+(defschema OperatorCapacity
+  {:operator                (describe String "Operator name")
+   (optional-key :capacity) (describe (maybe OperatorCapacityInfo) "Capacity report (omitted when error is set)")
+   (optional-key :error)    (describe (maybe String) "Error message if the operator could not be reached")})
+
+(defschema OperatorCapacityList
+  (describe [OperatorCapacity] "Per-operator capacity"))
+
+(def OperatorIDParam (describe UUID "Operator UUID"))
