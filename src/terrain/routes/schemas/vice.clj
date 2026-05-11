@@ -2,7 +2,8 @@
   (:require
    [common-swagger-api.schema :refer [describe NonBlankString]]
    [schema.core :refer [Any defschema maybe optional-key]]
-   [schema.core :as s])
+   [schema.core :as s]
+   [schema-tools.core :as st])
   (:import
    [java.util UUID]))
 
@@ -437,10 +438,7 @@
   (describe [OperatorAdminSummary] "Registered operators"))
 
 (defschema UpdateOperatorRequest
-  {(optional-key :name)            (describe NonBlankString "New operator display name")
-   (optional-key :url)             (describe NonBlankString "New HTTP(S) base URL")
-   (optional-key :tls_skip_verify) (describe Boolean "New TLS-skip flag")
-   (optional-key :priority)        (describe Long "New scheduling priority")})
+  (st/optional-keys-schema OperatorConfig))
 
 (defschema OperatorCapacityInfo
   {:maxAnalyses              (describe Long "Maximum concurrent analyses")
