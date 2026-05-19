@@ -424,10 +424,12 @@
   {:ready (describe Boolean "Whether or not the analysis is ready to be accessed.")})
 
 (defschema OperatorConfig
-  {:name            (describe NonBlankString "The operator's display name")
-   :url             (describe NonBlankString "HTTP(S) base URL of the operator")
-   :tls_skip_verify (describe Boolean "Skip TLS verification for the operator's URL")
-   :priority        (describe Long "Scheduling priority; lower runs first")})
+  {:name                       (describe NonBlankString "The operator's display name")
+   :url                        (describe NonBlankString "HTTP(S) base URL of the operator")
+   :tls_skip_verify            (describe Boolean "Skip TLS verification for the operator's URL")
+   :priority                   (describe Long "Scheduling priority; lower runs first")
+   (optional-key :base_url)    (describe (maybe NonBlankString)
+                                         "Public base URL where VICE analyses launched by this operator are served")})
 
 (defschema OperatorAdminSummary
   (merge
