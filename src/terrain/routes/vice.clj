@@ -79,7 +79,7 @@
        (GET "/" []
          :return vice-schema/OperatorAdminSummaryList
          :summary "List registered operators"
-         :description "Returns id, name, URL, base_url, tls_skip_verify, and priority for all operators in the database."
+         :description "Returns id, name, URL, base_url, tls_skip_verify, priority, accepting_launches, and deactivated for all operators in the database."
          (ok (vice/admin-list-operators)))
 
        (POST "/" []
