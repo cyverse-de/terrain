@@ -388,7 +388,7 @@
   (merge
    BaseListing
    {(optional-key :defaultBackend) (describe String "The backend used for requests that don't match a rule")
-    :rules                         (describe [IngressRule] "The list of host and path rules for the ingress")}))
+    :rules                         (describe (maybe [IngressRule]) "The list of host and path rules for the ingress")}))
 
 (defschema FullResourceListing
   {:deployments (describe [Deployment] "The list of deployments")
