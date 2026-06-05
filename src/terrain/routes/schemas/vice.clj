@@ -380,11 +380,22 @@
    BaseListing
    {:rules (describe [HTTPRouteRule] "Rules used to match requests with the route")}))
 
+(defschema IngressRule
+  {(optional-key :host) (describe String "The fully qualified domain name the rule applies to")
+   s/Keyword            s/Any})
+
+(defschema Ingress
+  (merge
+   BaseListing
+   {(optional-key :defaultBackend) (describe String "The backend used for requests that don't match a rule")
+    :rules                         (describe (maybe [IngressRule]) "The list of host and path rules for the ingress")}))
+
 (defschema FullResourceListing
   {:deployments (describe [Deployment] "The list of deployments")
    :pods        (describe [Pod] "The list of pods")
    :configMaps  (describe [ConfigMap] "The list of config maps")
    :services    (describe [Service] "The list of services")
+   :ingresses   (describe [Ingress] "The list of ingresses")
    :routes      (describe [HTTPRoute] "The list of HTTP routes")})
 
 (defschema FilterParams
