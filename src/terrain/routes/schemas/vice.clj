@@ -446,13 +446,21 @@
 (defschema OperatorAdminSummary
   (merge
    {:id (describe UUID "Server-assigned UUID of the operator")}
-   OperatorConfig))
+   OperatorConfig
+   {:accepting_launches (describe Boolean "Whether the operator accepts new launches; false drains it but leaves it in service")
+    :deactivated        (describe Boolean "Whether the operator is fully removed from the live pool; takes precedence over accepting_launches")}))
 
 (defschema OperatorAdminSummaryList
   (describe [OperatorAdminSummary] "Registered operators"))
 
 (defschema UpdateOperatorRequest
-  (st/optional-keys-schema OperatorConfig))
+  (merge
+   (st/optional-keys-schema OperatorConfig)
+   {(optional-key :accepting_launches)
+    (describe Boolean "Whether the operator accepts new launches; false drains it but leaves it in service")
+
+    (optional-key :deactivated)
+    (describe Boolean "Whether the operator is fully removed from the live pool; takes precedence over accepting_launches")}))
 
 (defschema OperatorCapacityInfo
   {:maxAnalyses              (describe Long "Maximum concurrent analyses")
@@ -462,7 +470,9 @@
    :allocatableMemory        (describe Long "Allocatable memory in bytes")
    :usedCPU                  (describe Long "Used CPU in millicores")
    :usedMemory               (describe Long "Used memory in bytes")
-   (optional-key :gpuVendor) (describe String "GPU vendor (\"nvidia\", \"amd\", or empty)")})
+   (optional-key :gpuVendor) (describe String "GPU vendor (\"nvidia\", \"amd\", or empty)")
+   (optional-key :supportedGPUModels)
+   (describe [String] "Canonical GFD-style GPU model names this operator can deliver; empty means model-agnostic")})
 
 (defschema OperatorCapacity
   {:operator                (describe String "Operator name")
