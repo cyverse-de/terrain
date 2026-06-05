@@ -378,7 +378,8 @@
 (defschema HTTPRoute
   (merge
    BaseListing
-   {:rules (describe [HTTPRouteRule] "Rules used to match requests with the route")}))
+   {(optional-key :hostnames) (describe [String] "The hostnames associated with the HTTP route")
+    :rules                    (describe [HTTPRouteRule] "Rules used to match requests with the route")}))
 
 (defschema IngressRule
   {(optional-key :host) (describe String "The fully qualified domain name the rule applies to")
