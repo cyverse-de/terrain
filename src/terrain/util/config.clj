@@ -1,6 +1,7 @@
 (ns terrain.util.config
   (:require
    [async-tasks-client.core :as async-tasks-client]
+   [cemerick.url :as curl]
    [clojure-commons.config :as cc]
    [clojure-commons.error-codes :as ce]
    [clojure.string :as string]
@@ -706,6 +707,37 @@
   "The keycloak client secret to use."
   [props config-valid configs]
   "terrain.keycloak.client-secret")
+
+(declare base-uri)
+(cc/defprop-optstr base-uri
+  "The public base URI for Terrain (for example, https://qa.cyverse.org/terrain). Used to derive the OIDC
+   redirect and landing URIs. Must be set for the OIDC Authorization Code Flow endpoints to function."
+  [props config-valid configs]
+  "terrain.base-uri" "")
+
+(defn oidc-redirect-uri
+  "The redirect URI registered with Keycloak for terrain's OIDC Authorization Code Flow callback, derived from
+   the public Terrain base URI."
+  []
+  (str (curl/url (base-uri) "oidc" "callback")))
+
+(defn oidc-landing-uri
+  "The URI to redirect the browser to after a successful OIDC Authorization Code Flow login, derived from the
+   public Terrain base URI."
+  []
+  (str (curl/url (base-uri) "docs")))
+
+(declare oidc-scopes)
+(cc/defprop-optstr oidc-scopes
+  "The space-delimited OIDC scopes to request during the Authorization Code Flow."
+  [props config-valid configs]
+  "terrain.keycloak.oidc-scopes" "openid")
+
+(declare secure-cookies?)
+(cc/defprop-optboolean secure-cookies?
+  "Whether cookies set by terrain should have the Secure flag. Disable for local HTTP testing."
+  [props config-valid configs]
+  "terrain.keycloak.secure-cookies" true)
 
 (declare keycloak-admin-base-uri)
 (cc/defprop-optstr keycloak-admin-base-uri

@@ -8,10 +8,12 @@
    [common-swagger-api.schema :as schema]
    [compojure.api.core :refer [route-middleware]]
    [compojure.route :as route]
+   [ring.middleware.cookies :refer [wrap-cookies]]
    [ring.middleware.keyword-params :refer [wrap-keyword-params]]
    [service-logging.middleware :refer [clean-context wrap-logging]]
    [service-logging.thread-context :as tc]
    [terrain.auth.user-attributes :as user-attributes]
+   [terrain.clients.keycloak :as keycloak]
    [terrain.middleware :refer [wrap-context-path-adder wrap-create-workspace
                                wrap-query-param-remover]]
    [terrain.routes.admin :refer [secured-admin-routes]]
@@ -70,6 +72,7 @@
    [terrain.routes.notification :refer [secured-notification-routes]]
    [terrain.routes.oauth :refer [oauth-admin-routes oauth-routes
                                  secured-oauth-routes]]
+   [terrain.routes.oidc :refer [oidc-routes]]
    [terrain.routes.permanent-id-requests :refer [admin-permanent-id-request-routes
                                                  permanent-id-request-routes]]
    [terrain.routes.pref :refer [secured-pref-routes]]
@@ -229,6 +232,7 @@
   (util/flagged-routes
    (admin-token-routes)
    (callback-routes)
+   (oidc-routes)
    (token-routes)
    (unsecured-misc-routes)))
 
@@ -290,17 +294,25 @@
    optionally-authenticated-routes-handler
    secured-routes-no-context-handler))
 
-(def ^:private security-definitions
+(defn- security-definitions
+  []
   {:basic  {:type "basic"}
    :bearer {:type "apiKey"
             :name "Authorization"
-            :in   "header"}})
+            :in   "header"}
+   :oauth2 {:type             "oauth2"
+            :flow             "accessCode"
+            :authorizationUrl (keycloak/authorization-endpoint)
+            :tokenUrl         (keycloak/token-endpoint)
+            :scopes           {:openid "OpenID Connect scope"}}})
 
 (schema/defapi app
   {:exceptions cx/exception-handlers}
   (schema/swagger-routes
    {:ui       (str "/terrain" config/docs-uri)
     :spec     "/terrain/swagger.json"
+    :options  {:ui {:oauth2-client-id (config/keycloak-client-id)
+                    :oauth2-scopes    (config/oidc-scopes)}}
     :data     {:info                {:title       "Discovery Environment API"
                                      :description "Documentation for the Discovery Environment REST API"
                                      :version     "0.1.0"}
@@ -346,6 +358,7 @@
                                      {:name "filesystem", :description "Filesystem Endpoints"}
                                      {:name "instant-launches", :description "Instant Launch Endpoints"}
                                      {:name "notifications", :description "Notifications and related Endpoints"}
+                                     {:name "oidc", :description "OIDC Authorization Code Flow Endpoints"}
                                      {:name "permanent-id-requests", :description "Permanent ID Request Endpoints"}
                                      {:name "qms", :description "Quota Management Service Endpoints"}
                                      {:name "reference-genomes", :description "Reference Genome Endpoints"}
@@ -365,13 +378,14 @@
                                      {:name "service-account-email" :description "Service Account Email Endpoints"}
                                      {:name "service-account-qms", :description "Service Account QMS Endpoints"}
                                      {:name "service-account-user-info", :description "Service Account User Info Endpoints"}]
-               :securityDefinitions security-definitions}})
+               :securityDefinitions (security-definitions)}})
   (route-middleware
    [[wrap-query-param-remover "ip-address" #{#"^/terrain/secured/bootstrap"
                                              #"^/terrain/secured/logout"}]
     wrap-query-params
     wrap-lcase-params
     wrap-keyword-params
+    wrap-cookies
     clean-context]
    (schema/context "/terrain" []
      (terrain-routes))))
