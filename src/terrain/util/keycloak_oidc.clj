@@ -6,6 +6,14 @@
             [terrain.clients.keycloak :as kc]
             [terrain.util.config :as config]))
 
+(def access-token-cookie
+  "The name of the cookie used to store the Keycloak OIDC access token after an Authorization Code Flow login."
+  "de-access-token")
+
+(def refresh-token-cookie
+  "The name of the cookie used to store the Keycloak OIDC refresh token after an Authorization Code Flow login."
+  "de-refresh-token")
+
 (defn- is-service-account?
   [{:keys [preferred_username]}]
   (string/starts-with? preferred_username "service-account-"))

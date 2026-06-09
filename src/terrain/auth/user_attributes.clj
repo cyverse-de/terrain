@@ -156,6 +156,12 @@
     (when (and (is-bearer? header) (is-jwt? header))
       (second header))))
 
+(defn- get-keycloak-oidc-cookie-token
+  "Returns the Keycloak OIDC access token from the request's cookies, or nil if it isn't present. This cookie is
+   set by terrain's OIDC Authorization Code Flow callback."
+  [request]
+  (get-in request [:cookies keycloak-oidc-util/access-token-cookie :value]))
+
 (defn- wrap-fake-auth
   [handler]
   (wrap-current-user handler fake-user-from-attributes))
@@ -172,6 +178,13 @@
       (wrap-service-account keycloak-oidc-util/service-account-from-token)
       (keycloak-oidc-util/validate-token get-keycloak-oidc-token)))
 
+(defn- wrap-keycloak-oidc-cookie
+  [handler]
+  (-> handler
+      (wrap-current-user keycloak-oidc-util/user-from-token)
+      (wrap-service-account keycloak-oidc-util/service-account-from-token)
+      (keycloak-oidc-util/validate-token get-keycloak-oidc-cookie-token)))
+
 (defn authenticate-current-user
   "Authenticates the user and binds current-user to a map that is built from the user attributes retrieved
    during the authentication process. This middleware does not require authentication information to be
@@ -179,19 +192,21 @@
    request to be processed. Requests without credentials will be passed to the handler without authentication.
    Routes that require authentication can use the require-authentication middleware."
   [handler]
-  (wrap-auth-selection [[get-fake-auth           (wrap-fake-auth handler)]
-                        [get-de-jwt-assertion    (wrap-de-jwt-auth handler)]
-                        [get-keycloak-oidc-token (wrap-keycloak-oidc handler)]
-                        [(constantly true)       handler]]))
+  (wrap-auth-selection [[get-fake-auth                  (wrap-fake-auth handler)]
+                        [get-de-jwt-assertion           (wrap-de-jwt-auth handler)]
+                        [get-keycloak-oidc-token        (wrap-keycloak-oidc handler)]
+                        [get-keycloak-oidc-cookie-token (wrap-keycloak-oidc-cookie handler)]
+                        [(constantly true)              handler]]))
 
 (defn validate-current-user
   "Verifies that the user belongs to one of the groups that are permitted to access the resource."
   [handler]
   (wrap-auth-selection
-   [[get-fake-auth           handler]
-    [get-de-jwt-assertion    (jwt/validate-group-membership handler cfg/allowed-groups)]
-    [get-keycloak-oidc-token (keycloak-oidc-util/validate-group-membership handler cfg/allowed-groups)]
-    [(constantly true)       (constantly (resp/unauthorized "Admin endpoints require authentication."))]]))
+   [[get-fake-auth                  handler]
+    [get-de-jwt-assertion           (jwt/validate-group-membership handler cfg/allowed-groups)]
+    [get-keycloak-oidc-token        (keycloak-oidc-util/validate-group-membership handler cfg/allowed-groups)]
+    [get-keycloak-oidc-cookie-token (keycloak-oidc-util/validate-group-membership handler cfg/allowed-groups)]
+    [(constantly true)              (constantly (resp/unauthorized "Admin endpoints require authentication."))]]))
 
 (defn require-authentication
   "Middleware that checks for user information in an incoming request and returns a 401 if it's not found.
