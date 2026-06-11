@@ -30,6 +30,22 @@
   (fn [{{:keys [user]} :user-info {:keys [dest]} :params :as req}]
     (handler (multipart/multipart-params-request req {:store (store-fn user dest)}))))
 
+(defn overwrite-store-fn
+  "Returns a multipart :store function that overwrites the existing file at dest in the data-info
+  service with the uploaded part's contents. Unlike the string-based save endpoint, the part's
+  stream is forwarded as-is, so binary content survives the round trip."
+  [user dest]
+  (fn [{:keys [stream] :as file-info}]
+    (merge (select-keys file-info [:filename :content-type])
+           (data/overwrite-file user dest stream))))
+
+(defn wrap-file-overwrite
+  "Like wrap-file-upload, but overwrites the existing file at the dest path instead of creating a
+  new file in a destination directory."
+  [handler]
+  (fn [{{:keys [user]} :user-info {:keys [dest]} :params :as req}]
+    (handler (multipart/multipart-params-request req {:store (overwrite-store-fn user dest)}))))
+
 (defn saveas
   "Save a file to a location given the content in a (utf-8) string."
   [{user :shortUsername} {:keys [dest content]}]

@@ -40,6 +40,20 @@
        ;; The upload is handled in the middleware. All that remains to be done is to return the response body.
        (ok (select-keys file [:file])))
 
+     (POST "/overwrite" []
+       :summary "Overwrite a File"
+       :description (str "Overwrites the contents of an existing file in the Data Store with the uploaded content. "
+                         "Unlike the POST /terrain/secured/fileio/save endpoint, the content is forwarded as-is, so "
+                         "binary files are safe. The file must exist already; to upload a new file, use the POST "
+                         "/terrain/secured/fileio/upload endpoint.")
+       :query [params fileio-schema/FileOverwriteQueryParams]
+       :multipart-params [file :- fileio-schema/DataStoreUpload]
+       :middleware [require-authentication fio/wrap-file-overwrite mw/check-user-data-overages]
+       :return stats-schema/FileStat
+
+       ;; The overwrite is handled in the middleware, like the upload endpoint above.
+       (ok (select-keys file [:file])))
+
      (POST "/urlupload" []
        :summary "Upload a File from a URL"
        :description (str "Schedules a task to have the DE retrieve the contents of a new file in the data store from "
