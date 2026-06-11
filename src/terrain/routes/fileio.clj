@@ -48,7 +48,11 @@
                          "/terrain/secured/fileio/upload endpoint.")
        :query [params fileio-schema/FileOverwriteQueryParams]
        :multipart-params [file :- fileio-schema/DataStoreUpload]
-       :middleware [require-authentication fio/wrap-file-overwrite mw/check-user-data-overages]
+       ;; The overage check must run before the multipart middleware: parsing
+       ;; the multipart body performs the overwrite, so the order on the upload
+       ;; route (which checks afterwards) would replace the file and then
+       ;; reject the request.
+       :middleware [require-authentication mw/check-user-data-overages fio/wrap-file-overwrite]
        :return stats-schema/FileStat
 
        ;; The overwrite is handled in the middleware, like the upload endpoint above.

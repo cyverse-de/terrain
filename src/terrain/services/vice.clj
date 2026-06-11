@@ -22,11 +22,13 @@
 
 (defn- has-write-grant?
   "Checks the analysis permission listing for a write-level grant to the
-   current user. The listing only contains grants to subjects other than the
-   requesting user, so this is only consulted for non-owners."
+   current user. full-listing makes the listing include the requesting user's
+   own grants; without it only other subjects' grants are returned. Grants held
+   via group membership are listed under the group's subject and therefore do
+   not match here, so this is consulted after the cheaper owner check."
   [analysis-id]
   (let [username  (:shortUsername current-user)
-        grants    (-> (apps/list-job-permissions {:analyses [analysis-id]} {})
+        grants    (-> (apps/list-job-permissions {:analyses [analysis-id]} {:full-listing true})
                       :analyses
                       first
                       :permissions)
@@ -58,9 +60,12 @@
 
 (defn async-data
   "Returns the asynchronously-generated data for the analysis step identified
-   by the external-id query parameter."
+   by the external-id query parameter. Fails closed: a response that cannot be
+   attributed to an analysis the user can read is treated as not found."
   [params]
-  (let [data (app-exposer/async-data params)]
-    (when-let [analysis-id (:analysisID data)]
-      (get-readable-analysis analysis-id))
+  (let [data        (app-exposer/async-data params)
+        analysis-id (:analysisID data)]
+    (when-not analysis-id
+      (cxu/not-found (str "no analysis found for external ID " (:external-id params))))
+    (get-readable-analysis analysis-id)
     data))

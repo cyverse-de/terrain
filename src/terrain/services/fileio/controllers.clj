@@ -22,13 +22,18 @@
     (merge (select-keys file-info [:filename :content-type])
            (data-raw/upload-file user dest filename content-type stream))))
 
-(defn wrap-file-upload
-  "This is a specialized replacement for ring.middleware.multipart-params/wrap-mutlipart-params that forwards uploads
-  to the data-info service. The username and file destination are extracted from the request before processing the
-  multipart parameters."
-  [handler]
+(defn- wrap-multipart-store
+  "Builds a specialized replacement for ring.middleware.multipart-params/wrap-multipart-params
+  that forwards uploaded file contents to the data-info service via the store function returned
+  by (make-store user dest). The username and destination are extracted from the request before
+  processing the multipart parameters."
+  [make-store handler]
   (fn [{{:keys [user]} :user-info {:keys [dest]} :params :as req}]
-    (handler (multipart/multipart-params-request req {:store (store-fn user dest)}))))
+    (handler (multipart/multipart-params-request req {:store (make-store user dest)}))))
+
+(def wrap-file-upload
+  "Multipart middleware that uploads the file part as a new file in the dest directory."
+  (partial wrap-multipart-store store-fn))
 
 (defn overwrite-store-fn
   "Returns a multipart :store function that overwrites the existing file at dest in the data-info
@@ -39,12 +44,9 @@
     (merge (select-keys file-info [:filename :content-type])
            (data/overwrite-file user dest stream))))
 
-(defn wrap-file-overwrite
-  "Like wrap-file-upload, but overwrites the existing file at the dest path instead of creating a
-  new file in a destination directory."
-  [handler]
-  (fn [{{:keys [user]} :user-info {:keys [dest]} :params :as req}]
-    (handler (multipart/multipart-params-request req {:store (overwrite-store-fn user dest)}))))
+(def wrap-file-overwrite
+  "Multipart middleware that overwrites the existing file at the dest path."
+  (partial wrap-multipart-store overwrite-store-fn))
 
 (defn saveas
   "Save a file to a location given the content in a (utf-8) string."

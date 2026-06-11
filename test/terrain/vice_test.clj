@@ -39,11 +39,11 @@
                          [])})}}))
 
 (defn- permission-lister-route
-  "Fakes the apps permission-lister; grants lists [subject-id permission]
-   pairs for subjects other than the requesting user."
+  "Fakes the apps permission-lister (with the full-listing flag the service
+   sends); grants lists [subject-id permission] pairs."
   [grants]
   {{:address      (apps-url "analyses" "permission-lister")
-    :query-params (map-vals str (add-current-user-to-map {}))}
+    :query-params (map-vals str (add-current-user-to-map {:full-listing true}))}
    {:post (json-response
            {:analyses [{:id          analysis-id
                         :name        "test-analysis"
@@ -106,3 +106,11 @@
       {:get (json-response {:analysisID analysis-id :subdomain "a1b2c3" :ipAddr "127.0.0.1"})}})
     (testing "async data passes through once the analysis is readable"
       (is (= "a1b2c3" (:subdomain (vice/async-data {:external-id "ext-1"})))))))
+
+(deftest async-data-fails-closed-without-analysis-id
+  (with-fake-routes-in-isolation
+    {{:address      (app-exposer-url "vice" "async-data")
+      :query-params {:external-id "ext-1" :user "ipcdev"}}
+     {:get (json-response {:analysisID nil :subdomain "a1b2c3" :ipAddr "127.0.0.1"})}}
+    (testing "a response without an analysis id is rejected instead of leaked"
+      (is (thrown? ExceptionInfo (vice/async-data {:external-id "ext-1"}))))))
