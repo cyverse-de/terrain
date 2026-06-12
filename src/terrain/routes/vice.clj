@@ -3,6 +3,7 @@
             [ring.util.http-response :refer [ok]]
             [terrain.clients.app-exposer :as vice]
             [terrain.routes.schemas.vice :as vice-schema]
+            [terrain.services.vice :as vice-services]
             [terrain.util :refer [optional-routes]]
             [terrain.util.config :as config]))
 
@@ -139,6 +140,28 @@
        :summary "List Kubernetes resources deployed in the cluster"
        :description "Lists all Kubernetes resources associated with an analysis running in the cluster for a user"
        (ok (vice/get-resources filter)))
+
+     (GET "/async-data" []
+       :query [params vice-schema/AsyncDataParams]
+       :return vice-schema/AsyncData
+       :summary "Get data that is generated asynchronously"
+       :description "Get data for the VICE analysis that is generated asynchronously, after verifying that the user can read the analysis"
+       (ok (vice-services/async-data params)))
+
+     (context "/analyses" []
+       (context "/:analysis-id" []
+         :path-params [analysis-id :- vice-schema/AnalysisID]
+
+         (GET "/external-id" []
+           :return vice-schema/ExternalIDResponse
+           :summary "Get external UUID"
+           :description "Returns the external UUID associated with the analysis after verifying that the user can read it. VICE analyses only have a single external UUID"
+           (ok (vice-services/external-id analysis-id)))
+
+         (POST "/exit" []
+           :summary "Exit without saving"
+           :description "Terminates the analysis without uploading files to the data store, after verifying that the user can write to the analysis"
+           (ok (vice-services/exit analysis-id)))))
 
      (context "/:host" []
        :path-params [host :- vice-schema/Host]

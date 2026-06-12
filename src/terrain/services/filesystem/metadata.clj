@@ -31,6 +31,19 @@
 
 (with-post-hook! #'do-metadata-set (log-func "do-metadata-set"))
 
+(defn do-metadata-add
+  "Entrypoint for the API that calls (metadata-add): associates the given AVUs
+   with the data item without touching the existing ones."
+  [data-id {user :user} body]
+  (data-raw/add-avus user (uuidify data-id) body))
+
+(with-pre-hook! #'do-metadata-add
+  (fn [data-id params body]
+    (log-call "do-metadata-add" data-id params body)
+    (validate-map params {:user string?})))
+
+(with-post-hook! #'do-metadata-add (log-func "do-metadata-add"))
+
 (defn do-metadata-copy
   "Entrypoint for the API that calls (metadata-copy)."
   [{:keys [user]} data-id body]

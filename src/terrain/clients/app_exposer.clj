@@ -111,9 +111,11 @@
   (:body (client/get (app-exposer-url ["vice" "async-data"] query) {:as :json})))
 
 (defn admin-external-id
-  "Gets the external-id for the provided analysis-id. VICE analyses only have a single external-id"
+  "Gets the external-id for the provided analysis-id. VICE analyses only have a single external-id.
+   app-exposer responds with an external_id key; the published schema uses externalID."
   [analysis-id]
-  (:body (client/get (app-exposer-url ["vice" "admin" "analyses" analysis-id "external-id"] {} :no-user true) {:as :json})))
+  (let [body (:body (client/get (app-exposer-url ["vice" "admin" "analyses" analysis-id "external-id"] {} :no-user true) {:as :json}))]
+    {:externalID (:external_id body)}))
 
 (defn admin-exit
   "Forces the analysis to exit without transferring output files"

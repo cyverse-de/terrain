@@ -240,7 +240,7 @@
   "Attempts to resolve a test user from either a username or a map of user attributes."
   [user]
   (cond (string? user) (lookup-user user)
-        (map? user)    (user-from-attributes {:user-attribues user})
+        (map? user)    (user-from-attributes {:user-attributes user})
         :else          (cxu/internal-system-error "user must be a string or a map of attributes")))
 
 (defmacro with-user

@@ -184,6 +184,10 @@
      :middleware [require-authentication]
      (controller req meta/do-metadata-set data-id :params :body))
 
+   (POST "/filesystem/:data-id/metadata/add" [data-id :as req]
+     :middleware [require-authentication]
+     (controller req meta/do-metadata-add data-id :params :body))
+
    (POST "/filesystem/:data-id/metadata/copy" [data-id :as req]
      :middleware [require-authentication]
      (controller req meta/do-metadata-copy :params data-id :body))

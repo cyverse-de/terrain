@@ -10,6 +10,9 @@
 (s/defschema FileUploadQueryParams
   {:dest (describe NonBlankString "The destination directory for the uploaded file.")})
 
+(s/defschema FileOverwriteQueryParams
+  {:dest (describe NonBlankString "The path to the existing file to overwrite in the data store.")})
+
 (def DataStoreUpload
   "Schema for a data store upload file parameter. The multipart request has to be processed in middleware because
   the input stream for the file contents is closed before the body of the endpoint implementation is reached. We're
