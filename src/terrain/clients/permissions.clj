@@ -27,6 +27,8 @@
    held via group membership, or nil if the user has no access to it. The permission levels are
    the ones used by the apps service: read, admin, write, and own."
   [user analysis-id]
+  ;; The permissions service returns at most one entry per resource: the most privileged grant
+  ;; across the user and their groups, so `first` always yields the effective level.
   (-> (c/get-subject-permissions-for-resource (get-client) "user" user "analysis" (str analysis-id) true)
       :permissions
       first
