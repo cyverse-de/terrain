@@ -13,7 +13,6 @@
    [service-logging.middleware :refer [clean-context wrap-logging]]
    [service-logging.thread-context :as tc]
    [terrain.auth.user-attributes :as user-attributes]
-   [terrain.clients.keycloak :as keycloak]
    [terrain.middleware :refer [wrap-context-path-adder wrap-create-workspace
                                wrap-query-param-remover]]
    [terrain.routes.admin :refer [secured-admin-routes]]
@@ -299,20 +298,13 @@
   {:basic  {:type "basic"}
    :bearer {:type "apiKey"
             :name "Authorization"
-            :in   "header"}
-   :oauth2 {:type             "oauth2"
-            :flow             "accessCode"
-            :authorizationUrl (keycloak/authorization-endpoint)
-            :tokenUrl         (keycloak/token-endpoint)
-            :scopes           {:openid "OpenID Connect scope"}}})
+            :in   "header"}})
 
 (schema/defapi app
   {:exceptions cx/exception-handlers}
   (schema/swagger-routes
    {:ui       (str "/terrain" config/docs-uri)
     :spec     "/terrain/swagger.json"
-    :options  {:ui {:oauth2-client-id (config/keycloak-client-id)
-                    :oauth2-scopes    (config/oidc-scopes)}}
     :data     {:info                {:title       "Discovery Environment API"
                                      :description "Documentation for the Discovery Environment REST API"
                                      :version     "0.1.0"}
