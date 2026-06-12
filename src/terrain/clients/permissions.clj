@@ -21,3 +21,13 @@
   "Copies permissions from one subject to one or more other subjects."
   [source-type source-id dest-subjects]
   (c/copy-permissions (get-client) source-type source-id dest-subjects))
+
+(defn get-analysis-permission-level
+  "Returns the most privileged permission level the user holds on an analysis, including grants
+   held via group membership, or nil if the user has no access to it. The permission levels are
+   the ones used by the apps service: read, admin, write, and own."
+  [user analysis-id]
+  (-> (c/get-subject-permissions-for-resource (get-client) "user" user "analysis" (str analysis-id) true)
+      :permissions
+      first
+      :permission_level))

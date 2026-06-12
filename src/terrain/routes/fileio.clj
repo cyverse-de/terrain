@@ -34,7 +34,10 @@
        :description "Uploads a file to the CyVerse Data Store."
        :query [params fileio-schema/FileUploadQueryParams]
        :multipart-params [file :- fileio-schema/DataStoreUpload]
-       :middleware [require-authentication fio/wrap-file-upload mw/check-user-data-overages]
+       ;; The overage check must run before the multipart middleware: parsing
+       ;; the multipart body performs the upload, so checking afterwards would
+       ;; store the file and then reject the request.
+       :middleware [require-authentication mw/check-user-data-overages fio/wrap-file-upload]
        :return stats-schema/FileStat
 
        ;; The upload is handled in the middleware. All that remains to be done is to return the response body.
@@ -48,10 +51,8 @@
                          "/terrain/secured/fileio/upload endpoint.")
        :query [params fileio-schema/FileOverwriteQueryParams]
        :multipart-params [file :- fileio-schema/DataStoreUpload]
-       ;; The overage check must run before the multipart middleware: parsing
-       ;; the multipart body performs the overwrite, so the order on the upload
-       ;; route (which checks afterwards) would replace the file and then
-       ;; reject the request.
+       ;; As on the upload route, the overage check must run before the
+       ;; multipart middleware that performs the overwrite.
        :middleware [require-authentication mw/check-user-data-overages fio/wrap-file-overwrite]
        :return stats-schema/FileStat
 

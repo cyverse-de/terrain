@@ -29,11 +29,12 @@
   processing the multipart parameters."
   [make-store handler]
   (fn [{{:keys [user]} :user-info {:keys [dest]} :params :as req}]
-    (handler (multipart/multipart-params-request req {:store (make-store user dest)}))))
+    (handler (multipart/multipart-params-request req {:store (make-store user (some-> dest string/trim))}))))
 
-(def wrap-file-upload
+(defn wrap-file-upload
   "Multipart middleware that uploads the file part as a new file in the dest directory."
-  (partial wrap-multipart-store store-fn))
+  [handler]
+  (wrap-multipart-store store-fn handler))
 
 (defn overwrite-store-fn
   "Returns a multipart :store function that overwrites the existing file at dest in the data-info
@@ -44,9 +45,10 @@
     (merge (select-keys file-info [:filename :content-type])
            (data/overwrite-file user dest stream))))
 
-(def wrap-file-overwrite
+(defn wrap-file-overwrite
   "Multipart middleware that overwrites the existing file at the dest path."
-  (partial wrap-multipart-store overwrite-store-fn))
+  [handler]
+  (wrap-multipart-store overwrite-store-fn handler))
 
 (defn saveas
   "Save a file to a location given the content in a (utf-8) string."
