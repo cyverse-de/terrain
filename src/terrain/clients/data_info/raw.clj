@@ -6,7 +6,8 @@
             [cheshire.core :as json]
             [clj-http.client :as http]
             [terrain.util.config :as cfg])
-  (:import [clojure.lang IPersistentMap ISeq Keyword]))
+  (:import [clojure.lang IPersistentMap ISeq Keyword]
+           [org.apache.http.entity.mime HttpMultipartMode]))
 
 ;; HELPER FUNCTIONS
 
@@ -133,14 +134,18 @@
 (defn upload-file
   [user dest-path filename content-type istream]
   (:body (http/post (str (url/url (cfg/data-info-base-url) "data"))
-                    {:query-params {:user user
-                                    :dest dest-path}
-                     :accept       :json
-                     :as           :json
-                     :multipart    [{:part-name "file"
-                                     :name      filename
-                                     :mime-type content-type
-                                     :content   istream}]})))
+                    {:query-params   {:user user
+                                      :dest dest-path}
+                     :accept         :json
+                     :as             :json
+                     ;; RFC6532 encodes the multipart filename as UTF-8. The default
+                     ;; STRICT mode encodes it as US-ASCII, replacing characters like
+                     ;; ä/ö/ü with '?' before data-info ever stores the file.
+                     :multipart-mode HttpMultipartMode/RFC6532
+                     :multipart      [{:part-name "file"
+                                       :name      filename
+                                       :mime-type content-type
+                                       :content   istream}]})))
 (defn create-dirs
   "Uses the data-info directories endpoint to create several directories."
   [user paths]
