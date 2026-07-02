@@ -45,7 +45,6 @@ The application follows a typical Clojure web service architecture with clear se
    - Main application initialization
    - Configuration loading from `terrain.properties`
    - nREPL server setup
-   - NATS message queue connection
 
 2. **Routing Layer** (`src/terrain/routes.clj` and `src/terrain/routes/`)
    - Compojure-based routing
@@ -91,7 +90,6 @@ The application follows a typical Clojure web service architecture with clear se
 - **HTTP Client**: clj-http
 - **JSON**: Cheshire
 - **Database**: PostgreSQL via Kameleon library
-- **Message Queue**: NATS
 - **Storage**: iRODS (via clj-jargon)
 - **Authentication**: CyVerse custom auth + OAuth and Keycloak
 
