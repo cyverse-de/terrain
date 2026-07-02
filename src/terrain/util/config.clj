@@ -275,6 +275,24 @@
   [props config-valid configs]
   "terrain.iplant-groups.de-users-group" "de-users")
 
+(declare groups-base)
+(cc/defprop-optstr groups-base
+  "The base URL for the Groups service."
+  [props config-valid configs]
+  "terrain.groups.base-url" "http://groups")
+
+(declare groups-admin-user)
+(cc/defprop-optstr groups-admin-user
+  "The administrative user to use for the Groups service."
+  [props config-valid configs]
+  "terrain.groups.admin-user" "de_grouper")
+
+(declare groups-backend)
+(cc/defprop-optstr groups-backend
+  "Selects the backend used for group operations: `iplant-groups` (legacy) or `groups` (new)."
+  [props config-valid configs]
+  "terrain.groups.backend" "iplant-groups")
+
 (declare permissions-base)
 (cc/defprop-optstr permissions-base
   "The base URL for the permissions service."
