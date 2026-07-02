@@ -763,101 +763,11 @@
   [props config-valid configs]
   "terrain.dashboard-aggregator.base-uri" "http://dashboard-aggregator")
 
-(declare nats-urls)
-(cc/defprop-optstr nats-urls
-  "A comma separated list of NATS connection URLs."
+(declare subscriptions-base-uri)
+(cc/defprop-optstr subscriptions-base-uri
+  "The base URI for the subscriptions service, which serves the QMS add-on endpoints."
   [props config-valid configs]
-  "terrain.nats.urls" "tls://nats-0.nats,tls://nats-1.nats,tls://nats-2.nats,tls://nats-3.nats")
-
-(declare nats-reconnect-wait)
-(cc/defprop-optint nats-reconnect-wait
-  "How long to wait between NATS reconnection attempts"
-  [props config-valid configs]
-  "terrain.nats.reconnect.wait" 1)
-
-(declare nats-max-reconnects)
-(cc/defprop-optint nats-max-reconnects
-  "The maximum number of reconnection attempts to NATS"
-  [props config-valid configs]
-  "terrain.nats.reconnect.max" 10)
-
-(declare nats-tls-enabled)
-(cc/defprop-optboolean nats-tls-enabled
-  "Whether to use TLS with the connection to NATS"
-  [props config-valid configs]
-  "terrain.nats.tls.enabled" true)
-
-(declare nats-tls-key)
-(cc/defprop-optstr nats-tls-key
-  "The filename of the TLS key used for connecting to NATS. Must be present in nats-tls-dir"
-  [props config-valid configs]
-  "terrain.nats.tls.key" "/etc/nats/tls/pkcs8/tls.pkcs8")
-
-(declare nats-tls-crt)
-(cc/defprop-optstr nats-tls-crt
-  "The filename of the TLS key used for connecting to NATS. Must be present in nats-tls-dir"
-  [props config-valid configs]
-  "terrain.nats.tls.crt" "/etc/nats/tls/tls.crt")
-
-(declare nats-tls-ca)
-(cc/defprop-optstr nats-tls-ca
-  "The filename of the TLS CA crt used for connecting to NATS. Must be present in nats-tls-dir"
-  [props config-valid configs]
-  "terrain.nats.tls.ca" "/etc/nats/tls/ca.crt")
-
-(declare add-addon-subject)
-(cc/defprop-optstr add-addon-subject
-  "The NATS subject for adding add-ons"
-  [props config-valid configs]
-  "terrain.nats.subjects.addons.add" "cyverse.qms.addon.add")
-
-(declare list-addons-subject)
-(cc/defprop-optstr list-addons-subject
-  "The NATS subject for listing add-ons"
-  [props config-valid configs]
-  "terrain.nats.subjects.addons.list" "cyverse.qms.addon.list")
-
-(declare update-addon-subject)
-(cc/defprop-optstr update-addon-subject
-  "The NATS subject for updating an addon"
-  [props config-valid configs]
-  "terrain.nats.subjects.addons.update" "cyverse.qms.addon.update")
-
-(declare delete-addon-subject)
-(cc/defprop-optstr delete-addon-subject
-  "The NATS subject for deleting an addon"
-  [props config-valid configs]
-  "terrain.nats.subjects.addons.delete" "cyverse.qms.addon.delete")
-
-(declare add-subscription-addon-subject)
-(cc/defprop-optstr add-subscription-addon-subject
-  "The NATS subject for adding a subscription addon"
-  [props config-valid configs]
-  "terrain.nats.subjects.subscription.addons.add" "cyverse.qms.user.plan.addons.add")
-
-(declare list-subscription-addons-subject)
-(cc/defprop-optstr list-subscription-addons-subject
-  "The NATS subject for listing a subscription's addons"
-  [props config-valid configs]
-  "terrain.nats.subjects.subscription.addons.list" "cyverse.qms.user.plan.addons.list")
-
-(declare update-subscription-addon-subject)
-(cc/defprop-optstr update-subscription-addon-subject
-  "The NATS subject for updating a subscription addon"
-  [props config-valid configs]
-  "terrain.nats.subjects.subscription.addons.update" "cyverse.qms.user.plan.addons.update")
-
-(declare delete-subscription-addon-subject)
-(cc/defprop-optstr delete-subscription-addon-subject
-  "The NATS subject for deleting a subscription addon"
-  [props config-valid configs]
-  "terrain.nats.subjects.subscription.addons.delete" "cyverse.qms.user.plan.addons.delete")
-
-(declare get-subscription-addon-subject)
-(cc/defprop-optstr get-subscription-addon-subject
-  "The NATS subject for getting a subscription addon"
-  [props config-valid configs]
-  "terrain.nats.subjects.subscription.addons.get" "cyverse.qms.user.plan.addons.get")
+  "terrain.subscriptions.base-uri" "http://subscriptions")
 
 (declare portal-conductor-base-url)
 (cc/defprop-optstr portal-conductor-base-url

@@ -1,7 +1,6 @@
 (ns terrain.routes.qms
   (:require [terrain.util.config :as config]
             [terrain.clients.qms :as qms]
-            [terrain.clients.qms-nats :as n]
             [terrain.services.qms :as handlers]
             [terrain.auth.user-attributes :refer [current-user require-authentication require-service-account]]
             [terrain.util :refer [optional-routes]]
@@ -110,7 +109,7 @@
              :summary schema/ListSubscriptionAddonsSummary
              :description schema/ListSubscriptionAddonsDescription
              :return schema/SubscriptionAddonListResponse
-             (ok (n/list-subscription-addons subscription-uuid)))
+             (ok (qms/list-subscription-addons subscription-uuid)))
 
            (POST "/" []
              :middleware [require-authentication]
@@ -118,7 +117,7 @@
              :description schema/AddSubscriptionAddonDescription
              :body [body schema/AddonIDBody]
              :return schema/SubscriptionAddonResponse
-             (ok (n/add-subscription-addon subscription-uuid (:uuid body))))
+             (ok (qms/add-subscription-addon subscription-uuid (:uuid body))))
 
            (context "/:uuid" []
              :path-params [uuid :- schema/SubscriptionAddonID]
@@ -128,21 +127,21 @@
                :summary schema/GetSubscriptionAddonSummary
                :description schema/GetSubscriptionAddonDescription
                :return schema/SubscriptionAddonResponse
-               (ok (n/get-subscription-addon uuid)))
+               (ok (qms/get-subscription-addon subscription-uuid uuid)))
 
              (PUT "/" []
                :middleware [require-authentication]
                :summary schema/UpdateSubscriptionAddonSummary
                :description schema/UpdateSubscriptionAddonDescription
                :body [body schema/UpdateSubscriptionAddon]
-               (ok (n/update-subscription-addon (assoc body :uuid uuid))))
+               (ok (qms/update-subscription-addon subscription-uuid (assoc body :uuid uuid))))
 
              (DELETE "/" []
                :middleware [require-authentication]
                :summary schema/DeleteSubscriptionAddonSummary
                :description schema/DeleteSubscriptionAddonDescription
                :return schema/SubscriptionAddonResponse
-               (ok (n/delete-subscription-addon uuid)))))))
+               (ok (qms/delete-subscription-addon subscription-uuid uuid)))))))
 
      (context "/addons" []
        (POST "/" []
@@ -151,14 +150,14 @@
          :description schema/AddAddonDescription
          :body [body schema/AddOn]
          :return schema/AddonResponse
-         (ok (n/add-addon body)))
+         (ok (qms/add-addon body)))
 
        (GET "/" []
          :middleware [require-authentication]
          :summary schema/ListAddonsSummary
          :description schema/ListAddonsDescription
          :return schema/AddonListResponse
-         (ok (n/list-addons)))
+         (ok (qms/list-addons)))
 
        (PUT "/" []
          :middleware [require-authentication]
@@ -166,7 +165,7 @@
          :description schema/UpdateAddonDescription
          :body [body schema/UpdateAddon]
          :return schema/AddonResponse
-         (ok (n/update-addon body)))
+         (ok (qms/update-addon body)))
 
        (DELETE "/:uuid" []
          :middleware [require-authentication]
@@ -174,7 +173,7 @@
          :description schema/DeleteAddonDescription
          :path-params [uuid :- schema/AddonID]
          :return schema/DeletedAddonResponse
-         (ok (n/delete-addon uuid))))
+         (ok (qms/delete-addon uuid))))
 
      (context "/users" []
        (context "/:username" []
@@ -264,7 +263,7 @@
          :summary schema/ListAddonsSummary
          :description schema/ListAddonsDescription
          :return schema/AddonListResponse
-         (ok (n/list-addons))))
+         (ok (qms/list-addons))))
 
      (context "/subscriptions" []
        (context "/:subscription-uuid" []
@@ -276,7 +275,7 @@
              :summary schema/ListSubscriptionAddonsSummary
              :description schema/ListSubscriptionAddonsDescription
              :return schema/SubscriptionAddonListResponse
-             (ok (n/list-subscription-addons subscription-uuid)))
+             (ok (qms/list-subscription-addons subscription-uuid)))
 
            (POST "/" []
              :middleware [[require-service-account ["cyverse-subscription-updater"]]]
@@ -284,7 +283,7 @@
              :description schema/AddSubscriptionAddonDescription
              :body [body schema/AddonIDBody]
              :return schema/SubscriptionAddonResponse
-             (ok (n/add-subscription-addon subscription-uuid (:uuid body))))
+             (ok (qms/add-subscription-addon subscription-uuid (:uuid body))))
 
            (context "/:uuid" []
              :path-params [uuid :- schema/SubscriptionAddonID]
@@ -294,18 +293,18 @@
                :summary schema/GetSubscriptionAddonSummary
                :description schema/GetSubscriptionAddonDescription
                :return schema/SubscriptionAddonResponse
-               (ok (n/get-subscription-addon uuid)))
+               (ok (qms/get-subscription-addon subscription-uuid uuid)))
 
              (PUT "/" []
                :middleware [[require-service-account ["cyverse-subscription-updater"]]]
                :summary schema/UpdateSubscriptionAddonSummary
                :description schema/UpdateSubscriptionAddonDescription
                :body [body schema/UpdateSubscriptionAddon]
-               (ok (n/update-subscription-addon (assoc body :uuid uuid))))
+               (ok (qms/update-subscription-addon subscription-uuid (assoc body :uuid uuid))))
 
              (DELETE "/" []
                :middleware [[require-service-account ["cyverse-subscription-updater"]]]
                :summary schema/DeleteSubscriptionAddonSummary
                :description schema/DeleteSubscriptionAddonDescription
                :return schema/SubscriptionAddonResponse
-               (ok (n/delete-subscription-addon uuid))))))))))
+               (ok (qms/delete-subscription-addon subscription-uuid uuid))))))))))

@@ -9,7 +9,6 @@
             [terrain.middleware :refer [wrap-fake-user]]
             [terrain.services.filesystem.icat :as icat]
             [terrain.util.config :as config]
-            [terrain.util.nats :as nats]
             [service-logging.thread-context :as tc]))
 
 (defn- start-nrepl
@@ -46,24 +45,11 @@
   ([path]
    (config/load-config-from-file path)))
 
-(defn nats-connect
-  []
-  (nats/set-options
-   (config/nats-urls)
-   (config/nats-tls-enabled)
-   (config/nats-tls-crt)
-   (config/nats-tls-key)
-   (config/nats-tls-ca)
-   (config/nats-max-reconnects)
-   (config/nats-reconnect-wait))
-  (nats/set-connection))
-
 (defn lein-ring-init
   "This function is used by leiningen ring plugin to initialize terrain."
   []
   (load-configuration-from-file)
   (icat/configure-icat)
-  (nats-connect)
   (start-nrepl))
 
 (defn repl-init
@@ -119,7 +105,6 @@
   (tc/with-logging-context svc-info
     (let [{:keys [options]} (ccli/handle-args svc-info args cli-options)]
       (load-config (:config options))
-      (nats-connect)
       (http/with-connection-pool {:timeout 5 :threads 10 :insecure? false :default-per-route 10}
         (icat/configure-icat)
         (run-jetty (get-port options) (:fake-user options))))))

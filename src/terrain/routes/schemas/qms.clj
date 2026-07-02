@@ -212,7 +212,7 @@
    (optional-key :error)  (describe (maybe String) "The error message if the request could not be completed")
    :status                (describe String "The status of the request")})
 
-(defschema NATSResourceType
+(defschema AddonResourceType
   {(optional-key :uuid) ResourceID
    :name                ResourceTypeName
    :unit                (describe String "The unit of the resource type")
@@ -238,7 +238,7 @@
    :description         (describe String "The description of the add-on")
    :default_amount      (describe Double "The amount of the resource provided by the add-on")
    :default_paid        (describe Boolean "Whether the add-on needs to be paid for")
-   :resource_type       (describe NATSResourceType "The resource type the add-on provides more of")
+   :resource_type       (describe AddonResourceType "The resource type the add-on provides more of")
    :addon_rates         (describe [AddonRate] "The rates associated with the addon")})
 
 (defschema UpdateAddon
