@@ -42,14 +42,23 @@
                                :default_paid   false
                                :addon_rates    []}
                     :expected {:updateName          true
+                               :update_name         true
                                :updateDescription   true
+                               :update_description  true
                                :updateResourceType  true
+                               :update_resource_type true
                                :updateDefaultAmount true
+                               :update_default_amount true
                                :updateDefaultPaid   true
-                               :updateAddonRates    true}}
+                               :update_default_paid true
+                               :updateAddonRates    true
+                               :update_addon_rates  true}}
                    {:desc     "false and empty values still count as updates"
                     :in       {:default_paid false :addon_rates []}
-                    :expected {:updateDefaultPaid true :updateAddonRates true}}
+                    :expected {:updateDefaultPaid true
+                               :update_default_paid true
+                               :updateAddonRates  true
+                               :update_addon_rates true}}
                    {:desc     "absent fields produce no flags"
                     :in       {:uuid addon-uuid}
                     :expected {}}]]

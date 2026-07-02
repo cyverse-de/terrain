@@ -168,15 +168,19 @@
 
 (defn- addon-update-flags
   "Builds the updateX flags the subscriptions service uses to decide which
-   add-on fields to modify; a field is updated when it's present."
+   add-on fields to modify; a field is updated when it's present. Each flag is
+   sent under both its current camelCase key and the snake_case key the
+   pre-migration service bound, so a mis-ordered rolling deploy fails loudly
+   instead of silently ignoring the update; each service ignores the key it
+   doesn't know."
   [addon]
   (cond-> {}
-    (some? (:name addon))                     (assoc :updateName true)
-    (some? (:description addon))              (assoc :updateDescription true)
-    (some? (get-in addon [:resource_type :uuid])) (assoc :updateResourceType true)
-    (some? (:default_amount addon))           (assoc :updateDefaultAmount true)
-    (some? (:default_paid addon))             (assoc :updateDefaultPaid true)
-    (some? (:addon_rates addon))              (assoc :updateAddonRates true)))
+    (some? (:name addon))                         (assoc :updateName true :update_name true)
+    (some? (:description addon))                  (assoc :updateDescription true :update_description true)
+    (some? (get-in addon [:resource_type :uuid])) (assoc :updateResourceType true :update_resource_type true)
+    (some? (:default_amount addon))               (assoc :updateDefaultAmount true :update_default_amount true)
+    (some? (:default_paid addon))                 (assoc :updateDefaultPaid true :update_default_paid true)
+    (some? (:addon_rates addon))                  (assoc :updateAddonRates true :update_addon_rates true)))
 
 (defn add-addon
   [addon]
