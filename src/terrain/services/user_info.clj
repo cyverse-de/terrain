@@ -1,5 +1,5 @@
 (ns terrain.services.user-info
-  (:require [terrain.clients.iplant-groups :as ipg]
+  (:require [terrain.clients.grouping :as ipg]
             [terrain.auth.user-attributes :as user]))
 
 (defn- add-user-info

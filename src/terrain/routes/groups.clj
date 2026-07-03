@@ -1,7 +1,7 @@
 (ns terrain.routes.groups
   (:require [common-swagger-api.schema :refer [routes DELETE GET PUT]]
             [terrain.clients.apps.raw :as apps]
-            [terrain.clients.iplant-groups :as ipg]
+            [terrain.clients.grouping :as ipg]
             [terrain.util.service :as service]))
 
 ;; Declarations to eliminate lint warnings for path and query parameter bindings.

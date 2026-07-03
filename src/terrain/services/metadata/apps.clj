@@ -1,6 +1,6 @@
 (ns terrain.services.metadata.apps
   (:require [clojure.string :as string]
-            [terrain.clients.iplant-groups :as ipg]
+            [terrain.clients.grouping :as ipg]
             [terrain.clients.apps.raw :as apps-client]
             [terrain.clients.notifications :as dn]
             [terrain.util.email :as email]))

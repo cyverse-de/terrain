@@ -67,3 +67,83 @@
         (is (= "group" (:type (first groups))))
         (is (contains? (first groups) :id_index))
         (is (= "uuid-1" (:id (first groups))))))))
+
+;; Collaborator lists.
+
+(def ^:private cl-folder "de:users:alice:collaborator-lists")
+(def ^:private cl-full (str cl-folder ":friends"))
+
+(defn- resolve-route
+  "Fake route that resolves the collaborator-list group `friends` to id g1."
+  []
+  {{:address (groups-url "groups") :query-params {:user "alice" :search cl-full}}
+   (json-response {:groups [{:id "g1" :name cl-full :description "buddies"}]})})
+
+(deftest get-collaborator-lists-test
+  (with-fake-routes-in-isolation
+    {{:address (groups-url "groups") :query-params {:user "alice" :search cl-folder}}
+     (json-response {:groups [{:id "g1" :name cl-full :description "buddies"}]})}
+    (let [{:keys [groups]} (groups/get-collaborator-lists "alice" nil)]
+      (testing "listing strips the folder prefix and synthesizes contract fields"
+        (is (= 1 (count groups)))
+        (is (= "friends" (:name (first groups))))
+        (is (= "group" (:type (first groups))))
+        (is (= "g1" (:id (first groups))))))))
+
+(deftest add-collaborator-list-test
+  (with-fake-routes-in-isolation
+    {{:address (groups-url "groups") :query-params {:user "alice"}}
+     (fn [req]
+       (let [body (json/decode (slurp (:body req)) true)]
+         (is (= cl-full (:name body)))
+         (is (= "friends" (:display_extension body)))
+         {:status 200 :headers {"Content-Type" "application/json"}
+          :body (json/encode {:id "g1" :name cl-full :description "buddies" :display_extension "friends"})}))}
+    (let [result (groups/add-collaborator-list "alice" {:name "friends" :description "buddies"})]
+      (testing "the created list is returned with its short name"
+        (is (= "friends" (:name result)))
+        (is (= "g1" (:id result)))
+        (is (= "group" (:type result)))))))
+
+(deftest get-collaborator-list-members-test
+  (with-fake-routes-in-isolation
+    (merge (resolve-route)
+           {{:address (groups-url "groups" "g1" "members") :query-params {:user "alice"}}
+            (json-response {:members [alice {:id "de_grouper" :name "de_grouper"}]})})
+    (let [{:keys [members]} (groups/get-collaborator-list-members "alice" "friends")]
+      (testing "members exclude the admin user and get a display_name"
+        (is (= 1 (count members)))
+        (is (= "alice" (:id (first members))))
+        (is (= "alice" (:display_name (first members))))))))
+
+(deftest add-collaborator-list-members-test
+  (with-fake-routes-in-isolation
+    (merge (resolve-route)
+           {{:address (groups-url "groups" "g1" "members") :query-params {:user "alice"}}
+            (json-response {:results [{:subject_id "bob" :success true}]})
+            {:address (groups-url "subjects" "lookup") :query-params {:user "alice"}}
+            (json-response {:subjects [{:id "bob" :name "Bob" :source_id "ldap"}]})})
+    (let [{:keys [results]} (groups/add-collaborator-list-members "alice" "friends" ["bob"])]
+      (testing "membership results are enriched with source_id and subject_name"
+        (is (= 1 (count results)))
+        (is (= {:subject_id "bob" :success true :source_id "ldap" :subject_name "Bob"}
+               (first results)))))))
+
+(deftest delete-collaborator-list-test
+  (with-fake-routes-in-isolation
+    (merge (resolve-route)
+           {{:address (groups-url "groups" "g1") :query-params {:user "alice"}}
+            (json-response {:id "g1" :name cl-full})})
+    (let [result (groups/delete-collaborator-list "alice" "friends")]
+      (testing "delete returns the removed group including its id"
+        (is (= "g1" (:id result)))
+        (is (= "friends" (:name result)))))))
+
+(deftest remove-de-user-test
+  (with-fake-routes-in-isolation
+    {{:address (groups-url "groups") :query-params {:user "de_grouper" :search "de:users:de-users"}}
+     (json-response {:groups [{:id "du1" :name "de:users:de-users"}]})
+     {:address (groups-url "groups" "du1" "members" "bob") :query-params {:user "de_grouper"}}
+     (fn [_] {:status 200 :headers {"Content-Type" "application/json"} :body "{}"})}
+    (testing "removing a DE user deletes their membership in the de-users group"
+      (is (nil? (groups/remove-de-user "bob"))))))

@@ -1,7 +1,7 @@
 (ns terrain.services.qms
   (:require [clojure-commons.core :refer [remove-nil-values]]
             [clojure-commons.exception-util :as cxu]
-            [terrain.clients.iplant-groups.subjects :as subjects]
+            [terrain.clients.grouping.subjects :as subjects]
             [terrain.clients.qms :as qms]))
 
 (defn- validate-username

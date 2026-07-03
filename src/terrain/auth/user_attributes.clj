@@ -4,7 +4,7 @@
             [clojure-commons.response :as resp]
             [clojure-commons.exception-util :as cxu]
             [slingshot.slingshot :refer [try+]]
-            [terrain.clients.iplant-groups.subjects :as subjects]
+            [terrain.clients.grouping.subjects :as subjects]
             [terrain.util.config :as cfg]
             [terrain.util.jwt :as jwt]
             [terrain.util.keycloak-oidc :as keycloak-oidc-util]))
@@ -59,14 +59,15 @@
   "Looks up the user with the given username."
   [username]
   (try+
-   (let [subject (subjects/lookup-subject (cfg/grouper-user) username)]
+   (if-let [subject (subjects/lookup-subject (cfg/grouper-user) username)]
      {:username      (str (:id subject) "@" (cfg/uid-domain))
       :password      nil
       :email         (:email subject)
       :shortUsername (:id subject)
       :firstName     (:first_name subject)
       :lastName      (:last_name subject)
-      :commonName    (:description subject)})
+      :commonName    (:description subject)}
+     (cxu/internal-system-error (str "fake user " username " not found")))
    (catch [:status 404] _
      (cxu/internal-system-error (str "fake user " username " not found")))
    (catch Object _

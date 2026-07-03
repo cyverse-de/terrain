@@ -4,7 +4,7 @@
    [ring.util.http-response :refer [ok]]
    [schema-tools.core :as st]
    [terrain.auth.user-attributes :refer [require-service-account]]
-   [terrain.clients.iplant-groups :as ipg]
+   [terrain.clients.grouping :as ipg]
    [terrain.clients.portal-conductor :as pc]
    [terrain.routes.schemas.user-info :as user-info-schema]
    [terrain.services.user-info :refer [user-info]]
