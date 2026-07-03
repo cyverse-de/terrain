@@ -128,17 +128,21 @@
         (is (= "alice" (:display_name (first members))))))))
 
 (deftest add-collaborator-list-members-test
+  ;; No subjects/lookup route is registered: the members response now carries source_id and
+  ;; subject_name directly, so any enrichment lookup would fail the isolated fake routes.
   (with-fake-routes-in-isolation
     (merge (resolve-route)
            {{:address (groups-url "groups" "g1" "members") :query-params {:user "alice"}}
-            (json-response {:results [{:subject_id "bob" :success true}]})
-            {:address (groups-url "subjects" "lookup") :query-params {:user "alice"}}
-            (json-response {:subjects [{:id "bob" :name "Bob" :source_id "ldap"}]})})
-    (let [{:keys [results]} (groups/add-collaborator-list-members "alice" "friends" ["bob"])]
-      (testing "membership results are enriched with source_id and subject_name"
-        (is (= 1 (count results)))
+            (json-response {:results [{:subject_id "bob" :success true :source_id "ldap" :subject_name "Bob"}
+                                      {:subject_id "carol" :success true :source_id "" :subject_name ""}]})})
+    (let [{:keys [results]} (groups/add-collaborator-list-members "alice" "friends" ["bob" "carol"])
+          by-id             (into {} (map (juxt :subject_id identity)) results)]
+      (testing "membership results pass through source_id and subject_name from the service"
         (is (= {:subject_id "bob" :success true :source_id "ldap" :subject_name "Bob"}
-               (first results)))))))
+               (get by-id "bob"))))
+      (testing "a blank source_id or subject_name is defaulted to satisfy the schema"
+        (is (= {:subject_id "carol" :success true :source_id "unknown" :subject_name "carol"}
+               (get by-id "carol")))))))
 
 (deftest delete-collaborator-list-test
   (with-fake-routes-in-isolation

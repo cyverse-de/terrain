@@ -129,20 +129,18 @@
   [user full-name]
   (:id (find-group user full-name)))
 
-;; Membership result enrichment. The Groups service returns only {subject_id, success,
-;; error} per member; the terrain contract also requires source_id (and optionally
-;; subject_name), so we backfill those from a single bulk subject lookup.
+;; Membership result formatting. The Groups service returns source_id and subject_name
+;; alongside each result, so no extra lookup is needed; we only default a blank source_id
+;; (e.g. a non-federated user or a failed operation) so the response satisfies the group
+;; membership schema.
 
-(defn- enrich-member-results
-  [user results]
-  (let [by-id (into {} (map (juxt :id identity))
-                    (:subjects (lookup-subjects user (mapv :subject_id results))))]
-    (mapv (fn [{:keys [subject_id] :as result}]
-            (let [subject (get by-id subject_id)]
-              (assoc result
-                     :source_id    (or (:source_id subject) "unknown")
-                     :subject_name (or (:name subject) subject_id))))
-          results)))
+(defn- format-member-results
+  [results]
+  (mapv (fn [{:keys [subject_id] :as result}]
+          (-> result
+              (update :source_id    (fn [s] (if (string/blank? s) "unknown" s)))
+              (update :subject_name (fn [n] (or (not-empty n) subject_id)))))
+        results))
 
 ;; Collaborator lists. Stored as groups named `de:users:<user>:collaborator-lists:<short>`,
 ;; with the short name also kept in display_extension.
@@ -242,7 +240,7 @@
                      :as           :json})
          :body
          :results
-         (enrich-member-results user)
+         format-member-results
          (hash-map :results))))
 
 (defn remove-collaborator-list-members
@@ -256,7 +254,7 @@
                      :as           :json})
          :body
          :results
-         (enrich-member-results user)
+         format-member-results
          (hash-map :results))))
 
 ;; DE user group administration.
