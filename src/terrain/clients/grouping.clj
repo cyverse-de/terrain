@@ -5,6 +5,7 @@
    once the migration to the Groups service is complete, at which point callers can depend
    on terrain.clients.groups directly."
   (:require [terrain.clients.groups :as groups]
+            [terrain.clients.grouping.retag :as retag]
             [terrain.clients.iplant-groups :as ipg]
             [terrain.util.config :as config]))
 
@@ -138,3 +139,51 @@
 
 (defn leave-team [user name]
   (if (new-backend?) (groups/leave-team user name) (ipg/leave-team user name)))
+
+;; Communities.
+
+(defn get-communities [user params]
+  (if (new-backend?) (groups/get-communities user params) (ipg/get-communities user params)))
+
+(defn admin-get-communities [user params]
+  (if (new-backend?) (groups/admin-get-communities user params) (ipg/admin-get-communities user params)))
+
+(defn add-community [user body]
+  (if (new-backend?) (groups/add-community user body) (ipg/add-community user body)))
+
+(defn get-community [user name]
+  (if (new-backend?) (groups/get-community user name) (ipg/get-community user name)))
+
+(defn update-community [user name retag-apps? force-rename? body]
+  (if (new-backend?)
+    (do
+      (when-let [new-name (:name body)]
+        (when (not= new-name name)
+          (retag/check-for-tagged-apps retag-apps? force-rename? name new-name)))
+      (groups/update-community user name body))
+    (ipg/update-community user name retag-apps? force-rename? body)))
+
+(defn delete-community [user name]
+  (if (new-backend?) (groups/delete-community user name) (ipg/delete-community user name)))
+
+(defn get-community-members [user name]
+  (if (new-backend?) (groups/get-community-members user name) (ipg/get-community-members user name)))
+
+(defn get-community-admins [user name]
+  (if (new-backend?) (groups/get-community-admins user name) (ipg/get-community-admins user name)))
+
+(defn add-community-admins [user name members]
+  (if (new-backend?)
+    (groups/add-community-admins user name members)
+    (ipg/add-community-admins user name members)))
+
+(defn remove-community-admins [user name members]
+  (if (new-backend?)
+    (groups/remove-community-admins user name members)
+    (ipg/remove-community-admins user name members)))
+
+(defn join-community [user name]
+  (if (new-backend?) (groups/join-community user name) (ipg/join-community user name)))
+
+(defn leave-community [user name]
+  (if (new-backend?) (groups/leave-community user name) (ipg/leave-community user name)))

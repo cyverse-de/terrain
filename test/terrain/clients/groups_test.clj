@@ -291,6 +291,87 @@
         (is (= "alice" (:id (first members))))
         (is (= "a@x" (:email (first members))))))))
 
+;; Communities.
+
+(def ^:private community-full "de:communities:biology")
+
+(defn- community-resolve-route []
+  {{:address (groups-url "groups") :query-params {:user "alice" :search community-full}}
+   (json-response {:groups [{:id "c1" :name community-full :description "d"}]})})
+
+(deftest get-communities-test
+  (with-fake-routes-in-isolation
+    {{:address (groups-url "groups") :query-params {:user "alice" :search "de:communities"}}
+     (json-response {:groups [{:id "c1" :name community-full :description "d"}
+                              {:id "c2" :name "de:communities:physics" :description "d"}]})
+     {:address (groups-url "subjects" "alice" "groups") :query-params {:user "alice"}}
+     (json-response {:groups [{:id "c1" :name community-full}]})}
+    (let [{:keys [groups]} (groups/get-communities "alice" {})
+          by-name (into {} (map (juxt :name identity)) groups)]
+      (testing "listing strips the folder and reports per-user membership"
+        (is (= #{"biology" "physics"} (set (keys by-name))))
+        (is (true? (:member (get by-name "biology"))))
+        (is (false? (:member (get by-name "physics"))))
+        (is (= [] (:privileges (get by-name "biology")))))
+      (testing "contract group fields are synthesized"
+        (is (= "group" (:type (get by-name "biology"))))))))
+
+(deftest admin-get-communities-test
+  (with-fake-routes-in-isolation
+    {{:address (groups-url "groups") :query-params {:user "de_grouper" :search "de:communities"}}
+     (json-response {:groups [{:id "c1" :name community-full :description "d"}]})}
+    (let [{:keys [groups]} (groups/admin-get-communities "de_grouper" {})]
+      (testing "admin listing strips the folder and omits member/privileges"
+        (is (= ["biology"] (mapv :name groups)))
+        (is (not (contains? (first groups) :member)))))))
+
+(deftest add-community-test
+  (with-fake-routes-in-isolation
+    {{:address (groups-url "groups") :query-params {:user "alice"}}
+     (fn [req]
+       (let [body (json/decode (slurp (:body req)) true)]
+         (is (= "de:communities:biology" (:name body)))
+         {:status 200 :headers {"Content-Type" "application/json"}
+          :body (json/encode {:id "c1" :name community-full :description "d" :display_extension "biology"})}))
+     {:address (groups-url "groups" "c1" "permissions" "group" "GrouperAll") :query-params {:user "alice"}}
+     (json-response {:subject {:subject_id "GrouperAll" :subject_type "group"} :level "read"})}
+    (let [result (groups/add-community "alice" {:name "biology" :description "d" :public_privileges ["read" "optin"]})]
+      (testing "the community is created and returned with its short name"
+        (is (= "biology" (:name result)))
+        (is (= "c1" (:id result)))))))
+
+(deftest delete-community-test
+  (with-fake-routes-in-isolation
+    (merge (community-resolve-route)
+           {{:address (groups-url "groups" "c1") :query-params {:user "alice"}}
+            (json-response {:id "c1" :name community-full})})
+    (is (= "c1" (:id (groups/delete-community "alice" "biology"))))))
+
+(deftest add-community-admins-test
+  (with-fake-routes-in-isolation
+    (merge (community-resolve-route)
+           {{:address (groups-url "groups" "c1" "permissions" "user" "bob") :query-params {:user "alice"}}
+            (fn [req]
+              (is (= "admin" (:level (json/decode (slurp (:body req)) true))))
+              {:status 200 :headers {"Content-Type" "application/json"} :body "{}"})
+            {:address (groups-url "groups" "c1" "members") :query-params {:user "alice"}}
+            (json-response {:results [{:subject_id "bob" :success true :source_id "ldap" :subject_name "Bob"}]})})
+    (let [{:keys [results]} (groups/add-community-admins "alice" "biology" ["bob"])]
+      (testing "an admin is granted the admin level and added as a member"
+        (is (= "bob" (:subject_id (first results))))
+        (is (true? (:success (first results))))))))
+
+(deftest join-community-test
+  (with-fake-routes-in-isolation
+    (merge (community-resolve-route)
+           {{:address (groups-url "groups" "c1" "permissions") :query-params {:user "alice"}}
+            (json-response {:permissions [{:subject {:subject_id "GrouperAll" :subject_type "group"} :level "read"}]})
+            {:address (groups-url "groups" "c1" "members") :query-params {:user "de_grouper"}}
+            (json-response {:results [{:subject_id "alice" :success true :source_id "ldap" :subject_name "Alice"}]})})
+    (let [{:keys [results]} (groups/join-community "alice" "biology")]
+      (testing "joining a public community adds the caller as a member"
+        (is (= "alice" (:subject_id (first results))))))))
+
 (deftest remove-de-user-test
   (with-fake-routes-in-isolation
     {{:address (groups-url "groups") :query-params {:user "de_grouper" :search "de:users:de-users"}}

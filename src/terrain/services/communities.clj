@@ -1,5 +1,5 @@
 (ns terrain.services.communities
-  (:require [terrain.clients.iplant-groups :as ipg]
+  (:require [terrain.clients.grouping :as ipg]
             [terrain.clients.permissions :as perms-client]
             [terrain.clients.notifications :as cn]
             [terrain.util.config :as config]))

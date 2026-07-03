@@ -113,6 +113,12 @@
                             {:query-params {:user user :search search}
                              :as           :json}))))
 
+(defn- subject-group-list
+  "Returns the raw (unformatted) groups a subject belongs to."
+  [user subject-id]
+  (:groups (:body (http/get (groups-url "subjects" subject-id "groups")
+                            {:query-params {:user user} :as :json}))))
+
 (defn- find-group-by-name
   [user full-name]
   (first (filter (comp #{full-name} :name) (search-groups user full-name))))
@@ -298,8 +304,7 @@
   "Lists (or searches) teams, optionally scoped to a creator or to teams a member belongs to."
   [user {:keys [search creator member]}]
   (let [raw       (if member
-                    (:groups (:body (http/get (groups-url "subjects" member "groups")
-                                              {:query-params {:user user} :as :json})))
+                    (subject-group-list user member)
                     (search-groups user team-folder))
         formatted (->> raw
                        (filter #(string/starts-with? (:name %) (str team-folder ":")))
@@ -488,12 +493,11 @@
           (revoke-permission user id subject-type subject_id))))
     (list-team-privileges* user id)))
 
-(defn get-team-admins
-  "Lists the administrators of a team: the user subjects holding own/admin, excluding the
-   administrative service user and the public subject."
-  [user name]
-  (let [id        (resolve-group-id user (team-full-name name))
-        admin-ids (->> (group-permissions user id)
+(defn- admins-of
+  "Lists the administrators of a group by id: the user subjects holding own/admin, excluding
+   the administrative service user and the public subject."
+  [user group-id]
+  (let [admin-ids (->> (group-permissions user group-id)
                        (filter (comp #{"user"} :subject_type :subject))
                        (filter (comp #{"own" "admin"} :level))
                        (map (comp :subject_id :subject))
@@ -501,6 +505,172 @@
                        vec)
         by-id     (index-subjects (:subjects (lookup-subjects user admin-ids)))]
     {:members (mapv #(get by-id % {:id % :source_id ""}) admin-ids)}))
+
+(defn get-team-admins
+  "Lists the administrators of a team."
+  [user name]
+  (admins-of user (resolve-group-id user (team-full-name name))))
+
+;; Communities. Stored as groups named `de:communities:<short>`; the external community name
+;; is the short name. Public communities grant the all-users subject read (joinable),
+;; surfaced as the `view` privilege. Community admins hold the admin privilege and are also
+;; members.
+
+(def ^:private community-folder "de:communities")
+
+(defn- community-full-name
+  [name]
+  (str community-folder ":" name))
+
+(defn- format-community
+  [group]
+  (->> (update group :name (partial strip-folder community-folder))
+       format-group))
+
+(defn- community-names-under
+  [groups]
+  (->> groups
+       (filter #(string/starts-with? (:name %) (str community-folder ":")))
+       (mapv format-community)))
+
+(defn- user-community-names
+  [user]
+  (->> (subject-group-list user user)
+       (map :name)
+       (filter #(string/starts-with? % (str community-folder ":")))
+       (map (partial strip-folder community-folder))
+       set))
+
+(defn get-communities
+  "Lists (or searches) communities, reporting whether the caller is a member of each."
+  [user {:keys [search member]}]
+  (let [raw       (if member (subject-group-list user member) (search-groups user community-folder))
+        formatted (community-names-under raw)
+        filtered  (if search (filterv #(string/includes? (:name %) search) formatted) formatted)
+        ;; When listing a user's own communities, every result is a membership; otherwise
+        ;; fetch the caller's community memberships once (rather than per community).
+        member-of (if (= user member) (set (map :name filtered)) (user-community-names user))]
+    ;; :privileges is intentionally empty: the DE UI derives admin/follower status from the
+    ;; /admins and /members endpoints, and computing per-community privileges here would cost
+    ;; one permissions request per listed community.
+    {:groups (mapv #(assoc % :member (contains? member-of (:name %)) :privileges []) filtered)}))
+
+(defn admin-get-communities
+  "Lists (or searches) all communities without per-user membership details."
+  [user {:keys [search]}]
+  (let [formatted (community-names-under (search-groups user community-folder))]
+    {:groups (if search (filterv #(string/includes? (:name %) search) formatted) formatted)}))
+
+(defn add-community
+  "Creates a community owned by the caller, granting all DE users read when it is public."
+  [user {:keys [name description public_privileges] :or {public_privileges []}}]
+  (let [group (:body (http/post (groups-url "groups")
+                                {:query-params {:user user}
+                                 :form-params  {:name (community-full-name name) :description description
+                                                :display_extension name}
+                                 :content-type :json
+                                 :as           :json}))]
+    (when (seq public_privileges)
+      (grant-permission user (:id group) "group" public-subject "read"))
+    (format-community group)))
+
+(defn get-community
+  "Retrieves a single community by its short name in a single round trip."
+  [user name]
+  (->> (find-group user (community-full-name name))
+       format-community))
+
+(defn update-community
+  "Updates the name and/or description of a community. App-tag retagging on rename is handled
+   by the caller (see terrain.clients.grouping.retag)."
+  [user name {new-name :name description :description}]
+  (let [id   (resolve-group-id user (community-full-name name))
+        body (remove-vals nil? {:name              (when new-name (community-full-name new-name))
+                                :description       description
+                                :display_extension new-name})]
+    (->> (http/put (groups-url "groups" id)
+                   {:query-params {:user user} :form-params body :content-type :json :as :json})
+         :body
+         format-community)))
+
+(defn delete-community
+  "Deletes a community, returning the removed group (including its id)."
+  [user name]
+  (let [id (resolve-group-id user (community-full-name name))]
+    (->> (http/delete (groups-url "groups" id)
+                      {:query-params {:user user} :as :json})
+         :body
+         format-community)))
+
+(defn get-community-members
+  "Lists the members of a community."
+  [user name]
+  (let [id (resolve-group-id user (community-full-name name))]
+    (-> (http/get (groups-url "groups" id "members")
+                  {:query-params {:user user} :as :json})
+        :body
+        (update :members format-subjects))))
+
+(defn get-community-admins
+  "Lists the administrators of a community."
+  [user name]
+  (admins-of user (resolve-group-id user (community-full-name name))))
+
+(defn add-community-admins
+  "Grants the given subjects the admin privilege on a community and adds them as members."
+  [user name members]
+  (let [id (resolve-group-id user (community-full-name name))]
+    (doseq [member members]
+      (grant-permission user id "user" member "admin"))
+    (->> (http/post (groups-url "groups" id "members")
+                    {:query-params {:user user} :form-params {:members members} :content-type :json :as :json})
+         :body
+         :results
+         format-member-results
+         (hash-map :results))))
+
+(defn remove-community-admins
+  "Revokes the admin privilege from the given subjects and removes them as members."
+  [user name members]
+  (let [id (resolve-group-id user (community-full-name name))]
+    (doseq [member members]
+      (revoke-permission user id "user" member))
+    (->> (http/post (groups-url "groups" id "members" "deleter")
+                    {:query-params {:user user} :form-params {:members members} :content-type :json :as :json})
+         :body
+         :results
+         format-member-results
+         (hash-map :results))))
+
+(defn join-community
+  "Adds the caller to a public community, performed as the administrative user."
+  [user name]
+  (let [id (resolve-group-id user (community-full-name name))]
+    (when-not (team-public? user id)
+      (cxu/forbidden (str "community is not open to join: " name)))
+    (->> (http/post (groups-url "groups" id "members")
+                    {:query-params {:user (config/groups-admin-user)}
+                     :form-params  {:members [user]}
+                     :content-type :json
+                     :as           :json})
+         :body
+         :results
+         format-member-results
+         (hash-map :results))))
+
+(defn leave-community
+  "Removes the caller from a community, performed as the administrative user."
+  [user name]
+  (let [id (resolve-group-id user (community-full-name name))]
+    (->> (http/post (groups-url "groups" id "members" "deleter")
+                    {:query-params {:user (config/groups-admin-user)}
+                     :form-params  {:members [user]}
+                     :content-type :json
+                     :as           :json})
+         :body
+         :results
+         format-member-results
+         (hash-map :results))))
 
 ;; DE user group administration.
 
