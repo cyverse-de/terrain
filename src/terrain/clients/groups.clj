@@ -117,10 +117,17 @@
   [user full-name]
   (first (filter (comp #{full-name} :name) (search-groups user full-name))))
 
+(defn- find-group
+  "Resolves a group by name, throwing a 404 if it does not exist. The search response
+   already contains the full group, so callers that only need the group's data should use
+   this rather than following up with a lookup by UUID."
+  [user full-name]
+  (or (find-group-by-name user full-name)
+      (cxu/not-found (str "group not found: " full-name))))
+
 (defn- resolve-group-id
   [user full-name]
-  (or (:id (find-group-by-name user full-name))
-      (cxu/not-found (str "group not found: " full-name))))
+  (:id (find-group user full-name)))
 
 ;; Membership result enrichment. The Groups service returns only {subject_id, success,
 ;; error} per member; the terrain contract also requires source_id (and optionally
@@ -184,13 +191,11 @@
        (format-collaborator-list user)))
 
 (defn get-collaborator-list
-  "Retrieves a single collaborator list by its short name."
+  "Retrieves a single collaborator list by its short name. The search used to resolve the
+   name already returns the full group, so no follow-up lookup by UUID is needed."
   [user name]
-  (let [id (resolve-group-id user (collaborator-list-name user name))]
-    (->> (http/get (groups-url "groups" id)
-                   {:query-params {:user user} :as :json})
-         :body
-         (format-collaborator-list user))))
+  (->> (find-group user (collaborator-list-name user name))
+       (format-collaborator-list user)))
 
 (defn update-collaborator-list
   "Updates the name and/or description of a collaborator list."

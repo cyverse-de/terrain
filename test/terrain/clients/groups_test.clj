@@ -105,6 +105,17 @@
         (is (= "g1" (:id result)))
         (is (= "group" (:type result)))))))
 
+(deftest get-collaborator-list-test
+  ;; Only the resolving search is registered: if get-collaborator-list also fetched the
+  ;; group by UUID, with-fake-routes-in-isolation would throw on the unregistered route.
+  (with-fake-routes-in-isolation
+    {{:address (groups-url "groups") :query-params {:user "alice" :search cl-full}}
+     (json-response {:groups [{:id "g1" :name cl-full :description "buddies"}]})}
+    (let [result (groups/get-collaborator-list "alice" "friends")]
+      (testing "get resolves and returns the list in a single round trip"
+        (is (= "friends" (:name result)))
+        (is (= "g1" (:id result)))))))
+
 (deftest get-collaborator-list-members-test
   (with-fake-routes-in-isolation
     (merge (resolve-route)
