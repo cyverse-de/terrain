@@ -90,3 +90,51 @@
   (if (new-backend?)
     (groups/remove-collaborator-list-members user name members)
     (ipg/remove-collaborator-list-members user name members)))
+
+;; Teams.
+
+(defn get-teams [user params]
+  (if (new-backend?) (groups/get-teams user params) (ipg/get-teams user params)))
+
+(defn add-team [user body]
+  (if (new-backend?) (groups/add-team user body) (ipg/add-team user body)))
+
+(defn get-team [user name]
+  (if (new-backend?) (groups/get-team user name) (ipg/get-team user name)))
+
+(defn update-team [user name body]
+  (if (new-backend?) (groups/update-team user name body) (ipg/update-team user name body)))
+
+(defn delete-team [user name]
+  (if (new-backend?) (groups/delete-team user name) (ipg/delete-team user name)))
+
+(defn verify-team-exists [user name]
+  (if (new-backend?) (groups/verify-team-exists user name) (ipg/verify-team-exists user name)))
+
+(defn get-team-members [user name]
+  (if (new-backend?) (groups/get-team-members user name) (ipg/get-team-members user name)))
+
+(defn add-team-members [user name members]
+  (if (new-backend?) (groups/add-team-members user name members) (ipg/add-team-members user name members)))
+
+(defn remove-team-members [user name members]
+  (if (new-backend?)
+    (groups/remove-team-members user name members)
+    (ipg/remove-team-members user name members)))
+
+(defn list-team-privileges [user name]
+  (if (new-backend?) (groups/list-team-privileges user name) (ipg/list-team-privileges user name)))
+
+(defn update-team-privileges [user name updates]
+  (if (new-backend?)
+    (groups/update-team-privileges user name updates)
+    (ipg/update-team-privileges user name updates)))
+
+(defn get-team-admins [user name]
+  (if (new-backend?) (groups/get-team-admins user name) (ipg/get-team-admins user name)))
+
+(defn join-team [user name]
+  (if (new-backend?) (groups/join-team user name) (ipg/join-team user name)))
+
+(defn leave-team [user name]
+  (if (new-backend?) (groups/leave-team user name) (ipg/leave-team user name)))
