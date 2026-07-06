@@ -34,6 +34,20 @@
   [props config-valid configs]
   "terrain.app.listen-port" 60000)
 
+(declare jetty-max-idle-time)
+(cc/defprop-optint jetty-max-idle-time
+  "The default maximum idle time (in milliseconds) for a Jetty connection. Kept short; it
+   applies to every endpoint except uploads, which use jetty-upload-idle-time instead."
+  [props config-valid configs]
+  "terrain.app.jetty-max-idle-time" 200000)
+
+(declare jetty-upload-idle-time)
+(cc/defprop-optint jetty-upload-idle-time
+  "The maximum idle time (in milliseconds) applied to the file-upload endpoint. Raised well
+   above the short default so slow or intermittently-stalled uploads are not cut off mid-transfer."
+  [props config-valid configs]
+  "terrain.app.jetty-upload-idle-time" 3600000)
+
 (declare environment-name)
 (cc/defprop-optstr environment-name
   "The name of the environment that this instance of Terrain belongs to."

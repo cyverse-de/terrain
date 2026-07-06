@@ -9,6 +9,7 @@
             [terrain.middleware :refer [wrap-fake-user]]
             [terrain.services.filesystem.icat :as icat]
             [terrain.util.config :as config]
+            [terrain.util.jetty :as jetty]
             [terrain.util.nats :as nats]
             [service-logging.thread-context :as tc]))
 
@@ -99,7 +100,12 @@
   (log/warn "Started listening on" port)
   ((eval 'ring.adapter.jetty/run-jetty)
    (wrap-fake-user (eval 'terrain.routes/app-wrapper) fake-user)
-   {:port port}))
+   {:port          port
+    :max-idle-time (config/jetty-max-idle-time)
+    :configurator  (jetty/idle-timeout-configurator
+                    (fn [^String path] (and path (.contains path "/fileio/upload")))
+                    (config/jetty-max-idle-time)
+                    (config/jetty-upload-idle-time))}))
 
 (defn- load-config
   [config-path]
