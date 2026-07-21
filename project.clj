@@ -28,7 +28,7 @@
                  [org.cyverse/cyverse-groups-client "0.1.9"]
                  [org.cyverse/common-cfg "2.8.3"]
                  [org.cyverse/common-cli "2.8.2"]
-                 [org.cyverse/common-swagger-api "3.4.17"]
+                 [org.cyverse/common-swagger-api "3.4.20"]
                  [metosin/ring-swagger-ui "5.32.6"]
                  [org.cyverse/kameleon "3.0.10"
                   :exclusion [com.impossibl.pgjdbc-ng/pgjdbc-ng]]
