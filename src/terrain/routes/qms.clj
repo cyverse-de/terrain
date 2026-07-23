@@ -1,7 +1,7 @@
 (ns terrain.routes.qms
   (:require [terrain.util.config :as config]
             [terrain.clients.qms :as qms]
-            [terrain.clients.qms-nats :as n]
+            [terrain.clients.qms-addons :as n]
             [terrain.services.qms :as handlers]
             [terrain.auth.user-attributes :refer [current-user require-authentication require-service-account]]
             [terrain.util :refer [optional-routes]]

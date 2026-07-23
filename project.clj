@@ -36,12 +36,7 @@
                  [org.cyverse/metadata-client "3.2.0"]
                  [org.cyverse/metadata-files "2.1.1"]
                  [org.cyverse/permissions-client "2.8.5"]
-                 [org.cyverse/service-logging "2.8.5"]
-                 [io.nats/jnats "2.25.3"]
-                 [less-awful-ssl "1.0.8"]
-                 [clojure.java-time "1.4.3"]
-                 [com.appsflyer/pronto "3.0.0"]
-                 [org.cyverse/cyverse-de-protobufs "0.0.5"]]
+                 [org.cyverse/service-logging "2.8.5"]]
   :eastwood {:exclude-namespaces [terrain.util.jwt :test-paths]
              :linters [:wrong-arity :wrong-ns-form :wrong-pre-post :wrong-tag :misplaced-docstrings]}
   :plugins [[lein-ancient "0.7.0"]
