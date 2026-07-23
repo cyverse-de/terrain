@@ -1,12 +1,17 @@
 (ns terrain.clients.qms-addons-test
   (:require [clojure.test :refer [deftest is testing]]
+            [cemerick.url :as curl]
             [cheshire.core :as json]
             [clj-http.client :as http]
+            [clj-http.fake :refer [with-fake-routes-in-isolation]]
             [slingshot.slingshot :refer [try+ throw+]]
             [terrain.clients.qms-addons :as addons]
             [terrain.util.config :as config]))
 
 (def ^:private base "http://subscriptions")
+
+(defn- addons-url [& components]
+  (str (apply curl/url base components)))
 
 (deftest add-addon-test
   (let [captured (atom nil)
@@ -105,6 +110,46 @@
                     http/delete (fn [url _] (reset! captured url) {:body {:subscription_addon {:uuid "z"}}})]
         (is (= {:subscription_addon {:uuid "z"}} (addons/delete-subscription-addon "z")))
         (is (= (str base "/subscriptions/z/addons/z") @captured))))))
+
+;; The tests above capture the pre-serialization map via with-redefs. These two
+;; exercise the real clj-http request pipeline so the on-the-wire JSON is
+;; checked — java.util.UUID encoding and the update-mask key casing.
+(deftest add-addon-serializes-request-over-the-wire
+  (let [captured (atom nil)
+        rt-uuid  (java.util.UUID/fromString "45DD6319-219B-4EB1-A792-024AE323588E")]
+    (with-redefs [config/subscriptions-base-uri (constantly base)]
+      (with-fake-routes-in-isolation
+        {(addons-url "addons")
+         (fn [req]
+           (reset! captured req)
+           {:status  200
+            :headers {"Content-Type" "application/json"}
+            :body    (json/generate-string {:addon {:name "a"}})})}
+        (addons/add-addon {:name "a" :resource_type {:uuid rt-uuid}})))
+    (let [sent (json/parse-string (slurp (:body @captured)) true)]
+      (testing "issues a PUT"
+        (is (= :put (:request-method @captured))))
+      (testing "serializes a java.util.UUID as its string form"
+        (is (= (str rt-uuid) (get-in sent [:addon :resource_type :uuid])))))))
+
+(deftest update-addon-sends-camelcase-masks-over-the-wire
+  (let [captured (atom nil)
+        uuid     (java.util.UUID/fromString "262EF59B-08DF-4794-B81C-6F8602C54392")]
+    (with-redefs [config/subscriptions-base-uri (constantly base)]
+      (with-fake-routes-in-isolation
+        {(addons-url "addons" (str uuid))
+         (fn [req]
+           (reset! captured req)
+           {:status  200
+            :headers {"Content-Type" "application/json"}
+            :body    (json/generate-string {:addon {}})})}
+        (addons/update-addon {:uuid uuid :name "new name"})))
+    (let [sent (json/parse-string (slurp (:body @captured)) true)]
+      (testing "posts to /addons/{uuid}"
+        (is (= :post (:request-method @captured))))
+      (testing "sets only the camelCase mask for the changed field"
+        (is (true? (:updateName sent)))
+        (is (not (contains? sent :updateDescription)))))))
 
 (deftest error-handling-test
   (testing "maps a non-2xx response to a thrown error_code/reason from the body"
