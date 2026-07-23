@@ -1,6 +1,15 @@
 (ns terrain.test-fixtures
-  (:require [terrain.auth.user-attributes :as user-attributes]
+  (:require [cheshire.core :as json]
+            [terrain.auth.user-attributes :as user-attributes]
             [terrain.util.config :as config]))
+
+(defn json-response
+  "Builds a clj-http.fake handler that responds with the given body serialized as JSON."
+  [body]
+  (fn [_req]
+    {:status  200
+     :headers {"Content-Type" "application/json"}
+     :body    (json/generate-string body)}))
 
 (def test-config
   {:terrain.uid.domain                   "iplantcollaborative.org"
