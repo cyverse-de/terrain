@@ -5,7 +5,6 @@
    once the migration to the Groups service is complete, at which point callers can depend
    on terrain.clients.groups directly."
   (:require [terrain.clients.groups :as groups]
-            [terrain.clients.grouping.retag :as retag]
             [terrain.clients.iplant-groups :as ipg]
             [terrain.util.config :as config]))
 
@@ -154,13 +153,13 @@
 (defn get-community [user name]
   (if (new-backend?) (groups/get-community user name) (ipg/get-community user name)))
 
+;; The retag-apps and force-rename flags apply only to the legacy backend. Community app tags
+;; there are AVUs whose value is the community's name, so a rename had to rewrite them or be
+;; blocked. On the Groups backend a tag names the community by ID, so a rename is a single
+;; update with nothing to rewrite and nothing to block; the flags are accepted and ignored.
 (defn update-community [user name retag-apps? force-rename? body]
   (if (new-backend?)
-    (do
-      (when-let [new-name (:name body)]
-        (when (not= new-name name)
-          (retag/check-for-tagged-apps retag-apps? force-rename? name new-name)))
-      (groups/update-community user name body))
+    (groups/update-community user name body)
     (ipg/update-community user name retag-apps? force-rename? body)))
 
 (defn delete-community [user name]

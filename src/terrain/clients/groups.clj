@@ -1,6 +1,10 @@
 (ns terrain.clients.groups
-  "HTTP client for the new Groups service (Keycloak-backed), the intended replacement for
-   iplant-groups. Every request forwards the acting user as the `user` query parameter."
+  "HTTP client for the Groups service, the intended replacement for iplant-groups.
+
+   Groups are addressed by their structured identity -- type, owner, and short name -- so
+   nothing here packs hierarchy into a group name. The one place terrain's external group
+   contract is composed is `format-group`, including the `<owner>:<short>` name the DE uses
+   for teams. Every request forwards the acting user as the `user` query parameter."
   (:require [cemerick.url :as curl]
             [clj-http.client :as http]
             [clojure.string :as string]
@@ -10,9 +14,26 @@
             [slingshot.slingshot :refer [try+]]
             [terrain.util.config :as config]))
 
+;; The group types the Groups service recognizes.
+(def ^:private type-collaborator-list "collaborator_list")
+(def ^:private type-team "team")
+(def ^:private type-community "community")
+(def ^:private type-system "system")
+
+;; The well-known subject representing all DE users. It matches the value the legacy Grouper
+;; backend used for its public subject (and Sonora's configurable grouper.allUsers), so no
+;; Sonora configuration change is required.
+(def ^:private public-subject "GrouperAll")
+
 (defn- groups-url
   [& components]
   (str (apply curl/url (config/groups-base) components)))
+
+(defn- query
+  "Builds the query parameters for a request: the acting user plus whichever filters were
+   actually given."
+  ([user] {:user user})
+  ([user params] (assoc (remove-vals nil? params) :user user)))
 
 (defn- admin-user?
   "True if the given subject is the Groups administrative user, which should never be
@@ -46,7 +67,7 @@
   "Searches for subjects matching the given search string."
   [user search]
   (-> (http/get (groups-url "subjects")
-                {:query-params {:user user :search search}
+                {:query-params (query user {:search search})
                  :as           :json})
       :body
       (update :subjects format-subjects)))
@@ -56,7 +77,7 @@
   [user short-username]
   (try+
    (:body (http/get (groups-url "subjects" short-username)
-                    {:query-params {:user user}
+                    {:query-params (query user)
                      :as           :json}))
    (catch [:status 404] _
      (log/warn (str "no user info found for username '" short-username "'"))
@@ -69,7 +90,7 @@
   "Looks up multiple subjects by ID. Unresolvable IDs are silently omitted by the service."
   [user subject-ids]
   (:body (http/post (groups-url "subjects" "lookup")
-                    {:query-params {:user user}
+                    {:query-params (query user)
                      :form-params  {:subject_ids subject-ids}
                      :content-type :json
                      :as           :json})))
@@ -85,62 +106,96 @@
   (or (lookup-subject user short-username)
       (empty-user-info short-username)))
 
-;; General group formatting.
+;; The external group contract.
+
+(defn- external-name
+  "The name terrain exposes for a group. Teams carry their owner as a prefix because two
+   users may own teams with the same short name; no other group type is qualified."
+  [{:keys [group_type owner name]}]
+  (if (= group_type type-team)
+    (str owner ":" name)
+    name))
 
 (defn- format-group
-  "Reshapes a Groups service group into terrain's group contract, synthesizing the `type`
-   and `id_index` fields that the new service does not provide."
+  "Reshapes a group from the Groups service into terrain's external group contract. This is
+   the only place that contract is composed, and the only place that knows a team's external
+   name embeds its owner."
   [group]
-  (-> group
-      (assoc :type "group")
-      (assoc :id_index (or (:id_index group) ""))))
+  {:id                (:id group)
+   :name              (external-name group)
+   :type              "group"
+   :id_index          ""
+   :description       (or (:description group) "")
+   :display_extension (:name group)
+   :display_name      (or (:display_name group) (:name group))})
 
-(defn list-groups-for-user
-  "Lists the groups to which the given subject belongs."
-  [subject-id _details]
-  (-> (http/get (groups-url "subjects" subject-id "groups")
-                {:query-params {:user (config/groups-admin-user)}
-                 :as           :json})
-      :body
-      (update :groups (partial mapv format-group))))
+;; Group identity and requests. A `ref` is a group's structured identity: its type, its owner
+;; where it has one, and its short name.
 
-;; Name <-> UUID resolution. The Groups service is flat and addresses groups by UUID, so
-;; terrain encodes its hierarchy in the group name and resolves that name to a UUID.
-
-(defn- search-groups
-  [user search]
-  (:groups (:body (http/get (groups-url "groups")
-                            {:query-params {:user user :search search}
-                             :as           :json}))))
-
-(defn- subject-group-list
-  "Returns the raw (unformatted) groups a subject belongs to."
-  [user subject-id]
-  (:groups (:body (http/get (groups-url "subjects" subject-id "groups")
-                            {:query-params {:user user} :as :json}))))
-
-(defn- find-group-by-name
-  [user full-name]
-  (first (filter (comp #{full-name} :name) (search-groups user full-name))))
+(defn- ref-label
+  [{:keys [group-type owner name]}]
+  (str group-type " " (if owner (str owner ":" name) name)))
 
 (defn- find-group
-  "Resolves a group by name, throwing a 404 if it does not exist. The search response
-   already contains the full group, so callers that only need the group's data should use
-   this rather than following up with a lookup by UUID."
-  [user full-name]
-  (or (find-group-by-name user full-name)
-      (cxu/not-found (str "group not found: " full-name))))
+  "Resolves a group by its structured identity, returning nil if it does not exist."
+  [user {:keys [group-type owner name]}]
+  (try+
+   (:body (http/get (groups-url "groups" "lookup")
+                    {:query-params (query user {:group_type group-type :owner owner :name name})
+                     :as           :json}))
+   (catch [:status 404] _ nil)))
 
-(defn- resolve-group-id
-  [user full-name]
-  (:id (find-group user full-name)))
+(defn- get-group
+  "Resolves a group by its structured identity, throwing a 404 if it does not exist."
+  [user ref]
+  (or (find-group user ref)
+      (cxu/not-found (str "group not found: " (ref-label ref)))))
 
-;; Membership result formatting. The Groups service returns source_id and subject_name
-;; alongside each result, so no extra lookup is needed; we only default a blank source_id
-;; (e.g. a non-federated user or a failed operation) so the response satisfies the group
-;; membership schema.
+(defn- group-id
+  [user ref]
+  (:id (get-group user ref)))
+
+(defn- list-groups
+  [user filters]
+  (:groups (:body (http/get (groups-url "groups")
+                            {:query-params (query user filters)
+                             :as           :json}))))
+
+(defn- create-group
+  [user spec]
+  (:body (http/post (groups-url "groups")
+                    {:query-params (query user)
+                     :form-params  (remove-vals nil? spec)
+                     :content-type :json
+                     :as           :json})))
+
+(defn- update-group
+  [user id updates]
+  (:body (http/put (groups-url "groups" id)
+                   {:query-params (query user)
+                    :form-params  (remove-vals nil? updates)
+                    :content-type :json
+                    :as           :json})))
+
+(defn- delete-group
+  "Deletes a group by ID. The service returns no body, so callers report the group they
+   resolved beforehand rather than a deletion response."
+  [user id]
+  (http/delete (groups-url "groups" id) {:query-params (query user)})
+  nil)
+
+(defn- delete-group-by-ref
+  "Deletes a group by identity, returning it in the external contract shape."
+  [user ref]
+  (let [group (get-group user ref)]
+    (delete-group user (:id group))
+    (format-group group)))
+
+;; Membership.
 
 (defn- format-member-results
+  "Defaults a blank source_id (e.g. a non-federated user or a failed operation) and subject
+   name so the response satisfies the group membership schema."
   [results]
   (mapv (fn [{:keys [subject_id] :as result}]
           (-> result
@@ -148,295 +203,60 @@
               (update :subject_name (fn [n] (or (not-empty n) subject_id)))))
         results))
 
-;; Collaborator lists. Stored as groups named `de:users:<user>:collaborator-lists:<short>`,
-;; with the short name also kept in display_extension.
+(defn- list-members
+  [user group-id]
+  {:members (format-subjects (:members (:body (http/get (groups-url "groups" group-id "members")
+                                                        {:query-params (query user) :as :json}))))})
 
-(defn- collaborator-list-folder
-  [user]
-  (format "de:users:%s:collaborator-lists" user))
-
-(defn- collaborator-list-name
-  [user short-name]
-  (str (collaborator-list-folder user) ":" short-name))
-
-(defn- strip-folder
-  [folder group-name]
-  (string/replace group-name (re-pattern (str "^\\Q" folder ":\\E")) ""))
-
-(defn- format-collaborator-list
-  [user group]
-  (->> (update group :name (partial strip-folder (collaborator-list-folder user)))
-       format-group))
-
-(defn get-collaborator-lists
-  "Lists (or searches) the calling user's collaborator lists."
-  ([user _details]
-   (get-collaborator-lists user _details nil))
-  ([user _details search]
-   (let [folder (collaborator-list-folder user)
-         groups (->> (search-groups user folder)
-                     (filter #(string/starts-with? (:name %) (str folder ":")))
-                     (mapv (partial format-collaborator-list user)))]
-     {:groups (if search
-                (filterv #(string/includes? (:name %) search) groups)
-                groups)})))
-
-(defn add-collaborator-list
-  "Creates a collaborator list owned by the calling user."
-  [user {:keys [name description]}]
-  (->> (http/post (groups-url "groups")
-                  {:query-params {:user user}
-                   :form-params  {:name              (collaborator-list-name user name)
-                                  :description       description
-                                  :display_extension name}
+(defn- change-members
+  [user group-id components members]
+  (->> (http/post (apply groups-url "groups" group-id components)
+                  {:query-params (query user)
+                   :form-params  {:members members}
                    :content-type :json
                    :as           :json})
        :body
-       (format-collaborator-list user)))
+       :results
+       format-member-results
+       (hash-map :results)))
 
-(defn get-collaborator-list
-  "Retrieves a single collaborator list by its short name. The search used to resolve the
-   name already returns the full group, so no follow-up lookup by UUID is needed."
-  [user name]
-  (->> (find-group user (collaborator-list-name user name))
-       (format-collaborator-list user)))
+(defn- add-members
+  [user group-id members]
+  (change-members user group-id ["members"] members))
 
-(defn update-collaborator-list
-  "Updates the name and/or description of a collaborator list."
-  [user old-name {:keys [name description]}]
-  (let [id   (resolve-group-id user (collaborator-list-name user old-name))
-        body (remove-vals nil? {:name              (when name (collaborator-list-name user name))
-                                :description       description
-                                :display_extension name})]
-    (->> (http/put (groups-url "groups" id)
-                   {:query-params {:user user}
-                    :form-params  body
-                    :content-type :json
-                    :as           :json})
-         :body
-         (format-collaborator-list user))))
+(defn- remove-members
+  [user group-id members]
+  (change-members user group-id ["members" "deleter"] members))
 
-(defn delete-collaborator-list
-  "Deletes a collaborator list, returning the removed group (including its id)."
-  [user name]
-  (let [id (resolve-group-id user (collaborator-list-name user name))]
-    (->> (http/delete (groups-url "groups" id)
-                      {:query-params {:user user} :as :json})
-         :body
-         (format-collaborator-list user))))
-
-(defn get-collaborator-list-members
-  "Lists the members of a collaborator list."
-  [user name]
-  (let [id (resolve-group-id user (collaborator-list-name user name))]
-    (-> (http/get (groups-url "groups" id "members")
-                  {:query-params {:user user} :as :json})
-        :body
-        (update :members format-subjects))))
-
-(defn add-collaborator-list-members
-  "Adds members to a collaborator list, creating the list if it does not yet exist."
-  [user name members]
-  (let [id (or (:id (find-group-by-name user (collaborator-list-name user name)))
-               (:id (add-collaborator-list user {:name name :description ""})))]
-    (->> (http/post (groups-url "groups" id "members")
-                    {:query-params {:user user}
-                     :form-params  {:members members}
-                     :content-type :json
-                     :as           :json})
-         :body
-         :results
-         format-member-results
-         (hash-map :results))))
-
-(defn remove-collaborator-list-members
-  "Removes members from a collaborator list."
-  [user name members]
-  (let [id (resolve-group-id user (collaborator-list-name user name))]
-    (->> (http/post (groups-url "groups" id "members" "deleter")
-                    {:query-params {:user user}
-                     :form-params  {:members members}
-                     :content-type :json
-                     :as           :json})
-         :body
-         :results
-         format-member-results
-         (hash-map :results))))
-
-;; Teams. Stored as groups named `de:teams:<creator>:<short>`; the external team name is
-;; `<creator>:<short>`. "Public"/joinable teams are modeled by granting the well-known
-;; all-users subject read on the team, surfaced to callers as the `view` privilege.
-
-(def ^:private team-folder "de:teams")
-
-;; The well-known subject representing all DE users. It matches the value the old Grouper
-;; backend used for its public subject (and Sonora's configurable grouper.allUsers), so no
-;; Sonora configuration change is required.
-(def ^:private public-subject "GrouperAll")
-
-(defn- team-full-name
-  [external-name]
-  (str team-folder ":" external-name))
-
-(defn- format-team
-  [group]
-  (->> (update group :name (partial strip-folder team-folder))
-       format-group))
+;; Group permissions. The Groups service records group-management rights in the permissions
+;; service (own/write/admin/read). Terrain translates those to the privilege vocabulary used
+;; by the DE UI: `admin` (own/admin), `read` (write/read), and `view` for the public subject.
 
 (defn- grant-permission
   [user group-id subject-type subject-id level]
   (http/put (groups-url "groups" group-id "permissions" subject-type subject-id)
-            {:query-params {:user user}
+            {:query-params (query user)
              :form-params  {:level level}
              :content-type :json
              :as           :json}))
-
-(defn- group-permissions
-  [user group-id]
-  (:permissions (:body (http/get (groups-url "groups" group-id "permissions")
-                                 {:query-params {:user user} :as :json}))))
-
-(defn- team-public?
-  [user group-id]
-  (boolean (some (comp #{public-subject} :subject_id :subject) (group-permissions user group-id))))
-
-(defn get-teams
-  "Lists (or searches) teams, optionally scoped to a creator or to teams a member belongs to."
-  [user {:keys [search creator member]}]
-  (let [raw       (if member
-                    (subject-group-list user member)
-                    (search-groups user team-folder))
-        formatted (->> raw
-                       (filter #(string/starts-with? (:name %) (str team-folder ":")))
-                       (mapv format-team))
-        by-creator (if creator
-                     (filterv #(string/starts-with? (:name %) (str creator ":")) formatted)
-                     formatted)]
-    {:groups (if search
-               (filterv #(string/includes? (:name %) search) by-creator)
-               by-creator)}))
-
-(defn add-team
-  "Creates a team owned by the caller, optionally granting all DE users read access when the
-   team is public."
-  [user {:keys [name description public_privileges] :or {public_privileges []}}]
-  (let [full  (str team-folder ":" user ":" name)
-        group (:body (http/post (groups-url "groups")
-                                {:query-params {:user user}
-                                 :form-params  {:name full :description description :display_extension name}
-                                 :content-type :json
-                                 :as           :json}))]
-    (when (seq public_privileges)
-      (grant-permission user (:id group) "group" public-subject "read"))
-    (format-team group)))
-
-(defn get-team
-  "Retrieves a single team by its `<creator>:<short>` name in a single round trip."
-  [user name]
-  (->> (find-group user (team-full-name name))
-       format-team))
-
-(defn verify-team-exists
-  "Throws a 404 if the named team does not exist."
-  [user name]
-  (find-group user (team-full-name name))
-  nil)
-
-(defn update-team
-  "Updates the name and/or description of a team, preserving its creator prefix."
-  [user name {new-name :name description :description}]
-  (let [creator (first (string/split name #":" 2))
-        id      (resolve-group-id user (team-full-name name))
-        body    (remove-vals nil? {:name              (when new-name (str team-folder ":" creator ":" new-name))
-                                   :description       description
-                                   :display_extension new-name})]
-    (->> (http/put (groups-url "groups" id)
-                   {:query-params {:user user} :form-params body :content-type :json :as :json})
-         :body
-         format-team)))
-
-(defn delete-team
-  "Deletes a team, returning the removed group (including its id)."
-  [user name]
-  (let [id (resolve-group-id user (team-full-name name))]
-    (->> (http/delete (groups-url "groups" id)
-                      {:query-params {:user user} :as :json})
-         :body
-         format-team)))
-
-(defn get-team-members
-  "Lists the members of a team."
-  [user name]
-  (let [id (resolve-group-id user (team-full-name name))]
-    (-> (http/get (groups-url "groups" id "members")
-                  {:query-params {:user user} :as :json})
-        :body
-        (update :members format-subjects))))
-
-(defn add-team-members
-  "Adds members to a team. Membership implies read access, so no privilege grant is needed."
-  [user name members]
-  (let [id (resolve-group-id user (team-full-name name))]
-    (->> (http/post (groups-url "groups" id "members")
-                    {:query-params {:user user} :form-params {:members members} :content-type :json :as :json})
-         :body
-         :results
-         format-member-results
-         (hash-map :results))))
-
-(defn remove-team-members
-  "Removes members from a team."
-  [user name members]
-  (let [id (resolve-group-id user (team-full-name name))]
-    (->> (http/post (groups-url "groups" id "members" "deleter")
-                    {:query-params {:user user} :form-params {:members members} :content-type :json :as :json})
-         :body
-         :results
-         format-member-results
-         (hash-map :results))))
-
-(defn join-team
-  "Adds the caller to a public team. The membership change is performed as the administrative
-   user because a non-member has no write access to the group."
-  [user name]
-  (let [id (resolve-group-id user (team-full-name name))]
-    (when-not (team-public? user id)
-      (cxu/forbidden (str "team is not open to join: " name)))
-    (->> (http/post (groups-url "groups" id "members")
-                    {:query-params {:user (config/groups-admin-user)}
-                     :form-params  {:members [user]}
-                     :content-type :json
-                     :as           :json})
-         :body
-         :results
-         format-member-results
-         (hash-map :results))))
-
-(defn leave-team
-  "Removes the caller from a team, performed as the administrative user."
-  [user name]
-  (let [id (resolve-group-id user (team-full-name name))]
-    (->> (http/post (groups-url "groups" id "members" "deleter")
-                    {:query-params {:user (config/groups-admin-user)}
-                     :form-params  {:members [user]}
-                     :content-type :json
-                     :as           :json})
-         :body
-         :results
-         format-member-results
-         (hash-map :results))))
-
-;; Team privileges. The Groups service records group-management rights in the permissions
-;; service (own/write/admin/read). Terrain translates those to the privilege vocabulary
-;; used by the DE UI: `admin` (own/admin), `read` (write/read), and `view` for the public
-;; subject.
 
 (defn- revoke-permission
   [user group-id subject-type subject-id]
   (try+
    (http/delete (groups-url "groups" group-id "permissions" subject-type subject-id)
-                {:query-params {:user user} :as :json})
+                {:query-params (query user) :as :json})
    (catch [:status 404] _ nil)))
+
+(defn- group-permissions
+  [user group-id]
+  (:permissions (:body (http/get (groups-url "groups" group-id "permissions")
+                                 {:query-params (query user) :as :json}))))
+
+(defn- public-group?
+  "True if the group is open to join, which is modeled by granting the well-known all-users
+   subject read access."
+  [user group-id]
+  (boolean (some (comp #{public-subject} :subject_id :subject) (group-permissions user group-id))))
 
 (defn- index-subjects
   [subjects]
@@ -455,9 +275,9 @@
   [names]
   (let [names (set names)]
     (cond
-      (names "admin")                     "admin"
-      (or (names "read") (names "view"))  "read"
-      :else                               nil)))
+      (names "admin")                    "admin"
+      (or (names "read") (names "view")) "read"
+      :else                              nil)))
 
 (defn- permission-subject
   [subjects-by-id {:keys [subject_id subject_type]}]
@@ -465,7 +285,7 @@
     {:id subject_id :source_id "g:gsa"}
     (get subjects-by-id subject_id {:id subject_id :source_id ""})))
 
-(defn- list-team-privileges*
+(defn- list-privileges
   [user group-id]
   (let [perms    (group-permissions user group-id)
         user-ids (->> perms (map :subject) (filter (comp #{"user"} :subject_type)) (map :subject_id))
@@ -475,23 +295,6 @@
                           :name    (level->privilege-name (:subject_id subject) level)
                           :subject (permission-subject by-id subject)})
                        perms)}))
-
-(defn list-team-privileges
-  "Lists the privileges granted on a team, translated to the DE privilege vocabulary."
-  [user name]
-  (list-team-privileges* user (resolve-group-id user (team-full-name name))))
-
-(defn update-team-privileges
-  "Applies privilege updates to a team, translating DE privilege names to permission levels.
-   A subject with no privileges has its permission revoked."
-  [user name {:keys [updates]}]
-  (let [id (resolve-group-id user (team-full-name name))]
-    (doseq [{:keys [subject_id privileges]} updates]
-      (let [subject-type (if (= subject_id public-subject) "group" "user")]
-        (if-let [level (privileges->level privileges)]
-          (grant-permission user id subject-type subject_id level)
-          (revoke-permission user id subject-type subject_id))))
-    (list-team-privileges* user id)))
 
 (defn- admins-of
   "Lists the administrators of a group by id: the user subjects holding own/admin, excluding
@@ -506,179 +309,289 @@
         by-id     (index-subjects (:subjects (lookup-subjects user admin-ids)))]
     {:members (mapv #(get by-id % {:id % :source_id ""}) admin-ids)}))
 
+;; Collaborator lists, which are owned by the user who created them.
+
+(defn- collaborator-list-ref
+  [user name]
+  {:group-type type-collaborator-list :owner user :name name})
+
+(defn get-collaborator-lists
+  "Lists (or searches) the calling user's collaborator lists. The search is performed by the
+   service, which matches on name and description."
+  ([user details]
+   (get-collaborator-lists user details nil))
+  ([user _details search]
+   {:groups (mapv format-group (list-groups user {:group_type type-collaborator-list
+                                                  :owner      user
+                                                  :search     search}))}))
+
+(defn add-collaborator-list
+  "Creates a collaborator list owned by the calling user."
+  [user {:keys [name description]}]
+  (format-group (create-group user {:group_type   type-collaborator-list
+                                    :owner        user
+                                    :name         name
+                                    :display_name name
+                                    :description  description})))
+
+(defn get-collaborator-list
+  "Retrieves a single collaborator list by its short name."
+  [user name]
+  (format-group (get-group user (collaborator-list-ref user name))))
+
+(defn update-collaborator-list
+  "Updates the name and/or description of a collaborator list."
+  [user old-name {:keys [name description]}]
+  (let [id (group-id user (collaborator-list-ref user old-name))]
+    (format-group (update-group user id {:name         name
+                                         :display_name name
+                                         :description  description}))))
+
+(defn delete-collaborator-list
+  "Deletes a collaborator list, returning the removed group (including its id)."
+  [user name]
+  (delete-group-by-ref user (collaborator-list-ref user name)))
+
+(defn get-collaborator-list-members
+  "Lists the members of a collaborator list."
+  [user name]
+  (list-members user (group-id user (collaborator-list-ref user name))))
+
+(defn add-collaborator-list-members
+  "Adds members to a collaborator list, creating the list if it does not yet exist."
+  [user name members]
+  (let [id (or (:id (find-group user (collaborator-list-ref user name)))
+               (:id (add-collaborator-list user {:name name :description ""})))]
+    (add-members user id members)))
+
+(defn remove-collaborator-list-members
+  "Removes members from a collaborator list."
+  [user name members]
+  (remove-members user (group-id user (collaborator-list-ref user name)) members))
+
+;; Teams, whose external name is `<owner>:<short>`.
+
+(defn- team-ref
+  "Parses the external team name into a group identity. Only the first colon separates the
+   owner from the short name, which may itself contain colons."
+  [external-name]
+  (let [[owner name] (string/split external-name #":" 2)]
+    (when (string/blank? name)
+      (cxu/bad-request (str "team names must be qualified by their owner: " external-name)))
+    {:group-type type-team :owner owner :name name}))
+
+(defn get-teams
+  "Lists (or searches) teams, optionally scoped to a creator or to teams a member belongs to.
+   Filtering and searching are performed by the service."
+  [user {:keys [search creator member]}]
+  {:groups (mapv format-group (list-groups user {:group_type type-team
+                                                 :owner      creator
+                                                 :member     member
+                                                 :search     search}))})
+
+(defn add-team
+  "Creates a team owned by the caller, optionally granting all DE users read access when the
+   team is public."
+  [user {:keys [name description public_privileges] :or {public_privileges []}}]
+  (let [group (create-group user {:group_type   type-team
+                                  :owner        user
+                                  :name         name
+                                  :display_name name
+                                  :description  description})]
+    (when (seq public_privileges)
+      (grant-permission user (:id group) "group" public-subject "read"))
+    (format-group group)))
+
+(defn get-team
+  "Retrieves a single team by its `<owner>:<short>` name."
+  [user name]
+  (format-group (get-group user (team-ref name))))
+
+(defn verify-team-exists
+  "Throws a 404 if the named team does not exist."
+  [user name]
+  (get-group user (team-ref name))
+  nil)
+
+(defn update-team
+  "Updates the name and/or description of a team. The owner is part of the team's identity
+   and cannot change, so only the short name is sent."
+  [user name {new-name :name description :description}]
+  (let [id (group-id user (team-ref name))]
+    (format-group (update-group user id {:name         new-name
+                                         :display_name new-name
+                                         :description  description}))))
+
+(defn delete-team
+  "Deletes a team, returning the removed group (including its id)."
+  [user name]
+  (delete-group-by-ref user (team-ref name)))
+
+(defn get-team-members
+  "Lists the members of a team."
+  [user name]
+  (list-members user (group-id user (team-ref name))))
+
+(defn add-team-members
+  "Adds members to a team. Membership implies read access, so no privilege grant is needed."
+  [user name members]
+  (add-members user (group-id user (team-ref name)) members))
+
+(defn remove-team-members
+  "Removes members from a team."
+  [user name members]
+  (remove-members user (group-id user (team-ref name)) members))
+
+(defn join-team
+  "Adds the caller to a public team. The membership change is performed as the administrative
+   user because a non-member has no write access to the group."
+  [user name]
+  (let [id (group-id user (team-ref name))]
+    (when-not (public-group? user id)
+      (cxu/forbidden (str "team is not open to join: " name)))
+    (add-members (config/groups-admin-user) id [user])))
+
+(defn leave-team
+  "Removes the caller from a team, performed as the administrative user."
+  [user name]
+  (remove-members (config/groups-admin-user) (group-id user (team-ref name)) [user]))
+
+(defn list-team-privileges
+  "Lists the privileges granted on a team, translated to the DE privilege vocabulary."
+  [user name]
+  (list-privileges user (group-id user (team-ref name))))
+
+(defn update-team-privileges
+  "Applies privilege updates to a team, translating DE privilege names to permission levels.
+   A subject with no privileges has its permission revoked."
+  [user name {:keys [updates]}]
+  (let [id (group-id user (team-ref name))]
+    (doseq [{:keys [subject_id privileges]} updates]
+      (let [subject-type (if (= subject_id public-subject) "group" "user")]
+        (if-let [level (privileges->level privileges)]
+          (grant-permission user id subject-type subject_id level)
+          (revoke-permission user id subject-type subject_id))))
+    (list-privileges user id)))
+
 (defn get-team-admins
   "Lists the administrators of a team."
   [user name]
-  (admins-of user (resolve-group-id user (team-full-name name))))
+  (admins-of user (group-id user (team-ref name))))
 
-;; Communities. Stored as groups named `de:communities:<short>`; the external community name
-;; is the short name. Public communities grant the all-users subject read (joinable),
-;; surfaced as the `view` privilege. Community admins hold the admin privilege and are also
-;; members.
+;; Communities, which belong to no user namespace. Public communities grant the all-users
+;; subject read (joinable), surfaced as the `view` privilege. Community admins hold the admin
+;; privilege and are also members.
 
-(def ^:private community-folder "de:communities")
-
-(defn- community-full-name
+(defn- community-ref
   [name]
-  (str community-folder ":" name))
-
-(defn- format-community
-  [group]
-  (->> (update group :name (partial strip-folder community-folder))
-       format-group))
-
-(defn- community-names-under
-  [groups]
-  (->> groups
-       (filter #(string/starts-with? (:name %) (str community-folder ":")))
-       (mapv format-community)))
-
-(defn- user-community-names
-  [user]
-  (->> (subject-group-list user user)
-       (map :name)
-       (filter #(string/starts-with? % (str community-folder ":")))
-       (map (partial strip-folder community-folder))
-       set))
+  {:group-type type-community :name name})
 
 (defn get-communities
   "Lists (or searches) communities, reporting whether the caller is a member of each."
   [user {:keys [search member]}]
-  (let [raw       (if member (subject-group-list user member) (search-groups user community-folder))
-        formatted (community-names-under raw)
-        filtered  (if search (filterv #(string/includes? (:name %) search) formatted) formatted)
-        ;; When listing a user's own communities, every result is a membership; otherwise
-        ;; fetch the caller's community memberships once (rather than per community).
-        member-of (if (= user member) (set (map :name filtered)) (user-community-names user))]
+  (let [groups    (list-groups user {:group_type type-community :member member :search search})
+        ;; When listing a user's own communities every result is a membership; otherwise the
+        ;; caller's memberships are fetched once rather than once per listed community.
+        member-of (if (= user member)
+                    (set (map external-name groups))
+                    (set (map external-name (list-groups user {:group_type type-community
+                                                               :member     user}))))]
     ;; :privileges is intentionally empty: the DE UI derives admin/follower status from the
     ;; /admins and /members endpoints, and computing per-community privileges here would cost
     ;; one permissions request per listed community.
-    {:groups (mapv #(assoc % :member (contains? member-of (:name %)) :privileges []) filtered)}))
+    {:groups (mapv #(assoc (format-group %)
+                           :member     (contains? member-of (external-name %))
+                           :privileges [])
+                   groups)}))
 
 (defn admin-get-communities
   "Lists (or searches) all communities without per-user membership details."
   [user {:keys [search]}]
-  (let [formatted (community-names-under (search-groups user community-folder))]
-    {:groups (if search (filterv #(string/includes? (:name %) search) formatted) formatted)}))
+  {:groups (mapv format-group (list-groups user {:group_type type-community :search search}))})
 
 (defn add-community
-  "Creates a community owned by the caller, granting all DE users read when it is public."
+  "Creates a community, granting all DE users read when it is public."
   [user {:keys [name description public_privileges] :or {public_privileges []}}]
-  (let [group (:body (http/post (groups-url "groups")
-                                {:query-params {:user user}
-                                 :form-params  {:name (community-full-name name) :description description
-                                                :display_extension name}
-                                 :content-type :json
-                                 :as           :json}))]
+  (let [group (create-group user {:group_type   type-community
+                                  :name         name
+                                  :display_name name
+                                  :description  description})]
     (when (seq public_privileges)
       (grant-permission user (:id group) "group" public-subject "read"))
-    (format-community group)))
+    (format-group group)))
 
 (defn get-community
-  "Retrieves a single community by its short name in a single round trip."
+  "Retrieves a single community by its short name."
   [user name]
-  (->> (find-group user (community-full-name name))
-       format-community))
+  (format-group (get-group user (community-ref name))))
 
 (defn update-community
-  "Updates the name and/or description of a community. App-tag retagging on rename is handled
-   by the caller (see terrain.clients.grouping.retag)."
+  "Updates the name and/or description of a community."
   [user name {new-name :name description :description}]
-  (let [id   (resolve-group-id user (community-full-name name))
-        body (remove-vals nil? {:name              (when new-name (community-full-name new-name))
-                                :description       description
-                                :display_extension new-name})]
-    (->> (http/put (groups-url "groups" id)
-                   {:query-params {:user user} :form-params body :content-type :json :as :json})
-         :body
-         format-community)))
+  (let [id (group-id user (community-ref name))]
+    (format-group (update-group user id {:name         new-name
+                                         :display_name new-name
+                                         :description  description}))))
 
 (defn delete-community
   "Deletes a community, returning the removed group (including its id)."
   [user name]
-  (let [id (resolve-group-id user (community-full-name name))]
-    (->> (http/delete (groups-url "groups" id)
-                      {:query-params {:user user} :as :json})
-         :body
-         format-community)))
+  (delete-group-by-ref user (community-ref name)))
 
 (defn get-community-members
   "Lists the members of a community."
   [user name]
-  (let [id (resolve-group-id user (community-full-name name))]
-    (-> (http/get (groups-url "groups" id "members")
-                  {:query-params {:user user} :as :json})
-        :body
-        (update :members format-subjects))))
+  (list-members user (group-id user (community-ref name))))
 
 (defn get-community-admins
   "Lists the administrators of a community."
   [user name]
-  (admins-of user (resolve-group-id user (community-full-name name))))
+  (admins-of user (group-id user (community-ref name))))
 
 (defn add-community-admins
   "Grants the given subjects the admin privilege on a community and adds them as members."
   [user name members]
-  (let [id (resolve-group-id user (community-full-name name))]
+  (let [id (group-id user (community-ref name))]
     (doseq [member members]
       (grant-permission user id "user" member "admin"))
-    (->> (http/post (groups-url "groups" id "members")
-                    {:query-params {:user user} :form-params {:members members} :content-type :json :as :json})
-         :body
-         :results
-         format-member-results
-         (hash-map :results))))
+    (add-members user id members)))
 
 (defn remove-community-admins
   "Revokes the admin privilege from the given subjects and removes them as members."
   [user name members]
-  (let [id (resolve-group-id user (community-full-name name))]
+  (let [id (group-id user (community-ref name))]
     (doseq [member members]
       (revoke-permission user id "user" member))
-    (->> (http/post (groups-url "groups" id "members" "deleter")
-                    {:query-params {:user user} :form-params {:members members} :content-type :json :as :json})
-         :body
-         :results
-         format-member-results
-         (hash-map :results))))
+    (remove-members user id members)))
 
 (defn join-community
   "Adds the caller to a public community, performed as the administrative user."
   [user name]
-  (let [id (resolve-group-id user (community-full-name name))]
-    (when-not (team-public? user id)
+  (let [id (group-id user (community-ref name))]
+    (when-not (public-group? user id)
       (cxu/forbidden (str "community is not open to join: " name)))
-    (->> (http/post (groups-url "groups" id "members")
-                    {:query-params {:user (config/groups-admin-user)}
-                     :form-params  {:members [user]}
-                     :content-type :json
-                     :as           :json})
-         :body
-         :results
-         format-member-results
-         (hash-map :results))))
+    (add-members (config/groups-admin-user) id [user])))
 
 (defn leave-community
   "Removes the caller from a community, performed as the administrative user."
   [user name]
-  (let [id (resolve-group-id user (community-full-name name))]
-    (->> (http/post (groups-url "groups" id "members" "deleter")
-                    {:query-params {:user (config/groups-admin-user)}
-                     :form-params  {:members [user]}
-                     :content-type :json
-                     :as           :json})
-         :body
-         :results
-         format-member-results
-         (hash-map :results))))
+  (remove-members (config/groups-admin-user) (group-id user (community-ref name)) [user]))
 
 ;; DE user group administration.
+
+(defn list-groups-for-user
+  "Lists the groups to which the given subject belongs, including through nesting."
+  [subject-id _details]
+  {:groups (mapv format-group
+                 (:groups (:body (http/get (groups-url "subjects" subject-id "groups")
+                                           {:query-params (query (config/groups-admin-user))
+                                            :as           :json}))))})
 
 (defn remove-de-user
   "Removes a user from the well-known DE users group."
   [subject-id]
   (let [admin (config/groups-admin-user)
-        id    (resolve-group-id admin (str "de:users:" (config/de-users-group)))]
+        id    (group-id admin {:group-type type-system :name (config/de-users-group)})]
     (http/delete (groups-url "groups" id "members" subject-id)
-                 {:query-params {:user admin} :as :json})
+                 {:query-params (query admin) :as :json})
     nil))
