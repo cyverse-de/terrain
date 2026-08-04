@@ -1,9 +1,6 @@
 (ns terrain.routes.apps.communities
   (:require [common-swagger-api.schema :refer [context DELETE POST]]
-            [common-swagger-api.schema.apps
-             :refer [AppCategoryMetadataAddRequest
-                     AppCategoryMetadataDeleteRequest
-                     AppIdParam]]
+            [common-swagger-api.schema.apps :refer [AppIdParam]]
             [common-swagger-api.schema.apps.communities :as schema]
             [common-swagger-api.schema.metadata :refer [AvuList]]
             [ring.util.http-response :refer [ok]]
@@ -13,7 +10,7 @@
             [terrain.util.config :as config]))
 
 ;; Declarations to get rid of lint warnings for path and query parameter bindings.
-(declare body app-id)
+(declare body app-id community-id)
 
 (defn app-community-tag-routes
   []
@@ -25,17 +22,24 @@
      :tags ["app-community-tags"]
      :path-params [app-id :- AppIdParam]
 
+     (DELETE "/:community-id" []
+       :middleware [require-authentication]
+       :path-params [community-id :- schema/CommunityIdPathParam]
+       :summary schema/AppCommunityDeleteSummary
+       :description schema/AppCommunityDeleteDocs
+       (ok (apps/remove-app-from-community app-id community-id)))
+
      (DELETE "/" []
        :middleware [require-authentication]
-       :body [body AppCategoryMetadataDeleteRequest]
+       :body [body schema/AppCommunityListRequest]
        :summary schema/AppCommunityMetadataDeleteSummary
        :description schema/AppCommunityMetadataDeleteDocs
        (ok (apps/remove-app-from-communities app-id body)))
 
      (POST "/" []
        :middleware [require-authentication]
-       :body [body AppCategoryMetadataAddRequest]
+       :body [body schema/AppCommunityListRequest]
        :return AvuList
-       :summary schema/AppCommunityMetadataAddSummary
-       :description schema/AppCommunityMetadataAddDocs
+       :summary schema/AppCommunityAddSummary
+       :description schema/AppCommunityAddDocs
        (ok (apps/update-app-communities app-id body))))))
