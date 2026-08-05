@@ -155,11 +155,23 @@
   [user ref]
   (:id (get-group user ref)))
 
+;; The Groups service caps one listing response at this many groups.
+(def ^:private list-page-size 1000)
+
 (defn- list-groups
+  "Lists groups page by page. The service silently caps a single response at
+   `list-page-size` groups, so an unpaged request would truncate large listings."
   [user filters]
-  (:groups (:body (http/get (groups-url "groups")
-                            {:query-params (query user filters)
-                             :as           :json}))))
+  (loop [offset 0 groups []]
+    (let [page   (:groups (:body (http/get (groups-url "groups")
+                                           {:query-params (query user (assoc filters
+                                                                             :limit  list-page-size
+                                                                             :offset offset))
+                                            :as           :json})))
+          groups (into groups page)]
+      (if (< (count page) list-page-size)
+        groups
+        (recur (+ offset (count page)) groups)))))
 
 (defn- create-group
   [user spec]

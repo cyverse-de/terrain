@@ -123,7 +123,8 @@
 (deftest get-collaborator-lists-test
   (testing "listing asks the service for the caller's own lists"
     (with-fake-routes-in-isolation
-      {{:address (groups-url "groups") :query-params {:user "alice" :group_type "collaborator_list" :owner "alice"}}
+      {{:address (groups-url "groups")
+        :query-params {:user "alice" :group_type "collaborator_list" :owner "alice" :limit 1000 :offset 0}}
        (json-response {:groups [cl-group]})}
       (let [{:keys [groups]} (groups/get-collaborator-lists "alice" nil)]
         (is (= ["friends"] (mapv :name groups)))
@@ -131,7 +132,8 @@
   (testing "a search is delegated to the service rather than filtered in terrain"
     (with-fake-routes-in-isolation
       {{:address (groups-url "groups")
-        :query-params {:user "alice" :group_type "collaborator_list" :owner "alice" :search "fri"}}
+        :query-params {:user "alice" :group_type "collaborator_list" :owner "alice" :search "fri"
+                       :limit 1000 :offset 0}}
        (json-response {:groups [cl-group]})}
       (is (= ["friends"] (mapv :name (:groups (groups/get-collaborator-lists "alice" nil "fri"))))))))
 
@@ -245,7 +247,7 @@
 (deftest get-teams-test
   (testing "listing asks for teams by type"
     (with-fake-routes-in-isolation
-      {{:address (groups-url "groups") :query-params {:user "alice" :group_type "team"}}
+      {{:address (groups-url "groups") :query-params {:user "alice" :group_type "team" :limit 1000 :offset 0}}
        (json-response {:groups [team-group]})}
       (let [{:keys [groups]} (groups/get-teams "alice" {})]
         (is (= ["alice:t1"] (mapv :name groups)))
@@ -254,19 +256,38 @@
     ;; The old client filtered on the `<creator>:` string prefix, which matched any creator
     ;; whose name started with the requested one.
     (with-fake-routes-in-isolation
-      {{:address (groups-url "groups") :query-params {:user "alice" :group_type "team" :owner "bob"}}
+      {{:address (groups-url "groups")
+        :query-params {:user "alice" :group_type "team" :owner "bob" :limit 1000 :offset 0}}
        (json-response {:groups []})}
       (is (= [] (:groups (groups/get-teams "alice" {:creator "bob"}))))))
   (testing "a member filter is delegated to the service"
     (with-fake-routes-in-isolation
-      {{:address (groups-url "groups") :query-params {:user "alice" :group_type "team" :member "bob"}}
+      {{:address (groups-url "groups")
+        :query-params {:user "alice" :group_type "team" :member "bob" :limit 1000 :offset 0}}
        (json-response {:groups [team-group]})}
       (is (= ["alice:t1"] (mapv :name (:groups (groups/get-teams "alice" {:member "bob"})))))))
   (testing "a search is delegated to the service"
     (with-fake-routes-in-isolation
-      {{:address (groups-url "groups") :query-params {:user "alice" :group_type "team" :search "t"}}
+      {{:address (groups-url "groups")
+        :query-params {:user "alice" :group_type "team" :search "t" :limit 1000 :offset 0}}
        (json-response {:groups [team-group]})}
       (is (= ["alice:t1"] (mapv :name (:groups (groups/get-teams "alice" {:search "t"}))))))))
+
+(deftest list-groups-pagination-test
+  (testing "listings page past the service's 1000-group response cap"
+    ;; The service caps one listing response at 1000 groups, so a single unpaged
+    ;; request would silently truncate anything past that bound.
+    (let [page1 (mapv #(assoc team-group :id (str "t" %) :name (str "team" %)) (range 1000))]
+      (with-fake-routes-in-isolation
+        {{:address (groups-url "groups")
+          :query-params {:user "alice" :group_type "team" :limit 1000 :offset 0}}
+         (json-response {:groups page1})
+         {:address (groups-url "groups")
+          :query-params {:user "alice" :group_type "team" :limit 1000 :offset 1000}}
+         (json-response {:groups [(assoc team-group :id "t1000" :name "team1000")]})}
+        (let [{:keys [groups]} (groups/get-teams "alice" {})]
+          (is (= 1001 (count groups)))
+          (is (= "alice:team1000" (:name (last groups)))))))))
 
 (deftest add-team-test
   (testing "a public team grants the all-users subject read and returns the owner-scoped name"
@@ -496,9 +517,10 @@
 
 (deftest get-communities-test
   (with-fake-routes-in-isolation
-    {{:address (groups-url "groups") :query-params {:user "alice" :group_type "community"}}
+    {{:address (groups-url "groups") :query-params {:user "alice" :group_type "community" :limit 1000 :offset 0}}
      (json-response {:groups [community-group {:id "c2" :group_type "community" :name "physics"}]})
-     {:address (groups-url "groups") :query-params {:user "alice" :group_type "community" :member "alice"}}
+     {:address (groups-url "groups")
+      :query-params {:user "alice" :group_type "community" :member "alice" :limit 1000 :offset 0}}
      (json-response {:groups [community-group]})}
     (let [{:keys [groups]} (groups/get-communities "alice" {})
           by-name (into {} (map (juxt :name identity)) groups)]
@@ -512,7 +534,8 @@
 
 (deftest get-communities-for-member-test
   (with-fake-routes-in-isolation
-    {{:address (groups-url "groups") :query-params {:user "alice" :group_type "community" :member "alice"}}
+    {{:address (groups-url "groups")
+      :query-params {:user "alice" :group_type "community" :member "alice" :limit 1000 :offset 0}}
      (json-response {:groups [community-group]})}
     (testing "listing a user's own communities needs no second membership query"
       (let [{:keys [groups]} (groups/get-communities "alice" {:member "alice"})]
@@ -521,7 +544,8 @@
 
 (deftest admin-get-communities-test
   (with-fake-routes-in-isolation
-    {{:address (groups-url "groups") :query-params {:user "de_grouper" :group_type "community"}}
+    {{:address (groups-url "groups")
+      :query-params {:user "de_grouper" :group_type "community" :limit 1000 :offset 0}}
      (json-response {:groups [community-group]})}
     (let [{:keys [groups]} (groups/admin-get-communities "de_grouper" {})]
       (testing "admin listing omits member/privileges"
