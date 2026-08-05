@@ -403,6 +403,8 @@
 (defn add-collaborator-list-members
   "Adds members to a collaborator list, creating the list if it does not yet exist."
   [user name members]
+  ;; find-group turns only a 404 into nil; the service 403s for a group that exists but is
+  ;; unreadable, which propagates as an error here rather than triggering a create.
   (let [id (or (:id (find-group user (collaborator-list-ref user name)))
                (:id (add-collaborator-list user {:name name :description ""})))]
     (add-members user id members)))
