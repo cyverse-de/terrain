@@ -471,6 +471,7 @@
    could be joined directly and only `view` on public teams, refusing a self-join against
    those. Teams use the join-request flow, where an administrator approves."
   [user name]
+  (reject-admin-user [user])
   (let [group (get-group user (team-ref name))]
     (when-not (:joinable group)
       (cxu/forbidden (str "team is not open to join: " name)))
@@ -500,6 +501,7 @@
   "Removes the caller from a team, performed as the administrative user, and drops the read
    grant that membership carried."
   [user name]
+  (reject-admin-user [user])
   (let [id (group-id user (team-ref name))]
     (revoke-membership-read id user)
     (remove-members (config/groups-admin-user) id [user])))
@@ -621,6 +623,7 @@
    Communities carried `optin` in Grouper, so in practice this admits the same set as before.
    See join-team."
   [user name]
+  (reject-admin-user [user])
   (let [group (get-group user (community-ref name))]
     (when-not (:joinable group)
       (cxu/forbidden (str "community is not open to join: " name)))
@@ -630,6 +633,7 @@
   "Removes the caller from a community, performed as the administrative user, and drops the
    read grant that membership carried. See leave-team."
   [user name]
+  (reject-admin-user [user])
   (let [id (group-id user (community-ref name))]
     (revoke-membership-read id user)
     (remove-members (config/groups-admin-user) id [user])))

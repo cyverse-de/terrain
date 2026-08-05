@@ -642,9 +642,24 @@
     ;; UI can neither show nor remove. The legacy client rejected this with a 400.
     (with-fake-routes-in-isolation
       (team-lookup-route)
-      (doseq [[label f] [["add-team-members"      #(groups/add-team-members "alice" "alice:t1" ["de_grouper"])]
-                         ["remove-team-members"   #(groups/remove-team-members "alice" "alice:t1" ["de_grouper"])]
-                         ["add-community-admins"  #(groups/add-community-admins "alice" "biology" ["bob" "de_grouper"])]]]
+      (doseq [[label f] [["add-team-members"        #(groups/add-team-members "alice" "alice:t1" ["de_grouper"])]
+                         ["remove-team-members"     #(groups/remove-team-members "alice" "alice:t1" ["de_grouper"])]
+                         ["add-community-admins"    #(groups/add-community-admins "alice" "biology" ["bob" "de_grouper"])]
+                         ["remove-community-admins" #(groups/remove-community-admins "alice" "biology" ["de_grouper"])]]]
         (is (= :clojure-commons.exception/bad-request
                (try+ (f) nil (catch [:type :clojure-commons.exception/bad-request] {:keys [type]} type)))
             (str label " must reject the administrative account"))))))
+
+(deftest join-leave-admin-guard-test
+  (testing "the administrative account may not join or leave anything"
+    ;; Join and leave act as the administrative account, whose service-side permission
+    ;; bypass means nothing downstream stops it. The guard must fire before any HTTP
+    ;; call: no routes are registered, so a stray request fails loudly under isolation.
+    (with-fake-routes-in-isolation {}
+      (let [admin (config/groups-admin-user)]
+        (doseq [[label f] [["join-team"       #(groups/join-team admin "alice:t1")]
+                           ["leave-team"      #(groups/leave-team admin "alice:t1")]
+                           ["join-community"  #(groups/join-community admin "biology")]
+                           ["leave-community" #(groups/leave-community admin "biology")]]]
+          (is (= :clojure-commons.exception/bad-request (error-type (f)))
+              (str label " must reject the administrative account")))))))
