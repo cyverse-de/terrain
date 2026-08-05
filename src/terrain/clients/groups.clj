@@ -95,6 +95,10 @@
                      :content-type :json
                      :as           :json})))
 
+(defn- index-subjects
+  [subjects]
+  (into {} (map (juxt :id identity)) subjects))
+
 (defn- empty-user-info
   "Returns an empty user-info record for the given username."
   [username]
@@ -128,6 +132,43 @@
    :description       (or (:description group) "")
    :display_extension (:name group)
    :display_name      (or (:display_name group) (:name group))})
+
+(defn- epoch-millis
+  [timestamp]
+  (if timestamp
+    (.toEpochMilli (.toInstant (java.time.OffsetDateTime/parse timestamp)))
+    0))
+
+(defn- creator-subject
+  "The subject block for a group's creator, falling back to the bare owner id when the
+   lookup resolved nothing or the subject has no name."
+  [subjects-by-id owner]
+  (let [subject (get subjects-by-id owner {:id owner :source_id ""})]
+    (update subject :name #(or (not-empty %) owner))))
+
+(defn- attach-details
+  "Adds the :detail block the DE's listings read -- creation time plus creator id and display
+   name -- to each formatted group, resolving all distinct owners' names with one bulk subject
+   lookup. A group with no owner (e.g. a community) gets no :detail: there is no creator to
+   report."
+  [user groups formatted-groups]
+  (let [owners (vec (distinct (keep :owner groups)))
+        by-id  (if (seq owners) (index-subjects (:subjects (lookup-subjects user owners))) {})]
+    (mapv (fn [{:keys [owner created_at]} formatted]
+            (cond-> formatted
+              owner (assoc :detail {:created_at          (epoch-millis created_at)
+                                    :created_by          owner
+                                    :created_by_detail   (creator-subject by-id owner)
+                                    :has_composite       false
+                                    :is_composite_factor false})))
+          groups
+          formatted-groups)))
+
+(defn- format-groups
+  "Formats a listing into the external contract, attaching :detail when it was requested."
+  [user details groups]
+  (let [formatted (mapv format-group groups)]
+    (if details (attach-details user groups formatted) formatted)))
 
 ;; Group identity and requests. A `ref` is a group's structured identity: its type, its owner
 ;; where it has one, and its short name.
@@ -264,10 +305,6 @@
   (:permissions (:body (http/get (groups-url "groups" group-id "permissions")
                                  {:query-params (query user) :as :json}))))
 
-(defn- index-subjects
-  [subjects]
-  (into {} (map (juxt :id identity)) subjects))
-
 (defn- level->privilege-name
   [subject-id level]
   (cond
@@ -326,10 +363,10 @@
    service, which matches on name and description."
   ([user details]
    (get-collaborator-lists user details nil))
-  ([user _details search]
-   {:groups (mapv format-group (list-groups user {:group_type type-collaborator-list
-                                                  :owner      user
-                                                  :search     search}))}))
+  ([user details search]
+   {:groups (format-groups user details (list-groups user {:group_type type-collaborator-list
+                                                           :owner      user
+                                                           :search     search}))}))
 
 (defn add-collaborator-list
   "Creates a collaborator list owned by the calling user."
@@ -389,11 +426,11 @@
 (defn get-teams
   "Lists (or searches) teams, optionally scoped to a creator or to teams a member belongs to.
    Filtering and searching are performed by the service."
-  [user {:keys [search creator member]}]
-  {:groups (mapv format-group (list-groups user {:group_type type-team
-                                                 :owner      creator
-                                                 :member     member
-                                                 :search     search}))})
+  [user {:keys [search creator member details]}]
+  {:groups (format-groups user details (list-groups user {:group_type type-team
+                                                          :owner      creator
+                                                          :member     member
+                                                          :search     search}))})
 
 ;; Grouper separated `view` -- the group is discoverable and joinable -- from `read`, which
 ;; also exposes the member list, and both arrive here in public_privileges. The permissions
@@ -551,7 +588,9 @@
   {:group-type type-community :name name})
 
 (defn get-communities
-  "Lists (or searches) communities, reporting whether the caller is a member of each."
+  "Lists (or searches) communities, reporting whether the caller is a member of each. The
+   details flag is deliberately ignored: communities have no owner, so there is no creator
+   to build a :detail block from."
   [user {:keys [search member]}]
   (let [groups    (list-groups user {:group_type type-community :member member :search search})
         ;; When listing a user's own communities every result is a membership; otherwise the
@@ -657,11 +696,12 @@
 
 (defn list-groups-for-user
   "Lists the groups to which the given subject belongs, including through nesting."
-  [subject-id _details]
-  {:groups (mapv format-group
-                 (:groups (:body (http/get (groups-url "subjects" subject-id "groups")
-                                           {:query-params (query (config/groups-admin-user))
-                                            :as           :json}))))})
+  [subject-id details]
+  (let [admin  (config/groups-admin-user)
+        groups (:groups (:body (http/get (groups-url "subjects" subject-id "groups")
+                                         {:query-params (query admin)
+                                          :as           :json})))]
+    {:groups (format-groups admin details groups)}))
 
 (defn remove-de-user
   "Removes a user from the well-known DE users group."

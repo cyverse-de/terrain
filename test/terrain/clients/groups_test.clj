@@ -273,6 +273,43 @@
        (json-response {:groups [team-group]})}
       (is (= ["alice:t1"] (mapv :name (:groups (groups/get-teams "alice" {:search "t"}))))))))
 
+(deftest get-teams-details-test
+  (testing "details=true attaches creator info resolved by one bulk subject lookup"
+    (let [lookups (atom [])
+          team2   {:id "t2" :group_type "team" :owner "bob" :name "t2"}]
+      (with-fake-routes-in-isolation
+        {{:address (groups-url "groups") :query-params {:user "alice" :group_type "team" :limit 1000 :offset 0}}
+         (json-response {:groups [(assoc team-group :created_at "2026-01-15T10:20:30Z") team2]})
+         {:address (groups-url "subjects" "lookup") :query-params {:user "alice"}}
+         (fn [req]
+           (swap! lookups conj (json/decode (slurp (:body req)) true))
+           ((json-response {:subjects [{:id "alice" :name "Alice Anderson" :source_id "ldap"}]}) nil))}
+        (let [{:keys [groups]}  (groups/get-teams "alice" {:details true})
+              [detail1 detail2] (mapv :detail groups)]
+          (testing "the distinct owners are resolved with a single lookup request"
+            (is (= [{:subject_ids ["alice" "bob"]}] @lookups)))
+          (testing "the creator's id and resolved display name land in :detail"
+            (is (= "alice" (:created_by detail1)))
+            (is (= "Alice Anderson" (get-in detail1 [:created_by_detail :name])))
+            (is (= "ldap" (get-in detail1 [:created_by_detail :source_id]))))
+          (testing "the creation time is reported in ms since the epoch"
+            (is (= (.toEpochMilli (java.time.Instant/parse "2026-01-15T10:20:30Z"))
+                   (:created_at detail1))))
+          (testing "detail carries only schema-legal keys"
+            (is (= #{:created_at :created_by :created_by_detail :has_composite :is_composite_factor}
+                   (set (keys detail1))))
+            (is (false? (:has_composite detail1)))
+            (is (false? (:is_composite_factor detail1))))
+          (testing "an owner the lookup cannot resolve falls back to the bare id"
+            (is (= "bob" (:created_by detail2)))
+            (is (= {:id "bob" :source_id "" :name "bob"} (:created_by_detail detail2))))))))
+  (testing "details=false makes no subject lookup and attaches no detail"
+    ;; Only the listing route is registered: a stray subject lookup fails loudly.
+    (with-fake-routes-in-isolation
+      {{:address (groups-url "groups") :query-params {:user "alice" :group_type "team" :limit 1000 :offset 0}}
+       (json-response {:groups [team-group]})}
+      (is (not (contains? (first (:groups (groups/get-teams "alice" {:details false}))) :detail))))))
+
 (deftest list-groups-pagination-test
   (testing "listings page past the service's 1000-group response cap"
     ;; The service caps one listing response at 1000 groups, so a single unpaged
