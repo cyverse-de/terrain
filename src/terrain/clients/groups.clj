@@ -441,19 +441,34 @@
   [user name]
   (list-members user (group-id user (team-ref name))))
 
+(defn- reject-admin-user
+  "The administrative account may not be a member of anything. It is filtered out of every
+   listing, so admitting it creates a member the UI cannot show or remove."
+  [members]
+  (when (some #{(config/groups-admin-user)} members)
+    (cxu/bad-request "the administrative user may not be added to or removed from any group")))
+
 (defn add-team-members
   "Adds members to a team. Membership implies read access, so no privilege grant is needed."
   [user name members]
+  (reject-admin-user members)
   (add-members user (group-id user (team-ref name)) members))
 
 (defn remove-team-members
   "Removes members from a team."
   [user name members]
+  (reject-admin-user members)
   (remove-members user (group-id user (team-ref name)) members))
 
 (defn join-team
-  "Adds the caller to a public team. The membership change is performed as the administrative
-   user because a non-member has no write access to the group."
+  "Adds the caller to a team that is open to join. The membership change is performed as the
+   administrative user because a non-member has no write access to the group.
+
+   NOTE: Grouper granted the all-users subject `optin` on groups that could be joined directly,
+   and only `view` on public teams -- it refused a self-join against those, and the DE uses the
+   join-request flow for them. Nothing here carries `optin`, so this is more permissive than
+   Grouper for public teams. Decide whether public teams should be directly joinable before
+   cutover; if not, the importer needs to record `optins` the way it records `readers`."
   [user name]
   (let [id (group-id user (team-ref name))]
     (when-not (public-group? user id)
@@ -561,6 +576,7 @@
 (defn add-community-admins
   "Grants the given subjects the admin privilege on a community and adds them as members."
   [user name members]
+  (reject-admin-user members)
   (let [id (group-id user (community-ref name))]
     (doseq [member members]
       (grant-permission user id "user" member "admin"))
@@ -569,13 +585,15 @@
 (defn remove-community-admins
   "Revokes the admin privilege from the given subjects and removes them as members."
   [user name members]
+  (reject-admin-user members)
   (let [id (group-id user (community-ref name))]
     (doseq [member members]
       (revoke-permission user id "user" member))
     (remove-members user id members)))
 
 (defn join-community
-  "Adds the caller to a public community, performed as the administrative user."
+  "Adds the caller to a public community, performed as the administrative user. Communities
+   carried `optin` in Grouper, so unlike teams this matches the old behavior. See join-team."
   [user name]
   (let [id (group-id user (community-ref name))]
     (when-not (public-group? user id)

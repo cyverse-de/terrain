@@ -598,3 +598,16 @@
      (fn [_] {:status 200 :headers {"Content-Type" "application/json"} :body "{}"})}
     (testing "removing a DE user deletes their membership in the de-users system group"
       (is (nil? (groups/remove-de-user "bob"))))))
+
+(deftest admin-user-guard-test
+  (testing "the administrative account may not be added to or removed from a group"
+    ;; It is filtered out of every listing, so admitting it creates a member the
+    ;; UI can neither show nor remove. The legacy client rejected this with a 400.
+    (with-fake-routes-in-isolation
+      (team-lookup-route)
+      (doseq [[label f] [["add-team-members"      #(groups/add-team-members "alice" "alice:t1" ["de_grouper"])]
+                         ["remove-team-members"   #(groups/remove-team-members "alice" "alice:t1" ["de_grouper"])]
+                         ["add-community-admins"  #(groups/add-community-admins "alice" "biology" ["bob" "de_grouper"])]]]
+        (is (= :clojure-commons.exception/bad-request
+               (try+ (f) nil (catch [:type :clojure-commons.exception/bad-request] {:keys [type]} type)))
+            (str label " must reject the administrative account"))))))
