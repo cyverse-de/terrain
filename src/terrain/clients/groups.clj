@@ -252,12 +252,6 @@
   (:permissions (:body (http/get (groups-url "groups" group-id "permissions")
                                  {:query-params (query user) :as :json}))))
 
-(defn- public-group?
-  "True if the group is open to join, which is modeled by granting the well-known all-users
-   subject read access."
-  [user group-id]
-  (boolean (some (comp #{public-subject} :subject_id :subject) (group-permissions user group-id))))
-
 (defn- index-subjects
   [subjects]
   (into {} (map (juxt :id identity)) subjects))
@@ -397,6 +391,14 @@
   [public-privileges]
   (boolean (some #{"read"} public-privileges)))
 
+;; `optin` is what let a user add themselves without approval. The DE sends it for
+;; communities and withholds it from public teams, which go through the join-request
+;; flow instead -- so this is not derivable from members-public?, even though the two
+;; happen to coincide in the privileges the DE currently sends.
+(defn- joinable?
+  [public-privileges]
+  (boolean (some #{"optin"} public-privileges)))
+
 (defn add-team
   "Creates a team owned by the caller, optionally granting all DE users read access when the
    team is public."
@@ -406,7 +408,8 @@
                                   :name           name
                                   :display_name   name
                                   :description    description
-                                  :members_public (members-public? public_privileges)})]
+                                  :members_public (members-public? public_privileges)
+                                  :joinable       (joinable? public_privileges)})]
     (when (seq public_privileges)
       (grant-permission user (:id group) "group" public-subject "read"))
     (format-group group)))
@@ -464,16 +467,14 @@
   "Adds the caller to a team that is open to join. The membership change is performed as the
    administrative user because a non-member has no write access to the group.
 
-   NOTE: Grouper granted the all-users subject `optin` on groups that could be joined directly,
-   and only `view` on public teams -- it refused a self-join against those, and the DE uses the
-   join-request flow for them. Nothing here carries `optin`, so this is more permissive than
-   Grouper for public teams. Decide whether public teams should be directly joinable before
-   cutover; if not, the importer needs to record `optins` the way it records `readers`."
+   Being public is not enough: Grouper granted the all-users subject `optin` on groups that
+   could be joined directly and only `view` on public teams, refusing a self-join against
+   those. Teams use the join-request flow, where an administrator approves."
   [user name]
-  (let [id (group-id user (team-ref name))]
-    (when-not (public-group? user id)
+  (let [group (get-group user (team-ref name))]
+    (when-not (:joinable group)
       (cxu/forbidden (str "team is not open to join: " name)))
-    (add-members (config/groups-admin-user) id [user])))
+    (add-members (config/groups-admin-user) (:id group) [user])))
 
 (defn leave-team
   "Removes the caller from a team, performed as the administrative user."
@@ -540,7 +541,8 @@
                                   :name           name
                                   :display_name   name
                                   :description    description
-                                  :members_public (members-public? public_privileges)})]
+                                  :members_public (members-public? public_privileges)
+                                  :joinable       (joinable? public_privileges)})]
     (when (seq public_privileges)
       (grant-permission user (:id group) "group" public-subject "read"))
     (format-group group)))
@@ -592,13 +594,14 @@
     (remove-members user id members)))
 
 (defn join-community
-  "Adds the caller to a public community, performed as the administrative user. Communities
-   carried `optin` in Grouper, so unlike teams this matches the old behavior. See join-team."
+  "Adds the caller to a community that is open to join, performed as the administrative user.
+   Communities carried `optin` in Grouper, so in practice this admits the same set as before.
+   See join-team."
   [user name]
-  (let [id (group-id user (community-ref name))]
-    (when-not (public-group? user id)
+  (let [group (get-group user (community-ref name))]
+    (when-not (:joinable group)
       (cxu/forbidden (str "community is not open to join: " name)))
-    (add-members (config/groups-admin-user) id [user])))
+    (add-members (config/groups-admin-user) (:id group) [user])))
 
 (defn leave-community
   "Removes the caller from a community, performed as the administrative user."

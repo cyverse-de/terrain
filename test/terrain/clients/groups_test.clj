@@ -276,8 +276,12 @@
          (json-response {:subject {:subject_id "GrouperAll" :subject_type "group"} :level "read"})}
         (let [result (groups/add-team "alice" {:name "t1" :description "d" :public_privileges ["view"]})]
           (is (= {:group_type "team" :owner "alice" :name "t1" :display_name "t1" :description "d"
-                  :members_public false}
+                  :members_public false :joinable false}
                  @captured))
+          (testing "`view` neither exposes members nor admits anyone"
+            ;; Grouper refused a self-join on a view-only team; those go through
+            ;; the join-request flow for an administrator to approve.
+            (is (false? (:joinable @captured))))
           (testing "`view` makes the team discoverable without exposing its members"
             ;; This is the case the DE actually uses for public teams. Marking it
             ;; members_public would publish the membership of all 183 of them.
@@ -363,24 +367,24 @@
     (is (= "bob" (:subject_id (first (:results (groups/remove-team-members "alice" "alice:t1" ["bob"]))))))))
 
 (deftest join-team-test
-  (with-fake-routes-in-isolation
-    (merge (team-lookup-route)
-           {{:address (groups-url "groups" "t1" "permissions") :query-params {:user "alice"}}
-            (json-response {:permissions [{:subject {:subject_id "GrouperAll" :subject_type "group"} :level "read"}]})
-            {:address (groups-url "groups" "t1" "members") :query-params {:user "de_grouper"}}
-            (json-response {:results [{:subject_id "alice" :success true :source_id "ldap" :subject_name "Alice"}]})})
-    (let [{:keys [results]} (groups/join-team "alice" "alice:t1")]
-      (testing "joining a public team adds the caller as a member"
-        (is (= "alice" (:subject_id (first results))))
-        (is (true? (:success (first results))))))))
+  (testing "a team that carries optin can be joined directly"
+    (with-fake-routes-in-isolation
+      (merge (team-lookup-route :group (assoc team-group :joinable true))
+             {{:address (groups-url "groups" "t1" "members") :query-params {:user "de_grouper"}}
+              (json-response {:results [{:subject_id "alice" :success true :source_id "ldap" :subject_name "Alice"}]})})
+      (let [{:keys [results]} (groups/join-team "alice" "alice:t1")]
+        (testing "the caller is added as a member"
+          (is (= "alice" (:subject_id (first results))))
+          (is (true? (:success (first results))))))))
 
-(deftest join-non-public-team-test
-  (with-fake-routes-in-isolation
-    (merge (team-lookup-route)
-           {{:address (groups-url "groups" "t1" "permissions") :query-params {:user "alice"}}
-            (json-response {:permissions [{:subject {:subject_id "alice" :subject_type "user"} :level "own"}]})})
-    (testing "a team without the public grant cannot be joined"
-      (is (= ::cx/forbidden (error-type (groups/join-team "alice" "alice:t1")))))))
+  (testing "a public team without optin is refused, as Grouper refused it"
+    ;; Public teams carry `view` alone. Admitting anyone who can see one would
+    ;; bypass the join-request flow, where an administrator approves.
+    (with-fake-routes-in-isolation
+      (team-lookup-route :group (assoc team-group :joinable false))
+      (is (= :clojure-commons.exception/forbidden
+             (try+ (groups/join-team "alice" "alice:t1") nil
+                   (catch [:type :clojure-commons.exception/forbidden] {:keys [type]} type)))))))
 
 (deftest leave-team-test
   (with-fake-routes-in-isolation
@@ -447,10 +451,10 @@
 
 ;; Communities.
 
-(defn- community-lookup-route []
+(defn- community-lookup-route [& {:keys [group] :or {group community-group}}]
   {{:address (groups-url "groups" "lookup")
     :query-params {:user "alice" :group_type "community" :name "biology"}}
-   (json-response community-group)})
+   (json-response group)})
 
 (deftest get-communities-test
   (with-fake-routes-in-isolation
@@ -497,7 +501,7 @@
                                                   :public_privileges ["read" "optin"]})]
         (testing "a community is created with no owner, since it belongs to no user namespace"
           (is (= {:group_type "community" :name "biology" :display_name "biology" :description "d"
-                  :members_public true}
+                  :members_public true :joinable true}
                  @captured)))
         (testing "read among the public privileges makes the member list public"
           ;; Grouper gave public communities `read` and public teams `view`; the
@@ -570,15 +574,22 @@
     (is (= ["alice"] (mapv :id (:members (groups/get-community-admins "alice" "biology")))))))
 
 (deftest join-community-test
-  (with-fake-routes-in-isolation
-    (merge (community-lookup-route)
-           {{:address (groups-url "groups" "c1" "permissions") :query-params {:user "alice"}}
-            (json-response {:permissions [{:subject {:subject_id "GrouperAll" :subject_type "group"} :level "read"}]})
-            {:address (groups-url "groups" "c1" "members") :query-params {:user "de_grouper"}}
-            (json-response {:results [{:subject_id "alice" :success true :source_id "ldap" :subject_name "Alice"}]})})
-    (let [{:keys [results]} (groups/join-community "alice" "biology")]
-      (testing "joining a public community adds the caller as a member"
-        (is (= "alice" (:subject_id (first results))))))))
+  (testing "a community that carries optin can be joined directly"
+    ;; Communities carried read+optin in Grouper, so this matches the old behavior.
+    (with-fake-routes-in-isolation
+      (merge (community-lookup-route :group (assoc community-group :joinable true))
+             {{:address (groups-url "groups" "c1" "members") :query-params {:user "de_grouper"}}
+              (json-response {:results [{:subject_id "alice" :success true :source_id "ldap" :subject_name "Alice"}]})})
+      (let [{:keys [results]} (groups/join-community "alice" "biology")]
+        (testing "the caller is added as a member"
+          (is (= "alice" (:subject_id (first results))))))))
+
+  (testing "a community without optin is refused"
+    (with-fake-routes-in-isolation
+      (community-lookup-route :group (assoc community-group :joinable false))
+      (is (= :clojure-commons.exception/forbidden
+             (try+ (groups/join-community "alice" "biology") nil
+                   (catch [:type :clojure-commons.exception/forbidden] {:keys [type]} type)))))))
 
 (deftest leave-community-test
   (with-fake-routes-in-isolation
