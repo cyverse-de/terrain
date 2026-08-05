@@ -59,7 +59,7 @@
   "Looks up the user with the given username."
   [username]
   (try+
-   (if-let [subject (subjects/lookup-subject (cfg/grouper-user) username)]
+   (if-let [subject (subjects/lookup-subject username)]
      {:username      (str (:id subject) "@" (cfg/uid-domain))
       :password      nil
       :email         (:email subject)

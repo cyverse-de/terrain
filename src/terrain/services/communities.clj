@@ -1,8 +1,8 @@
 (ns terrain.services.communities
   (:require [terrain.clients.grouping :as ipg]
+            [terrain.clients.grouping.subjects :as subjects]
             [terrain.clients.permissions :as perms-client]
-            [terrain.clients.notifications :as cn]
-            [terrain.util.config :as config]))
+            [terrain.clients.notifications :as cn]))
 
 (defn get-communities [{user :shortUsername} params]
   (ipg/get-communities user (select-keys params [:search :member :details])))
@@ -44,22 +44,22 @@
   (ipg/leave-community user name))
 
 (defn admin-get-communities [params]
-  (ipg/admin-get-communities (config/grouper-user) params))
+  (ipg/admin-get-communities (subjects/admin-user) params))
 
 (defn admin-get-community [name]
-  (get-community {:shortUsername (config/grouper-user)} name))
+  (get-community {:shortUsername (subjects/admin-user)} name))
 
 (defn admin-update-community [name params body]
-  (update-community {:shortUsername (config/grouper-user)} name params body))
+  (update-community {:shortUsername (subjects/admin-user)} name params body))
 
 (defn admin-delete-community [name]
-  (delete-community {:shortUsername (config/grouper-user)} name))
+  (delete-community {:shortUsername (subjects/admin-user)} name))
 
 (defn admin-get-community-admins [name]
-  (get-community-admins {:shortUsername (config/grouper-user)} name))
+  (get-community-admins {:shortUsername (subjects/admin-user)} name))
 
 (defn admin-add-community-admins [name params]
-  (add-community-admins {:shortUsername (config/grouper-user)} name params))
+  (add-community-admins {:shortUsername (subjects/admin-user)} name params))
 
 (defn admin-remove-community-admins [name params]
-  (remove-community-admins {:shortUsername (config/grouper-user)} name params))
+  (remove-community-admins {:shortUsername (subjects/admin-user)} name params))

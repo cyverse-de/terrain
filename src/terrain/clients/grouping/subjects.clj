@@ -12,7 +12,9 @@
   []
   (= (config/groups-backend) "groups"))
 
-(defn- admin-user
+(defn admin-user
+  "The administrative account for the active group backend. Callers acting as the group
+   administrator must use this rather than a specific backend's configured account."
   []
   (if (new-backend?)
     (config/groups-admin-user)
