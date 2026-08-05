@@ -275,7 +275,13 @@
          {:address (groups-url "groups" "t1" "permissions" "group" "GrouperAll") :query-params {:user "alice"}}
          (json-response {:subject {:subject_id "GrouperAll" :subject_type "group"} :level "read"})}
         (let [result (groups/add-team "alice" {:name "t1" :description "d" :public_privileges ["view"]})]
-          (is (= {:group_type "team" :owner "alice" :name "t1" :display_name "t1" :description "d"} @captured))
+          (is (= {:group_type "team" :owner "alice" :name "t1" :display_name "t1" :description "d"
+                  :members_public false}
+                 @captured))
+          (testing "`view` makes the team discoverable without exposing its members"
+            ;; This is the case the DE actually uses for public teams. Marking it
+            ;; members_public would publish the membership of all 183 of them.
+            (is (false? (:members_public @captured))))
           (is (= "alice:t1" (:name result)))
           (is (= "t1" (:id result)))))))
   (testing "a non-public team makes no permission grant"
@@ -490,7 +496,14 @@
       (let [result (groups/add-community "alice" {:name "biology" :description "d"
                                                   :public_privileges ["read" "optin"]})]
         (testing "a community is created with no owner, since it belongs to no user namespace"
-          (is (= {:group_type "community" :name "biology" :display_name "biology" :description "d"} @captured)))
+          (is (= {:group_type "community" :name "biology" :display_name "biology" :description "d"
+                  :members_public true}
+                 @captured)))
+        (testing "read among the public privileges makes the member list public"
+          ;; Grouper gave public communities `read` and public teams `view`; the
+          ;; permissions service cannot express the difference, so it rides on the
+          ;; group. Dropping it would expose every public team's membership.
+          (is (true? (:members_public @captured))))
         (is (= "biology" (:name result)))
         (is (= "c1" (:id result)))))))
 

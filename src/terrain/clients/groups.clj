@@ -389,15 +389,24 @@
                                                  :member     member
                                                  :search     search}))})
 
+;; Grouper separated `view` -- the group is discoverable and joinable -- from `read`, which
+;; also exposes the member list, and both arrive here in public_privileges. The permissions
+;; service has no level weaker than read, so the public marker is one grant either way and
+;; the member-list half is carried by the group's own members_public flag.
+(defn- members-public?
+  [public-privileges]
+  (boolean (some #{"read"} public-privileges)))
+
 (defn add-team
   "Creates a team owned by the caller, optionally granting all DE users read access when the
    team is public."
   [user {:keys [name description public_privileges] :or {public_privileges []}}]
-  (let [group (create-group user {:group_type   type-team
-                                  :owner        user
-                                  :name         name
-                                  :display_name name
-                                  :description  description})]
+  (let [group (create-group user {:group_type     type-team
+                                  :owner          user
+                                  :name           name
+                                  :display_name   name
+                                  :description    description
+                                  :members_public (members-public? public_privileges)})]
     (when (seq public_privileges)
       (grant-permission user (:id group) "group" public-subject "read"))
     (format-group group)))
@@ -512,10 +521,11 @@
 (defn add-community
   "Creates a community, granting all DE users read when it is public."
   [user {:keys [name description public_privileges] :or {public_privileges []}}]
-  (let [group (create-group user {:group_type   type-community
-                                  :name         name
-                                  :display_name name
-                                  :description  description})]
+  (let [group (create-group user {:group_type     type-community
+                                  :name           name
+                                  :display_name   name
+                                  :description    description
+                                  :members_public (members-public? public_privileges)})]
     (when (seq public_privileges)
       (grant-permission user (:id group) "group" public-subject "read"))
     (format-group group)))
