@@ -476,10 +476,33 @@
       (cxu/forbidden (str "team is not open to join: " name)))
     (add-members (config/groups-admin-user) (:id group) [user])))
 
+(defn- revoke-membership-read
+  "Revokes a subject's read permission on a group, and only read.
+
+   The DE granted every member `optout` and `read` together, so leaving revoked both and an
+   ex-member kept nothing. The importer turns that `read` into an explicit grant, which
+   removing membership does not touch -- so without this an ex-member keeps read access to the
+   group and its member list.
+
+   Deliberately narrow: Grouper's leave revoked only the member privileges, so someone holding
+   `admin` who left a group kept administering it. Revoking whatever level is present would
+   strip owners and admins."
+  [group-id subject-id]
+  (let [admin (config/groups-admin-user)
+        level (->> (group-permissions admin group-id)
+                   (filter #(= subject-id (:subject_id (:subject %))))
+                   first
+                   :level)]
+    (when (= "read" level)
+      (revoke-permission admin group-id "user" subject-id))))
+
 (defn leave-team
-  "Removes the caller from a team, performed as the administrative user."
+  "Removes the caller from a team, performed as the administrative user, and drops the read
+   grant that membership carried."
   [user name]
-  (remove-members (config/groups-admin-user) (group-id user (team-ref name)) [user]))
+  (let [id (group-id user (team-ref name))]
+    (revoke-membership-read id user)
+    (remove-members (config/groups-admin-user) id [user])))
 
 (defn list-team-privileges
   "Lists the privileges granted on a team, translated to the DE privilege vocabulary."
@@ -604,9 +627,12 @@
     (add-members (config/groups-admin-user) (:id group) [user])))
 
 (defn leave-community
-  "Removes the caller from a community, performed as the administrative user."
+  "Removes the caller from a community, performed as the administrative user, and drops the
+   read grant that membership carried. See leave-team."
   [user name]
-  (remove-members (config/groups-admin-user) (group-id user (community-ref name)) [user]))
+  (let [id (group-id user (community-ref name))]
+    (revoke-membership-read id user)
+    (remove-members (config/groups-admin-user) id [user])))
 
 ;; DE user group administration.
 

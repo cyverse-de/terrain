@@ -387,13 +387,37 @@
                    (catch [:type :clojure-commons.exception/forbidden] {:keys [type]} type)))))))
 
 (deftest leave-team-test
-  (with-fake-routes-in-isolation
-    (merge (team-lookup-route)
-           {{:address (groups-url "groups" "t1" "members" "deleter") :query-params {:user "de_grouper"}}
-            (json-response {:results [{:subject_id "alice" :success true :source_id "ldap" :subject_name "Alice"}]})})
-    (let [{:keys [results]} (groups/leave-team "alice" "alice:t1")]
-      (testing "leaving removes the caller from the team"
-        (is (= "alice" (:subject_id (first results))))))))
+  (testing "leaving drops the read grant that membership carried"
+    ;; The DE granted every member optout+read, so Grouper's leave revoked both.
+    ;; The importer turns that read into an explicit grant, which removing
+    ;; membership does not touch -- an ex-member would keep read on the group
+    ;; and its member list.
+    (let [revoked (atom nil)]
+      (with-fake-routes-in-isolation
+        (merge (team-lookup-route)
+               {{:address (groups-url "groups" "t1" "permissions") :query-params {:user "de_grouper"}}
+                (json-response {:permissions [{:subject {:subject_id "alice" :subject_type "user"} :level "read"}]})
+                {:address (groups-url "groups" "t1" "permissions" "user" "alice")
+                 :query-params {:user "de_grouper"}}
+                (fn [_] (reset! revoked "alice") {:status 200 :headers {} :body "{}"})
+                {:address (groups-url "groups" "t1" "members" "deleter") :query-params {:user "de_grouper"}}
+                (json-response {:results [{:subject_id "alice" :success true :source_id "ldap" :subject_name "Alice"}]})})
+        (groups/leave-team "alice" "alice:t1")
+        (is (= "alice" @revoked) "the member's read grant must be revoked"))))
+
+  (testing "leaving does not strip an admin"
+    ;; Grouper revoked only the member privileges, so an admin who left kept
+    ;; administering the group. Revoking whatever level is present would
+    ;; silently demote owners and admins.
+    (with-fake-routes-in-isolation
+      (merge (team-lookup-route)
+             {{:address (groups-url "groups" "t1" "permissions") :query-params {:user "de_grouper"}}
+              (json-response {:permissions [{:subject {:subject_id "alice" :subject_type "user"} :level "admin"}]})
+              {:address (groups-url "groups" "t1" "members" "deleter") :query-params {:user "de_grouper"}}
+              (json-response {:results [{:subject_id "alice" :success true :source_id "ldap" :subject_name "Alice"}]})})
+      ;; The revoke route is deliberately unregistered: under isolation, calling
+      ;; it would fail the test.
+      (is (some? (groups/leave-team "alice" "alice:t1"))))))
 
 (deftest list-team-privileges-test
   (with-fake-routes-in-isolation
@@ -594,7 +618,9 @@
 (deftest leave-community-test
   (with-fake-routes-in-isolation
     (merge (community-lookup-route)
-           {{:address (groups-url "groups" "c1" "members" "deleter") :query-params {:user "de_grouper"}}
+           {{:address (groups-url "groups" "c1" "permissions") :query-params {:user "de_grouper"}}
+            (json-response {:permissions []})
+            {:address (groups-url "groups" "c1" "members" "deleter") :query-params {:user "de_grouper"}}
             (json-response {:results [{:subject_id "alice" :success true :source_id "ldap" :subject_name "Alice"}]})})
     (is (= "alice" (:subject_id (first (:results (groups/leave-community "alice" "biology"))))))))
 
