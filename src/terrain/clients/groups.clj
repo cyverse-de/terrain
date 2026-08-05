@@ -498,13 +498,15 @@
       (revoke-permission admin group-id "user" subject-id))))
 
 (defn leave-team
-  "Removes the caller from a team, performed as the administrative user, and drops the read
-   grant that membership carried."
+  "Removes the caller from a team, performed as the administrative user, then drops the read
+   grant that membership carried. Membership goes first: if the removal fails, the caller is
+   still an ordinary member rather than a member whose read grant was already revoked."
   [user name]
   (reject-admin-user [user])
-  (let [id (group-id user (team-ref name))]
+  (let [id      (group-id user (team-ref name))
+        results (remove-members (config/groups-admin-user) id [user])]
     (revoke-membership-read id user)
-    (remove-members (config/groups-admin-user) id [user])))
+    results))
 
 (defn list-team-privileges
   "Lists the privileges granted on a team, translated to the DE privilege vocabulary."
@@ -630,13 +632,14 @@
     (add-members (config/groups-admin-user) (:id group) [user])))
 
 (defn leave-community
-  "Removes the caller from a community, performed as the administrative user, and drops the
-   read grant that membership carried. See leave-team."
+  "Removes the caller from a community, performed as the administrative user, then drops the
+   read grant that membership carried. See leave-team for the ordering."
   [user name]
   (reject-admin-user [user])
-  (let [id (group-id user (community-ref name))]
+  (let [id      (group-id user (community-ref name))
+        results (remove-members (config/groups-admin-user) id [user])]
     (revoke-membership-read id user)
-    (remove-members (config/groups-admin-user) id [user])))
+    results))
 
 ;; DE user group administration.
 

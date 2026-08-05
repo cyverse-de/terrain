@@ -392,18 +392,20 @@
     ;; The importer turns that read into an explicit grant, which removing
     ;; membership does not touch -- an ex-member would keep read on the group
     ;; and its member list.
-    (let [revoked (atom nil)]
+    (let [calls (atom [])]
       (with-fake-routes-in-isolation
         (merge (team-lookup-route)
                {{:address (groups-url "groups" "t1" "permissions") :query-params {:user "de_grouper"}}
                 (json-response {:permissions [{:subject {:subject_id "alice" :subject_type "user"} :level "read"}]})
                 {:address (groups-url "groups" "t1" "permissions" "user" "alice")
                  :query-params {:user "de_grouper"}}
-                (fn [_] (reset! revoked "alice") {:status 200 :headers {} :body "{}"})
+                (fn [_] (swap! calls conj :revoke) {:status 200 :headers {} :body "{}"})
                 {:address (groups-url "groups" "t1" "members" "deleter") :query-params {:user "de_grouper"}}
-                (json-response {:results [{:subject_id "alice" :success true :source_id "ldap" :subject_name "Alice"}]})})
+                (fn [_] (swap! calls conj :remove)
+                  ((json-response {:results [{:subject_id "alice" :success true :source_id "ldap" :subject_name "Alice"}]}) nil))})
         (groups/leave-team "alice" "alice:t1")
-        (is (= "alice" @revoked) "the member's read grant must be revoked"))))
+        (is (= [:remove :revoke] @calls)
+            "membership must go before the read grant, so a failed removal cannot leave a read-revoked member"))))
 
   (testing "leaving does not strip an admin"
     ;; Grouper revoked only the member privileges, so an admin who left kept
@@ -616,13 +618,19 @@
                    (catch [:type :clojure-commons.exception/forbidden] {:keys [type]} type)))))))
 
 (deftest leave-community-test
-  (with-fake-routes-in-isolation
-    (merge (community-lookup-route)
-           {{:address (groups-url "groups" "c1" "permissions") :query-params {:user "de_grouper"}}
-            (json-response {:permissions []})
-            {:address (groups-url "groups" "c1" "members" "deleter") :query-params {:user "de_grouper"}}
-            (json-response {:results [{:subject_id "alice" :success true :source_id "ldap" :subject_name "Alice"}]})})
-    (is (= "alice" (:subject_id (first (:results (groups/leave-community "alice" "biology"))))))))
+  (let [calls (atom [])]
+    (with-fake-routes-in-isolation
+      (merge (community-lookup-route)
+             {{:address (groups-url "groups" "c1" "permissions") :query-params {:user "de_grouper"}}
+              (json-response {:permissions [{:subject {:subject_id "alice" :subject_type "user"} :level "read"}]})
+              {:address (groups-url "groups" "c1" "permissions" "user" "alice") :query-params {:user "de_grouper"}}
+              (fn [_] (swap! calls conj :revoke) {:status 200 :headers {} :body "{}"})
+              {:address (groups-url "groups" "c1" "members" "deleter") :query-params {:user "de_grouper"}}
+              (fn [_] (swap! calls conj :remove)
+                ((json-response {:results [{:subject_id "alice" :success true :source_id "ldap" :subject_name "Alice"}]}) nil))})
+      (is (= "alice" (:subject_id (first (:results (groups/leave-community "alice" "biology"))))))
+      (testing "membership is removed before the read grant is revoked"
+        (is (= [:remove :revoke] @calls))))))
 
 ;; DE user group administration.
 
