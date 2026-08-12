@@ -1,5 +1,5 @@
 (ns terrain.services.collaborator-lists
-  (:require [terrain.clients.iplant-groups :as ipg]
+  (:require [terrain.clients.grouping :as ipg]
             [terrain.clients.permissions :as perms-client]))
 
 (defn get-collaborator-lists [{user :shortUsername} {:keys [search details]}]

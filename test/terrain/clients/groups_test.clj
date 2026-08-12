@@ -1,0 +1,746 @@
+(ns terrain.clients.groups-test
+  (:require [cemerick.url :as curl]
+            [cheshire.core :as json]
+            [clj-http.fake :refer [with-fake-routes-in-isolation]]
+            [clojure.test :refer :all]
+            [clojure-commons.exception :as cx]
+            [slingshot.slingshot :refer [try+]]
+            [terrain.clients.groups :as groups]
+            [terrain.test-fixtures :as test-fixtures]
+            [terrain.util.config :as config]))
+
+(defmacro ^:private error-type
+  "Returns the error type thrown by `body`, or nil if it threw nothing."
+  [& body]
+  `(try+ ~@body nil (catch map? e# (:type e#))))
+
+(use-fixtures :once test-fixtures/with-test-config test-fixtures/with-test-user)
+
+(defn- groups-url [& components]
+  (str (apply curl/url (config/groups-base) components)))
+
+(defn- json-response [body]
+  (fn [_] {:status 200 :headers {"Content-Type" "application/json"} :body (json/encode body)}))
+
+(defn- not-found []
+  (fn [_] {:status 404 :headers {"Content-Type" "application/json"} :body "{}"}))
+
+(defn- captured-body
+  "Fake route that records the decoded request body in `capture` and responds with `body`."
+  [capture body]
+  (fn [req]
+    (reset! capture (json/decode (slurp (:body req)) true))
+    {:status 200 :headers {"Content-Type" "application/json"} :body (json/encode body)}))
+
+(def ^:private alice
+  {:id "alice" :name "alice" :first_name "Alice" :last_name "Anderson"
+   :email "alice@example.org" :institution "CyVerse" :source_id "ldap"})
+
+;; Groups as the service returns them: structured, with no hierarchy packed into the name.
+
+(def ^:private cl-group
+  {:id "g1" :group_type "collaborator_list" :owner "alice" :name "friends"
+   :display_name "friends" :description "buddies"})
+
+(def ^:private team-group
+  {:id "t1" :group_type "team" :owner "alice" :name "t1" :display_name "t1" :description "d"})
+
+(def ^:private community-group
+  {:id "c1" :group_type "community" :name "biology" :display_name "biology" :description "d"})
+
+;; Subject search and lookup.
+
+(deftest find-subjects-test
+  (with-fake-routes-in-isolation
+    {{:address (groups-url "subjects") :query-params {:user "ipcdev" :search "ali"}}
+     (json-response {:subjects [alice {:id "de_grouper" :name "de_grouper"}]})}
+    (let [{:keys [subjects]} (groups/find-subjects "ipcdev" "ali")]
+      (testing "the administrative user is filtered out of the results"
+        (is (= 1 (count subjects)))
+        (is (= "alice" (:id (first subjects)))))
+      (testing "each subject gets a display_name equal to its name"
+        (is (= "alice" (:display_name (first subjects))))))))
+
+(deftest lookup-subject-test
+  (with-fake-routes-in-isolation
+    {{:address (groups-url "subjects" "alice") :query-params {:user "de_grouper"}}
+     (json-response alice)}
+    (testing "a found subject is returned as-is"
+      (is (= alice (groups/lookup-subject "de_grouper" "alice")))))
+  (with-fake-routes-in-isolation
+    {{:address (groups-url "subjects" "nobody") :query-params {:user "de_grouper"}}
+     (not-found)}
+    (testing "a missing subject yields nil rather than an error"
+      (is (nil? (groups/lookup-subject "de_grouper" "nobody"))))))
+
+(deftest lookup-subjects-test
+  (let [captured (atom nil)]
+    (with-fake-routes-in-isolation
+      {{:address (groups-url "subjects" "lookup") :query-params {:user "de_grouper"}}
+       (captured-body captured {:subjects [alice]})}
+      (testing "bulk lookup posts the subject ids and returns the subjects list"
+        (is (= [alice] (:subjects (groups/lookup-subjects "de_grouper" ["alice" "ghost"]))))
+        (is (= {:subject_ids ["alice" "ghost"]} @captured))))))
+
+(deftest lookup-subject-add-empty-test
+  (with-fake-routes-in-isolation
+    {{:address (groups-url "subjects" "ghost") :query-params {:user "de_grouper"}}
+     (not-found)}
+    (testing "a missing subject yields an empty user-info block keyed by the username"
+      (is (= {:id "ghost" :name "" :first_name "" :last_name "" :email "" :institution "" :source_id ""}
+             (groups/lookup-subject-add-empty "de_grouper" "ghost"))))))
+
+;; The external group contract. Every response passes through one formatter, so this is the
+;; single place the shape terrain promises its callers is asserted.
+
+(deftest format-group-contract-test
+  (with-fake-routes-in-isolation
+    {{:address (groups-url "subjects" "bob" "groups") :query-params {:user "de_grouper"}}
+     (json-response {:groups [team-group community-group]})}
+    (let [{:keys [groups]} (groups/list-groups-for-user "bob" nil)
+          [team community] groups]
+      (testing "a team's external name carries its owner prefix"
+        (is (= "alice:t1" (:name team))))
+      (testing "other group types are named by their short name alone"
+        (is (= "biology" (:name community))))
+      (testing "the contract fields are exactly those the group schema defines"
+        (is (= #{:id :name :type :id_index :description :display_extension :display_name}
+               (set (keys team)))))
+      (testing "the service's structured fields are not leaked to callers"
+        (is (not-any? #(contains? team %) [:group_type :owner :created_at :updated_at])))
+      (testing "type and id_index are synthesized, and display_extension is the short name"
+        (is (= "group" (:type team)))
+        (is (= "" (:id_index team)))
+        (is (= "t1" (:display_extension team)))))))
+
+;; Collaborator lists.
+
+(defn- cl-lookup-route []
+  {{:address (groups-url "groups" "lookup")
+    :query-params {:user "alice" :group_type "collaborator_list" :owner "alice" :name "friends"}}
+   (json-response cl-group)})
+
+(deftest get-collaborator-lists-test
+  (testing "listing asks the service for the caller's own lists"
+    (with-fake-routes-in-isolation
+      {{:address (groups-url "groups")
+        :query-params {:user "alice" :group_type "collaborator_list" :owner "alice" :limit 1000 :offset 0}}
+       (json-response {:groups [cl-group]})}
+      (let [{:keys [groups]} (groups/get-collaborator-lists "alice" nil)]
+        (is (= ["friends"] (mapv :name groups)))
+        (is (= "g1" (:id (first groups)))))))
+  (testing "a search is delegated to the service rather than filtered in terrain"
+    (with-fake-routes-in-isolation
+      {{:address (groups-url "groups")
+        :query-params {:user "alice" :group_type "collaborator_list" :owner "alice" :search "fri"
+                       :limit 1000 :offset 0}}
+       (json-response {:groups [cl-group]})}
+      (is (= ["friends"] (mapv :name (:groups (groups/get-collaborator-lists "alice" nil "fri"))))))))
+
+(deftest add-collaborator-list-test
+  (let [captured (atom nil)]
+    (with-fake-routes-in-isolation
+      {{:address (groups-url "groups") :query-params {:user "alice"}}
+       (captured-body captured cl-group)}
+      (let [result (groups/add-collaborator-list "alice" {:name "friends" :description "buddies"})]
+        (testing "the group is created by structured identity, with no name packing"
+          (is (= {:group_type "collaborator_list" :owner "alice" :name "friends"
+                  :display_name "friends" :description "buddies"}
+                 @captured)))
+        (testing "the created list is returned in the external contract shape"
+          (is (= "friends" (:name result)))
+          (is (= "g1" (:id result))))))))
+
+(deftest get-collaborator-list-test
+  (with-fake-routes-in-isolation
+    (cl-lookup-route)
+    (testing "get resolves the list by identity in a single round trip"
+      (let [result (groups/get-collaborator-list "alice" "friends")]
+        (is (= "friends" (:name result)))
+        (is (= "g1" (:id result)))))))
+
+(deftest get-collaborator-list-not-found-test
+  (with-fake-routes-in-isolation
+    {{:address (groups-url "groups" "lookup")
+      :query-params {:user "alice" :group_type "collaborator_list" :owner "alice" :name "ghost"}}
+     (not-found)}
+    (testing "a missing list is reported as a 404 rather than an upstream error"
+      (is (= ::cx/not-found (error-type (groups/get-collaborator-list "alice" "ghost")))))))
+
+(deftest update-collaborator-list-test
+  (let [captured (atom nil)]
+    (with-fake-routes-in-isolation
+      (merge (cl-lookup-route)
+             {{:address (groups-url "groups" "g1") :query-params {:user "alice"}}
+              (captured-body captured (assoc cl-group :name "pals" :display_name "pals"))})
+      (let [result (groups/update-collaborator-list "alice" "friends" {:name "pals"})]
+        (testing "only the fields being changed are sent"
+          (is (= {:name "pals" :display_name "pals"} @captured)))
+        (is (= "pals" (:name result)))))))
+
+(deftest delete-collaborator-list-test
+  (with-fake-routes-in-isolation
+    (merge (cl-lookup-route)
+           {{:address (groups-url "groups" "g1") :query-params {:user "alice"}}
+            {:delete (json-response cl-group)}})
+    (testing "delete returns the removed group including its id"
+      (let [result (groups/delete-collaborator-list "alice" "friends")]
+        (is (= "g1" (:id result)))
+        (is (= "friends" (:name result)))))))
+
+(deftest get-collaborator-list-members-test
+  (with-fake-routes-in-isolation
+    (merge (cl-lookup-route)
+           {{:address (groups-url "groups" "g1" "members") :query-params {:user "alice"}}
+            (json-response {:members [alice {:id "de_grouper" :name "de_grouper"}]})})
+    (let [{:keys [members]} (groups/get-collaborator-list-members "alice" "friends")]
+      (testing "members exclude the admin user and get a display_name"
+        (is (= 1 (count members)))
+        (is (= "alice" (:id (first members))))
+        (is (= "alice" (:display_name (first members))))))))
+
+(deftest add-collaborator-list-members-test
+  (with-fake-routes-in-isolation
+    (merge (cl-lookup-route)
+           {{:address (groups-url "groups" "g1" "members") :query-params {:user "alice"}}
+            (json-response {:results [{:subject_id "bob" :success true :source_id "ldap" :subject_name "Bob"}
+                                      {:subject_id "carol" :success true :source_id "" :subject_name ""}]})})
+    (let [{:keys [results]} (groups/add-collaborator-list-members "alice" "friends" ["bob" "carol"])
+          by-id             (into {} (map (juxt :subject_id identity)) results)]
+      (testing "membership results pass through source_id and subject_name from the service"
+        (is (= {:subject_id "bob" :success true :source_id "ldap" :subject_name "Bob"}
+               (get by-id "bob"))))
+      (testing "a blank source_id or subject_name is defaulted to satisfy the schema"
+        (is (= {:subject_id "carol" :success true :source_id "unknown" :subject_name "carol"}
+               (get by-id "carol")))))))
+
+(deftest add-collaborator-list-members-creates-missing-list-test
+  (let [created (atom nil)]
+    (with-fake-routes-in-isolation
+      {{:address (groups-url "groups" "lookup")
+        :query-params {:user "alice" :group_type "collaborator_list" :owner "alice" :name "friends"}}
+       (not-found)
+       {:address (groups-url "groups") :query-params {:user "alice"}}
+       (captured-body created cl-group)
+       {:address (groups-url "groups" "g1" "members") :query-params {:user "alice"}}
+       (json-response {:results [{:subject_id "bob" :success true :source_id "ldap" :subject_name "Bob"}]})}
+      (let [{:keys [results]} (groups/add-collaborator-list-members "alice" "friends" ["bob"])]
+        (testing "a list that does not exist yet is created rather than 404ing"
+          (is (= "friends" (:name @created)))
+          (is (= "bob" (:subject_id (first results)))))))))
+
+(deftest remove-collaborator-list-members-test
+  (with-fake-routes-in-isolation
+    (merge (cl-lookup-route)
+           {{:address (groups-url "groups" "g1" "members" "deleter") :query-params {:user "alice"}}
+            (json-response {:results [{:subject_id "bob" :success true :source_id "ldap" :subject_name "Bob"}]})})
+    (is (= "bob" (:subject_id (first (:results (groups/remove-collaborator-list-members
+                                                "alice" "friends" ["bob"]))))))))
+
+;; Teams. The external name is `<owner>:<short>`; nothing else knows that format.
+
+(defn- team-lookup-route [& {:keys [owner name group] :or {owner "alice" name "t1" group team-group}}]
+  {{:address (groups-url "groups" "lookup")
+    :query-params {:user "alice" :group_type "team" :owner owner :name name}}
+   (json-response group)})
+
+(deftest get-teams-test
+  (testing "listing asks for teams by type"
+    (with-fake-routes-in-isolation
+      {{:address (groups-url "groups") :query-params {:user "alice" :group_type "team" :limit 1000 :offset 0}}
+       (json-response {:groups [team-group]})}
+      (let [{:keys [groups]} (groups/get-teams "alice" {})]
+        (is (= ["alice:t1"] (mapv :name groups)))
+        (is (= "group" (:type (first groups)))))))
+  (testing "a creator filter becomes an exact owner match, so `bob` cannot match `bobby`"
+    ;; The old client filtered on the `<creator>:` string prefix, which matched any creator
+    ;; whose name started with the requested one.
+    (with-fake-routes-in-isolation
+      {{:address (groups-url "groups")
+        :query-params {:user "alice" :group_type "team" :owner "bob" :limit 1000 :offset 0}}
+       (json-response {:groups []})}
+      (is (= [] (:groups (groups/get-teams "alice" {:creator "bob"}))))))
+  (testing "a member filter is delegated to the service"
+    (with-fake-routes-in-isolation
+      {{:address (groups-url "groups")
+        :query-params {:user "alice" :group_type "team" :member "bob" :limit 1000 :offset 0}}
+       (json-response {:groups [team-group]})}
+      (is (= ["alice:t1"] (mapv :name (:groups (groups/get-teams "alice" {:member "bob"})))))))
+  (testing "a search is delegated to the service"
+    (with-fake-routes-in-isolation
+      {{:address (groups-url "groups")
+        :query-params {:user "alice" :group_type "team" :search "t" :limit 1000 :offset 0}}
+       (json-response {:groups [team-group]})}
+      (is (= ["alice:t1"] (mapv :name (:groups (groups/get-teams "alice" {:search "t"}))))))))
+
+(deftest get-teams-details-test
+  (testing "details=true attaches creator info resolved by one bulk subject lookup"
+    (let [lookups (atom [])
+          team2   {:id "t2" :group_type "team" :owner "bob" :name "t2"}]
+      (with-fake-routes-in-isolation
+        {{:address (groups-url "groups") :query-params {:user "alice" :group_type "team" :limit 1000 :offset 0}}
+         (json-response {:groups [(assoc team-group :created_at "2026-01-15T10:20:30Z") team2]})
+         {:address (groups-url "subjects" "lookup") :query-params {:user "alice"}}
+         (fn [req]
+           (swap! lookups conj (json/decode (slurp (:body req)) true))
+           ((json-response {:subjects [{:id "alice" :name "Alice Anderson" :source_id "ldap"}]}) nil))}
+        (let [{:keys [groups]}  (groups/get-teams "alice" {:details true})
+              [detail1 detail2] (mapv :detail groups)]
+          (testing "the distinct owners are resolved with a single lookup request"
+            (is (= [{:subject_ids ["alice" "bob"]}] @lookups)))
+          (testing "the creator's id and resolved display name land in :detail"
+            (is (= "alice" (:created_by detail1)))
+            (is (= "Alice Anderson" (get-in detail1 [:created_by_detail :name])))
+            (is (= "ldap" (get-in detail1 [:created_by_detail :source_id]))))
+          (testing "the creation time is reported in ms since the epoch"
+            (is (= (.toEpochMilli (java.time.Instant/parse "2026-01-15T10:20:30Z"))
+                   (:created_at detail1))))
+          (testing "detail carries only schema-legal keys"
+            (is (= #{:created_at :created_by :created_by_detail :has_composite :is_composite_factor}
+                   (set (keys detail1))))
+            (is (false? (:has_composite detail1)))
+            (is (false? (:is_composite_factor detail1))))
+          (testing "an owner the lookup cannot resolve falls back to the bare id"
+            (is (= "bob" (:created_by detail2)))
+            (is (= {:id "bob" :source_id "" :name "bob"} (:created_by_detail detail2))))))))
+  (testing "details=false makes no subject lookup and attaches no detail"
+    ;; Only the listing route is registered: a stray subject lookup fails loudly.
+    (with-fake-routes-in-isolation
+      {{:address (groups-url "groups") :query-params {:user "alice" :group_type "team" :limit 1000 :offset 0}}
+       (json-response {:groups [team-group]})}
+      (is (not (contains? (first (:groups (groups/get-teams "alice" {:details false}))) :detail))))))
+
+(deftest list-groups-pagination-test
+  (testing "listings page past the service's 1000-group response cap"
+    ;; The service caps one listing response at 1000 groups, so a single unpaged
+    ;; request would silently truncate anything past that bound.
+    (let [page1 (mapv #(assoc team-group :id (str "t" %) :name (str "team" %)) (range 1000))]
+      (with-fake-routes-in-isolation
+        {{:address (groups-url "groups")
+          :query-params {:user "alice" :group_type "team" :limit 1000 :offset 0}}
+         (json-response {:groups page1})
+         {:address (groups-url "groups")
+          :query-params {:user "alice" :group_type "team" :limit 1000 :offset 1000}}
+         (json-response {:groups [(assoc team-group :id "t1000" :name "team1000")]})}
+        (let [{:keys [groups]} (groups/get-teams "alice" {})]
+          (is (= 1001 (count groups)))
+          (is (= "alice:team1000" (:name (last groups)))))))))
+
+(deftest add-team-test
+  (testing "a public team grants the all-users subject read and returns the owner-scoped name"
+    (let [captured (atom nil)]
+      (with-fake-routes-in-isolation
+        {{:address (groups-url "groups") :query-params {:user "alice"}}
+         (captured-body captured team-group)
+         {:address (groups-url "groups" "t1" "permissions" "group" "GrouperAll") :query-params {:user "alice"}}
+         (json-response {:subject {:subject_id "GrouperAll" :subject_type "group"} :level "read"})}
+        (let [result (groups/add-team "alice" {:name "t1" :description "d" :public_privileges ["view"]})]
+          (is (= {:group_type "team" :owner "alice" :name "t1" :display_name "t1" :description "d"
+                  :members_public false :joinable false}
+                 @captured))
+          (testing "`view` neither exposes members nor admits anyone"
+            ;; Grouper refused a self-join on a view-only team; those go through
+            ;; the join-request flow for an administrator to approve.
+            (is (false? (:joinable @captured))))
+          (testing "`view` makes the team discoverable without exposing its members"
+            ;; This is the case the DE actually uses for public teams. Marking it
+            ;; members_public would publish the membership of all 183 of them.
+            (is (false? (:members_public @captured))))
+          (is (= "alice:t1" (:name result)))
+          (is (= "t1" (:id result)))))))
+  (testing "a non-public team makes no permission grant"
+    ;; Only the create route is registered; a permission PUT would fail the isolated routes.
+    (with-fake-routes-in-isolation
+      {{:address (groups-url "groups") :query-params {:user "alice"}}
+       (json-response team-group)}
+      (is (= "alice:t1" (:name (groups/add-team "alice" {:name "t1" :description "d"})))))))
+
+(deftest get-team-test
+  (with-fake-routes-in-isolation
+    (team-lookup-route)
+    (let [result (groups/get-team "alice" "alice:t1")]
+      (testing "get resolves the team by owner and short name"
+        (is (= "alice:t1" (:name result)))
+        (is (= "t1" (:id result)))))))
+
+(deftest team-name-parsing-test
+  (testing "a short name containing colons round-trips instead of being mangled"
+    ;; The old client rebuilt the packed name as `de:teams:<creator>:<short>` and then split
+    ;; the result on the first colon, so a colon in the short name moved the boundary.
+    (let [captured (atom nil)
+          weird    (assoc team-group :name "my:team" :display_name "my:team")]
+      (with-fake-routes-in-isolation
+        (merge (team-lookup-route :name "my:team" :group weird)
+               {{:address (groups-url "groups" "t1") :query-params {:user "alice"}}
+                (captured-body captured (assoc weird :name "other:name" :display_name "other:name"))})
+        (let [result (groups/update-team "alice" "alice:my:team" {:name "other:name"})]
+          (is (= {:name "other:name" :display_name "other:name"} @captured))
+          (is (= "alice:other:name" (:name result)))))))
+  (testing "a team name with no owner prefix is rejected rather than silently mis-resolved"
+    (with-fake-routes-in-isolation {}
+      (is (= ::cx/bad-request (error-type (groups/get-team "alice" "t1")))))))
+
+(deftest update-team-test
+  (let [captured (atom nil)]
+    (with-fake-routes-in-isolation
+      (merge (team-lookup-route)
+             {{:address (groups-url "groups" "t1") :query-params {:user "alice"}}
+              (captured-body captured (assoc team-group :description "new"))})
+      (testing "an update that changes only the description leaves the name alone"
+        (let [result (groups/update-team "alice" "alice:t1" {:description "new"})]
+          (is (= {:description "new"} @captured))
+          (is (= "alice:t1" (:name result))))))))
+
+(deftest verify-team-exists-test
+  (with-fake-routes-in-isolation
+    (team-lookup-route)
+    (is (nil? (groups/verify-team-exists "alice" "alice:t1")))))
+
+(deftest delete-team-test
+  (with-fake-routes-in-isolation
+    (merge (team-lookup-route)
+           {{:address (groups-url "groups" "t1") :query-params {:user "alice"}}
+            {:delete (json-response team-group)}})
+    (is (= "t1" (:id (groups/delete-team "alice" "alice:t1"))))))
+
+(deftest get-team-members-test
+  (with-fake-routes-in-isolation
+    (merge (team-lookup-route)
+           {{:address (groups-url "groups" "t1" "members") :query-params {:user "alice"}}
+            (json-response {:members [alice]})})
+    (is (= ["alice"] (mapv :id (:members (groups/get-team-members "alice" "alice:t1")))))))
+
+(deftest add-team-members-test
+  (let [captured (atom nil)]
+    (with-fake-routes-in-isolation
+      (merge (team-lookup-route)
+             {{:address (groups-url "groups" "t1" "members") :query-params {:user "alice"}}
+              (captured-body captured {:results [{:subject_id "bob" :success true :source_id "ldap" :subject_name "Bob"}]})})
+      (let [{:keys [results]} (groups/add-team-members "alice" "alice:t1" ["bob"])]
+        (testing "the members are posted under the :members key the service expects"
+          (is (= {:members ["bob"]} @captured)))
+        (testing "members are added and results pass through source_id/subject_name"
+          (is (= {:subject_id "bob" :success true :source_id "ldap" :subject_name "Bob"} (first results))))))))
+
+(deftest remove-team-members-test
+  (with-fake-routes-in-isolation
+    (merge (team-lookup-route)
+           {{:address (groups-url "groups" "t1" "members" "deleter") :query-params {:user "alice"}}
+            (json-response {:results [{:subject_id "bob" :success true :source_id "ldap" :subject_name "Bob"}]})})
+    (is (= "bob" (:subject_id (first (:results (groups/remove-team-members "alice" "alice:t1" ["bob"]))))))))
+
+(deftest join-team-test
+  (testing "a team that carries optin can be joined directly"
+    (with-fake-routes-in-isolation
+      (merge (team-lookup-route :group (assoc team-group :joinable true))
+             {{:address (groups-url "groups" "t1" "members") :query-params {:user "de_grouper"}}
+              (json-response {:results [{:subject_id "alice" :success true :source_id "ldap" :subject_name "Alice"}]})})
+      (let [{:keys [results]} (groups/join-team "alice" "alice:t1")]
+        (testing "the caller is added as a member"
+          (is (= "alice" (:subject_id (first results))))
+          (is (true? (:success (first results))))))))
+
+  (testing "a public team without optin is refused, as Grouper refused it"
+    ;; Public teams carry `view` alone. Admitting anyone who can see one would
+    ;; bypass the join-request flow, where an administrator approves.
+    (with-fake-routes-in-isolation
+      (team-lookup-route :group (assoc team-group :joinable false))
+      (is (= :clojure-commons.exception/forbidden
+             (try+ (groups/join-team "alice" "alice:t1") nil
+                   (catch [:type :clojure-commons.exception/forbidden] {:keys [type]} type)))))))
+
+(deftest leave-team-test
+  (testing "leaving drops the read grant that membership carried"
+    ;; The DE granted every member optout+read, so Grouper's leave revoked both.
+    ;; The importer turns that read into an explicit grant, which removing
+    ;; membership does not touch -- an ex-member would keep read on the group
+    ;; and its member list.
+    (let [calls (atom [])]
+      (with-fake-routes-in-isolation
+        (merge (team-lookup-route)
+               {{:address (groups-url "groups" "t1" "permissions") :query-params {:user "de_grouper"}}
+                (json-response {:permissions [{:subject {:subject_id "alice" :subject_type "user"} :level "read"}]})
+                {:address (groups-url "groups" "t1" "permissions" "user" "alice")
+                 :query-params {:user "de_grouper"}}
+                (fn [_] (swap! calls conj :revoke) {:status 200 :headers {} :body "{}"})
+                {:address (groups-url "groups" "t1" "members" "deleter") :query-params {:user "de_grouper"}}
+                (fn [_] (swap! calls conj :remove)
+                  ((json-response {:results [{:subject_id "alice" :success true :source_id "ldap" :subject_name "Alice"}]}) nil))})
+        (groups/leave-team "alice" "alice:t1")
+        (is (= [:remove :revoke] @calls)
+            "membership must go before the read grant, so a failed removal cannot leave a read-revoked member"))))
+
+  (testing "leaving does not strip an admin"
+    ;; Grouper revoked only the member privileges, so an admin who left kept
+    ;; administering the group. Revoking whatever level is present would
+    ;; silently demote owners and admins.
+    (with-fake-routes-in-isolation
+      (merge (team-lookup-route)
+             {{:address (groups-url "groups" "t1" "permissions") :query-params {:user "de_grouper"}}
+              (json-response {:permissions [{:subject {:subject_id "alice" :subject_type "user"} :level "admin"}]})
+              {:address (groups-url "groups" "t1" "members" "deleter") :query-params {:user "de_grouper"}}
+              (json-response {:results [{:subject_id "alice" :success true :source_id "ldap" :subject_name "Alice"}]})})
+      ;; The revoke route is deliberately unregistered: under isolation, calling
+      ;; it would fail the test.
+      (is (some? (groups/leave-team "alice" "alice:t1"))))))
+
+(deftest list-team-privileges-test
+  (with-fake-routes-in-isolation
+    (merge (team-lookup-route)
+           {{:address (groups-url "groups" "t1" "permissions") :query-params {:user "alice"}}
+            (json-response {:permissions [{:subject {:subject_id "alice" :subject_type "user"} :level "own"}
+                                          {:subject {:subject_id "GrouperAll" :subject_type "group"} :level "read"}
+                                          {:subject {:subject_id "bob" :subject_type "user"} :level "read"}]})
+            {:address (groups-url "subjects" "lookup") :query-params {:user "alice"}}
+            (json-response {:subjects [{:id "alice" :name "Alice" :source_id "ldap"}
+                                       {:id "bob" :name "Bob" :source_id "ldap"}]})})
+    (let [privs (:privileges (groups/list-team-privileges "alice" "alice:t1"))
+          by-subject (into {} (map (juxt (comp :id :subject) identity)) privs)]
+      (testing "own/admin levels map to admin, write/read to read, and the public subject to view"
+        (is (= "admin" (:name (get by-subject "alice"))))
+        (is (= "read" (:name (get by-subject "bob"))))
+        (is (= "view" (:name (get by-subject "GrouperAll")))))
+      (testing "the public subject is surfaced as a group subject"
+        (is (= "g:gsa" (:source_id (:subject (get by-subject "GrouperAll")))))))))
+
+(deftest update-team-privileges-test
+  (let [granted (atom nil)
+        revoked (atom nil)]
+    (with-fake-routes-in-isolation
+      (merge (team-lookup-route)
+             {{:address (groups-url "groups" "t1" "permissions" "user" "bob") :query-params {:user "alice"}}
+              {:put (fn [req]
+                      (reset! granted (:level (json/decode (slurp (:body req)) true)))
+                      {:status 200 :headers {"Content-Type" "application/json"} :body "{}"})}
+              {:address (groups-url "groups" "t1" "permissions" "group" "GrouperAll") :query-params {:user "alice"}}
+              {:delete (fn [_]
+                         (reset! revoked "GrouperAll")
+                         {:status 200 :headers {"Content-Type" "application/json"} :body "{}"})}
+              {:address (groups-url "groups" "t1" "permissions") :query-params {:user "alice"}}
+              (json-response {:permissions [{:subject {:subject_id "bob" :subject_type "user"} :level "admin"}]})
+              {:address (groups-url "subjects" "lookup") :query-params {:user "alice"}}
+              (json-response {:subjects [{:id "bob" :name "Bob" :source_id "ldap"}]})})
+      (let [result (groups/update-team-privileges
+                    "alice" "alice:t1"
+                    {:updates [{:subject_id "bob" :privileges ["admin"]}
+                               {:subject_id "GrouperAll" :privileges []}]})]
+        (testing "privilege names are translated to a permission level and granted"
+          (is (= "admin" @granted)))
+        (testing "a subject left with no privileges has its permission revoked"
+          (is (= "GrouperAll" @revoked)))
+        (is (= "admin" (:name (first (:privileges result)))))))))
+
+(deftest get-team-admins-test
+  (with-fake-routes-in-isolation
+    (merge (team-lookup-route)
+           {{:address (groups-url "groups" "t1" "permissions") :query-params {:user "alice"}}
+            (json-response {:permissions [{:subject {:subject_id "alice" :subject_type "user"} :level "own"}
+                                          {:subject {:subject_id "GrouperAll" :subject_type "group"} :level "read"}
+                                          {:subject {:subject_id "de_grouper" :subject_type "user"} :level "admin"}]})
+            {:address (groups-url "subjects" "lookup") :query-params {:user "alice"}}
+            (json-response {:subjects [{:id "alice" :name "Alice" :email "a@x" :source_id "ldap"}]})})
+    (let [{:keys [members]} (groups/get-team-admins "alice" "alice:t1")]
+      (testing "admins are the own/admin user subjects, excluding the service user and public subject"
+        (is (= 1 (count members)))
+        (is (= "alice" (:id (first members))))
+        (is (= "a@x" (:email (first members))))))))
+
+;; Communities.
+
+(defn- community-lookup-route [& {:keys [group] :or {group community-group}}]
+  {{:address (groups-url "groups" "lookup")
+    :query-params {:user "alice" :group_type "community" :name "biology"}}
+   (json-response group)})
+
+(deftest get-communities-test
+  (with-fake-routes-in-isolation
+    {{:address (groups-url "groups") :query-params {:user "alice" :group_type "community" :limit 1000 :offset 0}}
+     (json-response {:groups [community-group {:id "c2" :group_type "community" :name "physics"}]})
+     {:address (groups-url "groups")
+      :query-params {:user "alice" :group_type "community" :member "alice" :limit 1000 :offset 0}}
+     (json-response {:groups [community-group]})}
+    (let [{:keys [groups]} (groups/get-communities "alice" {})
+          by-name (into {} (map (juxt :name identity)) groups)]
+      (testing "listing reports per-user membership from one membership query"
+        (is (= #{"biology" "physics"} (set (keys by-name))))
+        (is (true? (:member (get by-name "biology"))))
+        (is (false? (:member (get by-name "physics"))))
+        (is (= [] (:privileges (get by-name "biology")))))
+      (testing "contract group fields are synthesized"
+        (is (= "group" (:type (get by-name "biology"))))))))
+
+(deftest get-communities-for-member-test
+  (with-fake-routes-in-isolation
+    {{:address (groups-url "groups")
+      :query-params {:user "alice" :group_type "community" :member "alice" :limit 1000 :offset 0}}
+     (json-response {:groups [community-group]})}
+    (testing "listing a user's own communities needs no second membership query"
+      (let [{:keys [groups]} (groups/get-communities "alice" {:member "alice"})]
+        (is (= ["biology"] (mapv :name groups)))
+        (is (true? (:member (first groups))))))))
+
+(deftest admin-get-communities-test
+  (with-fake-routes-in-isolation
+    {{:address (groups-url "groups")
+      :query-params {:user "de_grouper" :group_type "community" :limit 1000 :offset 0}}
+     (json-response {:groups [community-group]})}
+    (let [{:keys [groups]} (groups/admin-get-communities "de_grouper" {})]
+      (testing "admin listing omits member/privileges"
+        (is (= ["biology"] (mapv :name groups)))
+        (is (not (contains? (first groups) :member)))))))
+
+(deftest add-community-test
+  (let [captured (atom nil)]
+    (with-fake-routes-in-isolation
+      {{:address (groups-url "groups") :query-params {:user "alice"}}
+       (captured-body captured community-group)
+       {:address (groups-url "groups" "c1" "permissions" "group" "GrouperAll") :query-params {:user "alice"}}
+       (json-response {:subject {:subject_id "GrouperAll" :subject_type "group"} :level "read"})}
+      (let [result (groups/add-community "alice" {:name "biology" :description "d"
+                                                  :public_privileges ["read" "optin"]})]
+        (testing "a community is created with no owner, since it belongs to no user namespace"
+          (is (= {:group_type "community" :name "biology" :display_name "biology" :description "d"
+                  :members_public true :joinable true}
+                 @captured)))
+        (testing "read among the public privileges makes the member list public"
+          ;; Grouper gave public communities `read` and public teams `view`; the
+          ;; permissions service cannot express the difference, so it rides on the
+          ;; group. Dropping it would expose every public team's membership.
+          (is (true? (:members_public @captured))))
+        (is (= "biology" (:name result)))
+        (is (= "c1" (:id result)))))))
+
+(deftest get-community-test
+  (with-fake-routes-in-isolation
+    (community-lookup-route)
+    (is (= "biology" (:name (groups/get-community "alice" "biology"))))))
+
+(deftest update-community-test
+  (let [captured (atom nil)]
+    (with-fake-routes-in-isolation
+      (merge (community-lookup-route)
+             {{:address (groups-url "groups" "c1") :query-params {:user "alice"}}
+              (captured-body captured (assoc community-group :name "bio" :display_name "bio"))})
+      (testing "a rename is a single update with no app retagging"
+        (let [result (groups/update-community "alice" "biology" {:name "bio"})]
+          (is (= {:name "bio" :display_name "bio"} @captured))
+          (is (= "bio" (:name result))))))))
+
+(deftest delete-community-test
+  (with-fake-routes-in-isolation
+    (merge (community-lookup-route)
+           {{:address (groups-url "groups" "c1") :query-params {:user "alice"}}
+            {:delete (json-response community-group)}})
+    (is (= "c1" (:id (groups/delete-community "alice" "biology"))))))
+
+(deftest get-community-members-test
+  (with-fake-routes-in-isolation
+    (merge (community-lookup-route)
+           {{:address (groups-url "groups" "c1" "members") :query-params {:user "alice"}}
+            (json-response {:members [alice]})})
+    (is (= ["alice"] (mapv :id (:members (groups/get-community-members "alice" "biology")))))))
+
+(deftest add-community-admins-test
+  (with-fake-routes-in-isolation
+    (merge (community-lookup-route)
+           {{:address (groups-url "groups" "c1" "permissions" "user" "bob") :query-params {:user "alice"}}
+            (fn [req]
+              (is (= "admin" (:level (json/decode (slurp (:body req)) true))))
+              {:status 200 :headers {"Content-Type" "application/json"} :body "{}"})
+            {:address (groups-url "groups" "c1" "members") :query-params {:user "alice"}}
+            (json-response {:results [{:subject_id "bob" :success true :source_id "ldap" :subject_name "Bob"}]})})
+    (let [{:keys [results]} (groups/add-community-admins "alice" "biology" ["bob"])]
+      (testing "an admin is granted the admin level and added as a member"
+        (is (= "bob" (:subject_id (first results))))
+        (is (true? (:success (first results))))))))
+
+(deftest remove-community-admins-test
+  (with-fake-routes-in-isolation
+    (merge (community-lookup-route)
+           {{:address (groups-url "groups" "c1" "permissions" "user" "bob") :query-params {:user "alice"}}
+            (fn [_] {:status 200 :headers {"Content-Type" "application/json"} :body "{}"})
+            {:address (groups-url "groups" "c1" "members" "deleter") :query-params {:user "alice"}}
+            (json-response {:results [{:subject_id "bob" :success true :source_id "ldap" :subject_name "Bob"}]})})
+    (is (= "bob" (:subject_id (first (:results (groups/remove-community-admins "alice" "biology" ["bob"]))))))))
+
+(deftest get-community-admins-test
+  (with-fake-routes-in-isolation
+    (merge (community-lookup-route)
+           {{:address (groups-url "groups" "c1" "permissions") :query-params {:user "alice"}}
+            (json-response {:permissions [{:subject {:subject_id "alice" :subject_type "user"} :level "admin"}]})
+            {:address (groups-url "subjects" "lookup") :query-params {:user "alice"}}
+            (json-response {:subjects [{:id "alice" :name "Alice" :source_id "ldap"}]})})
+    (is (= ["alice"] (mapv :id (:members (groups/get-community-admins "alice" "biology")))))))
+
+(deftest join-community-test
+  (testing "a community that carries optin can be joined directly"
+    ;; Communities carried read+optin in Grouper, so this matches the old behavior.
+    (with-fake-routes-in-isolation
+      (merge (community-lookup-route :group (assoc community-group :joinable true))
+             {{:address (groups-url "groups" "c1" "members") :query-params {:user "de_grouper"}}
+              (json-response {:results [{:subject_id "alice" :success true :source_id "ldap" :subject_name "Alice"}]})})
+      (let [{:keys [results]} (groups/join-community "alice" "biology")]
+        (testing "the caller is added as a member"
+          (is (= "alice" (:subject_id (first results))))))))
+
+  (testing "a community without optin is refused"
+    (with-fake-routes-in-isolation
+      (community-lookup-route :group (assoc community-group :joinable false))
+      (is (= :clojure-commons.exception/forbidden
+             (try+ (groups/join-community "alice" "biology") nil
+                   (catch [:type :clojure-commons.exception/forbidden] {:keys [type]} type)))))))
+
+(deftest leave-community-test
+  (let [calls (atom [])]
+    (with-fake-routes-in-isolation
+      (merge (community-lookup-route)
+             {{:address (groups-url "groups" "c1" "permissions") :query-params {:user "de_grouper"}}
+              (json-response {:permissions [{:subject {:subject_id "alice" :subject_type "user"} :level "read"}]})
+              {:address (groups-url "groups" "c1" "permissions" "user" "alice") :query-params {:user "de_grouper"}}
+              (fn [_] (swap! calls conj :revoke) {:status 200 :headers {} :body "{}"})
+              {:address (groups-url "groups" "c1" "members" "deleter") :query-params {:user "de_grouper"}}
+              (fn [_] (swap! calls conj :remove)
+                ((json-response {:results [{:subject_id "alice" :success true :source_id "ldap" :subject_name "Alice"}]}) nil))})
+      (is (= "alice" (:subject_id (first (:results (groups/leave-community "alice" "biology"))))))
+      (testing "membership is removed before the read grant is revoked"
+        (is (= [:remove :revoke] @calls))))))
+
+;; DE user group administration.
+
+(deftest remove-de-user-test
+  (with-fake-routes-in-isolation
+    {{:address (groups-url "groups" "lookup")
+      :query-params {:user "de_grouper" :group_type "system" :name "de-users"}}
+     (json-response {:id "du1" :group_type "system" :name "de-users"})
+     {:address (groups-url "groups" "du1" "members" "bob") :query-params {:user "de_grouper"}}
+     (fn [_] {:status 200 :headers {"Content-Type" "application/json"} :body "{}"})}
+    (testing "removing a DE user deletes their membership in the de-users system group"
+      (is (nil? (groups/remove-de-user "bob"))))))
+
+(deftest admin-user-guard-test
+  (testing "the administrative account may not be added to or removed from a group"
+    ;; It is filtered out of every listing, so admitting it creates a member the
+    ;; UI can neither show nor remove. The legacy client rejected this with a 400.
+    (with-fake-routes-in-isolation
+      (team-lookup-route)
+      (doseq [[label f] [["add-team-members"        #(groups/add-team-members "alice" "alice:t1" ["de_grouper"])]
+                         ["remove-team-members"     #(groups/remove-team-members "alice" "alice:t1" ["de_grouper"])]
+                         ["add-community-admins"    #(groups/add-community-admins "alice" "biology" ["bob" "de_grouper"])]
+                         ["remove-community-admins" #(groups/remove-community-admins "alice" "biology" ["de_grouper"])]]]
+        (is (= :clojure-commons.exception/bad-request
+               (try+ (f) nil (catch [:type :clojure-commons.exception/bad-request] {:keys [type]} type)))
+            (str label " must reject the administrative account"))))))
+
+(deftest join-leave-admin-guard-test
+  (testing "the administrative account may not join or leave anything"
+    ;; Join and leave act as the administrative account, whose service-side permission
+    ;; bypass means nothing downstream stops it. The guard must fire before any HTTP
+    ;; call: no routes are registered, so a stray request fails loudly under isolation.
+    (with-fake-routes-in-isolation {}
+      (let [admin (config/groups-admin-user)]
+        (doseq [[label f] [["join-team"       #(groups/join-team admin "alice:t1")]
+                           ["leave-team"      #(groups/leave-team admin "alice:t1")]
+                           ["join-community"  #(groups/join-community admin "biology")]
+                           ["leave-community" #(groups/leave-community admin "biology")]]]
+          (is (= :clojure-commons.exception/bad-request (error-type (f)))
+              (str label " must reject the administrative account")))))))

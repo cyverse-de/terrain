@@ -13,7 +13,7 @@
             [terrain.clients.data-info :as data-info]
             [terrain.clients.data-info.raw :as data-info-client]
             [terrain.clients.datacite :as datacite-client]
-            [terrain.clients.iplant-groups :as groups]
+            [terrain.clients.grouping :as groups]
             [terrain.clients.metadata.raw :as metadata]
             [terrain.clients.notifications :as notifications]
             [terrain.util.config :as config]

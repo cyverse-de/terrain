@@ -422,6 +422,14 @@
                     :content-type :json
                     :as           :json}))))
 
+(defn remove-app-from-community
+  [app-id community-id]
+  (:body
+   (client/delete (apps-url "apps" app-id "communities" community-id)
+                  (disable-redirects
+                   {:query-params (secured-params)
+                    :as           :json}))))
+
 (defn update-app-communities
   [app-id body]
   (:body

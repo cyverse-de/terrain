@@ -1,6 +1,6 @@
 (ns terrain.services.teams
   (:require [clojure-commons.assertions :as assertions]
-            [terrain.clients.iplant-groups :as ipg]
+            [terrain.clients.grouping :as ipg]
             [terrain.clients.permissions :as perms-client]
             [terrain.clients.notifications :as cn]))
 
