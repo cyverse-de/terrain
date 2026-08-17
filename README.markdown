@@ -50,7 +50,7 @@ You should be able to use this file without modification.
 
 #### Forward Connections to Kubernetes
 
-This step requires [kubefwd][5], which auomatically configures port forwarding and host name aliases. In another
+This step requires [kubefwd][5], which automatically configures port forwarding and host name aliases. In another
 terminal window or tab, run these commands:
 
 ```
