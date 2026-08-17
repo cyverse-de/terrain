@@ -82,7 +82,7 @@ You can run this command to verify that the command worked:
 $ echo $AUTH_HEADER
 ```
 
-If the value is `Authorization: berer null` then the authentication didn't work. In most cases, it means that the
+If the value is `Authorization: bearer null` then the authentication didn't work. In most cases, it means that the
 password was mistyped. Once you have the authorization header, you can make calls to other endpoints:
 
 ```
