@@ -136,6 +136,57 @@ Implementation note: `cider/cider-nrepl` is declared at compile scope by eleven
 different `org.cyverse` libraries, so a per-dependency exclusion was replaced
 with a project-level `:exclusions` entry.
 
+## Part 3: the JDK 25 AOT cache
+
+Implemented in the `Dockerfile` as a training run plus an `-XX:AOTCache` flag on
+the entrypoint.
+
+The training run lives in the **runtime** stage, not the builder. An AOT cache is
+only usable by the exact JVM build that wrote it. Both stages happen to ship
+Temurin 25.0.3+9 today, but their base images are updated independently, so
+training in the runtime stage guarantees parity by construction instead of by
+coincidence.
+
+### The classpath constraint
+
+The entrypoint classpath was `.:terrain-standalone.jar`. That does not work, in
+two separate ways:
+
+1. The dumper refuses a non-empty directory on the classpath outright:
+   `Error: non-empty directory '.'`.
+2. Dumping with a jar-only classpath and then running with `.` prepended is
+   rejected at startup: `The name of app classpath [1] does not match: expected
+   'terrain-standalone.jar', got '.'`.
+
+So `.` was removed from the entrypoint classpath and the training run uses the
+same jar-only classpath. Nothing needed the working directory: logback is
+configured through `-Dlogback.configurationFile` with an absolute path (verified
+that it resolves with the directory off the classpath), and `/usr/src/app`
+otherwise contains only the jar.
+
+### Failure mode
+
+A missing, stale, or mismatched cache logs an error and starts normally. That is
+good for availability but means a misconfigured cache is **invisible**: the
+service builds, boots, and serves traffic correctly while delivering none of the
+benefit. Confirm `Opened AOT cache` under `-Xlog:aot` rather than inferring
+success from a clean startup.
+
+### Results
+
+| Metric | Before | After |
+| --- | --- | --- |
+| Startup, in-container (3-run avg, incl. container start) | 2.12 s | 1.07 s (-50%) |
+| Startup, local, prod JVM opts | 2.35 s | 1.37 s (-42%) |
+| Metaspace | 70 MB | 4 MB |
+| Peak RSS | 452 MB | 443 MB |
+| Image size | ~391 MB | 495 MB (+104 MB) |
+
+Memory is a wash, as predicted: the cache trades anonymous Metaspace for a
+file-backed mapped archive. The image grows by more than Part 2 removed, so the
+net effect on image size across this work is roughly +82 MB in exchange for
+halved startup.
+
 ## Out of scope, noted for follow-up
 
 - `project.clj` writes `:exclusion` (singular) for kameleon, which is a silent

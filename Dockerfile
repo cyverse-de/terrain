@@ -35,6 +35,19 @@ RUN sed -i -E 's/\r\n?/\n/g' "/usr/local/share/ca-certificates/incommon-rsa-ca2.
 # Create symlink for terrain command
 RUN ln -s /opt/java/openjdk/bin/java /bin/terrain
 
+# Pre-load the class metadata terrain needs at startup into an AOT cache, roughly halving startup
+# time. Trained here rather than in the builder stage because the cache is only usable by the exact
+# JVM build that wrote it, and the two stages' base images are updated independently.
+RUN terrain -XX:AOTCacheOutput=/usr/src/app/terrain.aot \
+      -Dlogback.configurationFile=/usr/src/app/logback.xml \
+      -cp terrain-standalone.jar \
+      clojure.main -e "(require 'terrain.core 'terrain.routes 'ring.adapter.jetty)"
+
 CMD ["--help"]
 
-ENTRYPOINT ["terrain", "-Dlogback.configurationFile=/usr/src/app/logback.xml", "-cp", ".:terrain-standalone.jar", "terrain.core"]
+# The classpath must stay exactly as it was when the AOT cache above was written, or the cache is
+# rejected at startup. Adding the working directory back would break it two ways: the dumper refuses
+# a non-empty directory on the classpath, and a runtime classpath that does not match the dumped one
+# is discarded. Nothing here needs it — logback is configured by absolute path, and everything else
+# lives in the jar. A missing or rejected cache only logs an error; terrain still starts.
+ENTRYPOINT ["terrain", "-Dlogback.configurationFile=/usr/src/app/logback.xml", "-XX:AOTCache=/usr/src/app/terrain.aot", "-cp", "terrain-standalone.jar", "terrain.core"]
