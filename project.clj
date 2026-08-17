@@ -10,7 +10,8 @@
                  [cheshire "6.1.0"]
                  [clj-http "3.13.1"]
                  [clj-time "0.15.2"]
-                 [clojurewerkz/elastisch "3.0.1"]
+                 ;; Only the elastisch.native namespaces need the Elasticsearch jar; terrain uses the REST client.
+                 [clojurewerkz/elastisch "3.0.1" :exclusions [org.elasticsearch/elasticsearch]]
                  [com.cemerick/url "0.1.1" :exclusions [com.cemerick/clojurescript.test]]
                  [org.cyverse/dire "0.5.6"]
                  [me.raynes/fs "1.4.6" :exclusions [org.apache.commons/commons-compress]]
@@ -23,7 +24,7 @@
                  [org.cyverse/async-tasks-client "0.0.5"]
                  [org.cyverse/clj-icat-direct "2.9.7"]
                  [org.cyverse/clj-jargon "3.1.5"
-                  :exclusions [org.bouncycastle/bcprov-jdk16]]
+                  :exclusions [org.bouncycastle/bcprov-jdk16 junit]]
                  [org.cyverse/clojure-commons "3.0.12"]
                  [org.cyverse/cyverse-groups-client "0.1.9"]
                  [org.cyverse/common-cfg "2.8.3"]
@@ -37,6 +38,9 @@
                  [org.cyverse/metadata-files "2.1.1"]
                  [org.cyverse/permissions-client "2.8.5"]
                  [org.cyverse/service-logging "2.8.5"]]
+  ;; Many of the org.cyverse libraries declare this development tool at compile scope, so it would
+  ;; otherwise ship in the uberjar. Excluded globally rather than per-dependency to cover all of them.
+  :exclusions [cider/cider-nrepl]
   :eastwood {:exclude-namespaces [terrain.util.jwt :test-paths]
              :linters [:wrong-arity :wrong-ns-form :wrong-pre-post :wrong-tag :misplaced-docstrings]}
   :plugins [[lein-ancient "0.7.0"]
