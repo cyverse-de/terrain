@@ -13,15 +13,17 @@
            :folders (map mk-fav (:folders favs)))))
 
 (defn- user-col->api-col
-  "Maps a favorites sort column onto the sort-field data-info's listing endpoint accepts."
+  "Maps a favorites sort column onto the sort-field data-info's listing endpoint accepts. The result
+   goes out as a query parameter, so it has to be a string: clj-http renders a keyword with its
+   leading colon, which data-info then fails to coerce back into its sort-field enum."
   [col]
   (case col
-    :name         :name
-    :id           :path
-    :lastmodified :datemodified
-    :datecreated  :datecreated
-    :size         :size
-    :name))
+    :name         "name"
+    :id           "path"
+    :lastmodified "datemodified"
+    :datecreated  "datecreated"
+    :size         "size"
+    "name"))
 
 (defn- user-order->api-order
   [order]
