@@ -4,6 +4,32 @@
   :license {:name "BSD Standard License"
             :url "https://cyverse.org/license"}
   :uberjar-name "terrain-standalone.jar"
+  ;; Fail the build on a new dependency conflict rather than printing a
+  ;; warning nobody reads.
+  :pedantic? :abort
+  ;; Records versions Leiningen already resolves, read off the resolved
+  ;; classpath rather than copied from lein's "Consider using these
+  ;; :managed-dependencies" hint -- that hint names the version that LOST the
+  ;; conflict, so pasting it would be a silent upgrade.
+  ;;
+  ;; The jackson-* entries hold databind/annotations where clj-jargon puts them:
+  ;; jargon-core is pinned :upgrade false at 4.3.7.0-RELEASE for iRODS and brings
+  ;; jackson 2.14.1. jackson-core sits higher because cheshire needs it there --
+  ;; cheshire 6 throws at runtime against jackson-core 2.14.1. The family is
+  ;; therefore deliberately not uniform, matching what main already resolved. Do
+  ;; not "tidy" this by dropping core to match the rest; unifying means moving
+  ;; jargon.
+  :managed-dependencies [[com.fasterxml.jackson.core/jackson-annotations "2.14.1"]
+                         [com.fasterxml.jackson.core/jackson-databind "2.14.1"]
+                         [com.google.guava/guava "16.0.1"]
+                         [commons-codec "1.16.1"]
+                         [commons-io "2.16.1"]
+                         [org.apache.commons/commons-fileupload2-core "2.0.0-M1"]
+                         [org.ring-clojure/ring-core-protocols "1.13.0"]
+                         [org.ring-clojure/ring-websocket-protocols "1.13.0"]
+                         [prismatic/schema "1.1.12"]
+                         [ring/ring-codec "1.2.0"]
+                         [ring/ring-core "1.13.0"]]
   :dependencies [[org.clojure/clojure "1.12.5"]
                  [org.clojure/data.codec "0.2.1"]
                  [org.clojure/tools.nrepl "0.2.13"]
