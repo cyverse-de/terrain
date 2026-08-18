@@ -16,7 +16,7 @@
   "Checks that a URL import can land where it was asked to: the destination has to be writeable by
    the user, and nothing can already be sitting at the name being imported."
   [user dest-path filename]
-  (let [dest-stat (data-info/stat-by-path user dest-path)
+  (let [dest-stat (data-info/stat-by-path user dest-path "permission")
         dest-file (ft/path-join dest-path filename)]
     (when-not (contains? #{"write" "own"} (:permission dest-stat))
       (throw+ {:error_code ce/ERR_NOT_WRITEABLE :user user :path dest-path}))

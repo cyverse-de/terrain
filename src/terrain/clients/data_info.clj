@@ -136,6 +136,15 @@
     (-> (check-existence user [path])
         (get-in [:paths (keyword path)]))))
 
+(defn- error-code-of
+  "Extracts the DE error code from a failed data-info response, if it reported one."
+  [response]
+  (let [body (:body response)]
+    (when (string? body)
+      (try
+        (:error_code (json/decode body true))
+        (catch Exception _ nil)))))
+
 (defn ensure-dir-created
   "If a folder doesn't exist, it creates the folder and makes the given user an owner of it.
 
@@ -144,15 +153,24 @@
      dir  - the absolute path to the folder"
   [^String user ^String dir]
   (when-not (path-exists? user dir)
-    (raw/create-dirs user [dir])))
+    ;; The existence check races other requests and can't see folders the user isn't allowed to
+    ;; read, so data-info may well find the folder already there. Either way it now exists.
+    (try+
+     (raw/create-dirs user [dir])
+     (catch #(= error/ERR_EXISTS (error-code-of %)) _
+       (log/debug "folder" dir "already existed when it was created for" user)))))
 
 (defn stat-by-path
-  "Resolves the stat info for the entity at a given path."
-  [^String user ^String path]
-  (-> (raw/collect-stats user {:paths [path]})
-      :body
-      (json/decode true)
-      (get-in [:paths (keyword path)])))
+  "Resolves the stat info for the entity at a given path. Passing filter-include, a comma-separated
+   list of stat field names, lets data-info skip the fields the caller doesn't need; some of them
+   are expensive to gather for large folders."
+  ([^String user ^String path]
+   (stat-by-path user path nil))
+  ([^String user ^String path ^String filter-include]
+   (-> (raw/collect-path-info user :paths [path] :filter-include filter-include)
+       :body
+       (json/decode true)
+       (get-in [:paths (keyword path)]))))
 
 (defn get-or-create-dir
   "Returns the path argument if the path exists and refers to a directory.  If
@@ -163,7 +181,7 @@
   (let [user (:shortUsername current-user)]
     (if-not (path-exists? user path)
       (create-dir {:user user} {:path path})
-      (when (= "dir" (:type (stat-by-path user path)))
+      (when (= "dir" (:type (stat-by-path user path "type")))
         path))))
 
 (defn can-create-dir?
@@ -329,8 +347,9 @@
                   of info types.
 
    Returns:
-     It returns a page of stat info maps."
-  ^ISeq
+     It returns a map containing a page of stat info maps, split into files and folders, alongside
+     the total number of matching items."
+  ^IPersistentMap
   [^String  user
    ^String  sort-field
    ^String  sort-order
@@ -376,14 +395,15 @@
   "Given filesystem id, it returns the type of data item it is, file or folder.
 
    Parameters:
+     user    - the authenticated name of the user
      data-id - The UUID of the data item to inspect
 
    Returns:
      The type of the data item, `file` or `folder`"
-  ^String [^UUID data-id]
-  (let [stats (stats-by-uuids (cfg/irods-user) [data-id] {:ignore-missing      true
-                                                          :ignore-inaccessible true
-                                                          :filter-include      "type"})]
+  ^String [^String user ^UUID data-id]
+  (let [stats (stats-by-uuids user [data-id] {:ignore-missing      true
+                                              :ignore-inaccessible true
+                                              :filter-include      "type"})]
     ;; A data id that resolves to nothing reports as a file, which is what the ICAT lookup this
     ;; replaced did.
     (if (= "dir" (:type (get stats (keyword (str data-id)))))
@@ -427,6 +447,9 @@
 (defn share
   "grants access to a list of data entities for a list of users by a user
 
+   data-info validates and applies each user/path pair on its own, so a throw from this function
+   means at least one pair failed, not that none of them were applied.
+
    Params:
      user        - the username of the sharing user
      share-withs - the list of usernames receiving access
@@ -456,7 +479,11 @@
      :permission perm}))
 
 (defn unshare
-  "Params:
+  "Revokes access to a list of data entities for a list of users. Like share, this applies each
+   user/path pair on its own, so a throw means at least one pair failed rather than none of them
+   being applied.
+
+   Params:
      user          - the username of the user removing access
      unshare-withs - the list of usernames having access removed
      fpaths        - the list of absolute paths ot the data entities losing accessibility

@@ -38,7 +38,7 @@
   [data-id]
   (let [user (:shortUsername user/current-user)]
     (data/validate-uuid-accessible user data-id)
-    (metadata/add-favorite data-id (data/resolve-data-type data-id))))
+    (metadata/add-favorite data-id (data/resolve-data-type user data-id))))
 
 (defn remove-favorite
   "This function unmarks a given data item as a favorite of the authenticated user.

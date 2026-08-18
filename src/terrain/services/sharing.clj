@@ -2,6 +2,7 @@
   (:require [clojure.tools.logging :as log]
             [clojure.string :refer [join]]
             [clojure.walk :refer [walk]]
+            [clojure-commons.error-codes :as ce]
             [clojure-commons.file-utils :refer [basename]]
             [terrain.auth.user-attributes :refer [current-user]]
             [terrain.clients.data-info :as data]
@@ -151,46 +152,76 @@
         provided-subject (:subject share-unshare)]
     (or provided-user (get-user-from-subject provided-subject))))
 
+(defn- unresolvable-subject-error
+  "The error recorded against every path of a request that names neither a username nor a subject
+   that can be translated into one."
+  [subject]
+  {:error_code ce/ERR_BAD_OR_MISSING_FIELD
+   :message    (if subject
+                 (str "no username could be determined for a subject from source " (:source_id subject))
+                 "neither a user nor a subject was given")})
+
+(defn- share-with-unresolvable-subject
+  "Fails every path of a share request whose subject can't be translated into an iRODS username,
+   reporting it the way data-info reports a path it couldn't share."
+  [{:keys [subject paths] :as share}]
+  (let [error   (unresolvable-subject-error subject)
+        results (mapv #(assoc % :success false :error error) paths)]
+    (log/error "unable to determine the user to share" (map :path paths) "with:" (:message error))
+    (send-share-err-notification (:id subject) results)
+    (assoc (select-keys share [:subject]) :sharing results)))
+
+(defn- unshare-with-unresolvable-subject
+  "Fails every path of an unshare request whose subject can't be translated into an iRODS username."
+  [{:keys [subject paths] :as unshare}]
+  (let [error   (unresolvable-subject-error subject)
+        results (mapv (fn [path] {:path path :success false :error error}) paths)]
+    (log/error "unable to determine the user to unshare" paths "from:" (:message error))
+    (send-unshare-err-notification (:id subject) results)
+    (assoc (select-keys unshare [:subject]) :unshare results)))
+
 (defn- share-with-user
   "Forwards a user's share requests to data-info in a single call, sending any success notifications
    to the users involved, and any error notifications to the current user. data-info reports the
    outcome of every path, so one path that can't be shared doesn't affect the others."
   [share]
-  (let [user                (translate-user-for-irods share)
-        sharer              (:shortUsername current-user)
-        paths               (:paths share)
-        _                   (log/warn "share" (map :path paths) "with" user "by" sharer)
-        user_share_results  (mapv #(dissoc % :user :reason)
-                                  (data/share-paths sharer [{:user user :paths paths}]))
-        successful_shares   (filter :success user_share_results)
-        unsuccessful_shares (remove :success user_share_results)]
-    (when (seq unsuccessful_shares)
-      (log/error "data-info could not share" (map :path unsuccessful_shares) "with" user))
-    (when (seq successful_shares)
-      (send-share-notifications user successful_shares))
-    (when (seq unsuccessful_shares)
-      (send-share-err-notification user unsuccessful_shares))
-    {:user user :sharing user_share_results}))
+  (if-let [user (translate-user-for-irods share)]
+    (let [sharer              (:shortUsername current-user)
+          paths               (:paths share)
+          _                   (log/warn "share" (map :path paths) "with" user "by" sharer)
+          user_share_results  (mapv #(dissoc % :user :reason)
+                                    (data/share-paths sharer [{:user user :paths paths}]))
+          successful_shares   (filter :success user_share_results)
+          unsuccessful_shares (remove :success user_share_results)]
+      (when (seq unsuccessful_shares)
+        (log/error "data-info could not share" (map :path unsuccessful_shares) "with" user))
+      (when (seq successful_shares)
+        (send-share-notifications user successful_shares))
+      (when (seq unsuccessful_shares)
+        (send-share-err-notification user unsuccessful_shares))
+      {:user user :sharing user_share_results})
+    (share-with-unresolvable-subject share)))
 
 (defn- unshare-with-user
   "Forwards a user's unshare requests to data-info in a single call, sending any success
    notifications to the users involved, and any error notifications to the current user."
   [unshare]
-  (let [user                  (translate-user-for-irods unshare)
-        unsharer              (:shortUsername current-user)
-        paths                 (:paths unshare)
-        _                     (log/warn "unshare" paths "from" user "by" unsharer)
-        unshare_results       (mapv #(dissoc % :user :reason)
-                                    (data/unshare-paths unsharer [{:user user :paths paths}]))
-        successful_unshares   (filter :success unshare_results)
-        unsuccessful_unshares (remove :success unshare_results)]
-    (when (seq unsuccessful_unshares)
-      (log/error "data-info could not unshare" (map :path unsuccessful_unshares) "from" user))
-    (when (seq successful_unshares)
-      (send-unshare-notifications user successful_unshares))
-    (when (seq unsuccessful_unshares)
-      (send-unshare-err-notification user unsuccessful_unshares))
-    {:user user :unshare unshare_results}))
+  (if-let [user (translate-user-for-irods unshare)]
+    (let [unsharer              (:shortUsername current-user)
+          paths                 (:paths unshare)
+          _                     (log/warn "unshare" paths "from" user "by" unsharer)
+          unshare_results       (mapv #(dissoc % :user :reason)
+                                      (data/unshare-paths unsharer [{:user user :paths paths}]))
+          successful_unshares   (filter :success unshare_results)
+          unsuccessful_unshares (remove :success unshare_results)]
+      (when (seq unsuccessful_unshares)
+        (log/error "data-info could not unshare" (map :path unsuccessful_unshares) "from" user))
+      (when (seq successful_unshares)
+        (send-unshare-notifications user successful_unshares))
+      (when (seq unsuccessful_unshares)
+        (send-unshare-err-notification user unsuccessful_unshares))
+      {:user user :unshare unshare_results})
+    (unshare-with-unresolvable-subject unshare)))
 
 (defn share
   "Parses a batch share request, forwarding each user-share request to data-info."

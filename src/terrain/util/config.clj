@@ -313,6 +313,9 @@
   [props config-valid configs data-routes-enabled]
   "terrain.irods.zone" "iplant")
 
+;;;End iRODS connection information
+
+;;; File IO configuration
 (declare fileio-url-import-app)
 (cc/defprop-optuuid fileio-url-import-app
   "The identifier of the internal app used for URL imports."

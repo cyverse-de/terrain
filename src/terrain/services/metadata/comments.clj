@@ -28,7 +28,7 @@
   [entry-id body]
   (let [user     (:shortUsername user/current-user)
         _        (validate-entry-id-accessible user entry-id)
-        tgt-type (data/resolve-data-type entry-id)]
+        tgt-type (data/resolve-data-type user entry-id)]
     (metadata/add-data-comment entry-id tgt-type body)))
 
 (defn add-app-comment
