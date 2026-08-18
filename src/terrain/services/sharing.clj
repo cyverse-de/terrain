@@ -3,7 +3,6 @@
             [clojure.string :refer [join]]
             [clojure.walk :refer [walk]]
             [clojure-commons.file-utils :refer [basename]]
-            [slingshot.slingshot :refer [try+]]
             [terrain.auth.user-attributes :refer [current-user]]
             [terrain.clients.data-info :as data]
             [terrain.clients.notifications :as dn]))
@@ -19,39 +18,6 @@
   "Returns a string that joins the given path list by commas."
   [path-list]
   (join ", " (map basename path-list)))
-
-(defn- forward-data-info-share
-  "Forwards a data-info share request."
-  [user share]
-  (let [paths       [(:path share)]
-        sharer      (:shortUsername current-user)
-        share-withs [user]
-        perm        (:permission share)]
-    (try+
-     (log/warn "share" paths "with" share-withs "by" sharer)
-     (data/share sharer share-withs paths perm)
-     (merge {:success true} share)
-     (catch map? e
-       (log/error "data-info error: " e)
-       (merge {:success false,
-               :error e}
-              share)))))
-
-(defn- forward-data-info-unshare
-  "Forwards a data-info unshare request."
-  [user path]
-  (let [unsharer      (:shortUsername current-user)
-        unshare-withs [user]]
-    (try+
-     (log/warn "unshare" path "from" user "by" unsharer)
-     (data/unshare unsharer unshare-withs (vector path))
-     {:success true
-      :path path}
-     (catch map? e
-       (log/error "data-info error: " e)
-       {:success false,
-        :error e
-        :path path}))))
 
 (defn- send-sharing-notification
   "Sends an (un)sharing notification."
@@ -186,15 +152,20 @@
     (or provided-user (get-user-from-subject provided-subject))))
 
 (defn- share-with-user
-  "Forwards share requests to data-info from the user and list of paths and permissions in the given
-   share map, sending any success notifications to the users involved, and any error notifications
-   to the current user."
+  "Forwards a user's share requests to data-info in a single call, sending any success notifications
+   to the users involved, and any error notifications to the current user. data-info reports the
+   outcome of every path, so one path that can't be shared doesn't affect the others."
   [share]
-  (let [user (translate-user-for-irods share)
-        paths (:paths share)
-        user_share_results (map #(forward-data-info-share user %) paths)
-        successful_shares (filter :success user_share_results)
+  (let [user                (translate-user-for-irods share)
+        sharer              (:shortUsername current-user)
+        paths               (:paths share)
+        _                   (log/warn "share" (map :path paths) "with" user "by" sharer)
+        user_share_results  (mapv #(dissoc % :user :reason)
+                                  (data/share-paths sharer [{:user user :paths paths}]))
+        successful_shares   (filter :success user_share_results)
         unsuccessful_shares (remove :success user_share_results)]
+    (when (seq unsuccessful_shares)
+      (log/error "data-info could not share" (map :path unsuccessful_shares) "with" user))
     (when (seq successful_shares)
       (send-share-notifications user successful_shares))
     (when (seq unsuccessful_shares)
@@ -202,15 +173,19 @@
     {:user user :sharing user_share_results}))
 
 (defn- unshare-with-user
-  "Forwards unshare requests to data-info from the user and list of paths in the given unshare map,
-   sending any success notifications to the users involved, and any error notifications to the
-   current user."
+  "Forwards a user's unshare requests to data-info in a single call, sending any success
+   notifications to the users involved, and any error notifications to the current user."
   [unshare]
-  (let [user (translate-user-for-irods unshare)
-        paths (:paths unshare)
-        unshare_results (map #(forward-data-info-unshare user %) paths)
-        successful_unshares (filter :success unshare_results)
+  (let [user                  (translate-user-for-irods unshare)
+        unsharer              (:shortUsername current-user)
+        paths                 (:paths unshare)
+        _                     (log/warn "unshare" paths "from" user "by" unsharer)
+        unshare_results       (mapv #(dissoc % :user :reason)
+                                    (data/unshare-paths unsharer [{:user user :paths paths}]))
+        successful_unshares   (filter :success unshare_results)
         unsuccessful_unshares (remove :success unshare_results)]
+    (when (seq unsuccessful_unshares)
+      (log/error "data-info could not unshare" (map :path unsuccessful_unshares) "from" user))
     (when (seq successful_unshares)
       (send-unshare-notifications user successful_unshares))
     (when (seq unsuccessful_unshares)

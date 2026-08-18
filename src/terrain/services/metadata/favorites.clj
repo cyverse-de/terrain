@@ -13,23 +13,19 @@
            :folders (map mk-fav (:folders favs)))))
 
 (defn- user-col->api-col
+  "Maps a favorites sort column onto the sort-field data-info's listing endpoint accepts."
   [col]
   (case col
-    :name         :base-name
-    :id           :full-path
-    :lastmodified :modify-ts
-    :datecreated  :create-ts
-    :size         :data-size
-    :base-name))
+    :name         :name
+    :id           :path
+    :lastmodified :datemodified
+    :datecreated  :datecreated
+    :size         :size
+    :name))
 
 (defn- user-order->api-order
   [order]
-  (if order
-    (case order
-      :asc  :asc
-      :desc :desc
-      :asc)
-    :asc))
+  (if (= order :desc) "DESC" "ASC"))
 
 (defn add-favorite
   "This function marks a given data item as a favorite of the authenticated user.

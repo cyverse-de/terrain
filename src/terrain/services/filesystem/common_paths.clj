@@ -1,7 +1,6 @@
 (ns terrain.services.filesystem.common-paths
   (:require [clojure-commons.file-utils :as ft]
             [clojure.tools.logging :as log]
-            [clj-jargon.item-info :as item]
             [terrain.util.config :as cfg]
             [terrain.util.validators :as valid]))
 
@@ -41,11 +40,7 @@
 
 (defn user-trash-path
   [user]
-  (item/trash-base-dir (cfg/irods-zone) user))
-
-(defn in-trash?
-  [user ^String fpath]
-  (.startsWith fpath (user-trash-path user)))
+  (ft/path-join "/" (cfg/irods-zone) "trash" "home" user))
 
 (defn- dir-equal?
   [path comparison]
