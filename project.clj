@@ -43,12 +43,18 @@
   :exclusions [cider/cider-nrepl]
   :eastwood {:exclude-namespaces [terrain.util.jwt :test-paths]
              :linters [:wrong-arity :wrong-ns-form :wrong-pre-post :wrong-tag :misplaced-docstrings]}
-  :plugins [[lein-ancient "0.7.0"]
-            [lein-cljfmt "0.9.2"]
+  :plugins [[lein-ancient "1.0.0"]
             [lein-ring "0.12.6"]
             [test2junit "1.4.4"]
             [jonase/eastwood "1.4.3"]]
-  :profiles {:dev     {:dependencies [[clj-http-fake "1.0.4"]]
+  ;; cljfmt lives in its own profile: its tree and test2junit's disagree on which
+  ;; Clojure to use, which trips :pedantic? :abort on a conflict between two
+  ;; plugins that never reaches the runtime classpath. This repo also carried the
+  ;; deprecated `lein-cljfmt` coordinates, so cljfmt was not actually runnable
+  ;; here. Format with `lein with-profile +cljfmt cljfmt check`.
+  :profiles {:cljfmt  {:plugins [[dev.weavejester/lein-cljfmt "0.16.4"]]
+                       :pedantic? :warn}
+             :dev     {:dependencies [[clj-http-fake "1.0.4"]]
                        :resource-paths ["conf/test" "test-resources"]}
              :uberjar {:aot :all}}
   :main ^:skip-aot terrain.core
