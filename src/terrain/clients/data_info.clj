@@ -145,6 +145,15 @@
         (:error_code (json/decode body true))
         (catch Exception _ nil)))))
 
+(defn- already-created?
+  "Determines whether a failed folder creation failed only because the folder was already there.
+   data-info reports that as ERR_EXISTS when it catches the clash against its own existence check,
+   but as an unchecked iRODS error when two creates interleave past it, so anything else falls back
+   to re-checking the path rather than matching on the error."
+  [^String user ^String dir err]
+  (or (= error/ERR_EXISTS (error-code-of err))
+      (path-exists? user dir)))
+
 (defn ensure-dir-created
   "If a folder doesn't exist, it creates the folder and makes the given user an owner of it.
 
@@ -157,7 +166,9 @@
     ;; read, so data-info may well find the folder already there. Either way it now exists.
     (try+
      (raw/create-dirs user [dir])
-     (catch #(= error/ERR_EXISTS (error-code-of %)) _
+     (catch map? e
+       (when-not (already-created? user dir e)
+         (throw+))
        (log/debug "folder" dir "already existed when it was created for" user)))))
 
 (defn stat-by-path
