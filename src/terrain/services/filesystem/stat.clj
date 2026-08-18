@@ -1,75 +1,9 @@
 (ns terrain.services.filesystem.stat
   (:require [cheshire.core :as json]
-            [clj-icat-direct.icat :as icat]
-            [clj-jargon.init :refer [with-jargon]]
-            [clj-jargon.item-info :refer [exists? is-dir?]]
-            [clj-jargon.item-ops :refer [input-stream]]
-            [clj-jargon.metadata :refer [get-attribute]]
-            [clj-jargon.permissions :refer [is-writeable? list-user-perms permission-for owns?]]
             [clojure.string :as string]
-            [clojure.tools.logging :as log]
-            [clojure-commons.file-utils :as ft]
             [slingshot.slingshot :refer [throw+]]
             [terrain.clients.data-info.raw :as data-raw]
-            [terrain.services.filesystem.common-paths :as paths]
-            [terrain.services.filesystem.garnish.irods :as filetypes]
-            [terrain.services.filesystem.icat :as jargon]
-            [terrain.services.filesystem.validators :as validators]
-            [terrain.util.config :as cfg])
-  (:import [clojure.lang IPersistentMap]
-           [java.io InputStream]
-           [org.apache.tika Tika]))
-
-;; Declarations to eliminate lint warnings for bindings in non-standard macros.
-(declare cm)
-
-(defn- count-shares
-  [cm user path]
-  (let [filter-users (set (conj (cfg/fs-perms-filter) user (cfg/irods-user)))
-        full-listing (list-user-perms cm path)]
-    (count
-     (filterv
-      #(not (contains? filter-users (:user %1)))
-      full-listing))))
-
-(defn- merge-counts
-  [stat-map cm user path]
-  (if (is-dir? cm path)
-    (merge stat-map {:file-count (icat/number-of-files-in-folder user (cfg/irods-zone) path)
-                     :dir-count  (icat/number-of-folders-in-folder user (cfg/irods-zone) path)})
-    stat-map))
-
-(defn- merge-shares
-  [stat-map cm user path]
-  (if (owns? cm user path)
-    (merge stat-map {:share-count (count-shares cm user path)})
-    stat-map))
-
-(defn- detect-media-type-from-contents
-  [^IPersistentMap cm ^String path]
-  (with-open [^InputStream istream (input-stream cm path)]
-    (.detect (Tika.) istream)))
-
-(defn- detect-content-type
-  [^IPersistentMap cm ^String path]
-  (let [path-type (.detect (Tika.) (ft/basename path))]
-    (if (or (= path-type "application/octet-stream")
-            (= path-type "text/plain"))
-      (detect-media-type-from-contents cm path)
-      path-type)))
-
-(defn- merge-type-info
-  [stat-map cm user path]
-  (if-not (is-dir? cm path)
-    (-> stat-map
-        (merge {:infoType (filetypes/get-types cm user path)})
-        (merge {:content-type (detect-content-type cm path)}))
-    stat-map))
-
-(defn- merge-label
-  [stat-map user path]
-  (assoc stat-map
-         :label (paths/id->label user path)))
+            [terrain.util.config :as cfg]))
 
 (defn get-public-data-user
   "Returns the anonymous user for public data if a user is not provided"
@@ -83,41 +17,6 @@
                                :user user}))))
   ([user paths]
    (get-public-data-user user paths nil)))
-
-(defn path-is-dir?
-  [path]
-  (with-jargon (jargon/jargon-cfg) [cm]
-    (validators/path-exists cm path)
-    (is-dir? cm path)))
-
-(defn decorate-stat
-  [cm user stat]
-  (let [path (:path stat)]
-    (-> stat
-        (assoc :id         (:value (first (get-attribute cm path "ipc_UUID")))
-               :permission (permission-for cm user path))
-        (merge-label user path)
-        (merge-type-info cm user path)
-        (merge-shares cm user path)
-        (merge-counts cm user path))))
-
-(defn- dir-stack
-  "Obtains a stack of parent directories for a directory path."
-  [path]
-  (take-while (complement nil?) (iterate ft/dirname path)))
-
-(defn- deepest-extant-parent
-  "Finds the deepest parent of a path that exists."
-  [cm path]
-  (first (filter (partial exists? cm) (dir-stack path))))
-
-(defn can-create-dir?
-  ([cm user path]
-   ((every-pred (partial is-dir? cm) (partial is-writeable? cm user))
-    (log/spy :warn (deepest-extant-parent cm path))))
-  ([user path]
-   (with-jargon (jargon/jargon-cfg) [cm]
-     (can-create-dir? cm user path))))
 
 (defn do-stat
   [{user :user} body]

@@ -6,7 +6,6 @@
             [cemerick.url :as url]
             [cheshire.core :as json]
             [me.raynes.fs :as fs]
-            [clj-icat-direct.icat :as db]
             [clojure-commons.core :refer [remove-nil-values]]
             [clojure-commons.error-codes :as error]
             [clojure-commons.file-utils :as ft]
@@ -15,11 +14,7 @@
             [terrain.auth.user-attributes :refer [current-user]]
             [terrain.clients.data-info.raw :as raw]
             [terrain.services.filesystem.common-paths :as cp]
-            [terrain.services.filesystem.create :as cr]
-            [terrain.services.filesystem.icat :as icat]
-            [terrain.services.filesystem.sharing :as sharing]
             [terrain.services.filesystem.stat :as st]
-            [terrain.services.filesystem.uuids :as uuids]
             [terrain.services.filesystem.validators :as validators]
             [terrain.util.config :as cfg])
   (:import [clojure.lang IPersistentMap ISeq Keyword]
@@ -63,15 +58,6 @@
       :body
       (json/decode true)
       :id))
-
-(defn ensure-dir-created
-  "If a folder doesn't exist, it creates the folder and makes the given user an owner of it.
-
-   Parameters:
-     user - the username of the user to become an owner of the new folder
-     dir  - the absolute path to the folder"
-  [^String user ^String dir]
-  (cr/ensure-created user dir))
 
 (defn read-chunk
   "Uses the data-info read-chunk endpoint."
@@ -150,6 +136,53 @@
     (-> (check-existence user [path])
         (get-in [:paths (keyword path)]))))
 
+(defn- error-code-of
+  "Extracts the DE error code from a failed data-info response, if it reported one."
+  [response]
+  (let [body (:body response)]
+    (when (string? body)
+      (try
+        (:error_code (json/decode body true))
+        (catch Exception _ nil)))))
+
+(defn- already-created?
+  "Determines whether a failed folder creation failed only because the folder was already there.
+   data-info reports that as ERR_EXISTS when it catches the clash against its own existence check,
+   but as an unchecked iRODS error when two creates interleave past it, so anything else falls back
+   to re-checking the path rather than matching on the error."
+  [^String user ^String dir err]
+  (or (= error/ERR_EXISTS (error-code-of err))
+      (path-exists? user dir)))
+
+(defn ensure-dir-created
+  "If a folder doesn't exist, it creates the folder and makes the given user an owner of it.
+
+   Parameters:
+     user - the username of the user to become an owner of the new folder
+     dir  - the absolute path to the folder"
+  [^String user ^String dir]
+  (when-not (path-exists? user dir)
+    ;; The existence check races other requests and can't see folders the user isn't allowed to
+    ;; read, so data-info may well find the folder already there. Either way it now exists.
+    (try+
+     (raw/create-dirs user [dir])
+     (catch map? e
+       (when-not (already-created? user dir e)
+         (throw+))
+       (log/debug "folder" dir "already existed when it was created for" user)))))
+
+(defn stat-by-path
+  "Resolves the stat info for the entity at a given path. Passing filter-include, a comma-separated
+   list of stat field names, lets data-info skip the fields the caller doesn't need; some of them
+   are expensive to gather for large folders."
+  ([^String user ^String path]
+   (stat-by-path user path nil))
+  ([^String user ^String path ^String filter-include]
+   (-> (raw/collect-path-info user :paths [path] :filter-include filter-include)
+       :body
+       (json/decode true)
+       (get-in [:paths (keyword path)]))))
+
 (defn get-or-create-dir
   "Returns the path argument if the path exists and refers to a directory.  If
    the path exists and refers to a regular file then nil is returned.
@@ -157,24 +190,20 @@
   [path]
   (log/debug "getting or creating dir: path =" path)
   (let [user (:shortUsername current-user)]
-    (cond
-      (not (path-exists? user path))
+    (if-not (path-exists? user path)
       (create-dir {:user user} {:path path})
-
-      (and (path-exists? user path) (st/path-is-dir? path))
-      path
-
-      (and (path-exists? user path) (not (st/path-is-dir? path)))
-      nil
-
-      :else
-      nil)))
+      (when (= "dir" (:type (stat-by-path user path "type")))
+        path))))
 
 (defn can-create-dir?
   "Determines if a directory exists or can be created."
   [user path]
   (log/warn "checking to see if" path "can be created")
-  (st/can-create-dir? user path))
+  (-> (raw/check-creatability user [path])
+      :body
+      (json/decode true)
+      (get-in [:paths (keyword path)])
+      boolean))
 
 (defn overwrite-file
   "Overwrite a file with a new file by path."
@@ -329,8 +358,9 @@
                   of info types.
 
    Returns:
-     It returns a page of stat info maps."
-  ^ISeq
+     It returns a map containing a page of stat info maps, split into files and folders, alongside
+     the total number of matching items."
+  ^IPersistentMap
   [^String  user
    ^String  sort-field
    ^String  sort-order
@@ -339,17 +369,13 @@
    ^Integer offset
    ^ISeq    uuids
    info-types]
-  (let [info-types (if (string? info-types) [info-types] info-types)
-        page       (uuids/paths-for-uuids-paged user
-                                                sort-field
-                                                sort-order
-                                                limit
-                                                offset
-                                                uuids
-                                                info-types)]
-    {:files   (filter #(= (:type %) :file) page)
-     :folders (filter #(= (:type %) :dir) page)
-     :total   (db/number-of-uuids-in-folder user (cfg/irods-zone) uuids info-types)}))
+  (-> (raw/list-stats-by-ids user uuids {:sort-field sort-field
+                                         :sort-dir   sort-order
+                                         :limit      limit
+                                         :offset     offset
+                                         :info-type  info-types})
+      :body
+      (json/decode true)))
 
 (defn uuid-accessible?
   "Indicates if a data item is readable by a given user.
@@ -361,7 +387,10 @@
    Returns:
      It returns true if the user can access the data item, otherwise false"
   ^Boolean [^String user ^UUID data-id]
-  (uuids/uuid-accessible? user data-id))
+  (-> (stats-by-uuids user [data-id] {:ignore-missing      true
+                                      :ignore-inaccessible true
+                                      :filter-include      "id"})
+      (contains? (keyword (str data-id)))))
 
 (defn validate-uuid-accessible
   "Throws an exception if the given data item is not accessible to the given user.
@@ -377,15 +406,60 @@
   "Given filesystem id, it returns the type of data item it is, file or folder.
 
    Parameters:
+     user    - the authenticated name of the user
      data-id - The UUID of the data item to inspect
 
    Returns:
      The type of the data item, `file` or `folder`"
-  ^String [^UUID data-id]
-  (icat/resolve-data-type data-id))
+  ^String [^String user ^UUID data-id]
+  (let [stats (stats-by-uuids user [data-id] {:ignore-missing      true
+                                              :ignore-inaccessible true
+                                              :filter-include      "type"})]
+    ;; A data id that resolves to nothing reports as a file, which is what the ICAT lookup this
+    ;; replaced did.
+    (if (= "dir" (:type (get stats (keyword (str data-id)))))
+      "folder"
+      "file")))
+
+(defn- flatten-share-outcomes
+  "Flattens data-info's per-user sharing response into one entry per user/path pair, tagging each
+   entry with the user it applies to."
+  [response outer-key inner-key]
+  (mapcat (fn [entry] (map #(assoc % :user (:user entry)) (get entry inner-key)))
+          (get response outer-key)))
+
+(defn- throw-first-failure
+  "data-info reports a failed share per item rather than failing the request, but most callers here
+   predate that and expect a throw. Re-raise the first failure for them."
+  [outcomes]
+  (when-let [failure (first (remove :success outcomes))]
+    (throw+ (or (:error failure)
+                {:error_code error/ERR_REQUEST_FAILED :path (:path failure)}))))
+
+(defn share-paths
+  "Grants users access to sets of paths, returning one outcome per user/path pair. Each entry has
+   :user, :path, :permission and :success, plus :reason when the share was a no-op and :error when
+   it failed."
+  ^ISeq [^String user ^ISeq sharing]
+  (-> (raw/share user sharing)
+      :body
+      (json/decode true)
+      (flatten-share-outcomes :sharing :sharing)))
+
+(defn unshare-paths
+  "Revokes users' access to sets of paths, returning one outcome per user/path pair the way
+   share-paths does."
+  ^ISeq [^String user ^ISeq unshare]
+  (-> (raw/unshare user unshare)
+      :body
+      (json/decode true)
+      (flatten-share-outcomes :unshare :unshare)))
 
 (defn share
   "grants access to a list of data entities for a list of users by a user
+
+   data-info validates and applies each user/path pair on its own, so a throw from this function
+   means at least one pair failed, not that none of them were applied.
 
    Params:
      user        - the username of the sharing user
@@ -404,10 +478,23 @@
                     :reason - the reason access wasn't granted
        :perm    - the permission that was granted"
   ^IPersistentMap [^String user ^ISeq share-withs ^ISeq fpaths ^String perm]
-  (sharing/share user share-withs fpaths perm))
+  (let [outcomes (share-paths user
+                              (mapv (fn [share-with]
+                                      {:user  share-with
+                                       :paths (mapv (fn [path] {:path path :permission perm}) fpaths)})
+                                    share-withs))]
+    (throw-first-failure outcomes)
+    {:user       (distinct (map :user outcomes))
+     :path       fpaths
+     :skipped    (mapv #(select-keys % [:user :path :reason]) (filter :reason outcomes))
+     :permission perm}))
 
 (defn unshare
-  "Params:
+  "Revokes access to a list of data entities for a list of users. Like share, this applies each
+   user/path pair on its own, so a throw means at least one pair failed rather than none of them
+   being applied.
+
+   Params:
      user          - the username of the user removing access
      unshare-withs - the list of usernames having access removed
      fpaths        - the list of absolute paths ot the data entities losing accessibility
@@ -422,7 +509,13 @@
                     :path   - the path the user still can access
                     :reason - the reason access wasn't removed"
   [^String user ^ISeq unshare-withs ^ISeq fpaths]
-  (sharing/unshare user unshare-withs fpaths))
+  (let [outcomes (unshare-paths user
+                                (mapv (fn [unshare-with] {:user unshare-with :paths fpaths})
+                                      unshare-withs))]
+    (throw-first-failure outcomes)
+    {:user    (distinct (map :user outcomes))
+     :path    fpaths
+     :skipped (mapv #(select-keys % [:user :path :reason]) (filter :reason outcomes))}))
 
 (defn- fmt-method
   [method]

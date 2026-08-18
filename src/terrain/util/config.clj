@@ -307,100 +307,13 @@
   [props config-valid configs data-routes-enabled]
   "terrain.irods.user" "rods")
 
-(declare irods-pass)
-(cc/defprop-optstr irods-pass
-  "Returns the iRODS user's password."
-  [props config-valid configs data-routes-enabled]
-  "terrain.irods.pass" "notprod")
-
-(declare irods-host)
-(cc/defprop-optstr irods-host
-  "Returns the iRODS hostname/IP address."
-  [props config-valid configs data-routes-enabled]
-  "terrain.irods.host" "irods")
-
-(declare irods-port)
-(cc/defprop-optstr irods-port
-  "Returns the iRODS port."
-  [props config-valid configs data-routes-enabled]
-  "terrain.irods.port" "1247")
-
 (declare irods-zone)
 (cc/defprop-optstr irods-zone
   "Returns the iRODS zone."
   [props config-valid configs data-routes-enabled]
   "terrain.irods.zone" "iplant")
 
-(declare irods-resc)
-(cc/defprop-optstr irods-resc
-  "Returns the iRODS resource."
-  [props config-valid configs data-routes-enabled]
-  "terrain.irods.resc" "")
-
-(declare irods-max-retries)
-(cc/defprop-optint irods-max-retries
-  "The number of retries for failed operations."
-  [props config-valid configs data-routes-enabled]
-  "terrain.irods.max-retries" 10)
-
-(declare irods-retry-sleep)
-(cc/defprop-optint irods-retry-sleep
-  "The number of milliseconds to sleep between retries."
-  [props config-valid configs data-routes-enabled]
-  "terrain.irods.retry-sleep" 1000)
-
-(declare irods-use-trash)
-(cc/defprop-optboolean irods-use-trash
-  "Toggles whether to move deleted files to the trash first."
-  [props config-valid configs data-routes-enabled]
-  "terrain.irods.use-trash" true)
-
-(declare irods-admins)
-(cc/defprop-optvec irods-admins
-  "The admin users in iRODS."
-  [props config-valid configs fileio-routes-enabled]
-  "terrain.irods.admin-users" ["rods", "rodsadmin"])
 ;;;End iRODS connection information
-
-;;; ICAT connection information
-(declare icat-host)
-(cc/defprop-optstr icat-host
-  "The hostname for the server running the ICAT database."
-  [props config-valid configs data-routes-enabled]
-  "terrain.icat.host" "irods")
-
-(declare icat-port)
-(cc/defprop-optint icat-port
-  "The port that the ICAT is accepting connections on."
-  [props config-valid configs data-routes-enabled]
-  "terrain.icat.port" 5432)
-
-(declare icat-user)
-(cc/defprop-optstr icat-user
-  "The user for the ICAT database."
-  [props config-valid configs data-routes-enabled]
-  "terrain.icat.user" "rods")
-
-(declare icat-password)
-(cc/defprop-optstr icat-password
-  "The password for the ICAT database."
-  [props config-valid configs data-routes-enabled]
-  "terrain.icat.password" "notprod")
-
-(declare icat-db)
-(cc/defprop-optstr icat-db
-  "The database name for the ICAT database. Yeah, it's most likely going to be 'ICAT'."
-  [props config-valid configs data-routes-enabled]
-  "terrain.icat.db" "ICAT")
-;;; End ICAT connection information.
-
-;;; Garnish configuration
-(declare garnish-type-attribute)
-(cc/defprop-optstr garnish-type-attribute
-  "The value that goes in the attribute column for AVUs that define a file type."
-  [props config-valid configs data-routes-enabled]
-  "terrain.garnish.type-attribute" "ipc-filetype")
-;;; End of Garnish configuration
 
 ;;; File IO configuration
 (declare fileio-url-import-app)
@@ -423,12 +336,6 @@
   "The bad data names."
   [props config-valid configs filesystem-routes-enabled]
   "terrain.fs.bad-names" "cacheServiceTempDir")
-
-(declare fs-perms-filter)
-(cc/defprop-optvec fs-perms-filter
-  "Hmmm..."
-  [props config-valid configs filesystem-routes-enabled]
-  "terrain.fs.perms-filter" ["rods", "rodsadmin"])
 
 (declare fs-bad-chars)
 (cc/defprop-optstr fs-bad-chars
@@ -816,7 +723,7 @@
 (defn- exception-filters
   []
   (filter #(not (nil? %))
-          [(icat-password) (icat-user) (irods-pass) (irods-user)]))
+          [(irods-user)]))
 
 (defn jwt-opts
   []

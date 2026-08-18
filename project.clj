@@ -12,16 +12,12 @@
   ;; :managed-dependencies" hint -- that hint names the version that LOST the
   ;; conflict, so pasting it would be a silent upgrade.
   ;;
-  ;; The jackson-* entries hold databind/annotations where clj-jargon puts them:
-  ;; jargon-core is pinned :upgrade false at 4.3.7.0-RELEASE for iRODS and brings
-  ;; jackson 2.14.1. jackson-core sits higher because cheshire needs it there --
-  ;; cheshire 6 throws at runtime against jackson-core 2.14.1. The family is
-  ;; therefore deliberately not uniform, matching what main already resolved. Do
-  ;; not "tidy" this by dropping core to match the rest; unifying means moving
-  ;; jargon.
-  :managed-dependencies [[com.fasterxml.jackson.core/jackson-annotations "2.14.1"]
-                         [com.fasterxml.jackson.core/jackson-databind "2.14.1"]
-                         [com.google.guava/guava "16.0.1"]
+  ;; No jackson entries: databind/annotations only needed pinning because
+  ;; clj-jargon dragged them down to 2.14.1, and terrain no longer depends on
+  ;; clj-jargon. Nothing else asks for that version, so the family resolves on
+  ;; its own; pinning it now would put databind below the jackson-core cheshire
+  ;; brings.
+  :managed-dependencies [[com.google.guava/guava "16.0.1"]
                          [commons-codec "1.16.1"]
                          [commons-io "2.16.1"]
                          [org.apache.commons/commons-fileupload2-core "2.0.0-M1"]
@@ -48,9 +44,6 @@
                  [ring/ring-jetty-adapter "1.15.5"]
                  [slingshot "0.12.2"]
                  [org.cyverse/async-tasks-client "0.0.6"]
-                 [org.cyverse/clj-icat-direct "2.9.8"]
-                 [org.cyverse/clj-jargon "3.1.6"
-                  :exclusions [org.bouncycastle/bcprov-jdk16 junit]]
                  [org.cyverse/clojure-commons "3.0.13"]
                  [org.cyverse/cyverse-groups-client "0.1.10"]
                  [org.cyverse/common-cfg "2.8.4"]

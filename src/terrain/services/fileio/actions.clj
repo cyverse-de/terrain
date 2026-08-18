@@ -1,19 +1,27 @@
 (ns terrain.services.fileio.actions
   (:require [cemerick.url :as url]
-            [clj-jargon.init :refer [with-jargon]]
+            [clojure-commons.error-codes :as ce]
             [clojure-commons.file-utils :as ft]
             [clojure.tools.logging :as log]
-            [terrain.services.filesystem.icat :as icat]
-            [terrain.services.filesystem.validators :as validators]
+            [slingshot.slingshot :refer [throw+]]
+            [terrain.clients.data-info :as data-info]
             [terrain.services.filesystem.updown :as updown]
             [terrain.services.metadata.internal-jobs :as internal-jobs]))
-
-;; Declarations to eliminate lint warnings for the iRODS context map binding.
-(declare cm)
 
 (defn- url-encoded?
   [string-to-check]
   (re-seq #"\%[A-Fa-f0-9]{2}" string-to-check))
+
+(defn- validate-import-target
+  "Checks that a URL import can land where it was asked to: the destination has to be writeable by
+   the user, and nothing can already be sitting at the name being imported."
+  [user dest-path filename]
+  (let [dest-stat (data-info/stat-by-path user dest-path "permission")
+        dest-file (ft/path-join dest-path filename)]
+    (when-not (contains? #{"write" "own"} (:permission dest-stat))
+      (throw+ {:error_code ce/ERR_NOT_WRITEABLE :user user :path dest-path}))
+    (when (data-info/path-exists? user dest-file)
+      (throw+ {:error_code ce/ERR_EXISTS :path dest-file}))))
 
 (defn urlimport
   "Submits a URL import job for execution.
@@ -26,10 +34,7 @@
   [user address filename dest-path]
   (let [filename  (if (url-encoded? filename) (url/url-decode filename) filename)
         dest-path (ft/rm-last-slash dest-path)]
-    (with-jargon (icat/jargon-cfg) [cm]
-      (validators/user-exists cm user)
-      (validators/path-writeable cm user dest-path)
-      (validators/path-not-exists cm (ft/path-join dest-path filename)))
+    (validate-import-target user dest-path filename)
     (internal-jobs/submit :url-import [address filename dest-path])
     {:msg   "Upload scheduled."
      :url   address

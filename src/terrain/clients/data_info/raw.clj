@@ -290,6 +290,21 @@
   (request :post ["anonymizer"]
            (mk-req-map user (json/encode {:paths paths}))))
 
+(defn share
+  "Uses the data-info sharer endpoint to grant users access to sets of paths. The outcome of every
+   path is reported in the response rather than thrown, so a path that can't be shared fails only
+   its own entry."
+  [user sharing]
+  (request :post ["sharer"]
+           (mk-req-map user (json/encode {:sharing sharing}))))
+
+(defn unshare
+  "Uses the data-info unsharer endpoint to revoke users' access to sets of paths, reporting the
+   outcome per path the way share does."
+  [user unshare]
+  (request :post ["unsharer"]
+           (mk-req-map user (json/encode {:unshare unshare}))))
+
 ;; TICKETS
 
 (defn list-tickets
@@ -344,6 +359,19 @@
   [user paths]
   (request :post ["existence-marker"]
            (mk-req-map user (json/encode {:paths paths}))))
+
+(defn check-creatability
+  "Uses the data-info creatability-marker endpoint to determine whether a folder could be created at
+   each of a set of paths."
+  [user paths]
+  (request :post ["creatability-marker"]
+           (mk-req-map user (json/encode {:paths paths}))))
+
+(defn list-stats-by-ids
+  "Uses the data-info stat-lister endpoint to gather a page of stat information for a set of data ids."
+  [user ids params]
+  (request :post ["stat-lister"]
+           (mk-req-map user (json/encode {:ids ids}) (remove-vals nil? params))))
 
 (defn get-type-list
   "Uses the data-info file-types endpoint to produce a list of acceptable types."
