@@ -3,10 +3,6 @@
             [clj-http.client :as http]
             [terrain.util.config :as cfg]))
 
-;; File type detection moved out of data-info and into info-typer, which owns it. The paths
-;; are the ones data-info served, so this is the same two calls against a different base URL --
-;; which is what keeps the move reversible by configuration while both services still answer.
-
 (defn- info-typer-url
   [& url-path]
   (str (apply url/url (cfg/info-typer-base-url) url-path)))

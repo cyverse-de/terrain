@@ -26,24 +26,6 @@
   [& url-path]
   (str (apply url/url (cfg/data-info-base-url) url-path)))
 
-(defn- get-options
-  ([]
-   (get-options {}))
-  ([params]
-   {:query-params params
-    :as           :json})
-  ([user params]
-   (get-options (assoc params :user user))))
-
-(defn- put-options
-  ([user body]
-   (put-options user body {}))
-  ([user body params]
-   {:form-params  body
-    :query-params (assoc params :user user)
-    :content-type :json
-    :as           :json}))
-
 (defn request
   "This function makes an HTTP request to the data-info service. It uses clj-http to make the
    request."
