@@ -373,17 +373,6 @@
   (request :post ["stat-lister"]
            (mk-req-map user (json/encode {:ids ids}) (remove-vals nil? params))))
 
-(defn get-type-list
-  "Uses the data-info file-types endpoint to produce a list of acceptable types."
-  []
-  (:body (http/get (data-info-url "file-types") (get-options))))
-
-(defn set-file-type
-  "Uses the data-info set-type endpoint to change the type of a file."
-  [user path-uuid type]
-  (:body (http/put (data-info-url "data" path-uuid "type")
-                   (put-options user {:type type}))))
-
 (defn path-list-creator
   "Uses the data-info path-list-creator endpoint to create an HT Path List files for a set of file/folder paths."
   [user paths params]
