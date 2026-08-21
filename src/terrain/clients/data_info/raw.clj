@@ -26,24 +26,6 @@
   [& url-path]
   (str (apply url/url (cfg/data-info-base-url) url-path)))
 
-(defn- get-options
-  ([]
-   (get-options {}))
-  ([params]
-   {:query-params params
-    :as           :json})
-  ([user params]
-   (get-options (assoc params :user user))))
-
-(defn- put-options
-  ([user body]
-   (put-options user body {}))
-  ([user body params]
-   {:form-params  body
-    :query-params (assoc params :user user)
-    :content-type :json
-    :as           :json}))
-
 (defn request
   "This function makes an HTTP request to the data-info service. It uses clj-http to make the
    request."
@@ -372,17 +354,6 @@
   [user ids params]
   (request :post ["stat-lister"]
            (mk-req-map user (json/encode {:ids ids}) (remove-vals nil? params))))
-
-(defn get-type-list
-  "Uses the data-info file-types endpoint to produce a list of acceptable types."
-  []
-  (:body (http/get (data-info-url "file-types") (get-options))))
-
-(defn set-file-type
-  "Uses the data-info set-type endpoint to change the type of a file."
-  [user path-uuid type]
-  (:body (http/put (data-info-url "data" path-uuid "type")
-                   (put-options user {:type type}))))
 
 (defn path-list-creator
   "Uses the data-info path-list-creator endpoint to create an HT Path List files for a set of file/folder paths."

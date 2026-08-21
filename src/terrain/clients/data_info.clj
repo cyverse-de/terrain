@@ -13,6 +13,7 @@
             [slingshot.slingshot :refer [throw+ try+]]
             [terrain.auth.user-attributes :refer [current-user]]
             [terrain.clients.data-info.raw :as raw]
+            [terrain.clients.info-typer :as info-typer]
             [terrain.services.filesystem.common-paths :as cp]
             [terrain.services.filesystem.stat :as st]
             [terrain.services.filesystem.validators :as validators]
@@ -269,13 +270,14 @@
   [params body]
   (raw/path-list-creator (:user params) (:paths body) params))
 
-(def get-type-list raw/get-type-list)
+(def get-type-list info-typer/get-type-list)
 
 (defn set-file-type
-  "Uses the data-info set-type endpoint to change the type of a file."
+  "Sets a file's type. The path is still resolved to an ID through data-info, which owns
+   paths; the type itself is info-typer's."
   [params body]
   (let [path-uuid (uuid-for-path (:user params) (:path body))]
-    (raw/set-file-type (:user params) path-uuid (:type body))))
+    (info-typer/set-file-type (:user params) path-uuid (:type body))))
 
 (defn share-with-anonymous
   "Uses the data-info anonymizer endpoint to share paths with the anonymous user."

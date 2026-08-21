@@ -363,6 +363,12 @@
   [props config-valid configs filesystem-routes-enabled]
   "terrain.data-info.base-url" "http://data-info")
 
+(declare info-typer-base-url)
+(cc/defprop-optstr info-typer-base-url
+  "The base URL for the info typer service, which owns file type detection."
+  [props config-valid configs filesystem-routes-enabled]
+  "terrain.info-typer.base-url" "http://info-typer")
+
 (declare es-enabled)
 (cc/defprop-optboolean es-enabled
   "Whether Elasticsearch is enabled for the deployment."
