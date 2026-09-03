@@ -8,10 +8,10 @@
   (:require [cemerick.url :as curl]
             [clj-http.client :as http]
             [clojure.string :as string]
-            [clojure.tools.logging :as log]
             [clojure-commons.exception-util :as cxu]
             [medley.core :refer [remove-vals]]
             [slingshot.slingshot :refer [try+]]
+            [terrain.clients.subject-info :as subject-info]
             [terrain.util.config :as config]))
 
 ;; The group types the Groups service recognizes.
@@ -24,6 +24,13 @@
 ;; backend used for its public subject (and Sonora's configurable grouper.allUsers), so no
 ;; Sonora configuration change is required.
 (def ^:private public-subject "GrouperAll")
+
+;; The connection pool in terrain.core sets an idle-connection TTL, not a request deadline, so
+;; these keep a stalled Groups service from pinning request threads indefinitely. Subject lookups
+;; run on the bootstrap and user-info paths, so a hang here reaches well beyond group management.
+(def ^:private request-timeouts
+  {:socket-timeout 10000
+   :conn-timeout   10000})
 
 (defn- groups-url
   [& components]
@@ -43,21 +50,12 @@
 
 ;; Subject search and lookup functions.
 
-(defn format-like-trellis
-  "Reformat a Groups subject response to look like a trellis response."
-  [response]
-  {:username    (:id response)
-   :firstname   (:first_name response)
-   :lastname    (:last_name response)
-   :name        (:name response)
-   :email       (:email response)
-   :institution (:institution response)})
-
 (defn- format-subject
-  "The Groups service returns user subjects directly, so the display name is simply the
-   subject name."
-  [subject]
-  (assoc subject :display_name (:name subject)))
+  "The Groups service returns user subjects directly, so the display name is simply the subject
+   name, falling back to the subject id when the name is blank. The listing schemas require a
+   non-blank display name, so one nameless member would otherwise fail the whole response."
+  [{:keys [id name] :as subject}]
+  (assoc subject :display_name (or (not-empty name) id)))
 
 (defn- format-subjects
   [subjects]
@@ -67,48 +65,45 @@
   "Searches for subjects matching the given search string."
   [user search]
   (-> (http/get (groups-url "subjects")
-                {:query-params (query user {:search search})
-                 :as           :json})
+                (merge request-timeouts
+                       {:query-params (query user {:search search})
+                        :as           :json}))
       :body
       (update :subjects format-subjects)))
 
 (defn lookup-subject
   "Looks up a single subject by ID, returning nil if the subject is not found."
   [user short-username]
-  (try+
-   (:body (http/get (groups-url "subjects" short-username)
-                    {:query-params (query user)
-                     :as           :json}))
-   (catch [:status 404] _
-     (log/warn (str "no user info found for username '" short-username "'"))
-     nil)
-   (catch Object _
-     (log/error (:throwable &throw-context) "user lookup for '" short-username "' failed")
-     nil)))
+  (subject-info/lookup-or-nil
+   short-username
+   #(:body (http/get (groups-url "subjects" short-username)
+                     (merge request-timeouts
+                            {:query-params (query user)
+                             :as           :json})))))
 
 (defn lookup-subjects
   "Looks up multiple subjects by ID. Unresolvable IDs are silently omitted by the service."
   [user subject-ids]
   (:body (http/post (groups-url "subjects" "lookup")
-                    {:query-params (query user)
-                     :form-params  {:subject_ids subject-ids}
-                     :content-type :json
-                     :as           :json})))
+                    (merge request-timeouts
+                           {:query-params (query user)
+                            :form-params  {:subject_ids subject-ids}
+                            :content-type :json
+                            :as           :json}))))
 
-(defn- index-subjects
-  [subjects]
-  (into {} (map (juxt :id identity)) subjects))
-
-(defn- empty-user-info
-  "Returns an empty user-info record for the given username."
-  [username]
-  {:id username :name "" :first_name "" :last_name "" :email "" :institution "" :source_id ""})
+(defn- subjects-by-id
+  "Bulk-resolves subject IDs into a map keyed by ID. An empty list of IDs resolves to an empty
+   map without a request; the service has nothing to look up."
+  [user subject-ids]
+  (if (seq subject-ids)
+    (into {} (map (juxt :id identity)) (:subjects (lookup-subjects user (vec subject-ids))))
+    {}))
 
 (defn lookup-subject-add-empty
   "Looks up a single subject by ID, returning an empty user-info block if nothing is found."
   [user short-username]
   (or (lookup-subject user short-username)
-      (empty-user-info short-username)))
+      (subject-info/empty-user-info short-username)))
 
 ;; The external group contract.
 
@@ -152,8 +147,8 @@
    lookup. A group with no owner (e.g. a community) gets no :detail: there is no creator to
    report."
   [user groups formatted-groups]
-  (let [owners (vec (distinct (keep :owner groups)))
-        by-id  (if (seq owners) (index-subjects (:subjects (lookup-subjects user owners))) {})]
+  (let [owners (distinct (keep :owner groups))
+        by-id  (subjects-by-id user owners)]
     (mapv (fn [{:keys [owner created_at]} formatted]
             (cond-> formatted
               owner (assoc :detail {:created_at          (epoch-millis created_at)
@@ -182,8 +177,9 @@
   [user {:keys [group-type owner name]}]
   (try+
    (:body (http/get (groups-url "groups" "lookup")
-                    {:query-params (query user {:group_type group-type :owner owner :name name})
-                     :as           :json}))
+                    (merge request-timeouts
+                           {:query-params (query user {:group_type group-type :owner owner :name name})
+                            :as           :json})))
    (catch [:status 404] _ nil)))
 
 (defn- get-group
@@ -205,10 +201,11 @@
   [user filters]
   (loop [offset 0 groups []]
     (let [page   (:groups (:body (http/get (groups-url "groups")
-                                           {:query-params (query user (assoc filters
-                                                                             :limit  list-page-size
-                                                                             :offset offset))
-                                            :as           :json})))
+                                           (merge request-timeouts
+                                                  {:query-params (query user (assoc filters
+                                                                                    :limit  list-page-size
+                                                                                    :offset offset))
+                                                   :as           :json}))))
           groups (into groups page)]
       (if (< (count page) list-page-size)
         groups
@@ -217,24 +214,26 @@
 (defn- create-group
   [user spec]
   (:body (http/post (groups-url "groups")
-                    {:query-params (query user)
-                     :form-params  (remove-vals nil? spec)
-                     :content-type :json
-                     :as           :json})))
+                    (merge request-timeouts
+                           {:query-params (query user)
+                            :form-params  (remove-vals nil? spec)
+                            :content-type :json
+                            :as           :json}))))
 
 (defn- update-group
   [user id updates]
   (:body (http/put (groups-url "groups" id)
-                   {:query-params (query user)
-                    :form-params  (remove-vals nil? updates)
-                    :content-type :json
-                    :as           :json})))
+                   (merge request-timeouts
+                          {:query-params (query user)
+                           :form-params  (remove-vals nil? updates)
+                           :content-type :json
+                           :as           :json}))))
 
 (defn- delete-group
   "Deletes a group by ID. The service returns no body, so callers report the group they
    resolved beforehand rather than a deletion response."
   [user id]
-  (http/delete (groups-url "groups" id) {:query-params (query user)})
+  (http/delete (groups-url "groups" id) (merge request-timeouts {:query-params (query user)}))
   nil)
 
 (defn- delete-group-by-ref
@@ -258,16 +257,19 @@
 
 (defn- list-members
   [user group-id]
-  {:members (format-subjects (:members (:body (http/get (groups-url "groups" group-id "members")
-                                                        {:query-params (query user) :as :json}))))})
+  {:members (format-subjects
+             (:members (:body (http/get (groups-url "groups" group-id "members")
+                                        (merge request-timeouts
+                                               {:query-params (query user) :as :json})))))})
 
 (defn- change-members
   [user group-id components members]
   (->> (http/post (apply groups-url "groups" group-id components)
-                  {:query-params (query user)
-                   :form-params  {:members members}
-                   :content-type :json
-                   :as           :json})
+                  (merge request-timeouts
+                         {:query-params (query user)
+                          :form-params  {:members members}
+                          :content-type :json
+                          :as           :json}))
        :body
        :results
        format-member-results
@@ -288,22 +290,24 @@
 (defn- grant-permission
   [user group-id subject-type subject-id level]
   (http/put (groups-url "groups" group-id "permissions" subject-type subject-id)
-            {:query-params (query user)
-             :form-params  {:level level}
-             :content-type :json
-             :as           :json}))
+            (merge request-timeouts
+                   {:query-params (query user)
+                    :form-params  {:level level}
+                    :content-type :json
+                    :as           :json})))
 
 (defn- revoke-permission
   [user group-id subject-type subject-id]
   (try+
    (http/delete (groups-url "groups" group-id "permissions" subject-type subject-id)
-                {:query-params (query user) :as :json})
+                (merge request-timeouts {:query-params (query user) :as :json}))
    (catch [:status 404] _ nil)))
 
 (defn- group-permissions
   [user group-id]
   (:permissions (:body (http/get (groups-url "groups" group-id "permissions")
-                                 {:query-params (query user) :as :json}))))
+                                 (merge request-timeouts
+                                        {:query-params (query user) :as :json})))))
 
 (defn- level->privilege-name
   [subject-id level]
@@ -332,7 +336,7 @@
   [user group-id]
   (let [perms    (group-permissions user group-id)
         user-ids (->> perms (map :subject) (filter (comp #{"user"} :subject_type)) (map :subject_id))
-        by-id    (index-subjects (:subjects (lookup-subjects user (vec user-ids))))]
+        by-id    (subjects-by-id user user-ids)]
     {:privileges (mapv (fn [{:keys [subject level]}]
                          {:type    "access"
                           :name    (level->privilege-name (:subject_id subject) level)
@@ -349,7 +353,7 @@
                        (map (comp :subject_id :subject))
                        (remove #{(config/groups-admin-user)})
                        vec)
-        by-id     (index-subjects (:subjects (lookup-subjects user admin-ids)))]
+        by-id     (subjects-by-id user admin-ids)]
     {:members (mapv #(get by-id % {:id % :source_id ""}) admin-ids)}))
 
 ;; Collaborator lists, which are owned by the user who created them.
@@ -566,11 +570,19 @@
 
 (defn update-team-privileges
   "Applies privilege updates to a team, translating DE privilege names to permission levels.
-   A subject with no privileges has its permission revoked."
+   A subject with no privileges has its permission revoked.
+
+   The public subject also carries the halves of `view`/`read`/`optin` that the permissions
+   service has no level for, so its privileges rewrite the group's own flags as well; otherwise
+   a team's member-list visibility and joinability would be frozen at whatever it was created
+   with. The flags are written first so they are never broader than the grants backing them."
   [user name {:keys [updates]}]
   (let [id (group-id user (team-ref name))]
     (doseq [{:keys [subject_id privileges]} updates]
       (let [subject-type (if (= subject_id public-subject) "group" "user")]
+        (when (= subject_id public-subject)
+          (update-group user id {:members_public (members-public? privileges)
+                                 :joinable       (joinable? privileges)}))
         (if-let [level (privileges->level privileges)]
           (grant-permission user id subject-type subject_id level)
           (revoke-permission user id subject-type subject_id))))
@@ -701,8 +713,9 @@
   [subject-id details]
   (let [admin  (config/groups-admin-user)
         groups (:groups (:body (http/get (groups-url "subjects" subject-id "groups")
-                                         {:query-params (query admin)
-                                          :as           :json})))]
+                                         (merge request-timeouts
+                                                {:query-params (query admin)
+                                                 :as           :json}))))]
     {:groups (format-groups admin details groups)}))
 
 (defn remove-de-user
@@ -711,5 +724,5 @@
   (let [admin (config/groups-admin-user)
         id    (group-id admin {:group-type type-system :name (config/de-users-group)})]
     (http/delete (groups-url "groups" id "members" subject-id)
-                 {:query-params (query admin) :as :json})
+                 (merge request-timeouts {:query-params (query admin) :as :json}))
     nil))

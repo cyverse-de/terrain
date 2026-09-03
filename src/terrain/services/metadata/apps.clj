@@ -3,6 +3,7 @@
             [terrain.clients.grouping :as ipg]
             [terrain.clients.apps.raw :as apps-client]
             [terrain.clients.notifications :as dn]
+            [terrain.clients.subject-info :as subject-info]
             [terrain.util.email :as email]))
 
 (defn import-tools
@@ -19,7 +20,7 @@
   [body]
   (let [tool-req     (apps-client/submit-tool-request body)
         username     (string/replace (:submitted_by tool-req) #"@.*" "")
-        user-details (ipg/format-like-trellis (ipg/lookup-subject-add-empty username username))]
+        user-details (subject-info/format-like-trellis (ipg/lookup-subject-add-empty username username))]
     (email/send-tool-request-email tool-req user-details)
     tool-req))
 

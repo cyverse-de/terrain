@@ -8,9 +8,11 @@
             [terrain.clients.iplant-groups.subjects :as ipg-subjects]
             [terrain.util.config :as config]))
 
-(defn- new-backend?
+(defn new-backend?
+  "True when group operations should be routed to the Groups service. Defined here rather than
+   in terrain.clients.grouping so that both facades test the backend the same way."
   []
-  (= (config/groups-backend) "groups"))
+  (= (config/groups-backend) config/groups-backend-groups))
 
 (defn admin-user
   "The administrative account for the active group backend. Callers acting as the group

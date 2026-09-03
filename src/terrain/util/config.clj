@@ -287,11 +287,30 @@
   [props config-valid configs]
   "terrain.groups.admin-user" "de_grouper")
 
+(def groups-backend-groups
+  "The value of `terrain.groups.backend` that selects the Groups service."
+  "groups")
+
+(def groups-backend-iplant-groups
+  "The value of `terrain.groups.backend` that selects the legacy iplant-groups service."
+  "iplant-groups")
+
+(def ^:private known-groups-backends
+  #{groups-backend-groups groups-backend-iplant-groups})
+
+(defn valid-groups-backend?
+  "True if the given value names a group backend that terrain knows how to dispatch to."
+  [backend]
+  (contains? known-groups-backends backend))
+
 (declare groups-backend)
 (cc/defprop-optstr groups-backend
-  "Selects the backend used for group operations: `iplant-groups` (legacy) or `groups` (new)."
+  "Selects the backend used for group operations: `iplant-groups` (legacy) or `groups` (new).
+   The `groups` backend is only safe in an environment whose paired apps and Sonora images are
+   also deployed: community app tags name the community by ID there, and an older apps image
+   still tags by name, so a community rename against it silently orphans every app tag."
   [props config-valid configs]
-  "terrain.groups.backend" "iplant-groups")
+  "terrain.groups.backend" groups-backend-iplant-groups)
 
 (declare permissions-base)
 (cc/defprop-optstr permissions-base
@@ -740,9 +759,24 @@
 (def metadata-client
   (memoize #(metadata-client/new-metadata-client (metadata-base-url))))
 
+(defn- validate-groups-backend
+  "Marks the configuration invalid when the group backend selector names a backend that does not
+   exist. Every dispatch site tests for one specific backend, so an unrecognized or empty value
+   would otherwise select the legacy backend without any indication that it had done so."
+  []
+  (let [backend (groups-backend)]
+    (when-not (valid-groups-backend? backend)
+      (cc/record-invalid-prop
+       "terrain.groups.backend"
+       (IllegalArgumentException.
+        (str "must be one of " (string/join ", " (sort known-groups-backends))
+             ", but was '" backend "'"))
+       config-valid))))
+
 (defn- validate-config
   "Validates the configuration settings after they've been loaded."
   []
+  (validate-groups-backend)
   (when-not (cc/validate-config configs config-valid)
     (throw+ {:error_code ce/ERR_CONFIG_INVALID})))
 

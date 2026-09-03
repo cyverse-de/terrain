@@ -18,6 +18,7 @@
             [terrain.clients.grouping :as groups]
             [terrain.clients.metadata.raw :as metadata]
             [terrain.clients.notifications :as notifications]
+            [terrain.clients.subject-info :as subject-info]
             [terrain.util.config :as config]
             [terrain.util.email :as email])
   (:import [java.util Locale]))
@@ -407,7 +408,7 @@ If this dataset accompanies a paper, please contact us with the DOI for that pap
 (defn- format-requested-by
   [user {:keys [requested_by _target_id] :as permanent-id-request}]
   (if-let [user-info (groups/lookup-subject user requested_by)]
-    (assoc permanent-id-request :requested_by (groups/format-like-trellis user-info))
+    (assoc permanent-id-request :requested_by (subject-info/format-like-trellis user-info))
     permanent-id-request))
 
 (defn- format-permanent-id-request-details

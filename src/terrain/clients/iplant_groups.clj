@@ -1,6 +1,5 @@
 (ns terrain.clients.iplant-groups
   (:require [clojure.string :as string]
-            [clojure.tools.logging :as log]
             [clojure-commons.exception-util :as cxu]
             [cyverse-groups-client.core :as c]
             [medley.core :refer [remove-vals]]
@@ -8,6 +7,7 @@
             [terrain.clients.apps.raw :as apps-client]
             [terrain.clients.iplant-groups.subjects :as subjects]
             [terrain.clients.metadata.raw :as metadata-client]
+            [terrain.clients.subject-info :as subject-info]
             [terrain.util.config :as config]))
 
 (def ^:private team-group-type "group")
@@ -35,46 +35,17 @@
 (defn grouper-admin-user? [{username :id}]
   (= username (config/grouper-user)))
 
-(defn format-like-trellis
-  "Reformat an iplant-groups response to look like a trellis response."
-  [response]
-  {:username (:id response)
-   :firstname (:first_name response)
-   :lastname (:last_name response)
-   :name (:name response)
-   :email (:email response)
-   :institution (:institution response)})
-
-(defn- empty-user-info
-  "Returns an empty user-info record for the given username."
-  [username]
-  {:id username
-   :name ""
-   :first_name ""
-   :last_name ""
-   :email ""
-   :institution ""
-   :source_id ""})
-
 (defn lookup-subject
   "Uses iplant-groups's subject lookup by ID endpoint to retrieve user details."
   [user short-username]
-  (try+
-   (subjects/lookup-subject user short-username)
-   (catch [:status 404] _
-     (log/warn (str "no user info found for username '" short-username "'"))
-     nil)
-   (catch Object _
-     (log/error (:throwable &throw-context) "user lookup for '" short-username "' failed")
-     nil)))
+  (subject-info/lookup-or-nil short-username #(subjects/lookup-subject user short-username)))
 
 (defn lookup-subject-add-empty
   "Uses iplant-groups's subject lookup by ID endpoint to retrieve user details, returning an empty user info block if
    nothing is found."
   [user short-username]
-  (if-let [user-info (lookup-subject user short-username)]
-    user-info
-    (empty-user-info short-username)))
+  (or (lookup-subject user short-username)
+      (subject-info/empty-user-info short-username)))
 
 (defn- get-client []
   (c/new-cyverse-groups-client (config/ipg-base) (config/environment-name)))

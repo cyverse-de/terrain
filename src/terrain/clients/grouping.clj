@@ -5,12 +5,8 @@
    once the migration to the Groups service is complete, at which point callers can depend
    on terrain.clients.groups directly."
   (:require [terrain.clients.groups :as groups]
-            [terrain.clients.iplant-groups :as ipg]
-            [terrain.util.config :as config]))
-
-(defn- new-backend?
-  []
-  (= (config/groups-backend) "groups"))
+            [terrain.clients.grouping.subjects :refer [new-backend?]]
+            [terrain.clients.iplant-groups :as ipg]))
 
 ;; Subjects.
 
@@ -28,11 +24,6 @@
   (if (new-backend?)
     (groups/lookup-subject-add-empty user short-username)
     (ipg/lookup-subject-add-empty user short-username)))
-
-(defn format-like-trellis [response]
-  (if (new-backend?)
-    (groups/format-like-trellis response)
-    (ipg/format-like-trellis response)))
 
 (defn list-groups-for-user [subject-id details]
   (if (new-backend?)
@@ -155,8 +146,10 @@
 
 ;; The retag-apps and force-rename flags apply only to the legacy backend. Community app tags
 ;; there are AVUs whose value is the community's name, so a rename had to rewrite them or be
-;; blocked. On the Groups backend a tag names the community by ID, so a rename is a single
-;; update with nothing to rewrite and nothing to block; the flags are accepted and ignored.
+;; blocked. The paired apps image tags a community by ID instead, leaving a rename with nothing
+;; to rewrite and nothing to block, so the flags are accepted and ignored here. That is a
+;; property of the deployed apps image rather than of terrain: against an older apps image a
+;; rename silently orphans every tag, which is why terrain.groups.backend documents the pairing.
 (defn update-community [user name retag-apps? force-rename? body]
   (if (new-backend?)
     (groups/update-community user name body)

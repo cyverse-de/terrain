@@ -192,12 +192,16 @@
   (with-fake-routes-in-isolation
     (merge (cl-lookup-route)
            {{:address (groups-url "groups" "g1" "members") :query-params {:user "alice"}}
-            (json-response {:members [alice {:id "de_grouper" :name "de_grouper"}]})})
-    (let [{:keys [members]} (groups/get-collaborator-list-members "alice" "friends")]
+            (json-response {:members [alice
+                                      {:id "carol" :name "" :source_id "ldap"}
+                                      {:id "de_grouper" :name "de_grouper"}]})})
+    (let [{:keys [members]} (groups/get-collaborator-list-members "alice" "friends")
+          by-id             (into {} (map (juxt :id identity)) members)]
       (testing "members exclude the admin user and get a display_name"
-        (is (= 1 (count members)))
-        (is (= "alice" (:id (first members))))
-        (is (= "alice" (:display_name (first members))))))))
+        (is (= 2 (count members)))
+        (is (= "alice" (:display_name (get by-id "alice")))))
+      (testing "a member with a blank name falls back to its id rather than failing the listing"
+        (is (= "carol" (:display_name (get by-id "carol"))))))))
 
 (deftest add-collaborator-list-members-test
   (with-fake-routes-in-isolation
@@ -508,7 +512,9 @@
         revoked (atom nil)]
     (with-fake-routes-in-isolation
       (merge (team-lookup-route)
-             {{:address (groups-url "groups" "t1" "permissions" "user" "bob") :query-params {:user "alice"}}
+             {{:address (groups-url "groups" "t1") :query-params {:user "alice"}}
+              {:put (json-response team-group)}
+              {:address (groups-url "groups" "t1" "permissions" "user" "bob") :query-params {:user "alice"}}
               {:put (fn [req]
                       (reset! granted (:level (json/decode (slurp (:body req)) true)))
                       {:status 200 :headers {"Content-Type" "application/json"} :body "{}"})}
@@ -529,6 +535,32 @@
         (testing "a subject left with no privileges has its permission revoked"
           (is (= "GrouperAll" @revoked)))
         (is (= "admin" (:name (first (:privileges result)))))))))
+
+(deftest update-team-public-privileges-test
+  (doseq [[privileges expected-flags expected-level]
+          [[[]               {:members_public false :joinable false} nil]
+           [["view"]         {:members_public false :joinable false} "read"]
+           [["read" "optin"] {:members_public true  :joinable true}  "read"]]]
+    (let [updated (atom nil)
+          granted (atom nil)]
+      (with-fake-routes-in-isolation
+        (merge (team-lookup-route)
+               {{:address (groups-url "groups" "t1") :query-params {:user "alice"}}
+                {:put (captured-body updated team-group)}
+                {:address (groups-url "groups" "t1" "permissions" "group" "GrouperAll")
+                 :query-params {:user "alice"}}
+                {:put    (fn [req]
+                           (reset! granted (:level (json/decode (slurp (:body req)) true)))
+                           {:status 200 :headers {"Content-Type" "application/json"} :body "{}"})
+                 :delete (fn [_] {:status 200 :headers {"Content-Type" "application/json"} :body "{}"})}
+                {:address (groups-url "groups" "t1" "permissions") :query-params {:user "alice"}}
+                (json-response {:permissions []})})
+        (groups/update-team-privileges "alice" "alice:t1"
+                                       {:updates [{:subject_id "GrouperAll" :privileges privileges}]})
+        (testing (str "public privileges " privileges " rewrite the group's own public flags")
+          (is (= expected-flags (select-keys @updated [:members_public :joinable]))))
+        (testing (str "public privileges " privileges " still drive the permission grant")
+          (is (= expected-level @granted)))))))
 
 (deftest get-team-admins-test
   (with-fake-routes-in-isolation
