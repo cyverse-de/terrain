@@ -590,22 +590,46 @@
      (json-response {:groups [community-group {:id "c2" :group_type "community" :name "physics"}]})
      {:address (groups-url "groups")
       :query-params {:user "alice" :group_type "community" :member "alice" :limit 1000 :offset 0}}
-     (json-response {:groups [community-group]})}
+     (json-response {:groups [community-group]})
+     {:address (groups-url "subjects" "alice" "permissions") :query-params {:user "alice"}}
+     (json-response {:permissions [{:group_id "c1" :level "own"}]})}
     (let [{:keys [groups]} (groups/get-communities "alice" {})
           by-name (into {} (map (juxt :name identity)) groups)]
       (testing "listing reports per-user membership from one membership query"
         (is (= #{"biology" "physics"} (set (keys by-name))))
         (is (true? (:member (get by-name "biology"))))
-        (is (false? (:member (get by-name "physics"))))
-        (is (= [] (:privileges (get by-name "biology")))))
+        (is (false? (:member (get by-name "physics")))))
+      (testing "privileges come from one permissions query for the whole listing"
+        (is (= ["admin"] (:privileges (get by-name "biology"))))
+        (is (= [] (:privileges (get by-name "physics")))))
       (testing "contract group fields are synthesized"
         (is (= "group" (:type (get by-name "biology"))))))))
+
+(deftest get-communities-privilege-levels-test
+  (doseq [[level expected] {"own"   ["admin"]
+                            "admin" ["admin"]
+                            "write" ["read"]
+                            "read"  ["read"]}]
+    (testing (str "a " level " grant is reported as " (first expected))
+      (with-fake-routes-in-isolation
+        {{:address (groups-url "groups")
+          :query-params {:user "alice" :group_type "community" :limit 1000 :offset 0}}
+         (json-response {:groups [community-group]})
+         {:address (groups-url "groups")
+          :query-params {:user "alice" :group_type "community" :member "alice" :limit 1000 :offset 0}}
+         (json-response {:groups []})
+         {:address (groups-url "subjects" "alice" "permissions") :query-params {:user "alice"}}
+         (json-response {:permissions [{:group_id "c1" :level level}]})}
+        (let [{:keys [groups]} (groups/get-communities "alice" {})]
+          (is (= expected (:privileges (first groups)))))))))
 
 (deftest get-communities-for-member-test
   (with-fake-routes-in-isolation
     {{:address (groups-url "groups")
       :query-params {:user "alice" :group_type "community" :member "alice" :limit 1000 :offset 0}}
-     (json-response {:groups [community-group]})}
+     (json-response {:groups [community-group]})
+     {:address (groups-url "subjects" "alice" "permissions") :query-params {:user "alice"}}
+     (json-response {:permissions []})}
     (testing "listing a user's own communities needs no second membership query"
       (let [{:keys [groups]} (groups/get-communities "alice" {:member "alice"})]
         (is (= ["biology"] (mapv :name groups)))

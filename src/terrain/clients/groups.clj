@@ -107,6 +107,19 @@
 
 ;; The external group contract.
 
+(defn- subject-group-levels
+  "Maps group ID to the permission level the user holds on it, in one request. The service
+   folds in permissions inherited through group membership, so this agrees with what an
+   authorization check on any single group would decide."
+  [user]
+  (->> (http/get (groups-url "subjects" user "permissions")
+                 (merge request-timeouts
+                        {:query-params (query user)
+                         :as           :json}))
+       :body
+       :permissions
+       (reduce (fn [acc {:keys [group_id level]}] (assoc acc group_id level)) {})))
+
 (defn- external-name
   "The name terrain exposes for a group. Teams carry their owner as a prefix because two
    users may own teams with the same short name; no other group type is qualified."
@@ -602,9 +615,9 @@
   {:group-type type-community :name name})
 
 (defn get-communities
-  "Lists (or searches) communities, reporting whether the caller is a member of each. The
-   details flag is deliberately ignored: communities have no owner, so there is no creator
-   to build a :detail block from."
+  "Lists (or searches) communities, reporting whether the caller is a member of each and
+   which privileges it holds. The details flag is deliberately ignored: communities have no
+   owner, so there is no creator to build a :detail block from."
   [user {:keys [search member]}]
   (let [groups    (list-groups user {:group_type type-community :member member :search search})
         ;; When listing a user's own communities every result is a membership; otherwise the
@@ -612,13 +625,19 @@
         member-of (if (= user member)
                     (set (map external-name groups))
                     (set (map external-name (list-groups user {:group_type type-community
-                                                               :member     user}))))]
-    ;; :privileges is intentionally empty: the DE UI derives admin/follower status from the
-    ;; /admins and /members endpoints, and computing per-community privileges here would cost
-    ;; one permissions request per listed community.
-    {:groups (mapv #(assoc (format-group %)
-                           :member     (contains? member-of (external-name %))
-                           :privileges [])
+                                                               :member     user}))))
+        ;; Also once for the whole listing rather than once per community.
+        levels    (subject-group-levels user)]
+    {:groups (mapv (fn [group]
+                     (let [level (get levels (:id group))]
+                       (assoc (format-group group)
+                              :member     (contains? member-of (external-name group))
+                              ;; One level collapses to one privilege name, where Grouper
+                              ;; could hold several at once. That is the same collapse
+                              ;; privileges->level performs when a privilege is granted.
+                              :privileges (if level
+                                            [(level->privilege-name user level)]
+                                            []))))
                    groups)}))
 
 (defn admin-get-communities
