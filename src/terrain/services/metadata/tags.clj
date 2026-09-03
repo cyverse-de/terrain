@@ -69,7 +69,7 @@
         user     (:shortUsername user/current-user)]
     (data/validate-uuid-accessible user entry-id)
     (update-tags-targets
-     (meta/update-attached-tags entry-id (data/resolve-data-type entry-id) params body))))
+     (meta/update-attached-tags entry-id (data/resolve-data-type user entry-id) params body))))
 
 (defn list-all-attached-tags
   "Lists all of the tags attached to any filesystem entry by the authenticated user."

@@ -13,23 +13,21 @@
            :folders (map mk-fav (:folders favs)))))
 
 (defn- user-col->api-col
+  "Maps a favorites sort column onto the sort-field data-info's listing endpoint accepts. The result
+   goes out as a query parameter, so it has to be a string: clj-http renders a keyword with its
+   leading colon, which data-info then fails to coerce back into its sort-field enum."
   [col]
   (case col
-    :name         :base-name
-    :id           :full-path
-    :lastmodified :modify-ts
-    :datecreated  :create-ts
-    :size         :data-size
-    :base-name))
+    :name         "name"
+    :id           "path"
+    :lastmodified "datemodified"
+    :datecreated  "datecreated"
+    :size         "size"
+    "name"))
 
 (defn- user-order->api-order
   [order]
-  (if order
-    (case order
-      :asc  :asc
-      :desc :desc
-      :asc)
-    :asc))
+  (if (= order :desc) "DESC" "ASC"))
 
 (defn add-favorite
   "This function marks a given data item as a favorite of the authenticated user.
@@ -40,7 +38,7 @@
   [data-id]
   (let [user (:shortUsername user/current-user)]
     (data/validate-uuid-accessible user data-id)
-    (metadata/add-favorite data-id (data/resolve-data-type data-id))))
+    (metadata/add-favorite data-id (data/resolve-data-type user data-id))))
 
 (defn remove-favorite
   "This function unmarks a given data item as a favorite of the authenticated user.

@@ -1,9 +1,11 @@
 (ns terrain.services.permanent-id-requests
-  (:require [cheshire.core :as json]
+  (:require [cemerick.url :as curl]
+            [cheshire.core :as json]
             [clj-time.core :as time]
             [clojure.data.xml :as xml]
             [clojure.string :as string]
             [clojure.tools.logging :as log]
+            [clojure-commons.exception-util :as cxu]
             [clojure-commons.file-utils :as ft]
             [kameleon.uuids :refer [uuidify]]
             [org.cyverse.metadata-files.datacite-4-2 :as datacite]
@@ -17,7 +19,8 @@
             [terrain.clients.metadata.raw :as metadata]
             [terrain.clients.notifications :as notifications]
             [terrain.util.config :as config]
-            [terrain.util.email :as email]))
+            [terrain.util.email :as email])
+  (:import [java.util Locale]))
 
 ;; Status Codes.
 (def ^:private status-code-completion "Completion")
@@ -33,6 +36,14 @@ If you need to make any changes to the dataset, including the metadata, please c
 
 If this dataset accompanies a paper, please contact us with the DOI for that paper once it is published.")
 
+;; The attribute holding the dataset title. This must match the attribute name used in
+;; `org.cyverse.metadata-files.datacite-4-2.titles`.
+(def ^:private datacite-title-attr "title")
+
+;; CKAN's own bounds on a dataset name.
+(def ^:private ckan-dataset-name-min-length 2)
+(def ^:private ckan-dataset-name-max-length 100)
+
 (defn- format-staging-path
   [path]
   (ft/path-join (config/permanent-id-staging-dir) (ft/basename path)))
@@ -41,16 +52,37 @@ If this dataset accompanies a paper, please contact us with the DOI for that pap
   [path]
   (ft/path-join (config/permanent-id-publish-dir) (ft/basename path)))
 
-(defn- format-metadata-target-url
-  [path]
-  (str (ft/rm-last-slash (config/permanent-id-target-base-url)) (format-publish-path path)))
-
 (defn- find-attr-value
   [avus attr]
   (->> avus
        (filter #(= attr (:attr %)))
        first
        :value))
+
+(defn- ckan-dataset-name
+  "Derives the CKAN dataset name (the last path element of a dataset's page URL) from its title,
+   reproducing the rule used by the job that syncs curated folders into CKAN."
+  [title]
+  ;; Use Locale/ROOT so that the case conversion doesn't depend on the host's locale setting.
+  (let [dataset-name (-> (.toLowerCase (str title) Locale/ROOT)
+                         (string/replace " " "_")
+                         (string/replace #"[^\w-]" ""))
+        dataset-name (subs dataset-name 0 (min (count dataset-name) ckan-dataset-name-max-length))]
+    (when (< (count dataset-name) ckan-dataset-name-min-length)
+      (cxu/bad-request "metadata title contains too few characters"
+                       {:title        title
+                        :dataset-name dataset-name
+                        :length       (count dataset-name)
+                        :min-length   ckan-dataset-name-min-length}))
+    dataset-name))
+
+(defn- format-metadata-target-url
+  "Builds the URL the DOI resolves to: the dataset's page in the CyVerse Data Commons CKAN catalog.
+   The dataset may not exist in CKAN when the DOI is minted, so its name is derived from the same
+   title AVU the sync will derive it from rather than looked up."
+  [avus]
+  (str (curl/url (config/permanent-id-target-base-url)
+                 (ckan-dataset-name (find-attr-value avus datacite-title-attr)))))
 
 (defn- validate-datacite-metadata
   [avus]
@@ -456,8 +488,8 @@ If this dataset accompanies a paper, please contact us with the DOI for that pap
          folder-id       (uuidify (:id folder))
          metadata        (data-info/get-metadata-json user folder-id)
          avus            (format-avus metadata)
-         target-url      (format-metadata-target-url (:path folder))
          datacite-xml    (parse-valid-datacite-metadata type avus)
+         target-url      (format-metadata-target-url avus)
          doi-response    (datacite-client/create-doi datacite-xml target-url)
          identifier      (get-in doi-response [:data :id])
          publish-avus    (format-publish-avus avus identifier type)

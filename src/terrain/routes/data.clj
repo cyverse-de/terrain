@@ -5,6 +5,7 @@
             [ring.util.http-response :refer [ok]]
             [terrain.auth.user-attributes :refer [require-authentication current-user]]
             [terrain.clients.data-info :as data]
+            [terrain.clients.info-typer :as info-typer]
             [terrain.clients.saved-searches :as saved]
             [terrain.routes.schemas.filesystem :refer [SharingRequest SharingResponse UnshareRequest UnshareResponse]]
             [terrain.routes.schemas.filetypes :refer [FileType FileTypeReturn TypesList]]
@@ -37,7 +38,7 @@
        :summary "List Supported File Type Labels"
        :return TypesList
        :description "Lists the file type labels supported by the Discovery Environment."
-       (ok (data/get-type-list))))
+       (ok (info-typer/get-type-list))))
 
    (POST "/share" []
      :middleware [require-authentication]

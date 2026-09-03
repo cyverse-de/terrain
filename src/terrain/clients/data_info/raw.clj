@@ -26,24 +26,6 @@
   [& url-path]
   (str (apply url/url (cfg/data-info-base-url) url-path)))
 
-(defn- get-options
-  ([]
-   (get-options {}))
-  ([params]
-   {:query-params params
-    :as           :json})
-  ([user params]
-   (get-options (assoc params :user user))))
-
-(defn- put-options
-  ([user body]
-   (put-options user body {}))
-  ([user body params]
-   {:form-params  body
-    :query-params (assoc params :user user)
-    :content-type :json
-    :as           :json}))
-
 (defn request
   "This function makes an HTTP request to the data-info service. It uses clj-http to make the
    request."
@@ -290,6 +272,21 @@
   (request :post ["anonymizer"]
            (mk-req-map user (json/encode {:paths paths}))))
 
+(defn share
+  "Uses the data-info sharer endpoint to grant users access to sets of paths. The outcome of every
+   path is reported in the response rather than thrown, so a path that can't be shared fails only
+   its own entry."
+  [user sharing]
+  (request :post ["sharer"]
+           (mk-req-map user (json/encode {:sharing sharing}))))
+
+(defn unshare
+  "Uses the data-info unsharer endpoint to revoke users' access to sets of paths, reporting the
+   outcome per path the way share does."
+  [user unshare]
+  (request :post ["unsharer"]
+           (mk-req-map user (json/encode {:unshare unshare}))))
+
 ;; TICKETS
 
 (defn list-tickets
@@ -345,16 +342,18 @@
   (request :post ["existence-marker"]
            (mk-req-map user (json/encode {:paths paths}))))
 
-(defn get-type-list
-  "Uses the data-info file-types endpoint to produce a list of acceptable types."
-  []
-  (:body (http/get (data-info-url "file-types") (get-options))))
+(defn check-creatability
+  "Uses the data-info creatability-marker endpoint to determine whether a folder could be created at
+   each of a set of paths."
+  [user paths]
+  (request :post ["creatability-marker"]
+           (mk-req-map user (json/encode {:paths paths}))))
 
-(defn set-file-type
-  "Uses the data-info set-type endpoint to change the type of a file."
-  [user path-uuid type]
-  (:body (http/put (data-info-url "data" path-uuid "type")
-                   (put-options user {:type type}))))
+(defn list-stats-by-ids
+  "Uses the data-info stat-lister endpoint to gather a page of stat information for a set of data ids."
+  [user ids params]
+  (request :post ["stat-lister"]
+           (mk-req-map user (json/encode {:ids ids}) (remove-vals nil? params))))
 
 (defn path-list-creator
   "Uses the data-info path-list-creator endpoint to create an HT Path List files for a set of file/folder paths."

@@ -7,7 +7,6 @@
             [common-cli.core :as ccli]
             [me.raynes.fs :as fs]
             [terrain.middleware :refer [wrap-fake-user]]
-            [terrain.services.filesystem.icat :as icat]
             [terrain.util.config :as config]
             [terrain.util.jetty :as jetty]
             [service-logging.thread-context :as tc]))
@@ -50,14 +49,12 @@
   "This function is used by leiningen ring plugin to initialize terrain."
   []
   (load-configuration-from-file)
-  (icat/configure-icat)
   (start-nrepl))
 
 (defn repl-init
   "This function is used to manually initialize terrain from the leiningen REPL."
   []
-  (load-configuration-from-file)
-  (icat/configure-icat))
+  (load-configuration-from-file))
 
 (defn cli-options
   []
@@ -112,5 +109,4 @@
     (let [{:keys [options]} (ccli/handle-args svc-info args cli-options)]
       (load-config (:config options))
       (http/with-connection-pool {:timeout 5 :threads 10 :insecure? false :default-per-route 10}
-        (icat/configure-icat)
         (run-jetty (get-port options) (:fake-user options))))))
