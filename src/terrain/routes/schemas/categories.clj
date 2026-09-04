@@ -1,7 +1,6 @@
 (ns terrain.routes.schemas.categories
   (:require [common-swagger-api.schema :refer [describe SortFieldOptionalKey SortFieldDocs]]
             [common-swagger-api.schema.apps :as apps-schema]
-            [common-swagger-api.schema.apps.categories :as categories-schema]
             [schema.core :refer [defschema enum]]))
 
 ;; Convert the keywords in AppListingValidSortFields to strings,
@@ -13,8 +12,4 @@
 
 (defschema AppListingPagingParams
   (merge apps-schema/AppListingPagingParams
-         AppListingValidSortFieldStrings))
-
-(defschema OntologyAppListingPagingParams
-  (merge categories-schema/OntologyAppListingPagingParams
          AppListingValidSortFieldStrings))

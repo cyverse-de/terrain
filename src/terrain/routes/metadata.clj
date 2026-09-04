@@ -57,43 +57,6 @@
    (PATCH "/apps/categories/:system-id/:category-id" [system-id category-id :as {:keys [body]}]
      (service/success-response (apps/update-category system-id category-id body)))))
 
-(defn admin-ontology-routes
-  []
-  (optional-routes
-   [#(and (config/admin-routes-enabled)
-          (config/app-routes-enabled)
-          (config/metadata-routes-enabled))]
-
-   (GET "/ontologies" []
-     (service/success-response (apps/list-ontologies)))
-
-   (POST "/ontologies" [:as request]
-     (service/success-response (metadata/upload-ontology request)))
-
-   (DELETE "/ontologies/:ontology-version" [ontology-version]
-     (service/success-response (apps/delete-ontology ontology-version)))
-
-   (GET "/ontologies/:ontology-version" [ontology-version]
-     (service/success-response (metadata-client/get-ontology-hierarchies ontology-version)))
-
-   (POST "/ontologies/:ontology-version" [ontology-version]
-     (service/success-response (apps/set-ontology-version ontology-version)))
-
-   (DELETE "/ontologies/:ontology-version/:root-iri" [ontology-version root-iri]
-     (service/success-response (metadata-client/delete-app-category-hierarchy ontology-version root-iri)))
-
-   (GET "/ontologies/:ontology-version/:root-iri" [ontology-version root-iri :as {params :params}]
-     (service/success-response (apps/get-app-category-hierarchy ontology-version root-iri params)))
-
-   (PUT "/ontologies/:ontology-version/:root-iri" [ontology-version root-iri]
-     (service/success-response (metadata-client/save-ontology-hierarchy ontology-version root-iri)))
-
-   (GET "/ontologies/:ontology-version/:root-iri/apps" [ontology-version root-iri :as {params :params}]
-     (service/success-response (apps/get-hierarchy-app-listing ontology-version root-iri params)))
-
-   (GET "/ontologies/:ontology-version/:root-iri/unclassified" [ontology-version root-iri :as {params :params}]
-     (service/success-response (apps/get-unclassified-app-listing ontology-version root-iri params)))))
-
 (defn admin-app-community-routes
   []
   (optional-routes

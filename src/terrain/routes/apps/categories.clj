@@ -4,19 +4,15 @@
             [common-swagger-api.schema.apps :as apps-schema]
             [common-swagger-api.schema.apps.categories :as schema]
             [common-swagger-api.schema.apps.pipeline]
-            [common-swagger-api.schema.ontologies :refer [OntologyClassIRIParam
-                                                          OntologyHierarchy
-                                                          OntologyHierarchyFilterParams
-                                                          OntologyHierarchyList]]
             [ring.util.http-response :refer [ok]]
             [terrain.auth.user-attributes :refer [require-authentication]]
             [terrain.clients.apps.raw :as apps]
-            [terrain.routes.schemas.categories :refer [AppListingPagingParams OntologyAppListingPagingParams]]
+            [terrain.routes.schemas.categories :refer [AppListingPagingParams]]
             [terrain.util :refer [optional-routes]]
             [terrain.util.config :as config]))
 
 ;; Declarations for path and query parameter bindings to avoid lint warnings.
-(declare params system-id category-id root-iri community-id)
+(declare params system-id category-id community-id)
 
 (defn app-category-routes
   []
@@ -51,49 +47,6 @@
        :description schema/AppCategoryAppListingDocs
        (ok (apps/apps-in-category system-id category-id params))))))
 
-(defn app-ontology-routes
-  []
-  (optional-routes
-   [#(and (config/app-routes-enabled)
-          (config/metadata-routes-enabled))]
-
-   (context "/apps/hierarchies" []
-     :tags ["app-hierarchies"]
-
-     (GET "/" []
-       :middleware [require-authentication]
-       :return OntologyHierarchyList
-       :summary schema/AppHierarchiesListingSummary
-       :description schema/AppHierarchiesListingDocs
-       (ok (apps/get-app-category-hierarchies)))
-
-     (context "/:root-iri" []
-       :path-params [root-iri :- OntologyClassIRIParam]
-
-       (GET "/" []
-         :middleware [require-authentication]
-         :query [params OntologyHierarchyFilterParams]
-         :return OntologyHierarchy
-         :summary schema/AppCategoryHierarchyListingSummary
-         :description schema/AppCategoryHierarchyListingDocs
-         (ok (apps/get-app-category-hierarchy root-iri params)))
-
-       (GET "/apps" []
-         :middleware [require-authentication]
-         :query [params OntologyAppListingPagingParams]
-         :return apps-schema/AppListing
-         :summary schema/AppCategoryAppListingSummary
-         :description schema/AppHierarchyAppListingDocs
-         (ok (apps/get-hierarchy-app-listing root-iri params)))
-
-       (GET "/unclassified" []
-         :middleware [require-authentication]
-         :query [params OntologyAppListingPagingParams]
-         :return apps-schema/AppListing
-         :summary schema/AppHierarchyUnclassifiedListingSummary
-         :description schema/AppHierarchyUnclassifiedListingDocs
-         (ok (apps/get-unclassified-app-listing root-iri params)))))))
-
 (defn app-community-routes
   []
   (optional-routes
@@ -110,4 +63,4 @@
        :return apps-schema/AppListing
        :summary schema/AppCommunityAppListingSummary
        :description schema/AppCommunityAppListingDocs
-       (ok (apps/apps-in-community community-id))))))
+       (ok (apps/apps-in-community community-id params))))))

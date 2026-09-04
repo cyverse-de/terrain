@@ -8,16 +8,11 @@
 
 (def apps-sort-params [:limit :offset :sort-field :sort-dir :app-type])
 (def base-search-params (conj apps-sort-params :search))
-(def apps-hierarchy-sort-params (conj apps-sort-params :attr))
 (def tools-search-params (conj base-search-params :include-hidden :public))
 
 (defn- apps-url
   [& components]
   (str (apply curl/url (config/apps-base-url) components)))
-
-(defn- apps-url-encoded
-  [& components]
-  (str (apply curl/url (config/apps-base-url) (map curl/url-encode components))))
 
 (defn get-all-workflow-elements
   [params]
@@ -34,74 +29,6 @@
                (disable-redirects
                 {:query-params (secured-params params)
                  :as           :json}))))
-
-(defn list-ontologies
-  []
-  (client/get (apps-url "admin" "ontologies")
-              (disable-redirects
-               {:query-params (secured-params)
-                :as           :stream})))
-
-(defn delete-ontology
-  [ontology-version]
-  (client/delete (apps-url-encoded "admin" "ontologies" ontology-version)
-                 (disable-redirects
-                  {:query-params (secured-params)
-                   :as           :stream})))
-
-(defn set-ontology-version
-  [ontology-version]
-  (client/post (apps-url-encoded "admin" "ontologies" ontology-version)
-               (disable-redirects
-                {:query-params (secured-params)
-                 :as           :stream})))
-
-(defn get-app-category-hierarchy
-  ([ontology-version root-iri params]
-   (client/get (apps-url-encoded "admin" "ontologies" ontology-version root-iri)
-               (disable-redirects
-                {:query-params (secured-params params [:attr])
-                 :as           :stream})))
-  ([root-iri params]
-   (:body
-    (client/get (apps-url-encoded "apps" "hierarchies" root-iri)
-                (disable-redirects
-                 {:query-params (secured-params params [:attr])
-                  :as           :json})))))
-
-(defn get-app-category-hierarchies
-  []
-  (:body
-   (client/get (apps-url "apps" "hierarchies")
-               (disable-redirects
-                {:query-params (secured-params)
-                 :as           :json}))))
-
-(defn get-hierarchy-app-listing
-  ([ontology-version root-iri params]
-   (client/get (apps-url-encoded "admin" "ontologies" ontology-version root-iri "apps")
-               (disable-redirects
-                {:query-params (secured-params params apps-hierarchy-sort-params)
-                 :as           :stream})))
-  ([root-iri params]
-   (:body
-    (client/get (apps-url-encoded "apps" "hierarchies" root-iri "apps")
-                (disable-redirects
-                 {:query-params (secured-params params apps-hierarchy-sort-params)
-                  :as           :json})))))
-
-(defn get-unclassified-app-listing
-  ([ontology-version root-iri params]
-   (client/get (apps-url-encoded "admin" "ontologies" ontology-version root-iri "unclassified")
-               (disable-redirects
-                {:query-params (secured-params params apps-hierarchy-sort-params)
-                 :as           :stream})))
-  ([root-iri params]
-   (:body
-    (client/get (apps-url-encoded "apps" "hierarchies" root-iri "unclassified")
-                (disable-redirects
-                 {:query-params (secured-params params apps-hierarchy-sort-params)
-                  :as           :json})))))
 
 (defn get-app-categories
   [params]
@@ -128,11 +55,11 @@
                  :as           :json}))))
 
 (defn apps-in-community
-  [community-id]
+  [community-id params]
   (:body
    (client/get (apps-url "apps" "communities" community-id "apps")
                (disable-redirects
-                {:query-params (secured-params)
+                {:query-params (secured-params params)
                  :as           :json}))))
 
 (defn admin-get-apps-in-community

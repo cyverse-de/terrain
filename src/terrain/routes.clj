@@ -23,8 +23,7 @@
    [terrain.routes.apps.admin.tools :refer [admin-tool-request-routes
                                             admin-tool-routes]]
    [terrain.routes.apps.categories :refer [app-category-routes
-                                           app-community-routes
-                                           app-ontology-routes]]
+                                           app-community-routes]]
    [terrain.routes.apps.communities :refer [app-community-tag-routes]]
    [terrain.routes.apps.elements :refer [app-elements-routes]]
    [terrain.routes.apps.metadata :refer [app-avu-routes]]
@@ -64,7 +63,6 @@
                                     admin-app-community-routes
                                     admin-category-routes
                                     admin-integration-data-routes
-                                    admin-ontology-routes
                                     admin-workspace-routes apps-routes
                                     misc-metadata-routes]]
    [terrain.routes.misc :refer [unsecured-misc-routes]]
@@ -124,7 +122,6 @@
    (app-category-routes)
    (app-avu-routes)
    (app-comment-routes)
-   (app-ontology-routes)
    (app-community-routes)
    (app-community-tag-routes)
    (app-elements-routes)
@@ -202,7 +199,6 @@
    (admin-filesystem-metadata-routes)
    (admin-groups-routes)
    (admin-instant-launch-routes)
-   (admin-ontology-routes)
    (admin-reference-genomes-routes)
    (admin-tool-routes)
    (admin-tool-request-routes)
