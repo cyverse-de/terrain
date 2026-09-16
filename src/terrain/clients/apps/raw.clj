@@ -1099,6 +1099,14 @@
                 {:query-params (secured-params)
                  :as           :json}))))
 
+(defn list-resource-presets
+  []
+  (:body
+   (client/get (apps-url "resource-presets")
+               (disable-redirects
+                {:query-params (secured-params)
+                 :as           :json}))))
+
 (defn create-private-tool
   [body]
   (:body
@@ -1409,3 +1417,55 @@
                        {:form-params  body
                         :content-type :json
                         :as           :json}))))
+
+(defn admin-list-resource-presets
+  []
+  (:body
+   (client/get (apps-url "admin" "resource-presets")
+               (disable-redirects
+                {:query-params (secured-params)
+                 :as           :json}))))
+
+(defn admin-create-resource-preset
+  [body]
+  (:body
+   (client/post (apps-url "admin" "resource-presets")
+                (disable-redirects
+                 {:query-params (secured-params)
+                  :form-params  body
+                  :content-type :json
+                  :as           :json}))))
+
+(defn admin-get-resource-preset
+  [preset-id]
+  (:body
+   (client/get (apps-url "admin" "resource-presets" preset-id)
+               (disable-redirects
+                {:query-params (secured-params)
+                 :as           :json}))))
+
+(defn admin-update-resource-preset
+  [preset-id body]
+  (:body
+   (client/patch (apps-url "admin" "resource-presets" preset-id)
+                 (disable-redirects
+                  {:query-params (secured-params)
+                   :form-params  body
+                   :content-type :json
+                   :as           :json}))))
+
+(defn admin-delete-resource-preset
+  [preset-id]
+  (:body
+   (client/delete (apps-url "admin" "resource-presets" preset-id)
+                  (disable-redirects
+                   {:query-params (secured-params)
+                    :as           :json}))))
+
+(defn admin-set-default-resource-preset
+  [preset-id]
+  (:body
+   (client/put (apps-url "admin" "resource-presets" preset-id "default")
+               (disable-redirects
+                {:query-params (secured-params)
+                 :as           :json}))))

@@ -20,6 +20,8 @@
    [terrain.routes.analyses :refer [analysis-routes quicklaunch-routes]]
    [terrain.routes.apps.admin.apps :refer [admin-apps-routes]]
    [terrain.routes.apps.admin.reference-genomes :refer [admin-reference-genomes-routes]]
+   [terrain.routes.apps.admin.resource-presets :refer [admin-resource-preset-routes
+                                                       resource-preset-routes]]
    [terrain.routes.apps.admin.tools :refer [admin-tool-request-routes
                                             admin-tool-routes]]
    [terrain.routes.apps.categories :refer [app-category-routes
@@ -145,6 +147,7 @@
    (subject-routes)
    (reference-genomes-routes)
    (gpu-models-routes)
+   (resource-preset-routes)
    (tool-routes)
    (tool-request-routes)
    (permanent-id-request-routes)
@@ -200,6 +203,7 @@
    (admin-groups-routes)
    (admin-instant-launch-routes)
    (admin-reference-genomes-routes)
+   (admin-resource-preset-routes)
    (admin-tool-routes)
    (admin-tool-request-routes)
    (admin-permanent-id-request-routes)
@@ -313,6 +317,7 @@
                                      {:name "admin-permanent-id-requests", :description "Admin Permanent ID Request Endpoints"}
                                      {:name "admin-qms", :description "Admin Quota Management Service Endpoints"}
                                      {:name "admin-reference-genomes", :description "Admin Reference Genome Endpoints"}
+                                     {:name "admin-resource-presets", :description "Admin Resource Preset Endpoints"}
                                      {:name "admin-request-types", :description "Admin Request Type Endpoints"}
                                      {:name "admin-requests", :description "Admin Request Endpoints"}
                                      {:name "admin-resource-usage", :description "Resource Usage Administration Endpoints"}
@@ -358,6 +363,7 @@
                                      {:name "teams", :description "Team Endpoints"}
                                      {:name "tools", :description "Tool Endpoints"}
                                      {:name "gpu-models", :description "GPU Model Configuration Endpoints"}
+                                     {:name "resource-presets", :description "Resource Preset Endpoints"}
                                      {:name "tool-requests", :description "Tool Request Endpoints"}
                                      {:name "token", :description "OAuth Tokens"}
                                      {:name "user-info", :description "User Information Endpoints"}
