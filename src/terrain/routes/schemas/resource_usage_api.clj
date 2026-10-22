@@ -16,6 +16,15 @@
    :effective_end   (describe String "The end date for the time range during which the total is applicable ")
    :last_modified   (describe String "The date the record in the database was last modified")})
 
+(defschema GPUHoursTotal
+  {:id              (describe String "The UUID assigned to the total")
+   :user_id         (describe String "The UUID assigned to the user the total applies to")
+   :username        (describe String "The username of the user the total applies to")
+   :total           (describe String "The total number of GPU hours that the user has consumed")
+   :effective_start (describe String "The start date for the time range during which the total is applicable")
+   :effective_end   (describe String "The end date for the time range during which the total is applicable")
+   :last_modified   (describe String "The date the record in the database was last modified")})
+
 (defschema APIError
   {:field      (describe String "The top-level JSON field whose generation caused the error to occur")
    :message    (describe String "The error message")
@@ -79,6 +88,7 @@
 
 (defschema ResourceSummary
   {:cpu_usage     (describe CPUHoursTotal "The object containing the CPU hours total")
+   :gpu_usage     (describe GPUHoursTotal "The object containing the GPU hours total")
    :data_usage    (describe UserCurrentDataTotal "The object containing the data usage total")
    :subscription  (describe SubscriptionSummary "The user's subscription")
    :errors        (describe [APIError] "The list of errors generated during summary creation")})
