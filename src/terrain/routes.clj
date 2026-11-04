@@ -82,7 +82,7 @@
    [terrain.routes.resource-usage-api :refer [resource-usage-api-routes]]
    [terrain.routes.search :refer [secured-search-routes]]
    [terrain.routes.session :refer [secured-session-routes]]
-   [terrain.routes.settings :refer [admin-setting-routes]]
+   [terrain.routes.settings :refer [admin-setting-routes service-account-setting-routes]]
    [terrain.routes.tags :refer [secured-tag-routes]]
    [terrain.routes.token :refer [admin-token-routes token-routes]]
    [terrain.routes.user-info :refer [admin-user-info-routes
@@ -222,6 +222,7 @@
   []
   (util/flagged-routes
    (service-account-qms-api-routes)
+   (service-account-setting-routes)
    (service-account-email-routes)
    (service-account-user-info-routes)
    (route/not-found (service/unrecognized-path-response))))

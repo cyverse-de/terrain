@@ -2,6 +2,7 @@
   (:require [common-swagger-api.schema :refer [context GET PUT DELETE]]
             [common-swagger-api.schema.analyses :as analyses-schema]
             [ring.util.http-response :refer [ok]]
+            [terrain.auth.user-attributes :refer [require-service-account]]
             [terrain.clients.analyses :as ac]
             [terrain.util :refer [optional-routes]]
             [terrain.util.config :as config]))
@@ -47,3 +48,32 @@
            :return analyses-schema/ConcurrentJobLimit
            :description analyses-schema/ConcurrentJobLimitRemovalDescription
            (ok (ac/remove-concurrent-job-limit username))))))))
+
+(defn service-account-setting-routes
+  "Service-account routes for managing settings."
+  []
+  (optional-routes
+   [config/setting-routes-enabled]
+
+   (context "/settings" []
+     :tags ["service-account-settings"]
+
+     (context "/concurrent-job-limits" []
+
+       (context "/:username" []
+         :path-params [username :- analyses-schema/ConcurrentJobLimitUsername]
+
+         (GET "/" []
+           :middleware [[require-service-account ["cyverse-subscription-updater"]]]
+           :summary analyses-schema/ConcurrentJobLimitRetrievalSummary
+           :return analyses-schema/ConcurrentJobLimit
+           :description analyses-schema/ConcurrentJobLimitRetrievalDescription
+           (ok (ac/get-concurrent-job-limit username)))
+
+         (PUT "/" []
+           :middleware [[require-service-account ["cyverse-subscription-updater"]]]
+           :summary analyses-schema/ConcurrentJobLimitUpdateSummary
+           :body [body analyses-schema/ConcurrentJobLimitUpdate]
+           :return analyses-schema/ConcurrentJobLimit
+           :description analyses-schema/ConcurrentJobLimitUpdateDescription
+           (ok (ac/set-concurrent-job-limit username (:concurrent_jobs body)))))))))
